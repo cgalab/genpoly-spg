@@ -1,3 +1,5 @@
+#include "points.h"
+
 #ifndef __INITS_H_
 #define __INITS_H_
 

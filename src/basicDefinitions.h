@@ -1,6 +1,9 @@
 #ifndef __BASIC_DEFINITIONS_H_
 #define __BASIC_DEFINITIONS_H_
 
+// largest number a double can take that works with ++/-- operation.
+#define DBL_MAX_ITER_INT 9007199254740992
+
 // return errors
 enum error {
   SUCCESS = 0,
@@ -31,7 +34,19 @@ enum out_format_t {
 // the input format of the point set.
 enum in_format_t {
   IF_UNDEFINED,
-  IF_POINTS
+  IF_POINTS,
+  IF_POLY,
+  IF_COMP
+};
+
+enum point_format_t {
+  PF_UNDEFINED,
+  PF_SIGNED_INT,
+  PF_UNSIGNED_INT,
+  PF_FLOAT,
+  PF_DOUBLE,
+  PF_LONG_DOUBLE,
+  PF_BIG
 };
 
 #endif

@@ -1,7 +1,13 @@
 #include <iostream> // for endl
 #include <getopt.h> // for parsing command line arguments
 #include "string.h"
+#include <vector>
 #include "basicDefinitions.h"
+#include "points.h"
+
+/*
+  Functions that deal with possible errors in the command line argument parsing
+*/
 
 enum error inFileInit(char *inFile, char *optarg) {
   enum error returnValue = SUCCESS;
@@ -52,7 +58,9 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 
 enum error ifInit(enum in_format_t *inFormat, char *optarg) {
   enum error returnValue = SUCCESS;
-  if(strcmp(optarg,"points") == 0) *inFormat = IF_POINTS;
+       if (strcmp(optarg,"points") == 0) *inFormat = IF_POINTS;
+  else if (strcmp(optarg,"poly") == 0) *inFormat = IF_POLY;
+  else if (strcmp(optarg,"comp") == 0) *inFormat = IF_COMP;
   else {
     *inFormat = IF_UNDEFINED;
     std::cerr << "Error:  --informat input incorrect.  Input: '" << optarg << "', should be 'points', 'json', or 'comp'." << std::endl;

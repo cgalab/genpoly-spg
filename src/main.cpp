@@ -4,9 +4,12 @@
 
 #include <time.h> // for time measurements
 #include <iostream> // for endl
+#include <vector>
 #include "string.h" // for strcpy
 #include "basicDefinitions.h"
 #include "inits.h"
+#include "points.h"
+#include "io.h"
 
 int main(int argc, char *argv[]) {
   // final return value
@@ -21,12 +24,23 @@ int main(int argc, char *argv[]) {
   enum in_format_t inFormat = IF_UNDEFINED;
   enum out_format_t outFormat = OF_UNDEFINED;
 
+  // parse command line arguments
   returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat);
   if (returnValue == SUCCESS) {
-    std::cout << "all good to go" << std::endl;
+    //std::cout << "all good to go" << std::endl;
+
+    std::vector<Point> points;
+
+    returnValue = readInFile(inFile, inFormat, &points);
+    if(returnValue == SUCCESS) {
+      pdisplay(points);
+
+      // points are inside a vector.  Now do some calculations on them
+      
+
+
+    }
   }
-
-
 
   //begin = clock();
   //end = clock();

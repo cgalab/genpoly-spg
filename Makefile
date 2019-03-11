@@ -6,7 +6,7 @@ WFLAGS = -Wall -Wextra -Werror
 _DEP = %.cpp
 DEP = $(patsubst %,$(SDIR)/%,$(_DEP))
 
-_OBJ = main.o inits.o
+_OBJ = main.o inits.o points.o io.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 .PHONY: all
