@@ -10,39 +10,41 @@ DEP = $(patsubst %, $(SDIR)/%, $(_DEP))
 _OBJ = main.o inits.o io.o
 OBJ = $(patsubst %, $(ODIR)/%, $(_OBJ))
 
-_UTIL = points.o
+_UTIL = points.cpp
 UTIL = $(patsubst %, $(UDIR)/%, $(_UTIL))
 
+_UOBJ = points.o
 UODIR = $(patsubst %, $(UDIR)/%, $(ODIR))
+UOBJ = $(patsubst %, $(UODIR)/%, $(_UOBJ))
+
+_INCLUDES = basicDefinitions.h
+INCLUDES =$(patsubst %, $(UDIR)/%, $(_INCLUDES))
 
 MKDIR_P = mkdir -p
 
 .PHONY: all
-all: dirs dirs1 util spg
+all: dirs spg
 
 .PHONY: dirs
-dirs: $(ODIR)
-$(info    ODIR is $(ODIR))
+dirs: $(ODIR) $(UODIR)
+
 $(ODIR):
 	$(MKDIR_P) $(ODIR)
 
-.PHONY: dirs1
-dirs1: $(UODIR)
-$(info    UODIR is $(UODIR))
 $(UODIR):
 	$(MKDIR_P) $(UODIR)
 
-obj/%.o: src/%.cpp $(DEP)
+$(UODIR)/%.o: $(UTIL)
 	$(PP) -c -o $@ $< $(WFLAGS)
 
-util: $(UTIL)
-	$(PP) -o $@ $^ $(WFLAGS)
+obj/%.o: $(DEP)
+	$(PP) -c -o $@ $< $(WFLAGS)
 
-spg: $(OBJ)
+spg: $(OBJ) $(UOBJ) $(INCLUDES)
 	$(PP) -o $@ $^ $(WFLAGS)
 
 
 .PHONY: clean
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+	rm -f $(ODIR)/*.o $(UODIR)/*.o $(UDIR)/*.o *~ core $(INCDIR)/*~ 
 
