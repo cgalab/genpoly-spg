@@ -35,8 +35,9 @@ int main(int argc, char *argv[]) {
     if(returnValue == SUCCESS) {
       pdisplay(points);
 
-      // points are inside a vector.  Now do some calculations on them
+      // points are inside a vector. Create a polygon
       
+
 
 
     }

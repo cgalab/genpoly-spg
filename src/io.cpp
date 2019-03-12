@@ -18,6 +18,7 @@ enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *poi
       if(aLine[0] == '#') continue; // ignore lines beginning with #
 
       // Should I do regex matching instead of this ?
+      // It would catch any errors when the format of the file doesn't match the command line argument for inFormat
       switch (inFormat) {
         case IF_POINTS:  // each line has only "x y" on it
           sscanf(aLine,"%lf %lf",&x,&y);
