@@ -1,50 +1,35 @@
 PP = g++
+
 SDIR = src
-UDIR = ../util
 ODIR = obj
-WFLAGS = -Wall -Wextra -Werror
+IDIR = includes
 
-_DEP = %.cpp
-DEP = $(patsubst %, $(SDIR)/%, $(_DEP))
+SRC := $(wildcard $(SDIR)/*.cpp)
+OBJ := $(patsubst $(SDIR)/%.cpp, $(ODIR)/%.o, $(SRC))
 
-_OBJ = main.o inits.o io.o
-OBJ = $(patsubst %, $(ODIR)/%, $(_OBJ))
+USDIR := ../util/src
+UIDIR := ../util/includes
+UODIR := ../util/obj
 
-_UTIL = points.cpp
-UTIL = $(patsubst %, $(UDIR)/%, $(_UTIL))
+USRC := $(wildcard $(USDIR)/*.cpp)
+UOBJ := $(patsubst $(USDIR)/%.cpp, $(UODIR)/%.o, $(USRC))
 
-_UOBJ = points.o
-UODIR = $(patsubst %, $(UDIR)/%, $(ODIR))
-UOBJ = $(patsubst %, $(UODIR)/%, $(_UOBJ))
+all: dir $(UOBJ) $(OBJ)
+	$(PP) $(OBJ) $(UOBJ) -o app
 
-_INCLUDES = basicDefinitions.h
-INCLUDES =$(patsubst %, $(UDIR)/%, $(_INCLUDES))
-
-MKDIR_P = mkdir -p
-
-.PHONY: all
-all: dirs spg
-
-.PHONY: dirs
-dirs: $(ODIR) $(UODIR)
-
-$(ODIR):
-	$(MKDIR_P) $(ODIR)
-
-$(UODIR):
-	$(MKDIR_P) $(UODIR)
-
-$(UODIR)/%.o: $(UTIL)
-	$(PP) -c -o $@ $< $(WFLAGS)
-
-obj/%.o: $(DEP)
-	$(PP) -c -o $@ $< $(WFLAGS)
-
-spg: $(OBJ) $(UOBJ) $(INCLUDES)
-	$(PP) -o $@ $^ $(WFLAGS)
+dir:
+	$(info   OBJECTS is $(OBJ))
+	mkdir -p $(ODIR)
+	mkdir -p $(UODIR)
 
 
-.PHONY: clean
+$(UODIR)/%.o: $(USDIR)/%.cpp
+	$(PP) -I$(UIDIR) -c $< -o $@
+
+$(ODIR)/%.o: $(SDIR)/%.cpp
+	$(PP) -I$(UIDIR) -I$(IDIR) -c $< -o $@
+
 clean:
-	rm -f $(ODIR)/*.o $(UODIR)/*.o $(UDIR)/*.o *~ core $(INCDIR)/*~ 
 
+	rm -f app $(ODIR)/*.o $(UODIR)/*.o
+	rm -f -d $(ODIR) $(UODIR)
