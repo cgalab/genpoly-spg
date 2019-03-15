@@ -1,0 +1,9 @@
+for n points:
+- start with polygon of sqrt(n) points
+- do maybe n random translations
+- compute Voronoi diagram of edges
+- insert sqrt(n) points into each edge
+- for each edge:
+	- do maybe n translation of points of the edge
+	- additional translation condition: each point must stay in the Voronoi region of the edge
+	=> intersections with edges of other Voronoi regions are avoided
