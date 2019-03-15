@@ -17,8 +17,10 @@ UOBJ := $(patsubst $(USDIR)/%.cpp, $(UODIR)/%.o, $(USRC))
 all: dir $(UOBJ) $(OBJ)
 	$(PP) $(OBJ) $(UOBJ) -o app
 
+all_win: $(UOBJ) $(OBJ)
+	$(PP) $(OBJ) $(UOBJ) -o app
+
 dir:
-	$(info   OBJECTS is $(OBJ))
 	mkdir -p $(ODIR)
 	mkdir -p $(UODIR)
 

@@ -1,4 +1,5 @@
 #include <iostream> // for endl
+#include <vector>
 
 #ifndef __POINTS_H_
 #define __POINTS_H_
@@ -14,8 +15,8 @@ public:
   void set(double X, double Y, unsigned int I) { x = X; y = Y; i = I; }
 
   friend std::ostream& operator<<(std::ostream& os, const Point& p) {
-  os << "x: " << p.x << ", y: " << p.y << ", i:" << p.i;
-  return os;
+    os << "x: " << p.x << ", y: " << p.y << ", i:" << p.i;
+    return os;
   };
 
 };

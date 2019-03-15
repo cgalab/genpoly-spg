@@ -1,5 +1,3 @@
-#include <vector>
-#include <iostream> // for endl
 #include "points.h"
 
 // simple function to display points in a Point vector.
