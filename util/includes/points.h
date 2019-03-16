@@ -13,6 +13,7 @@ public:
   Point() {x = 0; y = 0; i = 0;}
   Point(double X, double Y, unsigned int I) { x = X; y = Y; i = I; }
   void set(double X, double Y, unsigned int I) { x = X; y = Y; i = I; }
+  void set(double X, double Y) { x = X; y = Y; }
 
   friend std::ostream& operator<<(std::ostream& os, const Point& p) {
     os << "x: " << p.x << ", y: " << p.y << ", i:" << p.i;

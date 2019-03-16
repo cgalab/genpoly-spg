@@ -11,6 +11,7 @@ class Polygon{
 
     void addVertex(Point p){ vertices.push_back(p);}
     int getNumberOfVertices(){ return vertices.size();}
+    Point getVertex(int i){ return vertices[i]; }
 
 };
 
