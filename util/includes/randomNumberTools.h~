@@ -1,0 +1,3 @@
+
+
+int getRandomIndex(int n);

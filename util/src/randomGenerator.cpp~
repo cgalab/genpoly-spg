@@ -1,0 +1,6 @@
+#include "randomNumberTools.h"
+
+// produces uniform distributed integer 0 <= i < n as index for a polygon vertex
+int getRandomIndex(int n){
+	
+}
