@@ -4,7 +4,7 @@ Polygon* generateRectangularPolygon(int n, enum RPShapes type){
 	int i;
 	double min, max;
 	Point* v;
-	Polygon* p = new Polygon;
+	Polygon* p = new Polygon(n);
 
 	if(type == RPShapes::RPS_FLAT){
 		// number of points must be even to generate two parallel lines
@@ -19,12 +19,12 @@ Polygon* generateRectangularPolygon(int n, enum RPShapes type){
 
 		for(i = 0; i < n / 2; i++){
 			v = new Point(min + i, -1, i);
-			(*p).addVertex(*v);
+			(*p).addVertex(v);
 		}
 
 		for(i = 0; i < n / 2; i++){
 			v = new Point(max - i, 1, i);
-			(*p).addVertex(*v);
+			(*p).addVertex(v);
 		}
 
 	}else if(type == RPShapes::RPS_QUADRATIC){
