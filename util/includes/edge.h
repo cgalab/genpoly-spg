@@ -53,7 +53,6 @@ public:
 };
 
 
-enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg);
 void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points);
 void lexSort(std::vector<unsigned int>& lex, std::vector<Point>& points);
 bool checkIntersection(const Edge e1, const Edge e2);

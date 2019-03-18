@@ -4,26 +4,6 @@
 #include "edge.h"
 #include "point.h"
 #include "random.h"
-#include "opt2.h"
-
-enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg) {
-  enum error returnValue;
-  switch(alg) {
-    case A_UNDEFINED:
-      returnValue = ALGORITHM_UNDEFINED;
-      break;
-    case A_IDLE:
-      returnValue = ALGORITHM_IDLE;
-      break;
-    case A_2OPT:
-      returnValue = opt2(polygon, points);
-      break;
-    default:
-      returnValue = UNEXPECTED_ERROR;
-      break;
-  }
-  return returnValue;
-}
 
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   unsigned int i, j, k;
@@ -68,21 +48,8 @@ bool checkIntersection(const Edge e1, const Edge e2) {
   double t_den =  ( (pb.x - pa.x) );
   std::cout << "s_num: " << s_num << ", s_den: " << s_den << ", t_num: " << t_num << ", t_den: " << t_den << std::endl;
 
-  if (s_den == 0) {
-    // s has no parameterisation on either the x or y axis, i.e. all x or all y values are the same
-    if (s_num == 0) {
-      // s doesn't need to go anywhere outside of the no parameterisation, so it intersects.
-      return true;
-    }
-    else return false; // is s_num is a number then there is a distance to the point from the point on x (or y) where the line intersects
-  }                    // as s can never get to it, it can't intersect the line.
-  else s = s_num / s_den;                
-
-  if (t_den == 0) {
-    if (t_num == 0) return true;
-    else return false;
-  }
-  else t = t_num / t_den;
+  s = s_num / s_den;             
+  t = t_num / t_den;
 
   std::cout << "s: " << s << " t: " << t << std::endl;
 

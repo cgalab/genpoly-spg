@@ -1,3 +1,7 @@
+#include <vector>
+#include "basicDefinitions.h"
+#include "point.h"
+
 #ifndef __2OPT_H_
 #define __2OPT_H_
 
