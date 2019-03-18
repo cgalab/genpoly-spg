@@ -3,6 +3,7 @@
 
 // largest number a double can take that works with ++/-- operation.
 #define DBL_MAX_ITER_INT 9007199254740992
+#define EPSILON 
 
 #define Swap(X,Y)  do{ __typeof__ (X) _T = X; X = Y; Y = _T; }while(0)
 
@@ -52,6 +53,12 @@ enum point_format_t {
   PF_DOUBLE,
   PF_LONG_DOUBLE,
   PF_BIG
+};
+
+enum intersect_t {
+  IS_FALSE,
+  IS_VERTEX,
+  IS_TRUE
 };
 
 #endif

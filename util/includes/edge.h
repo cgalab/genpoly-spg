@@ -25,10 +25,10 @@ public:
     l_idx=L_I;
   }
 
-  friend bool operator==(const Edge & lhs, const Edge & rhs) {
+  friend bool operator==(const Edge& lhs, const Edge& rhs) {
     if ((lhs.p1 == rhs.p1) && (lhs.p2 == rhs.p2)) return true;
     else return false;
-  }
+  };
 
   friend std::ostream& operator<<(std::ostream& os, const Edge& e) {
   os << " p1: x:" << (*e.p1).x << ", y:" << (*e.p1).y << ", i:" << (*e.p1).i << ", v:" << (*e.p1).v << ", p2: x:" << (*e.p2).x << ", y:" << (*e.p2).y << ", i:" << (*e.p2).i << ", v:" << (*e.p2).v << ": l_idx:" << e.l_idx;
@@ -39,9 +39,9 @@ public:
 class lexComp
 {
 public:
-    const std::vector<Point> & value_vector;
+    const std::vector<Point>& value_vector;
 
-    lexComp(const std::vector<Point> & val_vec):
+    lexComp(const std::vector<Point>& val_vec):
         value_vector(val_vec) {}
 
     bool operator()(int i, int j)
@@ -55,7 +55,8 @@ public:
 
 void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points);
 void lexSort(std::vector<unsigned int>& lex, std::vector<Point>& points);
-bool checkIntersection(const Edge e1, const Edge e2);
+enum intersect_t checkIntersection(const Edge e1, const Edge e2);
+bool checkIntersection1(const Edge e1, const Edge e2);
 void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void poldisplay (std::vector<unsigned int>& p);

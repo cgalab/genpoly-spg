@@ -8,6 +8,7 @@
 #include <list>
 #include "string.h" // for strcpy
 #include "basicDefinitions.h"
+#include "basicFunctions.h"
 #include "inits.h"
 #include "io.h"
 #include "point.h"

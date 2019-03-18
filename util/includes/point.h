@@ -28,10 +28,15 @@ public:
     else return false;
   }
 
+  friend bool operator==(const Point & lhs, const Point & rhs) {
+    if ((lhs.x == rhs.x) && (lhs.y == rhs.y)) return true;
+    else return false;
+  }
+
   friend std::ostream& operator<<(std::ostream& os, const Point& p) {
   os << " x: " << p.x << ", y: " << p.y << ", i:" << p.i << ", v: " << p.v;
   return os;
-  };
+  }
 };
 
 void pdisplay (const std::vector< Point >& vy);

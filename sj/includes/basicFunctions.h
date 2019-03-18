@@ -1,4 +1,5 @@
 #include <vector>
+#include "point.h"
 
 #ifndef __BASICFUNCTIONS_H_
 #define __BASICFUNCTIONS_H_

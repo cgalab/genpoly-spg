@@ -1,9 +1,12 @@
+#include <iostream> // for endl
 #include <vector>
 #include <list>
 #include <algorithm>
+#include <math.h>
+#include "basicDefinitions.h"
 #include "edge.h"
 #include "point.h"
-#include "random.h"
+#include "rand.h"
 
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   unsigned int i, j, k;
@@ -28,8 +31,56 @@ void lexSort(std::vector<unsigned int>& lex, std::vector<Point>& points) {
   std::sort(lex.begin(), lex.end(), lexComp(points));
 }
 
+enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
+  double det_a, det_b, det_c, det_d;
+  double dp_1, dp_2, dp_3, dp_4;
+
+  const Point& pa = *e1.p1;
+  const Point& pb = *e1.p2;
+  const Point& pc = *e2.p1;
+  const Point& pd = *e2.p2;
+
+  //quick check if the edges share a vertex
+  if ( (pa == pc) || (pa == pd) || (pb == pc) || (pb == pd) )
+    return IS_VERTEX;
+
+  // determinant between edge 1 and a point in edge 2
+  det_a = pc.x * (pa.y - pb.y) - pc.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y);
+  det_b = pd.x * (pa.y - pb.y) - pd.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y);
+  // determinant between edge 2 and a point in edge 1
+  det_c = pa.x * (pc.y - pd.y) - pa.y * (pc.x-pd.x) + (pc.x*pd.y - pd.x*pc.y);
+  det_d = pb.x * (pc.y - pd.y) - pb.y * (pc.x-pd.x) + (pc.x*pd.y - pd.x*pc.y);
+
+  if (det_a*det_b*det_c*det_b == 0) {
+    // some determinant was 0, need to check if it's inside an edge or outside.
+    // checks where point c lies 
+    dp_1 = (pc.x-pa.x)*(pb.x-pa.x) + (pc.y-pa.y)*(pb.y-pa.y) / ( (pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y) );
+    dp_2 = (pd.x-pa.x)*(pb.x-pa.x) + (pd.y-pa.y)*(pb.y-pa.y) / ( (pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y) );
+    dp_3 = (pa.x-pc.x)*(pd.x-pc.x) + (pa.y-pc.y)*(pd.y-pc.y) / ( (pd.x-pc.x)*(pd.x-pc.x) + (pd.y-pc.y)*(pd.y-pc.y) );
+    dp_4 = (pb.x-pc.x)*(pd.x-pc.x) + (pb.y-pc.y)*(pd.y-pc.y) / ( (pd.x-pc.x)*(pd.x-pc.x) + (pd.y-pc.y)*(pd.y-pc.y) );
+
+    if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) )
+        return IS_TRUE;
+    else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) )
+        return IS_TRUE;
+    else if ( (det_c == 0) && (dp_3 > 0) && (dp_3 < 1) )
+        return IS_TRUE;
+    else if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) )
+        return IS_TRUE;
+    else
+        return IS_FALSE;
+  } 
+  else {
+    // none of the determinants were 0, so just need to check the sign for intersection.
+    if ( (signbit(det_a) ^ signbit(det_b)) && (signbit(det_c) ^ signbit(det_d)) ) {
+      return IS_TRUE;
+    }
+    else return IS_FALSE;
+  }
+}
+
 // checks if 2 edges intersect, returns true if they intersect.
-bool checkIntersection(const Edge e1, const Edge e2) {
+bool checkIntersection1(const Edge e1, const Edge e2) {
   // 2 edges with a common point cannot intersect.
   std::cout << "IE: e1: " << e1 << std::endl;
   std::cout << "IE: e2: " << e2 << std::endl;
@@ -60,6 +111,8 @@ bool checkIntersection(const Edge e1, const Edge e2) {
   }
   return false;
 }
+
+
 
 // flips the smaller range of indexes in a polygon and updates the references in 'points' vector
 void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points) {

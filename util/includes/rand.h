@@ -1,7 +1,7 @@
 #include <random>
 
-#ifndef __RANDOM_H_
-#define __RANDOM_H_
+#ifndef __RAND_H_
+#define __RAND_H_
 
 std::random_device rd;  // global variables for random engine
 std::mt19937 mt(rd());
