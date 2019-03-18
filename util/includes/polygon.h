@@ -7,11 +7,12 @@
 
 class Polygon{
   public:
-    std::vector<Point> vertices;
+    std::vector<Point*> vertices;
 
-    void addVertex(Point p){ vertices.push_back(p);}
+    void addVertex(Point* v){ vertices.push_back(v);}
     int getNumberOfVertices(){ return vertices.size();}
-    Point getVertex(int i){ return vertices[i]; }
+    Point* getVertex(int i){ return vertices[i]; }
+    void replaceVertex(Point* v, int i){ vertices[i] = v;}
 
 };
 
