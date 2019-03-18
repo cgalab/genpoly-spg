@@ -4,6 +4,8 @@
 // largest number a double can take that works with ++/-- operation.
 #define DBL_MAX_ITER_INT 9007199254740992
 
+#define Swap(X,Y)  do{ __typeof__ (X) _T = X; X = Y; Y = _T; }while(0)
+
 // return errors
 enum error {
   SUCCESS = 0,
@@ -15,7 +17,9 @@ enum error {
   READ_ERROR_OFILE = 6,
   READ_ERROR_IFORMAT = 7,
   READ_ERROR_OFORMAT = 8,
-  NO_ARGUMENTS  =9
+  NO_ARGUMENTS  = 9,
+  ALGORITHM_UNDEFINED = 10,
+  ALGORITHM_IDLE = 11
 };
 
 // the algorithms that should be selectable.
@@ -28,7 +32,8 @@ enum alg_t {
 // the output format of the result.
 enum out_format_t {
   OF_UNDEFINED,
-  OF_PERM
+  OF_PERM,
+  OF_POLY
 };
 
 // the input format of the point set.

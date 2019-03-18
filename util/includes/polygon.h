@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "points.h"
+#include "point.h"
 #include <vector>
 
 #ifndef __POLYGON_H_

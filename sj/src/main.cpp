@@ -5,11 +5,13 @@
 #include <time.h> // for time measurements
 #include <iostream> // for endl
 #include <vector>
+#include <list>
 #include "string.h" // for strcpy
 #include "basicDefinitions.h"
 #include "inits.h"
-#include "points.h"
 #include "io.h"
+#include "point.h"
+#include "edge.h"
 
 int main(int argc, char *argv[]) {
   // final return value
@@ -23,23 +25,29 @@ int main(int argc, char *argv[]) {
   enum alg_t alg = A_UNDEFINED;
   enum in_format_t inFormat = IF_UNDEFINED;
   enum out_format_t outFormat = OF_UNDEFINED;
+  bool writeNew = false;
 
   // parse command line arguments
-  returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat);
+  returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat, writeNew);
   if (returnValue == SUCCESS) {
     //std::cout << "all good to go" << std::endl;
 
+    // points from input file saved in a vector
+    // needs to be public so the lexComp function can access values for comparison
     std::vector<Point> points;
 
     returnValue = readInFile(inFile, inFormat, &points);
     if(returnValue == SUCCESS) {
-      pdisplay(points);
 
-      // points are inside a vector. Create a polygon
-      
+      // a polygon is a list of indexes in 'points'
+      std::vector<unsigned int> polygon;
 
+      // get a simple polygon with a given method
+      returnValue = getSP(polygon, points, alg);
 
-
+      if (returnValue == SUCCESS) {
+        returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
+      }
     }
   }
 

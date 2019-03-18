@@ -1,9 +1,10 @@
 #include <iostream> // for endl
 #include <getopt.h> // for parsing command line arguments
-#include "string.h"
+#include <stdio.h>
+#include <string.h>
 #include <vector>
 #include "basicDefinitions.h"
-#include "points.h"
+#include "point.h"
 
 /*
   Functions that deal with possible errors in the command line argument parsing
@@ -71,7 +72,8 @@ enum error ifInit(enum in_format_t *inFormat, char *optarg) {
 
 enum error ofInit(enum out_format_t *outFormat, char *optarg) {
   enum error returnValue = SUCCESS;
-  if(strcmp(optarg,"perm") == 0) *outFormat = OF_PERM;
+  if (strcmp(optarg,"perm") == 0) *outFormat = OF_PERM;
+  else if (strcmp(optarg,"poly") == 0) *outFormat = OF_POLY;
   else {
     *outFormat = OF_UNDEFINED;
     std::cerr << "Error:  --outformat input incorrect.  Input: '" << optarg << "', should be 'perm', 'json', or 'poly'." << std::endl;
@@ -80,7 +82,7 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
   return returnValue;
 }
 
-enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg, enum in_format_t *inFormat, enum out_format_t *outFormat) {
+enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg, enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew) {
   enum error returnValue = SUCCESS;
   int comm;
 
@@ -91,10 +93,11 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
     {"alg", required_argument, NULL, 'a'},
     {"informat", required_argument, NULL, 'b'},
     {"outformat", required_argument, NULL, 'c'},
+    {"writeNew", no_argument, NULL, 'w'},
     {0, 0, 0, 0}
   };
 
-  while( (comm = getopt_long (argc, argv, "i:o:a:b:c:", long_options, NULL)) != -1 ) {
+  while( (comm = getopt_long (argc, argv, "i:o:a:b:c:w", long_options, NULL)) != -1 ) {
         
     switch(comm) {
       case 'i':
@@ -111,6 +114,9 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
         break;
       case 'c':
         returnValue = ofInit(outFormat, optarg);
+        break;
+      case 'w':
+        writeNew = true;
         break;
 
       default:

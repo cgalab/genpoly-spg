@@ -1,4 +1,4 @@
-#include "points.h"
+#include "point.h"
 
 #ifndef __INITS_H_
 #define __INITS_H_
@@ -10,6 +10,6 @@ void ifInit(enum in_format_t *inFormat, char *optarg);
 
 void ofInit(enum out_format_t *outFormat, char *optarg);
 
-enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg, enum in_format_t *inFormat, enum out_format_t *outFormat);
+enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg, enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew);
 
 #endif

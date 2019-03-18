@@ -1,7 +1,8 @@
 #include <vector>
 #include <stdio.h>
+#include <string.h>
 #include "basicDefinitions.h"
-#include "points.h"
+#include "point.h"
 
 
 enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *points) {
@@ -68,4 +69,51 @@ enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *poi
     std::cout << "Error:  unknown error opening input file" << std::endl;
   }
   return returnValue;
+}
+
+
+enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  FILE *fout;
+
+  if(writeNew) {
+    fout = fopen(outFile, "r");
+
+    if(fout != NULL) {
+      fprintf(stderr, "outFile already exists, need to create a new file\n");
+
+      int counter = 0;
+      char tempOutFile[255];
+
+      do {
+        snprintf(tempOutFile, sizeof(tempOutFile), "%s%d", outFile, counter);
+        fout = fopen(tempOutFile, "r");
+        ++counter;
+      } while (fout != NULL);
+          strcpy(outFile, tempOutFile);
+    }
+  }
+  
+  fout = fopen(outFile, "w");
+
+  switch(outFormat) {
+    case OF_PERM:
+      for (unsigned int i = 0; i < polygon.size(); ++i)
+        fprintf(fout, "%u\n", polygon[i]);
+      break;
+    case OF_POLY:
+      fprintf(fout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
+      fprintf(fout, "%lu\n", points.size());
+      for (unsigned int i = 0; i < points.size(); ++i)
+        fprintf(fout, "%lf %lf\n", points[i].x, points[i].y);
+      break;
+    case OF_UNDEFINED:
+        std::cerr << "output format undefined" << std::endl;
+      break;
+    default:
+      std::cerr << "unknown error writing output" << std::endl;
+      break;
+  }
+
+  fclose(fout);
+  return SUCCESS;
 }
