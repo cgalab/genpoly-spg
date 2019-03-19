@@ -56,9 +56,9 @@ enum point_format_t {
 };
 
 enum intersect_t {
-  IS_FALSE,
-  IS_VERTEX,
-  IS_TRUE
+  IS_FALSE = 0,
+  IS_VERTEX = 1,
+  IS_TRUE = 2
 };
 
 #endif
