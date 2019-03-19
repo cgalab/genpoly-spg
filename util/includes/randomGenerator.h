@@ -5,9 +5,14 @@
 
 class RandomGenerator{
 	private:
-		std::default_random_engine generator;
-		
+		std::random_device rd;  // global variables for random engine
+		std::mt19937 generator;
+
 	public:
+		RandomGenerator(){
+			generator.seed(rd());
+		}
+
 		int getRandomIndex(int n){ return std::uniform_int_distribution<int> {0, n - 1} (generator); }
 		
 		Point* translatePointNormal(Point* v, double mean, double stddev){

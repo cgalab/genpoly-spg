@@ -1,5 +1,4 @@
 #include "IOtools.h"
-#include <stdio.h>
 
 void printPolygonToDat(Polygon p, char* filename){
 	int i;
