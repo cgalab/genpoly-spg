@@ -3,15 +3,21 @@
 #include <stdio.h>
 #include "IOtools.h"
 #include "polygonTransformer.h"
+#include "timer.h"
 
 
 int main(){
 	Polygon* p;
-	int n = 100;
+	int n = 10000;
+	int translations = 10 * n;
+	Timer t;
 
+	t.start();
 	p = generateRectangularPolygon(n, RPShapes::RPS_FLAT);
-	transformPolygon(p, 1000);
-	printPolygonToDat(*p, "test.dat");
+	printf("Initial polygon with rectangular flat shape computed after %f seconds\n", t.elapsedTime());
 
-	printf("Size of polygon: %d \n", (*p).getNumberOfVertices());
+	transformPolygon(p, translations, t);
+	printf("Transformed polygon with %d translations in %f seconds\n", translations, t.elapsedTime());
+
+	printPolygonToDat(*p, "test.dat");
 }
