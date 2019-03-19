@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "point.h"
 #include <vector>
 
@@ -12,7 +11,19 @@ class Polygon{
 		Polygon(int n){ vertices.reserve(n); }
    	void addVertex(Point* v){ vertices.push_back(v);}
    	int getNumberOfVertices(){ return vertices.size();}
-   	Point* getVertex(int i){ return vertices[i]; }
+   	Point* getVertex(int i){ 
+			int n = vertices.size();			
+			
+			if(i == -1){   		
+   			return vertices[n - 1];
+   		}else if(i == n){
+				  return vertices[0]; 		
+   		}else if(i > -1 && i < n){
+				return vertices[i];   		
+   		}else{
+				;// TODO: some error handling   		
+   		}
+   	}
    	void replaceVertex(Point* v, int i){ vertices[i] = v;}
 
 };

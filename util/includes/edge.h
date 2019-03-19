@@ -25,6 +25,11 @@ public:
 		l_idx=L_I;
 	}
 
+	void setVertices(Point* v1, Point* v2){
+		p1 = v1;
+		p2 = v2;  
+	}
+
 	friend bool operator==(const Edge& lhs, const Edge& rhs) {
 		if ((lhs.p1 == rhs.p1) && (lhs.p2 == rhs.p2)) return true;
 		else return false;
