@@ -15,10 +15,12 @@
 #include "edge.h"
 
 int main(int argc, char *argv[]) {
+  //test();
+
   // final return value
   enum error returnValue = SUCCESS;
   // time measurement variables
-  //clock_t begin, end;  
+  //clock_t begin, end;
   //double elapsed; // to get time in seconds, divide elapsed with CLOCKS_PER_SEC
 
   // command line variables

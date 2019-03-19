@@ -56,13 +56,13 @@ enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *poi
 
 
   }
+  else if (fin == NULL) {
+    returnValue = READ_ERROR_IFILE;
+    std::cout << "Error: unable to open input file: " << ((inFile[0] == NULL) ? "No input given" : inFile)  << std::endl;
+  }
   else if (inFormat == IF_UNDEFINED) {
     returnValue = READ_ERROR_IFORMAT;
     std::cout << "Error: input file format not defined." << std::endl;
-  }
-  else if (fin == NULL) {
-    returnValue = READ_ERROR_IFILE;
-    std::cout << "Error: unable to open input file: " << inFile << std::endl;
   }
   else {
     returnValue = UNEXPECTED_ERROR;
