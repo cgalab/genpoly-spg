@@ -46,7 +46,7 @@ enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *poi
           (*points).push_back(p);
           break;
         default:
-          std::cout << "Warning: unidentified input file format, " << std::endl;
+          std::cout << "Warning: unidentified input file format. Use -? for help." << std::endl;
           returnValue = READ_ERROR_IFORMAT;
           break;
       }
@@ -58,15 +58,15 @@ enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *poi
   }
   else if (fin == NULL) {
     returnValue = READ_ERROR_IFILE;
-    std::cout << "Error: unable to open input file: " << ((inFile[0] == NULL) ? "No input given" : inFile)  << std::endl;
+    std::cout << "Error: unable to open input file.  Use -? for help.: " << ((inFile[0] == 0) ? "No input given" : inFile)  << std::endl;
   }
   else if (inFormat == IF_UNDEFINED) {
     returnValue = READ_ERROR_IFORMAT;
-    std::cout << "Error: input file format not defined." << std::endl;
+    std::cout << "Error: input file format not defined. Use -? for help." << std::endl;
   }
   else {
     returnValue = UNEXPECTED_ERROR;
-    std::cout << "Error:  unknown error opening input file" << std::endl;
+    std::cout << "Error:  unknown error opening input file." << std::endl;
   }
   return returnValue;
 }
@@ -79,7 +79,7 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
     fout = fopen(outFile, "r");
 
     if(fout != NULL) {
-      fprintf(stderr, "outFile already exists, need to create a new file\n");
+      //fprintf(stderr, "outFile already exists, need to create a new file\n");
 
       int counter = 0;
       char tempOutFile[255];
@@ -106,8 +106,14 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
       for (unsigned int i = 0; i < points.size(); ++i)
         fprintf(fout, "%lf %lf\n", points[i].x, points[i].y);
       break;
+    case OF_DAT:
+      fprintf(fout, "# X   Y\n");
+      for (unsigned int i = 0; i < points.size(); ++i)
+        fprintf(fout, "  %lf   %lf\n", points[polygon[i]].x, points[polygon[i]].y);
+      fprintf(fout, "  %lf   %lf\n", points[polygon[0]].x, points[polygon[0]].y);
+      break;
     case OF_UNDEFINED:
-        std::cerr << "output format undefined" << std::endl;
+        std::cerr << "output format undefined.  Use -? for help." << std::endl;
       break;
     default:
       std::cerr << "unknown error writing output" << std::endl;

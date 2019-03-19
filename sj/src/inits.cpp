@@ -13,11 +13,11 @@
 enum error inFileInit(char *inFile, char *optarg) {
 	enum error returnValue = SUCCESS;
 	if(optarg[0] == 0) {
-		std::cerr << "Error: no input entered for inFile" << std::endl;
+		std::cerr << "Error: no input entered for inFile. Use -? for help." << std::endl;
 		returnValue = NO_IN_FILE;
 	}
 	else if (optarg[0] == '-') {
-		std::cerr << "Error: another command set as input <string> for --infile" << std::endl;
+		std::cerr << "Error: another command set as input <string> for --infile. Use -? for help." << std::endl;
 		returnValue = READ_ERROR_IFILE;
 	}
 	else {
@@ -30,11 +30,11 @@ enum error inFileInit(char *inFile, char *optarg) {
 enum error outFileInit(char *outFile, char *optarg) {
 	enum error returnValue = SUCCESS;
 	if(optarg[0] == 0) {
-		std::cerr << "Error: no input entered for outFile" << std::endl;
+		std::cerr << "Error: no input entered for outFile. Use -? for help." << std::endl;
 		returnValue = NO_OUT_FILE;
 	}
 	else if (optarg[0] == '-') {
-		std::cerr << "Error: another command set as input <string> for --outfile" << std::endl;
+		std::cerr << "Error: another command set as input <string> for --outfile. Use -? for help." << std::endl;
 		returnValue = READ_ERROR_OFILE;
 	}
 	else {
@@ -51,7 +51,7 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	}
 	else {
 		*alg = A_UNDEFINED;
-		std::cerr << "Error:  --alg input incorrect.  Input: '" << optarg << "', should be '2opt', 'space', or 'quick'." << std::endl;
+		std::cerr << "Error:  --alg input incorrect.  Use -? for help. Input: '" << optarg << "', should be '2opt', 'space', or 'quick'." << std::endl;
 		returnValue = NO_ALGORITHM;
 	}
 	return returnValue;
@@ -64,7 +64,7 @@ enum error ifInit(enum in_format_t *inFormat, char *optarg) {
 	else if (strcmp(optarg,"comp") == 0) *inFormat = IF_COMP;
 	else {
 		*inFormat = IF_UNDEFINED;
-		std::cerr << "Error:  --informat input incorrect.  Input: '" << optarg << "', should be 'points', 'json', or 'comp'." << std::endl;
+		std::cerr << "Error:  --informat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'points', 'json', or 'comp'." << std::endl;
 		returnValue = READ_ERROR_IFORMAT;
 	}
 	return returnValue;
@@ -74,9 +74,10 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 	enum error returnValue = SUCCESS;
 	if (strcmp(optarg,"perm") == 0) *outFormat = OF_PERM;
 	else if (strcmp(optarg,"poly") == 0) *outFormat = OF_POLY;
+	else if (strcmp(optarg,"dat") == 0) *outFormat = OF_DAT;
 	else {
 		*outFormat = OF_UNDEFINED;
-		std::cerr << "Error:  --outformat input incorrect.  Input: '" << optarg << "', should be 'perm', 'json', or 'poly'." << std::endl;
+		std::cerr << "Error:  --outformat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'perm', 'json', or 'poly'." << std::endl;
 		returnValue = READ_ERROR_OFORMAT;
 	}
 	return returnValue;
@@ -118,7 +119,10 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 				writeNew = true;
 				break;
 			case '?':
+				returnValue = NO_ARGUMENTS;
 				std::cerr << "Command line arguments:" << std::endl;
+				std::cerr << " -?" << std::endl;
+				std::cerr << " :: ignores any other argument and just prints this helpful information." << std::endl;
 				std::cerr << " --infile <string>  |OR| -i <string>" << std::endl;
 				std::cerr << " ::  <string> is the filename of a file containing a set of points." << std::endl;
 				std::cerr << " --outfile <string> |OR| -o <string>" << std::endl;
@@ -128,14 +132,14 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 				std::cerr << " --informat <arg>   |OR| -b <arg>" << std::endl;
 				std::cerr << " :: <arg> can be 'points' OR 'poly' OR 'comp'." << std::endl;
 				std::cerr << " --outformat <arg>  |OR| -c <arg>" << std::endl;
-				std::cerr << " :: <arg> can be 'perm' OR 'poly'." << std::endl;
+				std::cerr << " :: <arg> can be 'perm' OR 'poly' OR 'dat'." << std::endl;
 				std::cerr << " --writenew         |OR| -w" << std::endl;
 				std::cerr << " :: option to not overwrite the output file if it already exists," << std::endl;
 				std::cerr << "    a new file is created with an increment number added to the end." << std::endl;
 				break;
 
 			default:
-				std::cerr << "Error:  input arguments not formatted correctly." << std::endl;
+				std::cerr << "Error:  input arguments not formatted correctly.  Use -? for help." << std::endl;
 				returnValue = UNEXPECTED_ERROR;
 		}
 	}

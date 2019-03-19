@@ -34,7 +34,8 @@ enum alg_t {
 enum out_format_t {
   OF_UNDEFINED,
   OF_PERM,
-  OF_POLY
+  OF_POLY,
+  OF_DAT
 };
 
 // the input format of the point set.
