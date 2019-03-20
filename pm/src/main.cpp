@@ -4,11 +4,12 @@
 #include "IOtools.h"
 #include "polygonTransformer.h"
 #include "timer.h"
+#include "statistics.h"
 
 
 int main(){
 	Polygon* p;
-	int n = 10000;
+	int n = 50;
 	int translations = 10 * n;
 	Timer t;
 
@@ -18,6 +19,7 @@ int main(){
 
 	transformPolygon(p, translations, t);
 	printf("Transformed polygon with %d translations in %f seconds\n", translations, t.elapsedTime());
+	printStats(p);
 
 	printPolygonToDat(*p, "test.dat");
 }
