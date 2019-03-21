@@ -9,12 +9,13 @@
 
 int main(){
 	Polygon* p;
-	int n = 50;
-	int translations = 10 * n;
+	int n = 1000;
+	int translations = 5 * n;
 	Timer t;
 
 	t.start();
-	p = generateRectangularPolygon(n, RPShapes::RPS_FLAT);
+	p = generateRegularPolygon(n);
+	//p = generateRectangularPolygon(n, RPShapes::RPS_FLAT);
 	printf("Initial polygon with rectangular flat shape computed after %f seconds\n", t.elapsedTime());
 
 	transformPolygon(p, translations, t);

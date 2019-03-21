@@ -37,5 +37,18 @@ Polygon* generateRectangularPolygon(int n, enum RPShapes type){
 }
 
 Polygon* generateRegularPolygon(int n){
+	double r, alpha;
+	int i;
+	Point* v;
+	Polygon* p = new Polygon(n);
 
+	alpha = 2 * M_PI / n;
+	r = 30.0;
+
+	for(i = 0; i < n; i++){
+		v = new Point(r * cos(i * alpha), r * sin(i * alpha), i);
+		(*p).addVertex(v);
+	}
+
+	return p; 
 }
