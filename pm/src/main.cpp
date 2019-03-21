@@ -10,7 +10,7 @@
 int main(){
 	Polygon* p;
 	int n = 1000;
-	int translations = 5 * n;
+	int translations = 50 * n;
 	Timer t;
 
 	t.start();

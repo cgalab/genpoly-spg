@@ -7,7 +7,7 @@ void transformPolygon(Polygon* p, int iterations, Timer t){
 	RandomGenerator *generator = new RandomGenerator();
 	Point *original, *translated;
 	int tries;
-	double stddev = 100.0;
+	double stddev = 5.0;
  	
 	for(i = 0; i < iterations; i++){
 		index = (*generator).getRandomIndex(n);
@@ -24,7 +24,6 @@ void transformPolygon(Polygon* p, int iterations, Timer t){
 		printf("Translation %d took %d tries and finished after %f seconds \n", i, tries, t.elapsedTime());
 		
 		free(original);
-		stddev = stddev * 0.999;
 	}
 	
 }
