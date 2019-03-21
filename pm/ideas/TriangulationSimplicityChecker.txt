@@ -51,4 +51,4 @@ repairTriangulation():
 			insert triangle N, P and the point PP adjacent to P 
 			make new edge an CE
 
-	some bla bla
+- delete all intersected edges and make simple polygon of their space -> triangulate with any standard triangulation algo
