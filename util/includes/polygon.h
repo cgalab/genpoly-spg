@@ -21,7 +21,7 @@ class Polygon{
    		}else if(i > -1 && i < n){
 				return vertices[i];   		
    		}else{
-				;// TODO: some error handling   		
+				return NULL;// TODO: some error handling   		
    		}
    	}
    	void replaceVertex(Point* v, int i){ vertices[i] = v;}
