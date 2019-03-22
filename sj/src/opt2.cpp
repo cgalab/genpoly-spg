@@ -163,6 +163,8 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
 	std::list<Edge> edges; // a list for edges that need to be checked against the current edge being validated
+	
+
 
 	while (index < points.size()) {
 		std::cout << "index: " << index << std::endl;
