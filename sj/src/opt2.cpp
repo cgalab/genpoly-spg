@@ -5,13 +5,14 @@
 #include <stdlib.h>  // for abs
 #include <algorithm>    // std::sort
 #include "basicDefinitions.h"
+#include "basicFunctions.h"
 #include "point.h"
 #include "edge.h"
 #include "randomGenerator.h"
 
 // comparison function for sorting pairs by secondary value
 bool sortbysec(const std::pair<Point*,double> &a, const std::pair<Point*,double> &b) { 
-    return (a.second > b.second); 
+    return (a.second > b.second);
 }
 
 bool sortbyint(const int i, const int j) { return (i<j); }
@@ -153,7 +154,8 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	for(unsigned int i = 0; i < points.size(); ++i)
 		lex[i] = points[i].i;
 
-	lexSort(lex, points);
+	// lex contains a vector of 'points' indexes sorted lexicographically
+	std::sort(lex.begin(), lex.end(), lexComp(points));
 	//std::cout << "lexicographical order:" << std::endl;
 	//poldisplay(lex);
 
@@ -163,7 +165,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
 	std::list<Edge> edges; // a list for edges that need to be checked against the current edge being validated
-	
+
 
 
 	while (index < points.size()) {

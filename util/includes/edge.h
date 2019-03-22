@@ -41,25 +41,8 @@ public:
 	};
 };
 
-class lexComp
-{
-public:
-		const std::vector<Point>& value_vector;
-
-		lexComp(const std::vector<Point>& val_vec):
-			value_vector(val_vec) {}
-
-		bool operator()(int i, int j)
-		{
-			if (value_vector[i].x < value_vector[j].x) return true;
-			else if ((value_vector[i].x == value_vector[j].x) && (value_vector[i].y < value_vector[j].y)) return true;
-			else return false;
-		}
-};
-
 
 void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points);
-void lexSort(std::vector<unsigned int>& lex, std::vector<Point>& points);
 double reldist(const Edge& e, const Point& p);
 double det(const Edge& e, const Point& p);
 enum intersect_t checkIntersection(const Edge e1, const Edge e2);

@@ -26,11 +26,6 @@ void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& point
 	points[polygon[i]].v = i;
 }
 
-// Sort the points vector into lexicographical order
-void lexSort(std::vector<unsigned int>& lex, std::vector<Point>& points) {
-	std::sort(lex.begin(), lex.end(), lexComp(points));
-}
-
 // returns relative distance of a point to an edge.
 double reldist(const Edge& e, const Point& p) {
 	const Point& pa = *e.p1;
