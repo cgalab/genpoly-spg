@@ -12,6 +12,7 @@ public:
   unsigned int v; // index in polygon
 
   Point() {x=0; y=0; i=0; v=0;}
+  Point(const Point& p) {x=p.x;y=p.y;i=p.i;v=p.v;}
   Point(double X, double Y, unsigned int I) {x=X; y=Y; i=I; v=0;}
   Point(double X, double Y, unsigned int I, unsigned int V) {x=X; y=Y; i=I; v=V;}
   void set(double X, double Y) {x=X; y=Y;}

@@ -1,4 +1,5 @@
 PP = g++
+WFLAGS = -Wall -Werror -Wextra
 
 SDIR = src
 ODIR = obj
@@ -15,7 +16,7 @@ USRC := $(wildcard $(USDIR)/*.cpp)
 UOBJ := $(patsubst $(USDIR)/%.cpp, $(UODIR)/%.o, $(USRC))
 
 all: dir $(UOBJ) $(OBJ)
-	$(PP) $(OBJ) $(UOBJ) -o app
+	$(PP) $(OBJ) $(UOBJ) -o app $(WFLAGS)
 
 dir:
 	$(info   OBJECTS is $(OBJ))
@@ -24,10 +25,10 @@ dir:
 
 
 $(UODIR)/%.o: $(USDIR)/%.cpp
-	$(PP) -I$(UIDIR) -c $< -o $@
+	$(PP) -I$(UIDIR) -c $< -o $@ $(WFLAGS)
 
 $(ODIR)/%.o: $(SDIR)/%.cpp
-	$(PP) -I$(UIDIR) -I$(IDIR) -c $< -o $@
+	$(PP) -I$(UIDIR) -I$(IDIR) -c $< -o $@ $(WFLAGS)
 
 clean:
 

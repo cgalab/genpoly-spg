@@ -59,7 +59,14 @@ enum point_format_t {
 enum intersect_t {
   IS_FALSE = 0,
   IS_VERTEX = 1,
+  IS_COLLINEAR = 2,
   IS_TRUE = 10  // value 10 is required for a easy recognized non-vertex intersections in a sum
+};
+
+enum edge_t {
+  E_VALID,
+  E_SKIP,
+  E_NOT_VALID
 };
 
 #endif
