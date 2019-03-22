@@ -1,0 +1,4 @@
+- multiple different layers:
+	+ two layers with fixed translation directions but random translation width -> more influence on global structure
+- smaller standard deviation is much better(!), but needs more iterations
+- not using random indeces at the beginning seems to be useless

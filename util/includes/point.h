@@ -22,6 +22,9 @@ public:
   void setY(double Y) {y=Y;}
   void setI(unsigned int I) {i=I;}
   void setV(unsigned int V) {v=V;}
+  void printCoord(){
+    printf("x=%f y=%f \n", x, y);
+  }
 
   bool operator < (const Point& s) const {
     if (x < s.x) return true;
