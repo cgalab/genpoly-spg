@@ -1,4 +1,5 @@
 #include <list>
+#include <stdio.h>
 
 
 #ifndef __VERTEX_H_
@@ -23,6 +24,13 @@ public:
 		id = ID;
 	}
 
+	void addEdge(TEdge* e);
+
+	void print(FILE* f){
+		fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * 20, y * 20, id, id);
+	}
+
+	int getID(){ return id;}
 };
 
 #endif
