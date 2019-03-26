@@ -35,6 +35,8 @@ public:
 	void setTriangle(Triangle* t);
 
 	void print(FILE* f);
+
+	void print();
 };
 
 #endif

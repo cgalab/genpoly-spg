@@ -9,3 +9,10 @@ Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2){
 	(*e1).setTriangle(this);
 	(*e2).setTriangle(this);
 }
+
+void Triangle::print(){
+	printf("Triangle:\n");
+	(*e0).print();
+	(*e1).print();
+	(*e2).print();
+}

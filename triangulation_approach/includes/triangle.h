@@ -1,4 +1,5 @@
 #include <list>
+#include <stdio.h>
 
 #ifndef __TRIANGLE_H_
 #define __TRIANGLE_H_
@@ -16,6 +17,7 @@ private:
 
 public:
 	Triangle(TEdge* E0, TEdge* E1, TEdge* E2);
+	void print();
 };
 
 #endif

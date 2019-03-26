@@ -31,5 +31,12 @@ void TEdge::setTriangle(Triangle* t){
 }
 
 void TEdge::print(FILE* f){
-	fprintf(f, "<edge vertex1=\"%d\" vertex2=\"%d\"></edge>\n", (*v1).getID(), (*v2).getID());
+	int w = 0;
+	if(isPEdge) w = 2;
+	if(isCHEdge) w = w + 1;
+	fprintf(f, "<edge vertex1=\"%d\" vertex2=\"%d\" weight=\"%d\" useWeight=\"true\"></edge>\n", (*v1).getID(), (*v2).getID(), w);
+}
+
+void TEdge::print(){
+	printf("Edge from point %d to point %d is PE %d, is CHE %d\n", (*v1).getID(), (*v2).getID(), isPEdge, isCHEdge);
 }

@@ -27,6 +27,9 @@ dir:
 	mkdir -p $(ODIR)
 	mkdir -p $(UODIR)
 
+test: clean all
+	./app
+
 
 $(UODIR)/%.o: $(USDIR)/%.cpp
 	$(PP) -I$(UIDIR) -c $< -o $@ $(WFLAGS)

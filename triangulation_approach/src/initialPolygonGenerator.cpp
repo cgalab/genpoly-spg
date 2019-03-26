@@ -47,6 +47,7 @@ Triangulation* generateRegularPolygon(int n){
 	TEdge* e1 = NULL;
 	TEdge* e2 = NULL;
 	Triangulation* T = new Triangulation(n);
+	Triangle* t;
 
 	alpha = 2 * M_PI / n;
 	r = 30.0;
@@ -59,9 +60,9 @@ Triangulation* generateRegularPolygon(int n){
 	// the inital triangulation contains n-2 triangles
 	v0 = (*T).getVertex(0);
 	v1 = (*T).getVertex(n - 1);
-	e0 = new TEdge(v0, v1);
+	e0 = new TEdge(v0, v1, true, true);
 	(*T).addEdge(e0);
-	for(i = 0; i < n - 1; i++){
+	for(i = 0; i < n - 2; i++){
 		if(i % 2 == 0){
 			// v0 stays as it is and v1 becomes v2
 			v2 = v1;
@@ -78,7 +79,7 @@ Triangulation* generateRegularPolygon(int n){
 			(*e0).makeEdgePEdge();
 			(*e0).makeEdgeCHEdge();
 
-			new Triangle(e0, e1, e2);		
+			t = new Triangle(e0, e1, e2);		
 		}else{
 			// v1 becomes v0 and v2 stays as it is
 			v0 = v1;
@@ -95,10 +96,19 @@ Triangulation* generateRegularPolygon(int n){
 			(*e1).makeEdgePEdge();
 			(*e1).makeEdgeCHEdge();
 
-			new Triangle(e0, e1, e2);
+			t = new Triangle(e0, e1, e2);
 		}
-	}
-	// TODO: check why last vertex has a circle and if all triangles are right
 
+		(*t).print();
+	}
+
+	if(n % 2 == 0){
+		(*e0).makeEdgePEdge();
+		(*e0).makeEdgeCHEdge();
+	}else{
+		(*e1).makeEdgePEdge();
+		(*e1).makeEdgeCHEdge();
+	}
 	return T; 
+	
 }
