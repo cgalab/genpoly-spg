@@ -1,9 +1,12 @@
-#include "polygon.h"
+#include "triangulation.h"
 #include "randomGenerator.h"
 #include <stdio.h>
-#include "edge.h"
-#include "point.h"
+#include "tedge.h"
+#include "vertex.h"
 #include "timer.h"
+#include "triangle.h"
+#include <list>
 
-void transformPolygon(Polygon* p, int iterations, Timer t);
-bool checkSimplicityOfTranslation(Polygon* p, int index);
+void transformPolygon(Triangulation* T, int iterations, Timer t);
+void checkSimplicityAndExecute(Triangulation* T, Vertex* newV, int index);
+//bool checkSimplicityOfTranslation(Polygon* p, int index);

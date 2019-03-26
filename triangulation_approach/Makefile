@@ -1,6 +1,6 @@
 PP = g++
-# maybe add -Werror
-WFLAGS = -Wall -Wextra -O3
+# maybe add -Werror -Wall
+WFLAGS = -Wextra -O3 
 
 
 SDIR = src

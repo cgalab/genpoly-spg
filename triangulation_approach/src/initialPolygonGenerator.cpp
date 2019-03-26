@@ -79,7 +79,7 @@ Triangulation* generateRegularPolygon(int n){
 			(*e0).makeEdgePEdge();
 			(*e0).makeEdgeCHEdge();
 
-			t = new Triangle(e0, e1, e2);		
+			t = new Triangle(e0, e1, e2, v0, v1, v2);		
 		}else{
 			// v1 becomes v0 and v2 stays as it is
 			v0 = v1;
@@ -96,10 +96,10 @@ Triangulation* generateRegularPolygon(int n){
 			(*e1).makeEdgePEdge();
 			(*e1).makeEdgeCHEdge();
 
-			t = new Triangle(e0, e1, e2);
+			t = new Triangle(e0, e1, e2, v0, v1, v2);
 		}
 
-		(*t).print();
+		//(*t).print();
 	}
 
 	if(n % 2 == 0){

@@ -17,26 +17,32 @@ private:
 	Vertex* v2;
 	Triangle* t1;
 	Triangle* t2;
-	bool isPEdge; // polygon edge?
-	bool isCHEdge; // convex hull edge?
+	bool isPE; // polygon edge?
+	bool isCHE; // convex hull edge?
 
 public:
 	TEdge(Vertex* V1, Vertex* V2);
 	TEdge(Vertex* V1, Vertex* V2, bool PEdge, bool CHEdge);
 
 	void makeEdgePEdge(){
-		isPEdge = true;
+		isPE = true;
 	}
 
 	void makeEdgeCHEdge(){
-		isCHEdge = true;
+		isCHE = true;
 	}
+
+	bool isPEdge(){ return isPE;}
+	bool isCHEdge(){ return isCHE;}
 
 	void setTriangle(Triangle* t);
 
 	void print(FILE* f);
 
 	void print();
+
+	Vertex* getV1();
+	Vertex* getV2();
 };
 
 #endif

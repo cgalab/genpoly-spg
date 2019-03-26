@@ -23,9 +23,19 @@ public:
 		edges.push_back(e);
 	}
 
-	Vertex* getVertex(int index){
-		return vertices[index];
-	}
+	Vertex* getVertex(int i){ 
+		int n = vertices.size();			
+			
+		if(i == -1){   		
+   			return vertices[n - 1];
+   		}else if(i == n){
+			return vertices[0]; 		
+   		}else if(i > -1 && i < n){
+			return vertices[i];   		
+   		}else{
+			return NULL;// TODO: some error handling   		
+   		}
+   	}
 
 	// prints triangulation as graph into a graphml file
 	// https://de.wikipedia.org/wiki/GraphML
