@@ -26,46 +26,65 @@ void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& point
 	points[polygon[i]].v = i;
 }
 
-// Sort the points vector into lexicographical order
-void lexSort(std::vector<unsigned int>& lex, std::vector<Point>& points) {
-	std::sort(lex.begin(), lex.end(), lexComp(points));
+// returns relative distance of a point to an edge.
+double reldist(const Edge& e, const Point& p) {
+	const Point& pa = *e.p1;
+	const Point& pb = *e.p2;
+	return ( (p.x-pa.x)*(pb.x-pa.x) + (p.y-pa.y)*(pb.y-pa.y) / ((pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y)) );
+}
+
+double det(const Edge& e, const Point& p) {
+	const Point& pa = *e.p1;
+	const Point& pb = *e.p2;
+	return (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
 }
 
 enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;
 
-	const Point& pa = *e1.p1;
-	const Point& pb = *e1.p2;
-	const Point& pc = *e2.p1;
-	const Point& pd = *e2.p2;
+	//std::cout << "e1.p1 == e2.p1: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << ", e1.p1: " << *e1.p1 << std::endl;
+	//std::cout << "e1.p1 == e2.p2: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << ", e1.p2: " << *e1.p2 << std::endl;
+	//std::cout << "e1.p2 == e2.p1: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << ", e2.p1: " << *e2.p1 << std::endl;
+	//std::cout << "e1.p2 == e2.p2: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << ", e2.p2: " << *e2.p2 << std::endl;
 
 	//quick check if the edges share a vertex
-	if ( (pa == pc) || (pa == pd) || (pb == pc) || (pb == pd) )
+	if ( (*(e1.p1) == *(e2.p1)) || (*(e1.p1) == *(e2.p2)) || (*(e1.p2) == *(e2.p1)) || (*(e1.p2) == *(e2.p2)) )
 		return IS_VERTEX;
 
 	// determinant between edge 1 and a point in edge 2
-	det_a = pc.x * (pa.y - pb.y) - pc.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y);
-	det_b = pd.x * (pa.y - pb.y) - pd.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y);
+	det_a = det(e1, *e2.p1);
+	det_b = det(e1, *e2.p2);
 	// determinant between edge 2 and a point in edge 1
-	det_c = pa.x * (pc.y - pd.y) - pa.y * (pc.x-pd.x) + (pc.x*pd.y - pd.x*pc.y);
-	det_d = pb.x * (pc.y - pd.y) - pb.y * (pc.x-pd.x) + (pc.x*pd.y - pd.x*pc.y);
+	det_c = det(e2, *e1.p1);
+	det_d = det(e2, *e1.p2);
 
 	if (det_a*det_b*det_c*det_b == 0) {
+		bool col = false; // if true, check for collinearity
+
 		// some determinant was 0, need to check if it's inside an edge or outside.
-		// checks where point c lies 
-		dp_1 = (pc.x-pa.x)*(pb.x-pa.x) + (pc.y-pa.y)*(pb.y-pa.y) / ( (pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y) );
-		dp_2 = (pd.x-pa.x)*(pb.x-pa.x) + (pd.y-pa.y)*(pb.y-pa.y) / ( (pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y) );
-		dp_3 = (pa.x-pc.x)*(pd.x-pc.x) + (pa.y-pc.y)*(pd.y-pc.y) / ( (pd.x-pc.x)*(pd.x-pc.x) + (pd.y-pc.y)*(pd.y-pc.y) );
-		dp_4 = (pb.x-pc.x)*(pd.x-pc.x) + (pb.y-pc.y)*(pd.y-pc.y) / ( (pd.x-pc.x)*(pd.x-pc.x) + (pd.y-pc.y)*(pd.y-pc.y) );
+		dp_1 = reldist(e1, *e2.p1);
+		dp_2 = reldist(e1, *e2.p2);
+		dp_3 = reldist(e2, *e1.p1);
+		dp_4 = reldist(e2, *e1.p2);
+
+		//std::cout << "dp1: " << dp_1 << std::endl;
+		//std::cout << "dp2: " << dp_2 << std::endl;
+		//std::cout << "dp3: " << dp_3 << std::endl;
+		//std::cout << "dp4: " << dp_4 << std::endl;
 
 		if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) )
-			return IS_TRUE;
+			col = true;
 		else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) )
-			return IS_TRUE;
+			col = true;
 		else if ( (det_c == 0) && (dp_3 > 0) && (dp_3 < 1) )
-			return IS_TRUE;
+			col = true;
 		else if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) )
+			col = true;
+
+		if (col && (det_a == 0) && (det_b == 0) && (det_c == 0) && (det_d == 0))
+			return IS_COLLINEAR;
+		else if (col)
 			return IS_TRUE;
 		else
 			return IS_FALSE;

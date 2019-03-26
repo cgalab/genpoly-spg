@@ -1,5 +1,7 @@
 PP = g++
-WFLAGS = -Wall -Werror -Wextra
+# maybe add -Werror -Wall
+WFLAGS = -Wextra -O3 
+
 
 SDIR = src
 ODIR = obj
@@ -18,10 +20,15 @@ UOBJ := $(patsubst $(USDIR)/%.cpp, $(UODIR)/%.o, $(USRC))
 all: dir $(UOBJ) $(OBJ)
 	$(PP) $(OBJ) $(UOBJ) -o app $(WFLAGS)
 
+all_win: $(UOBJ) $(OBJ)
+	$(PP) $(OBJ) $(UOBJ) -o app $(WFLAGS)
+
 dir:
-	$(info   OBJECTS is $(OBJ))
 	mkdir -p $(ODIR)
 	mkdir -p $(UODIR)
+
+test: clean all
+	./app
 
 
 $(UODIR)/%.o: $(USDIR)/%.cpp
@@ -34,3 +41,4 @@ clean:
 
 	rm -f app $(ODIR)/*.o $(UODIR)/*.o
 	rm -f -d $(ODIR) $(UODIR)
+	rm -f *.dat
