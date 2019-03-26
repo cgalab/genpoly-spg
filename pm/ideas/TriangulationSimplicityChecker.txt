@@ -17,38 +17,7 @@ simplicityControl():
 
 - choosen point: C
 - generate new PEs l and r 
-- get all edges of triangles belonging to C but not containing C into list L
-- for all e in L
-	check intersection with l => intersecting edge el
-	check intersection with r => intersecting edge er
-	if no intersection: move was fine, proceed with repairTriangulation()
-	else if intersections just with CE: move was fine, proceed with repairTriangulation()
-- while intersection found:
-	get other triangle Tl of el
-	get other triangle Tr of er
-	get lists Ll and Lr of other edges of Tl and Tr
-	for each el of Ll and er of Lr
-		check for intersection of l and el
-		check for intersection of r and er
-		if no intersection: move was fine, proceed with repairTriangulation()
-		else if intersection wit PE: reject move
-		else if intersection just with CE: move was fine, proceed with repairTriangulation
-		else: go on!
-
-
-repairTriangulation():
-
-- delete all edges containing C except the new edges l and r
-- create triangle with the neighbooring points P and N
-- delete edges p and n between C and adjacent points P and N and insert edge e between adjacent points
-	if p and n were CE: e is CE
-	else:
-		e is SE
-		if just p was CE:
-			insert triangle P, N and the point NN adjacent to N 
-			make new edge an CE
-		if just n was CE:
-			insert triangle N, P and the point PP adjacent to P 
-			make new edge an CE
-
-- delete all intersected edges and make simple polygon of their space -> triangulate with any standard triangulation algo
+first decision criterion:
+are the two PE of C CE? 
+no -> we can start just with the surrounding triangles
+yes -> it may appear, that the new edges are completly outside of the polygon
