@@ -15,7 +15,6 @@
 #include "edge.h"
 
 int main(int argc, char *argv[]) {
-  //test();
 
   // final return value
   enum error returnValue = SUCCESS;
@@ -53,6 +52,7 @@ int main(int argc, char *argv[]) {
       }
     }
   }
+  else if (returnValue == RUN_TESTS) test();
 
   //begin = clock();
   //end = clock();

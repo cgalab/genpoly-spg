@@ -6,11 +6,41 @@
 #ifndef __EDGE_H_
 #define __EDGE_H_
 
+// class for when an edge is vertical on the x axis
+class Yval {
+private:
+public:
+  double max, min;
+
+  Yval() {max=0;min=0;}
+  Yval(double val) {max=val;min=val;}
+  Yval(double a, double b) {
+    if (a<b) {min=a;max=b;}
+    else {min=b;max=a;}
+  }
+
+  void set(double val) {max=val;min=val;}
+  void set(double a, double b) {
+    if (a<b) {min=a;max=b;}
+    else {min=b;max=a;}
+  }
+
+  bool operator < (const double s) const {
+    if (min < s) return true;
+    else return false;
+  }
+  bool operator < (const Yval s) const {
+         if (min < s.min) return true;
+    else if ((min == s.min) && (max < s.max)) return true;
+    else return false;
+  }
+};
+
 class Edge {
 public:
 	Point *p1;
 	Point *p2;
-	unsigned int l_idx; // the lower lexicographical index of the edge
+	double l_idx; // the lower lexicographical index of the edge
 
 	Edge() {p1=NULL; p2=NULL; l_idx=0;}
 	Edge(const Edge& e) {p1=e.p1; p2=e.p2; l_idx = e.l_idx;}
@@ -25,10 +55,65 @@ public:
 		l_idx=L_I;
 	}
 
-	void setVertices(Point* v1, Point* v2){
+	void setVertices(Point* v1, Point* v2) {
 		p1 = v1;
 		p2 = v2;  
 	}
+
+  Point getLexLow() const {
+    if ((*p1).x < (*p2).x)
+      return *p1;
+    else {
+      if (((*p1).x == (*p2).x) && ((*p1).y < (*p2).y))
+        return *p1;
+      else
+        return *p2;
+    }
+  }
+
+  Point getLexHigh() const {
+    if ((*p1).x < (*p2).x)
+      return *p2;
+    else {
+      if (((*p1).x == (*p2).x) && ((*p1).y < (*p2).y))
+        return *p2;
+      else
+        return *p1;
+    }
+  }
+
+  friend bool operator<(const Edge& lhs, const Edge& rhs) {
+    std::cout << "lhs: " << lhs << std::endl;
+    std::cout << "rhs: " << rhs << std::endl;
+    // The lhs is always the one being compared to all the others
+    double idx = lhs.l_idx;
+    Yval Ly, Ry;
+
+    // calculate the y-axis order of the 2 edges at idx
+    // use Yval in case of x1-x2 = 0, hopefully this will be a better comparison function..
+    // Line for lhs:
+    Point L1 = *lhs.p1;
+    Point L2 = *lhs.p2;
+
+    if ((L2.x - L1.x) == 0) {
+      Ly.set(L1.y, L2.y);
+    } else {
+      double slope = (L2.y-L1.y) / (L2.x-L1.x);
+      Ly.set(slope * (idx - L1.x) + L1.y);
+    }
+
+    Point R1 = *rhs.p1;
+    Point R2 = *rhs.p2;
+
+    if ((R2.x - R1.x) == 0) {
+      Ry.set(R1.y, R2.y);
+    } else {
+      double slope = (R2.y-R1.y) / (R2.x-R1.x);
+      Ry.set(slope * (idx - R1.x) + R1.y);
+    }
+
+    return Ly < Ry;
+  }
 
 	friend bool operator==(const Edge& lhs, const Edge& rhs) {
 		if ((lhs.p1 == rhs.p1) && (lhs.p2 == rhs.p2)) return true;
@@ -40,7 +125,6 @@ public:
 		return os;
 	};
 };
-
 
 void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points);
 double reldist(const Edge& e, const Point& p);

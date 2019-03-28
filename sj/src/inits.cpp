@@ -98,7 +98,7 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 		{0, 0, 0, 0}
 	};
 
-	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:w?", long_options, NULL)) != -1 ) {
+	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:w?t", long_options, NULL)) != -1 ) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -118,24 +118,29 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 			case 'w':
 				writeNew = true;
 				break;
+			case 't':
+				returnValue = RUN_TESTS;
+				break;
 			case '?':
 				returnValue = NO_ARGUMENTS;
 				std::cerr << "Command line arguments:" << std::endl;
 				std::cerr << " -?" << std::endl;
-				std::cerr << " :: ignores any other argument and just prints this helpful information." << std::endl;
+				std::cerr << " :: ignores any other argument and just prints this helpful information." << std::endl << std::endl;
 				std::cerr << " --infile <string>  |OR| -i <string>" << std::endl;
-				std::cerr << " ::  <string> is the filename of a file containing a set of points." << std::endl;
+				std::cerr << " ::  <string> is the filename of a file containing a set of points." << std::endl << std::endl;
 				std::cerr << " --outfile <string> |OR| -o <string>" << std::endl;
-				std::cerr << " :: <string> is the filename of a file with the processed output of the program." << std::endl;
+				std::cerr << " :: <string> is the filename of a file with the processed output of the program." << std::endl << std::endl;
 				std::cerr << " --alg <arg>        |OR| -a <arg>" << std::endl;
-				std::cerr << " :: <arg> can be '2opt' (without the '') ." << std::endl;
+				std::cerr << " :: <arg> can be '2opt' (without the '') ." << std::endl << std::endl;
 				std::cerr << " --informat <arg>   |OR| -b <arg>" << std::endl;
-				std::cerr << " :: <arg> can be 'points' OR 'poly' OR 'comp'." << std::endl;
+				std::cerr << " :: <arg> can be 'points' OR 'poly' OR 'comp'." << std::endl << std::endl;
 				std::cerr << " --outformat <arg>  |OR| -c <arg>" << std::endl;
-				std::cerr << " :: <arg> can be 'perm' OR 'poly' OR 'dat'." << std::endl;
+				std::cerr << " :: <arg> can be 'perm' OR 'poly' OR 'dat'." << std::endl << std::endl;
 				std::cerr << " --writenew         |OR| -w" << std::endl;
 				std::cerr << " :: option to not overwrite the output file if it already exists," << std::endl;
-				std::cerr << "    a new file is created with an increment number added to the end." << std::endl;
+				std::cerr << "    a new file is created with an increment number added to the end." << std::endl << std::endl;
+				std::cerr << " -t" << std::endl;
+				std::cerr << " :: ignores all other arguments and runs the test-bed." << std::endl;
 				break;
 
 			default:

@@ -20,7 +20,8 @@ enum error {
   READ_ERROR_OFORMAT = 8,
   NO_ARGUMENTS  = 9,
   ALGORITHM_UNDEFINED = 10,
-  ALGORITHM_IDLE = 11
+  ALGORITHM_IDLE = 11,
+  RUN_TESTS = 12
 };
 
 // the algorithms that should be selectable.
@@ -59,8 +60,8 @@ enum point_format_t {
 enum intersect_t {
   IS_FALSE = 0,
   IS_VERTEX = 1,
-  IS_COLLINEAR = 2,
-  IS_TRUE = 10  // value 10 is required for a easy recognized non-vertex intersections in a sum
+  IS_TRUE = 10,  // value 10 is required for a easy recognized non-vertex intersections in a sum
+  IS_COLLINEAR = 11
 };
 
 enum edge_t {

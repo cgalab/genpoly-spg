@@ -2,7 +2,7 @@
 #include <vector>
 #include <list>
 #include <algorithm>
-#include <math.h>
+#include <math.h> // for signbit
 #include "basicDefinitions.h"
 #include "edge.h"
 #include "point.h"

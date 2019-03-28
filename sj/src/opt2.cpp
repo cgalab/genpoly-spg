@@ -1,9 +1,11 @@
 #include <iostream> // for endl
 #include <vector>
 #include <list>
+#include <set>
 #include <utility> // for std::pair
 #include <stdlib.h>  // for abs
 #include <algorithm>    // std::sort
+#include <iterator> // for std:prev and std::next
 #include "basicDefinitions.h"
 #include "basicFunctions.h"
 #include "point.h"
@@ -17,8 +19,18 @@ bool sortbysec(const std::pair<Point*,double> &a, const std::pair<Point*,double>
 
 bool sortbyint(const int i, const int j) { return (i<j); }
 
+// function to remove edges from 'edgeS' up to and including value of 'index'
+void decrementEdges(unsigned int index, std::set<Edge, setComp>& edgeS) {
+	std::set<Edge, setComp>::iterator it = edgeS.begin();
+	while (it != edgeS.end()) {
+		if ((*it).l_idx >= index) it = edgeS.erase(it);
+		else ++it;
+	}
+}
+
+/*
 // function to remove edges from 'edges' up to and including value of 'index'
-void decrementEdges(unsigned int index, std::list<Edge>& edges) {
+void decrementEdges1(unsigned int index, std::list<Edge>& edges) {
 	// need to remove all edges in the set from the end up to and including new index.
 	unsigned int check = (*edges.rbegin()).l_idx;
 	//std::cout << "check: " << check << std::endl;
@@ -28,6 +40,7 @@ void decrementEdges(unsigned int index, std::list<Edge>& edges) {
 		//std::cout << "check: " << check << std::endl;
 	}
 }
+*/
 
 // function that erases points in 'moveP' from the polygon and adds them to the end in order of 'moveP'.
 void movePoints(std::vector<unsigned int>& moveP, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
@@ -55,7 +68,7 @@ void movePoints(std::vector<unsigned int>& moveP, std::vector<unsigned int>& pol
 	do {
 		j = rg.getRandomIndex(moveP.size()-1);
 		std::cout << "j: " << j << ", index: " << moveP[j] << std::endl;
-	} while (moveP[j] > 396);
+	} while (moveP[j] > points.size()-4);
 
 	std::vector<unsigned int>::iterator it = polygon.begin()+moveP[j];
 	std::cout << "points index at pol[j]: " << *it << ", point: " << points[*it] << std::endl;
@@ -75,7 +88,85 @@ void movePoints(std::vector<unsigned int>& moveP, std::vector<unsigned int>& pol
 	}
 }
 
-enum edge_t edgeCheck(unsigned int& index, Edge& e, std::list<Edge>& edges, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+// checks if an edge 'e' is: already in 'edgeS', if not checks if it intersects its neighbours and either cleans 'edgeS' or add 'e' into it.
+enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+	enum edge_t valid = E_VALID;
+	enum intersect_t cross = IS_FALSE;
+	bool bef = false, af = false;
+	// ok to try and insert the edge into 'edgeS', if it's already there, we have an iterator for removal of the value, if it isn't, we have an iterator to check neighbours.
+	std::pair<std::set<Edge, setComp>::iterator,bool> retval;
+
+	retval = edgeS.insert(e);
+	std::cout << "retval.first : " << *retval.first << std::endl;
+	std::cout << "retval.second: " << retval.second << std::endl;
+
+	if (retval.second) {
+		// 'e' was successfully inserted into 'edgeS' as a new element
+		// check if it intersects with its neighbours
+		Edge before, after;
+
+		std::cout << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
+		if (retval.first != edgeS.begin()) {
+			before = *(std::prev(retval.first));
+			std::cout << "before: " << before << std::endl;
+			bef = true;
+		}
+		std::cout << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
+		if (retval.first != --edgeS.end()) {
+			after  = *(std::next(retval.first));
+			std::cout << "after : " << after << std::endl;
+			af = true;
+		}
+
+		if (bef) {
+			cross = checkIntersection(e, before);
+			if ((cross == IS_FALSE) || (cross == IS_VERTEX)) {
+				std::cout << "no intersection between 'e' and 'before'" << std::endl;
+				valid = E_VALID;
+			}
+			else {
+				// edge intersects with 'before'.  Need to flip 'e' and 'before' in polygon, then remove edges in 'edgeS'
+				std::cout << "intersection with 'before'" << std::endl;
+				flip(e, before, polygon, points);
+				index = 0;
+				//index = (e.l_idx < before.l_idx) ? e.l_idx : after.l_idx;
+				decrementEdges(index, edgeS);
+				valid = E_SKIP;
+			}
+		}
+		if (valid != E_SKIP) {
+			if(af) {
+				cross  = checkIntersection(e, after);
+				if (af && (valid == E_VALID) && ((cross == IS_FALSE) || (cross == IS_VERTEX))) {
+					// edge inserted, and does not intersect its neighbours.
+					std::cout << "no intersection between 'e' and 'after'" << std::endl;
+					valid = E_VALID;
+				}
+				else {
+					// edge intersects with 'after'.  Need to flip 'e' and 'after' in polygon, then remove edges in 'edgeS'
+					std::cout << "intersection with 'after'" << std::endl;
+					flip(e, after, polygon, points);
+					index = 0;
+					//index = (e.l_idx < after.l_idx) ? e.l_idx : after.l_idx;
+					decrementEdges(index, edgeS);
+					valid = E_SKIP;
+				}
+			}
+		}
+	}
+	else {
+		// 'e' already existed and needs to be removed from 'edgeS'
+		std::cout << "'e' found in 'edgeS', removing it." << std::endl;
+		edgeS.erase(retval.first);
+		valid = E_NOT_VALID;
+	}
+
+	return valid;
+}
+
+/*
+// old version that checks all edges in 'edges' list to the edge 'e'
+enum edge_t edgeCheck1(unsigned int& index, Edge& e, std::list<Edge>& edges, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	enum edge_t valid = E_VALID;
 	enum intersect_t cross = IS_FALSE;
 
@@ -142,6 +233,7 @@ enum edge_t edgeCheck(unsigned int& index, Edge& e, std::list<Edge>& edges, std:
 	}
 	return valid;
 }
+*/
 
 enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	// initialise and create a random permutation for the polygon
@@ -161,18 +253,19 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
 	unsigned int index=0, before, after;
+	double d_idx;
 	enum edge_t val1, val2;
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
-	std::list<Edge> edges; // a list for edges that need to be checked against the current edge being validated
-
-
+	//std::list<Edge> edgesL; // a list for edges
+	std::set<Edge, setComp> edgeS; // a set of edges.
 
 	while (index < points.size()) {
 		std::cout << "index: " << index << std::endl;
 		val1 = E_VALID; val2 = E_VALID;
 		// get the current point at 'index'
 		p1 = &points[lex[index]];
+		d_idx = (*p1).x;
 		// get the 2 points it is connected to in 'polygon', treating the edge case when the point 'p1' is on the ends
 		before = ((*p1).v + points.size() -1) % points.size();
 		after =  ((*p1).v + points.size() +1) % points.size();
@@ -181,20 +274,18 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 		p3 = &points[polygon[after]];
 
 		// construct the edges
-		e1 = Edge (p1, p2, index);
-		e2 = Edge (p1, p3, index);
-		//std::cout << "e1:" << e1 << std::endl;
-		//std::cout << "e2:" << e2 << std::endl;
-
-		val1 = edgeCheck(index, e1, edges, polygon, points);
-		//std::cout << "after edgecheck1." << std::endl;
+		e1 = Edge (p1, p2, d_idx);
+		e2 = Edge (p1, p3, d_idx);
+		
+		std::cout << "processing e1: " << e1 << std::endl;
+		val1 = processEdge(index, e1, edgeS, polygon, points);
 		if (val1 == E_SKIP) continue; // swapping invalidates 'e2' so start again from the lower index before processing 'e2'
-		val2 = edgeCheck(index, e2, edges, polygon, points);
+
+		std::cout << "processing e2: " << e2 << std::endl;
+		val2 = processEdge(index, e2, edgeS, polygon, points);
 		//std::cout << "after edgecheck2." << std::endl;
 		if (val2 == E_SKIP) continue;
-
-		if (val1 == E_VALID) edges.emplace_back(e1);
-		if (val2 == E_VALID) edges.emplace_back(e2);
+ 
     //std::cout << "edges in 'edges':" << std::endl;
     //for (std::list<Edge>::iterator it=edges.begin(); it!=edges.end(); ++it) std::cout << *it << std::endl;
 		
