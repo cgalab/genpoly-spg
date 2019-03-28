@@ -48,7 +48,11 @@ public:
 	void addTriangle(Triangle* t);
 
 	void print(FILE* f){
-		fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * 20, y * 20, id, id);
+		fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * 10, y * 10, id, id);
+	}
+
+	void print(){
+		printf("Vertex %d at (%f, %f)\n", id, x, y);
 	}
 
 	int getID(){ return id;}
