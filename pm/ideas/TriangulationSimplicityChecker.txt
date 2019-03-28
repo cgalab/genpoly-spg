@@ -1,23 +1,77 @@
 Conditions for the triangulation:
 - must contain all polygon edges
-- no  other points than the polygon points
-- must contain all adges of the convex hull
+- must contain the four edges of a rectangle enclosing the polygon without touching it
+- no  other vertices than the polygon vertices and the four vertices of the rectangle
 
 Types of edges:
-- edges which are currently part of the polygon are called polygon edges (PE)
-- edges which are currently part of the convex hull are called convex hull edges (CE)
-- all other edges are called standard edges (SE)
-- caution: an edges can be a PE and a CE at the same time
+- polygon edges called PE
+- edges of the enclosing rectangle called RE
+- other edges of the triangulation called TE
 
 Initial triangulation:
-- no problem as long as the initial polygon is convex => all PE are also CE
-- can easily done by specific schemes for each type of initial polygons
+- triangulate the initial (convex) polygon by zigzag
+- generate the rectangle around
+- triangulate the space between the rectangle and the polygon
 
-simplicityControl():
+simplicity_check():
+- be C the vertex to translate, P its previous vertex in the polygon and N the next vertex
+- be p the PE from P to C and n the PE from C to N
+- be C' the translated vertex of C, p' the PE from P to C' and n' the PE from C' to N
 
-- choosen point: C
-- generate new PEs l and r 
-first decision criterion:
-are the two PE of C CE? 
-no -> we can start just with the surrounding triangles
-yes -> it may appear, that the new edges are completly outside of the polygon
+- set p and n to TE
+- get all triangles surrounding P into the list TP and all triangles surrounding N into the list TN
+- get all edges of the triangles in TP not incident to P into list EP
+- get all edges of the triangles in TN not incident to N into list EN
+
+- check for intersection of p' with any edges ei of the set EP
+- if no intersection: accept translation
+- else:
+	- take intersecting edge as e
+	- while p' intersects with e
+		- if e is PE or TE: reject translation
+		- take other triangle T of e
+		- check for intersection of p' with one of the other two edges of T
+		- if no intersection: accept translation
+		- else: take intersecting edge as e
+
+- do the same with n' and EN
+- if both accept, than accept the translation and repair_triangulation()
+- otherwise reject the translation and set n and p to PE
+
+repair_triangulation():
+- delete vertex C and all edges incident to it
+- delete all intersected edges
+- insert C', p' and n' into the triangulation
+
+- get edge e from P to N
+- if e exists:
+	- if C' is on the same side of e as C
+		- get inner polygon IP on C's side of e
+		- retriangulate IP
+	- if C' is on the other side of e as C
+		- remove e
+		- get inner polygon IP1 on C's side of e
+		- get inner polygon IP2 on the opposite side of e
+		- retriangulate IP1 and IP2
+- else:
+	- get inner polygon IP1 on C's side of e
+	- get inner polygon IP2 on the opposite side of e
+	- retriangulate IP1 and IP2
+
+How to get the inner polygons?
+- use the property that each edge of these polygons is just connected to one triangle at the moment whereas all other PE and TE are connected to two triangles
+- caution: RE of these polygons are at the moment connected to no triangle and also p' and n' may not be connected to any triangle if a retriangulation on both sides is necessary
+- create a new list L
+- start at the vertex P as V and insert P into the list
+- get one of the adjacent vertices of V connected by an edge with a missing triangle (but not C')
+- make this vertex to V and insert it into L
+- while V is not N
+ 	- get the other adjacent vertex of V connected by an edge with a missing triangle
+ 	- caution: don't go back on accident!
+ 	- make this vertex to V and insert it into L
+- insert C' into L
+=> the hull of the inner polygon is now in L
+ 
+
+
+
