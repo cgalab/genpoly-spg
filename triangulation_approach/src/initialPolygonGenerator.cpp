@@ -60,7 +60,7 @@ Triangulation* generateRegularPolygon(int n){
 	// the inital triangulation contains n-2 triangles
 	v0 = (*T).getVertex(0);
 	v1 = (*T).getVertex(n - 1);
-	e0 = new TEdge(v0, v1, true, true);
+	e0 = new TEdge(v0, v1, true, false);
 	(*T).addEdge(e0);
 	for(i = 0; i < n - 2; i++){
 		if(i % 2 == 0){
@@ -76,8 +76,7 @@ Triangulation* generateRegularPolygon(int n){
 			(*T).addEdge(e0);
 			(*T).addEdge(e1);
 
-			(*e0).makeEdgePEdge();
-			(*e0).makeEdgeCHEdge();
+			(*e0).setPEdge(true);
 
 			t = new Triangle(e0, e1, e2, v0, v1, v2);		
 		}else{
@@ -93,8 +92,7 @@ Triangulation* generateRegularPolygon(int n){
 			(*T).addEdge(e0);
 			(*T).addEdge(e1);
 			
-			(*e1).makeEdgePEdge();
-			(*e1).makeEdgeCHEdge();
+			(*e1).setPEdge(true);
 
 			t = new Triangle(e0, e1, e2, v0, v1, v2);
 		}
@@ -103,11 +101,9 @@ Triangulation* generateRegularPolygon(int n){
 	}
 
 	if(n % 2 == 0){
-		(*e0).makeEdgePEdge();
-		(*e0).makeEdgeCHEdge();
+		(*e0).setPEdge(true);
 	}else{
-		(*e1).makeEdgePEdge();
-		(*e1).makeEdgeCHEdge();
+		(*e1).setPEdge(true);
 	}
 	return T; 
 	

@@ -15,25 +15,26 @@ class TEdge {
 private:
 	Vertex* v1;
 	Vertex* v2;
+
 	Triangle* t1;
 	Triangle* t2;
+
 	bool isPE; // polygon edge?
-	bool isCHE; // convex hull edge?
+	bool isRE; // rectangle edge?
+
+	int id;
+	static int n;
 
 public:
 	TEdge(Vertex* V1, Vertex* V2);
-	TEdge(Vertex* V1, Vertex* V2, bool PEdge, bool CHEdge);
+	TEdge(Vertex* V1, Vertex* V2, bool PEdge, bool REdge);
 
-	void makeEdgePEdge(){
-		isPE = true;
-	}
-
-	void makeEdgeCHEdge(){
-		isCHE = true;
+	void setPEdge(bool isPEdge){
+		isPE = isPEdge;
 	}
 
 	bool isPEdge(){ return isPE;}
-	bool isCHEdge(){ return isCHE;}
+	bool isREdge(){ return isRE;}
 
 	void setTriangle(Triangle* t);
 

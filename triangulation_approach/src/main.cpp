@@ -19,8 +19,8 @@ int main(){
 	printf("Initial polygon with regular shape computed after %f seconds\n", t.elapsedTime());
 	
 
-	transformPolygon(T, translations, t);
-	printf("Transformed polygon with %d translations in %f seconds\n", translations, t.elapsedTime());
+	//transformPolygon(T, translations, t);
+	//printf("Transformed polygon with %d translations in %f seconds\n", translations, t.elapsedTime());
 	(*T).print("polygon.graphml");
 	//printStats(p);
 

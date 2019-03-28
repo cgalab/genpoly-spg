@@ -41,3 +41,5 @@ std::list<TEdge*> Vertex::getPolygonEdges(){
 
 	return out;
 }
+
+int Vertex::n = 0;

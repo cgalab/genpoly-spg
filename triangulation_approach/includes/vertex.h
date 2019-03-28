@@ -16,15 +16,32 @@ class Vertex {
 private:
 	double x;
 	double y;
+
+	static int n;
 	int id;
+
 	std::list<TEdge*> edges;
 	std::list<Triangle*> triangles;
 
+	bool rectangleVertex;
+
 public:
-	Vertex(double X, double Y, int ID){ 
+	Vertex(double X, double Y){ 
 		x = X,
 		y = Y;
-		id = ID;
+		rectangleVertex = false;
+
+		id = n;
+		n++;
+	}
+
+	Vertex(double X, double Y, bool RV){ 
+		x = X,
+		y = Y;
+		rectangleVertex = RV;
+
+		id = n;
+		n++;
 	}
 
 	void addEdge(TEdge* e);
@@ -35,9 +52,10 @@ public:
 	}
 
 	int getID(){ return id;}
+	bool isRectangleVertex(){ return rectangleVertex;}
 
 	Vertex* getTranslated(double dx, double dy){
-		return new Vertex(x + dx, y + dy, id);
+		return new Vertex(x + dx, y + dy);
 	}
 
 	TEdge* getEdgeTo(Vertex* v);

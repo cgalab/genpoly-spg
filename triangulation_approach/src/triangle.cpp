@@ -16,6 +16,9 @@ Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vert
 	(*v0).addTriangle(this);
 	(*v1).addTriangle(this);
 	(*v2).addTriangle(this);
+
+	id = n;
+	n++;
 }
 
 bool Triangle::contains(Vertex* v){
@@ -34,3 +37,5 @@ void Triangle::print(){
 	(*e1).print();
 	(*e2).print();
 }
+
+int Triangle::n = 0;
