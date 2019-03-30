@@ -24,7 +24,7 @@ public:
   BSTNode(Edge val, prnt) {key=val;left=NULL;right=NULL;parent=prnt;balance=0;}
 
   void rotateLeft() {
-    // A -> B -> C ==> A <- B -> C
+    // A -> B  ==> A <- B
     // where 'this' node is A
     BSTNode* root = this->parent;
     this->parent = this->right;    // B parent of A
@@ -33,11 +33,16 @@ public:
     (*this->parent).left = this;  // A left child of B
     (*this->parent).parent = root;// parent node moved from A to B
 
-    this->balance = 0;
-    (this->parent).balance = 0;
+    if ((*this->parent) == 0) { // if B was 0, and we rotated because of deletion
+      this->balance = 1;
+      (*this->parent).balance = -1;
+    } else {
+      this->balance = 0;
+      (*this->parent).balance = 0;
+    }
   }
   void rotateRight() {
-    // A <- B <- C ==> A <- B -> C
+    // B <- C ==> B -> C
     // Where 'this' node is C
     BSTNode* root = this->parent;
     this->parent = this->left;    // B parent of C
@@ -46,8 +51,13 @@ public:
     (*this->parent).right = this; // C right child of B
     (*this->parent).parent = root;// parent node moved from C to B
 
-    this->balance = 0;
-    (this->parent).balance = 0;
+    if ((*this->parent) == 0) {   // if 'balance' for B was 0, and we rotated because of deletion
+      this->balance = -1;
+      (*this->parent).balance = 1;
+    } else {
+      this->balance = 0;
+      (*this->parent).balance = 0;
+    }
   }
   void rotateLeftRight() {
     //  A <- C; A -> B ==> A <- B -> C
@@ -174,13 +184,12 @@ public:
 
 };
 
-template <class T>
-class bst {
+class ebst {
 private:
   BSTNode * root;
   long int size;
 public:
-  bst() { root = NULL; size = 0;}
+  ebst() {root = NULL; size = 0;}
 
   std::pair<BSTNODE*, enum bst_t> insert(T val) {
     std::pair<BSTNODE*, enum bst_t> response;
@@ -192,10 +201,9 @@ public:
     if (response.second == BST_SUCCESS) ++size;
     return response; 
   }
-  find(T val) const {} 
+  find(T val) const {}
   lower_bound (T val) const {}
   upper_bound (t val) const {}
-
 }
 
 #endif

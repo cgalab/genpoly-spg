@@ -34,6 +34,11 @@ public:
     else if ((min == s.min) && (max < s.max)) return true;
     else return false;
   }
+
+  friend std::ostream& operator<<(std::ostream& os, const Yval& y) {
+    os << "(" << y.min << "," << y.max << ")";
+    return os;
+  };
 };
 
 class Edge {
