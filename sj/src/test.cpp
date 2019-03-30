@@ -1,6 +1,7 @@
 #include <iostream> // for endl
 #include "edge.h"
 #include "point.h"
+#include "bst.h"
 
 
 void printEnum(enum intersect_t val) {
@@ -122,6 +123,18 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << y1 << " < " << y2 << " should be false : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   std::cerr << std:: endl;
+
+
+  std::cerr << "=== Edge class >< comparison tests ===" << std::endl;
+
+  // reuse the points variables from above, p1 & p2 are connected to e1 and p3 & p4 are connected to e2
+  p1.set(1,1);
+  p2.set(1,2);
+  p3.set(1,3);
+  p4.set(1,4);
+
+  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
+  // check if l_idx changes has an effect..
 
   // need to check if ebst class is working properly
 
