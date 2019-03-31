@@ -238,8 +238,16 @@ public:
     return response;
   }
 
+  friend std::ostream& operator<<(std::ostream& os, const BSTNode& y) {
+    if (y.left != NULL) os << *y.left;
+    if (y.right != NULL) os << *y.right;
+    os << y.key << ", b:" << y.balance << std::endl;
+    return os;
+  }
+
 };
 
+// Class for a balanced binary tree of Edges
 class ebst {
 private:
   BSTNode * root;
@@ -251,6 +259,8 @@ public:
     std::pair<BSTNode*, enum bst_t> response;
     if (root==NULL) {
       root = new BSTNode(val, NULL);
+      response = std::make_pair(root, BST_SUCCESS);
+      return response;
     }
     
     response = root->insert(val);
@@ -266,6 +276,12 @@ public:
   //find(Edge val) const {}
   //lower_bound (Edge val) const {}
   //upper_bound (Edge val) const {}
+
+  friend std::ostream& operator<<(std::ostream& os, const ebst& tree) {
+    if (tree.root != NULL)
+      os << "==Tree: < order==" << std::endl << *tree.root;
+    return os;
+  }
 };
 
 #endif

@@ -1,6 +1,6 @@
 #include <random>
 #include "point.h"
-#include "vertex.h"
+//#include "vertex.h"
 
 #ifndef __RANDOMGENERATOR_H_
 #define __RANDOMGENERATOR_H_
@@ -28,7 +28,7 @@ class RandomGenerator{
 			
 			return new Point(x + dx, y + dy, i);
 		}
-
+/*
 		Vertex* translateVertexNormal(Vertex* v, double mean, double stddev){
 			double dx, dy;
 			
@@ -37,6 +37,7 @@ class RandomGenerator{
 			
 			return (*v).getTranslated(dx, dy);
 		}
+*/
 };
 
 #endif

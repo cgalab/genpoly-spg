@@ -23,6 +23,25 @@ void printEnum(enum intersect_t val) {
   }
 }
 
+void printEnum(enum bst_t val) {
+  switch (val) {
+    case BST_SUCCESS:
+      std::cerr << "BST_SUCCESS";
+      break;
+    case BST_INTERSECTION:
+      std::cerr << "BST_INTERSECTION";
+      break;
+    case BST_EXISTS:
+      std::cerr << "BST_EXISTS";
+      break;
+    case BST_UNDEFINED:
+      std::cerr << "BST_UNDEFINED";
+      break;
+    default:
+      break;
+  }
+}
+
 void test() {
 /*
 test:  bool checkIntersection(const Edge e1, const Edge e2) 
@@ -91,39 +110,30 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << y1 << " < " << y2 << " should be true : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   y2.set(2,3);
-
   std::cerr << y1 << " < " << y2 << " should be true : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   y2.set(1.5,3);
-
   std::cerr << y1 << " < " << y2 << " should be true : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   y2.set(1,3);
-
   std::cerr << y1 << " < " << y2 << " should be true : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   y2.set(1,2);
-
   std::cerr << y1 << " < " << y2 << " should be false : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   y2.set(3);
-
   std::cerr << y1 << " < " << y2 << " should be true : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   y2.set(2);
-
   std::cerr << y1 << " < " << y2 << " should be true : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   y2.set(1.1);
-
   std::cerr << y1 << " < " << y2 << " should be true : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   y2.set(1);
-
   std::cerr << y1 << " < " << y2 << " should be false : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   std::cerr << std:: endl;
-
 
   std::cerr << "=== Edge class >< comparison tests ===" << std::endl;
 
@@ -132,10 +142,87 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p2.set(1,2);
   p3.set(1,3);
   p4.set(1,4);
+  e1.l_idx = 1;
+  e2.l_idx = 1;
 
   std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
-  // check if l_idx changes has an effect..
+  
+  // check if l_idx changes has an effect.
+  p1.set(0,0);
+  p2.set(1,1);
+  p3.set(0,1);
+  p4.set(1,0);
+  e1.l_idx = 0;
+  e2.l_idx = 0;
+
+  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
+  e1.l_idx = 1;
+  std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
+
+  p1.set(1,0);
+  e1.l_idx = 1;
+
+  std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
+
+  // testing if an interval on y axis: [0,1] at x coord: 1 is < of a point at (1,1)
+  p4.set(1,1);
+  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
+
+  //moving the interval up 0.5
+  p1.set(1,0.5);
+  p2.set(1,1.5);
+  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
+  // it is true because an interval at e1's l_idx uses its min value.
+
+  // 2 interval comparison at x coord: 1
+  p1.set(1,1);
+  p2.set(1,2);
+  p3.set(1,3);
+  p4.set(1,4);
+  e1.l_idx = 1;
+  e2.l_idx = 1;
+
+  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
+
+  p2.set(1,3);
+  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
+
+  p3.set(1,1.1);
+  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
+
+  p1.set(1,1);
+  p2.set(1,3);
+  p3.set(1,1);
+  p4.set(1,3);
+  std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
+
+  p4.set(1,2.8);
+  std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
 
   // need to check if ebst class is working properly
+    std::cerr << "=== Edge Binary Search Tree class tests ===" << std::endl;
+
+  ebst tree;
+  std::pair<BSTNode*, enum bst_t> retval;
+
+  p1.set(0,0);
+  p2.set(3,3);
+  e1.l_idx = 0;
+  p3.set(1,0);
+  p4.set(1,3);
+  e2.l_idx = 1;
+  std::cout << tree << std::endl;
+
+  retval = tree.insert(e1);
+  std::cout << "e1 enum: ";
+  printEnum(retval.second);
+  std::cout << std::endl;
+  std::cout << tree << std::endl;
+
+  retval = tree.insert(e2);
+  std::cout << "e2 enum: ";
+  printEnum(retval.second);
+  std::cout << std::endl;
+  std::cout << tree << std::endl;
 
 }

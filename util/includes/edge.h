@@ -47,7 +47,7 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const Yval& y) {
     os << "(" << y.min << "," << y.max << ")";
     return os;
-  };
+  }
 };
 
 class Edge {
@@ -90,7 +90,6 @@ public:
         return *p2;
     }
   }
-
   Point getLexHigh() const {
     if ((*p1).x < (*p2).x)
       return *p2;
@@ -101,12 +100,34 @@ public:
         return *p1;
     }
   }
+  double getxMin() const {
+    if ((*p1).x < (*p2).x) return (*p1).x;
+    else return (*p2).x;
+  }
+  double getxMax() const {
+    if ((*p1).x < (*p2).x) return (*p2).x;
+    else return (*p1).x;
+  }
+  double getyMin() const {
+    if ((*p1).y < (*p2).y) return (*p1).y;
+    else return (*p2).y;
+  }
+  double getyMax() const {
+    if ((*p1).y < (*p2).y) return (*p2).y;
+    else return (*p1).y;
+  }
 
+/*
+  IMPORTANT:  
+  1) Given that the 2 edges both exist at xcoord: lhs.l_idx, the comparison of the 2 edges is made at lhs.l_idx
+*/
   friend bool operator<(const Edge& lhs, const Edge& rhs) {
-    std::cout << "lhs: " << lhs << std::endl;
-    std::cout << "rhs: " << rhs << std::endl;
+    //std::cout << "lhs: " << lhs << std::endl;
+    //std::cout << "rhs: " << rhs << std::endl;
     // The lhs is always the one being compared to all the others
     double idx = lhs.l_idx;
+    //std::cout << "idx: " << idx << std::endl;
+
     Yval Ly, Ry;
 
     // calculate the y-axis order of the 2 edges at idx
@@ -136,8 +157,8 @@ public:
   }
 
   friend bool operator>(const Edge& lhs, const Edge& rhs) {
-    std::cout << "lhs: " << lhs << std::endl;
-    std::cout << "rhs: " << rhs << std::endl;
+    //std::cout << "lhs: " << lhs << std::endl;
+    //std::cout << "rhs: " << rhs << std::endl;
     // The lhs is always the one being compared to all the others
     double idx = lhs.l_idx;
     Yval Ly, Ry;
@@ -174,7 +195,7 @@ public:
 	};
 
 	friend std::ostream& operator<<(std::ostream& os, const Edge& e) {
-		os << " p1: x:" << (*e.p1).x << ", y:" << (*e.p1).y << ", i:" << (*e.p1).i << ", v:" << (*e.p1).v << ", p2: x:" << (*e.p2).x << ", y:" << (*e.p2).y << ", i:" << (*e.p2).i << ", v:" << (*e.p2).v << ": l_idx:" << e.l_idx;
+		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i << "," << (*e.p1).v << "] , (" << (*e.p2).x << "," << (*e.p2).y << "),[" << (*e.p2).i << "," << (*e.p2).v << "], l_i:" << e.l_idx;
 		return os;
 	};
 };
