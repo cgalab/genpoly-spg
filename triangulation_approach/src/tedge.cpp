@@ -1,12 +1,12 @@
 #include "tedge.h"
+#include <string>
 
-TEdge::TEdge(Vertex* V1, Vertex* V2, bool PEdge, bool REdge){ 
+TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp){ 
 	v1 = V1;
 	v2 = V2;
 	t1 = NULL;
 	t2 = NULL;
-	isPE = PEdge;
-	isRE = REdge;
+	type = tp;
 
 	(*V1).addEdge(this);
 	(*V2).addEdge(this);
@@ -22,8 +22,7 @@ TEdge::TEdge(Vertex* V1, Vertex* V2){
 	t1 = NULL;
 	t2 = NULL;
 
-	isPE = false;
-	isRE = false;
+	type = EdgeType::TRIANGULATION;
 
 	(*V1).addEdge(this);
 	(*V2).addEdge(this);
@@ -38,15 +37,30 @@ void TEdge::setTriangle(Triangle* t){
 	else printf("This edge already has two triangles\n");
 }
 
+int TEdge::nrAssignedTriangles(){
+	int n = 0;
+
+	if(t1 != NULL) n++;
+	if(t2 != NULL) n++;
+
+	return n;
+}
+
 void TEdge::print(FILE* f){
 	int w = 0;
-	if(isPE) w = 2;
-	if(isRE) w = w + 1;
+	if(type == EdgeType::POLYGON) w = 2;
+	if(type == EdgeType::FRAME) w = w + 1;
 	fprintf(f, "<edge vertex1=\"%d\" vertex2=\"%d\" weight=\"%d\" useWeight=\"true\"></edge>\n", (*v1).getID(), (*v2).getID(), w);
 }
 
 void TEdge::print(){
-	printf("Edge from point %d to point %d is PE %d, is CHE %d\n", (*v1).getID(), (*v2).getID(), isPE, isRE);
+	std::string tp;
+
+	if(type == EdgeType::POLYGON) tp = "POLYGON";
+	else if(type == EdgeType::FRAME) tp = "FRAME";
+	else tp = "TRIANGULATION";
+
+	printf("Edge from point %d to point %d of type %s \n", (*v1).getID(), (*v2).getID(), tp.c_str());
 }
 
 Vertex* TEdge::getV1(){

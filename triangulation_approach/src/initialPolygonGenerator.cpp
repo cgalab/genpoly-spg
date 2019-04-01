@@ -20,7 +20,7 @@ Triangulation* generateRegularPolygon(int n){
 	// the inital triangulation contains n-2 triangles
 	v0 = (*T).getVertex(0);
 	v1 = (*T).getVertex(n - 1);
-	e0 = new TEdge(v0, v1, true, false);
+	e0 = new TEdge(v0, v1, EdgeType::POLYGON);
 	(*T).addEdge(e0);
 	for(i = 0; i < n - 2; i++){
 		if(i % 2 == 0){
@@ -36,7 +36,7 @@ Triangulation* generateRegularPolygon(int n){
 			(*T).addEdge(e0);
 			(*T).addEdge(e1);
 
-			(*e0).setPEdge(true);
+			(*e0).setEdgeType(EdgeType::POLYGON);
 
 			t = new Triangle(e0, e1, e2, v0, v1, v2);		
 		}else{
@@ -52,7 +52,7 @@ Triangulation* generateRegularPolygon(int n){
 			(*T).addEdge(e0);
 			(*T).addEdge(e1);
 			
-			(*e1).setPEdge(true);
+			(*e1).setEdgeType(EdgeType::POLYGON);
 
 			t = new Triangle(e0, e1, e2, v0, v1, v2);
 		}
@@ -61,9 +61,9 @@ Triangulation* generateRegularPolygon(int n){
 	}
 
 	if(n % 2 == 0){
-		(*e0).setPEdge(true);
+		(*e0).setEdgeType(EdgeType::POLYGON);
 	}else{
-		(*e1).setPEdge(true);
+		(*e1).setEdgeType(EdgeType::POLYGON);
 	}
 
 	boxPolygon(T, r);
@@ -91,10 +91,10 @@ void boxPolygon(Triangulation* T, double r){
 	(*T).addVertex(rv1);
 	(*T).addVertex(rv2);
 	(*T).addVertex(rv3);
-	re0 = new TEdge(rv0, rv1, false, true);
-	re1 = new TEdge(rv1, rv2, false, true);
-	re2 = new TEdge(rv2, rv3, false, true);
-	re3 = new TEdge(rv3, rv0, false, true);
+	re0 = new TEdge(rv0, rv1, EdgeType::FRAME);
+	re1 = new TEdge(rv1, rv2, EdgeType::FRAME);
+	re2 = new TEdge(rv2, rv3, EdgeType::FRAME);
+	re3 = new TEdge(rv3, rv0, EdgeType::FRAME);
 	(*T).addEdge(re0);
 	(*T).addEdge(re1);
 	(*T).addEdge(re2);

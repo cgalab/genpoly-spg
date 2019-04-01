@@ -15,6 +15,7 @@ int main(){
 
 	t.start();
 	T = generateRegularPolygon(n);
+	(*T).check();
 	//p = generateRectangularPolygon(n, RPShapes::RPS_FLAT);
 	printf("Initial polygon with regular shape computed after %f seconds\n", t.elapsedTime());
 	

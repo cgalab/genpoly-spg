@@ -66,6 +66,28 @@ public:
 
 		fclose(f);
 	}
+
+	void check(){
+		EdgeType type;
+		int n;
+
+		for(auto const& i : edges){
+			type = (*i).getEdgeType();
+			n = (*i).nrAssignedTriangles();
+
+			if(type == EdgeType::FRAME){
+				if(n != 1){
+					printf("Edge of type FRAME with %d triangles:\n \t", n);
+					(*i).print();
+				}
+			}else{
+				if(n != 2){
+					printf("Edge of type not FRAME with %d triangles:\n \t", n);
+					(*i).print();
+				}
+			}			
+		}
+	}
 };
 
 #endif
