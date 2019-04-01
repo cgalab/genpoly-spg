@@ -36,7 +36,7 @@ std::list<TEdge*> Vertex::getPolygonEdges(){
 	std::list<TEdge*> out;
 
 	for(auto const& i : edges){
-		if((*i).isPEdge()) out.push_back(i);
+		if((*i).getEdgeType() == EdgeType::POLYGON) out.push_back(i);
 	}
 
 	return out;
