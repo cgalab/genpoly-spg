@@ -9,7 +9,7 @@
 
 int main(){
 	Triangulation* T;
-	int n = 10;
+	int n = 27;
 	int translations = 50 * n;
 	Timer t;
 

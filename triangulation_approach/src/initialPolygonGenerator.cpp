@@ -66,16 +66,20 @@ Triangulation* generateRegularPolygon(int n){
 		(*e1).setEdgeType(EdgeType::POLYGON);
 	}
 
-	boxPolygon(T, r);
+	boxPolygon(T, r, n);
 
 	return T; 
 	
 }
 
-void boxPolygon(Triangulation* T, double r){
+void boxPolygon(Triangulation* T, double r, int n){
 	// vertices and edges of the rectangle
 	Vertex *rv0, *rv1, *rv2, *rv3;
 	TEdge *re0, *re1, *re2, *re3;
+	int limit0, limit1, limit2, i;
+	TEdge *start, *prev, *next;
+	Vertex *v0, *v1;
+	Triangle *t;
 
 	// generate the rectangle
 	/*
@@ -99,4 +103,85 @@ void boxPolygon(Triangulation* T, double r){
 	(*T).addEdge(re1);
 	(*T).addEdge(re2);
 	(*T).addEdge(re3);
+
+	// studieren geht über probieren :D
+	limit0 = (n + 1) / 4;
+	limit1 = n / 2;
+	limit2 = 3 * n / 4;
+
+	// first quadrant
+	v0 = (*T).getVertex(0);
+	start = new TEdge(v0, rv0);
+	(*T).addEdge(start);
+	prev = start;
+
+	for(i = 1; i <= limit0; i++){
+		v1 = (*T).getVertex(i);
+		next = new TEdge(v1, rv0);
+		(*T).addEdge(next);
+
+		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv0);
+
+		v0 = v1;
+		prev = next;
+	}
+
+	// second quadrant
+	next = new TEdge(v0, rv1);
+	(*T).addEdge(next);
+	t = new Triangle(prev, next, re0, v0, rv0, rv1);
+	prev = next;
+
+	for(; i <= limit1; i++){
+		v1 = (*T).getVertex(i);
+		next = new TEdge(v1, rv1);
+		(*T).addEdge(next);
+
+		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv1);
+
+		v0 = v1;
+		prev = next;
+	}
+
+	// third quadrant
+	next = new TEdge(v0, rv2);
+	(*T).addEdge(next);
+	t = new Triangle(prev, next, re1, v0, rv1, rv2);
+	prev = next;
+
+	for(; i <= limit2; i++){
+		v1 = (*T).getVertex(i);
+		next = new TEdge(v1, rv2);
+		(*T).addEdge(next);
+
+		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv2);
+
+		v0 = v1;
+		prev = next;
+	}
+
+	// fourth quadrant
+	next = new TEdge(v0, rv3);
+	(*T).addEdge(next);
+	t = new Triangle(prev, next, re2, v0, rv2, rv3);
+	prev = next;
+
+	for(; i < n; i++){
+		v1 = (*T).getVertex(i);
+		next = new TEdge(v1, rv3);
+		(*T).addEdge(next);
+
+		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv3);
+
+		v0 = v1;
+		prev = next;
+	}
+
+	// close the triangulation
+	v1 = (*T).getVertex(0);
+	next = new TEdge(v1, rv3);
+	(*T).addEdge(next);
+
+	t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv3);
+	t = new Triangle(next, start, re3, v1, rv0, rv3);
 }

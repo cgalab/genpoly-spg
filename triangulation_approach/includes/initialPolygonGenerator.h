@@ -4,9 +4,10 @@
 #include "triangle.h"
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 enum class RPShapes {RPS_FLAT, RPS_QUADRATIC};
 
 //Polygon* generateRectangularPolygon(int n, enum RPShapes type);
 Triangulation* generateRegularPolygon(int n);
-void boxPolygon(Triangulation* T, double r);
+void boxPolygon(Triangulation* T, double r, int n);
