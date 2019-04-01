@@ -11,6 +11,7 @@
 #include "point.h"
 #include "edge.h"
 #include "randomGenerator.h"
+#include "bst.h"
 
 // comparison function for sorting pairs by secondary value
 bool sortbysec(const std::pair<Point*,double> &a, const std::pair<Point*,double> &b) { 
@@ -20,10 +21,10 @@ bool sortbysec(const std::pair<Point*,double> &a, const std::pair<Point*,double>
 bool sortbyint(const int i, const int j) { return (i<j); }
 
 // function to remove edges from 'edgeS' up to and including value of 'index'
-void decrementEdges(unsigned int index, std::set<Edge, setComp>& edgeS) {
-	std::set<Edge, setComp>::iterator it = edgeS.begin();
-	while (it != edgeS.end()) {
-		if ((*it).l_idx >= index) it = edgeS.erase(it);
+void decrementEdges(unsigned int index, ebst& tree) {
+	BSTNode* it = tree.root;
+	while (it != NULL) {
+		if ((*it).l_idx >= index) it = edgeS.del(it);
 		else ++it;
 	}
 }
@@ -89,37 +90,29 @@ void movePoints(std::vector<unsigned int>& moveP, std::vector<unsigned int>& pol
 }
 
 // checks if an edge 'e' is: already in 'edgeS', if not checks if it intersects its neighbours and either cleans 'edgeS' or add 'e' into it.
-enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+enum edge_t processEdge(unsigned int& index, Edge& e, ebst& tree, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	enum edge_t valid = E_VALID;
 	enum intersect_t cross = IS_FALSE;
-	bool bef = false, af = false;
-	// ok to try and insert the edge into 'edgeS', if it's already there, we have an iterator for removal of the value, if it isn't, we have an iterator to check neighbours.
-	std::pair<std::set<Edge, setComp>::iterator,bool> retval;
+	// ok to try and insert the edge into 'tree', if it's already there, we have an iterator for removal of the value, if it isn't, we have an iterator to check neighbours.
+	std::pair<BSTNode*, enum bst_t> retval;
 
-	retval = edgeS.insert(e);
-	std::cout << "retval.first : " << *retval.first << std::endl;
+	retval = tree.insert(e);
+	//std::cout << "retval.first : " << *retval.first << std::endl;
 	std::cout << "retval.second: " << retval.second << std::endl;
 
-	if (retval.second) {
+	if (retval.second == BST_SUCCESS) {
 		// 'e' was successfully inserted into 'edgeS' as a new element
 		// check if it intersects with its neighbours
-		Edge before, after;
+		BSTNode* before, after;
 
-		std::cout << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
-		if (retval.first != edgeS.begin()) {
-			before = *(std::prev(retval.first));
-			std::cout << "before: " << before << std::endl;
-			bef = true;
-		}
-		std::cout << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
-		if (retval.first != --edgeS.end()) {
-			after  = *(std::next(retval.first));
-			std::cout << "after : " << after << std::endl;
-			af = true;
-		}
+		before = retval.first.prev();
+		after  = retval.first.next();
+		std::cout << "before: " << before->key << std::endl;
+		std::cout << "after : " << after->key << std::endl;
 
-		if (bef) {
-			cross = checkIntersection(e, before);
+
+		if (before) {
+			cross = checkIntersection(e, before->key);
 			if ((cross == IS_FALSE) || (cross == IS_VERTEX)) {
 				std::cout << "no intersection between 'e' and 'before'" << std::endl;
 				valid = E_VALID;
@@ -127,17 +120,17 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 			else {
 				// edge intersects with 'before'.  Need to flip 'e' and 'before' in polygon, then remove edges in 'edgeS'
 				std::cout << "intersection with 'before'" << std::endl;
-				flip(e, before, polygon, points);
+				flip(e, before->key, polygon, points);
 				index = 0;
 				//index = (e.l_idx < before.l_idx) ? e.l_idx : after.l_idx;
-				decrementEdges(index, edgeS);
+				decrementEdges(index, tree);
 				valid = E_SKIP;
 			}
 		}
 		if (valid != E_SKIP) {
-			if(af) {
-				cross  = checkIntersection(e, after);
-				if (af && (valid == E_VALID) && ((cross == IS_FALSE) || (cross == IS_VERTEX))) {
+			if(after) {
+				cross  = checkIntersection(e, after->key);
+				if ((valid == E_VALID) && ((cross == IS_FALSE) || (cross == IS_VERTEX))) {
 					// edge inserted, and does not intersect its neighbours.
 					std::cout << "no intersection between 'e' and 'after'" << std::endl;
 					valid = E_VALID;
@@ -145,10 +138,10 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 				else {
 					// edge intersects with 'after'.  Need to flip 'e' and 'after' in polygon, then remove edges in 'edgeS'
 					std::cout << "intersection with 'after'" << std::endl;
-					flip(e, after, polygon, points);
+					flip(e, after->, polygon, points);
 					index = 0;
 					//index = (e.l_idx < after.l_idx) ? e.l_idx : after.l_idx;
-					decrementEdges(index, edgeS);
+					decrementEdges(index, tree);
 					valid = E_SKIP;
 				}
 			}
@@ -259,6 +252,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	Edge e1, e2;
 	//std::list<Edge> edgesL; // a list for edges
 	std::set<Edge, setComp> edgeS; // a set of edges.
+	ebst tree; // A balanced binary search tree.
 
 	while (index < points.size()) {
 		std::cout << "index: " << index << std::endl;
@@ -278,11 +272,11 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 		e2 = Edge (p1, p3, d_idx);
 		
 		std::cout << "processing e1: " << e1 << std::endl;
-		val1 = processEdge(index, e1, edgeS, polygon, points);
+		val1 = processEdge(index, e1, tree, polygon, points);
 		if (val1 == E_SKIP) continue; // swapping invalidates 'e2' so start again from the lower index before processing 'e2'
 
 		std::cout << "processing e2: " << e2 << std::endl;
-		val2 = processEdge(index, e2, edgeS, polygon, points);
+		val2 = processEdge(index, e2, tree, polygon, points);
 		//std::cout << "after edgecheck2." << std::endl;
 		if (val2 == E_SKIP) continue;
  
