@@ -44,7 +44,7 @@ void printEnum(enum bst_t val) {
 
 void test() {
 /*
-test:  bool checkIntersection(const Edge e1, const Edge e2) 
+test:  bool checkIntersection(const Edge e1, const Edge e2)
 */
   std::cerr << "=== checkIntersection tests ===" << std::endl;
   enum intersect_t itest;
@@ -146,7 +146,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   e2.l_idx = 1;
 
   std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
-  
+
   // check if l_idx changes has an effect.
   p1.set(0,0);
   p2.set(1,1);
@@ -199,6 +199,10 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(1,2.8);
   std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
 
+  std::cerr << "=== Edge Binary Search Tree class tests ===" << std::endl;
+
+
+/*
   // need to check if ebst class is working properly
     std::cerr << "=== Edge Binary Search Tree class tests ===" << std::endl;
 
@@ -224,5 +228,5 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   printEnum(retval.second);
   std::cout << std::endl;
   std::cout << tree << std::endl;
-
+*/
 }
