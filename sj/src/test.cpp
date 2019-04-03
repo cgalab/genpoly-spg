@@ -29,6 +29,8 @@ void printEnum(enum intersect_t val) {
     case IS_COLLINEAR:
       std::cerr << "IS_COLLINEAR";
       break;
+    case IS_SAME_EDGE:
+      std::cerr << "IS_SAME_EDGE";
     default:
       break;
   }
@@ -76,8 +78,10 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   p1.set(1,1);
   p2.set(2,2);
+  e1.set(p1,p2);
   p3.set(1,1);
   p4.set(2,2);
+  e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
   std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << ", value: ";
   printEnum(itest);
@@ -85,8 +89,10 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   p1.set(1,1);
   p2.set(2,2);
+  e1.set(p1,p2);
   p3.set(3,3);
   p4.set(4,4);
+  e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
   std::cerr << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest) ? "true" : "false") << ", value: ";
   printEnum(itest);
@@ -94,8 +100,10 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   p1.set(0,0);
   p2.set(0,2);
+  e1.set(p1,p2);
   p3.set(0,1);
   p4.set(0,3);
+  e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
   std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
   printEnum(itest);
@@ -103,8 +111,10 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   p1.set(0,0);
   p2.set(0,2);
+  e1.set(p1,p2);
   p3.set(0,2);
   p4.set(0,3);
+  e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
   std::cout << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
   printEnum(itest);
@@ -112,8 +122,10 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   p1.set(0,0);
   p2.set(1,1);
+  e1.set(p1,p2);
   p3.set(1,0);
   p4.set(0,1);
+  e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
   std::cout << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
   printEnum(itest);
@@ -230,8 +242,10 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   p1.set(0,0);
   p2.set(3,3);
+  e1.set(p1,p2);
   p3.set(1,0);
   p4.set(1,3);
+  e2.set(p3,p4);
   std::cerr << "inserting e1:" << e1 << std::endl;
   retval = edgeS.insert(e1);
   std::cerr << "r.1: " << (*retval.first) << std::endl;

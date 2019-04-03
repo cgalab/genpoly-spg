@@ -86,8 +86,12 @@ public:
   }
 
 	void set(Point* v1, Point* v2) {
-		p1 = v1;
-		p2 = v2;
+    if ((*v1) < (*v2)) {p1=v1; p2=v2;}
+		else {p1=v2; p2=v1;}
+	}
+  void set(Point& v1, Point& v2) {
+    if ((v1) < (v2)) {p1=&v1; p2=&v2;}
+		else {p1=&v2; p2=&v1;}
 	}
 
   void set(Edge val) {
