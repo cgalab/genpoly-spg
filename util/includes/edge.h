@@ -73,7 +73,7 @@ public:
   double l_idx;
 
 	Edge() {p1=NULL; p2=NULL;l_idx=0;}
-	Edge(const Edge& e) {p1=e.p1; p2=e.p2;l_idx=0;}
+	Edge(const Edge& e) {p1=e.p1; p2=e.p2;l_idx=e.l_idx;}
 	Edge(Point *P1, Point *P2) {
 		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
 		else {p1=P2; p2=P1;}
@@ -93,6 +93,7 @@ public:
   void set(Edge val) {
     p1 = val.p1;
     p2 = val.p2;
+    l_idx = val.l_idx;
   }
 
   Point getLexLow() const {
