@@ -23,9 +23,12 @@ int main(){
 	printf("Initial polygon with regular shape computed after %f seconds\n", t.elapsedTime());
 
 	// try to remove one vertex
-	v = (*T).getVertex(6);
-	(*T).removeVertex(6);
-	delete v;
+	(*T).deleteVertex(1);
+	(*T).deleteVertex(3);
+	(*T).deleteVertex(8);
+	/*v = (*T).getVertex(1);
+	(*T).removeVertex(1);
+	delete v;*/
 	printf("Vertex deleted\n");
 	(*T).check();
 

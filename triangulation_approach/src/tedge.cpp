@@ -64,8 +64,11 @@ int TEdge::nrAssignedTriangles(){
 
 void TEdge::print(FILE* f){
 	int w = 0;
-	if(type == EdgeType::POLYGON) w = 2;
-	if(type == EdgeType::FRAME) w = w + 1;
+	if(t1 != NULL) w++;
+	if(t2 != NULL) w++;
+
+	if(type == EdgeType::POLYGON) w = 5;
+	if(type == EdgeType::FRAME) w = 10;
 	fprintf(f, "<edge vertex1=\"%d\" vertex2=\"%d\" weight=\"%d\" useWeight=\"true\"></edge>\n", (*v1).getID(), (*v2).getID(), w);
 }
 

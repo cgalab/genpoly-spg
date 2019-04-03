@@ -80,3 +80,11 @@ TEdge* Triangulation::getEdge(int index){
 
     return *it;
 }
+
+void Triangulation::deleteVertex(int index){
+	Vertex* v;
+	
+	v = vertices[index];
+	vertices[index] = NULL;
+	delete v;
+}

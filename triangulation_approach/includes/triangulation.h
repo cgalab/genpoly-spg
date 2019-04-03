@@ -28,6 +28,7 @@ public:
 	void removeVertex(int i);
 	void print(char* filename);
 	void check();
+	void deleteVertex(int index);
 };
 
 #endif
