@@ -33,7 +33,8 @@ public:
     std::cout << "t: " << t << std::endl;
     // I think the lhs is always the one being compared to all the others
     Yval Ly, Ry;
-
+    enum intersect_t retval = checkIntersection(lhs, rhs);
+    if (retval > IS_VERTEX)
 
     // calculate the y-axis order of the 2 edges at idx
     // use Yval in case of x1-x2 = 0, hopefully this will be a better comparison function..

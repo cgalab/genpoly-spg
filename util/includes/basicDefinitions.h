@@ -3,7 +3,7 @@
 
 // largest number a double can take that works with ++/-- operation.
 #define DBL_MAX_ITER_INT 9007199254740992
-#define EPSILON 
+#define EPSILON
 
 #define Swap(X,Y)  do{ __typeof__ (X) _T = X; X = Y; Y = _T; }while(0)
 
@@ -61,7 +61,8 @@ enum intersect_t {
   IS_FALSE = 0,
   IS_VERTEX = 1,
   IS_TRUE = 10,  // value 10 is required for a easy recognized non-vertex intersections in a sum
-  IS_COLLINEAR = 11
+  IS_COLLINEAR = 11,
+  IS_SAME_EDGE = 12
 };
 
 enum edge_t {

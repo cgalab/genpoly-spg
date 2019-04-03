@@ -66,7 +66,7 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		if (*(e1.p2) == *(e2.p2)) same22 = true;
 
 		// is e1 and e2 the same edge? then return IS_TRUE
-		if (same11 && same22) return IS_TRUE;
+		if (same11 && same22) return IS_SAME_EDGE;
 
 		// some determinant was 0, need to check if it's inside an edge or outside.
 		dp_1 = reldist(e1, *e2.p1);
