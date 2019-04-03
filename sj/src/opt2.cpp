@@ -120,7 +120,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 
 		if (bef) {
 			cross = checkIntersection(e, before);
-			if ((cross == IS_FALSE) || (cross == IS_VERTEX)) {
+			if ((cross < IS_TRUE)) {
 				std::cout << "no intersection between 'e' and 'before'" << std::endl;
 				valid = E_VALID;
 			}
@@ -137,7 +137,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 		if (valid != E_SKIP) {
 			if(af) {
 				cross  = checkIntersection(e, after);
-				if (af && (valid == E_VALID) && ((cross == IS_FALSE) || (cross == IS_VERTEX))) {
+				if (af && (valid == E_VALID) && (cross < IS_TRUE)) {
 					// edge inserted, and does not intersect its neighbours.
 					std::cout << "no intersection between 'e' and 'after'" << std::endl;
 					valid = E_VALID;

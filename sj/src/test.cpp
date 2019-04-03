@@ -11,8 +11,17 @@ void printEnum(enum intersect_t val) {
     case IS_FALSE:
       std::cerr << "IS_FALSE";
       break;
-    case IS_VERTEX:
-      std::cerr << "IS_VERTEX";
+    case IS_VERTEX11:
+      std::cerr << "IS_VERTEX11";
+      break;
+    case IS_VERTEX12:
+      std::cerr << "IS_VERTEX12";
+      break;
+    case IS_VERTEX21:
+      std::cerr << "IS_VERTEX21";
+      break;
+    case IS_VERTEX22:
+      std::cerr << "IS_VERTEX22";
       break;
     case IS_TRUE:
       std::cerr << "IS_TRUE";

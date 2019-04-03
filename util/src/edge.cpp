@@ -84,12 +84,12 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		else if ( (det_c == 0) && (dp_3 > 0) && (dp_3 < 1) )	col = true;
 		else if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) )	col = true;
 
-		if (col)
-			return IS_COLLINEAR;
-		else if ( same11 || same12 || same21 || same22 )
-			return IS_VERTEX;
-		else
-			return IS_FALSE;
+		if (col) return IS_COLLINEAR;
+		else if (same11) return IS_VERTEX11;
+		else if (same12) return IS_VERTEX12;
+		else if (same21) return IS_VERTEX21;
+		else if (same22) return IS_VERTEX22;
+		else return IS_FALSE;
 	}
 	else {
 		// none of the determinants were 0, so just need to check the sign for intersection.
