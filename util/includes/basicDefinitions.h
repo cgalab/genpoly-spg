@@ -59,10 +59,13 @@ enum point_format_t {
 
 enum intersect_t {
   IS_FALSE = 0,
-  IS_VERTEX = 1,
-  IS_TRUE = 10,  // value 10 is required for a easy recognized non-vertex intersections in a sum
-  IS_COLLINEAR = 11,
-  IS_SAME_EDGE = 12
+  IS_VERTEX11 = 1,
+  IS_VERTEX12 = 2,
+  IS_VERTEX21 = 3,
+  IS_VERTEX22 = 4,
+  IS_TRUE = 50,  // value 10 is required for a easy recognized non-vertex intersections in a sum
+  IS_COLLINEAR = 51,
+  IS_SAME_EDGE = 52
 };
 
 enum edge_t {

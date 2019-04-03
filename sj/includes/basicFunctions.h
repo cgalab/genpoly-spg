@@ -34,7 +34,22 @@ public:
     // I think the lhs is always the one being compared to all the others
     Yval Ly, Ry;
     enum intersect_t retval = checkIntersection(lhs, rhs);
-    if (retval > IS_VERTEX)
+    if (retval == IS_SAME_EDGE) return false;
+    else if (retval == IS_VERTEX11) {
+      return *lhs.p2 < *rhs.p2;
+    }
+    else if (retval == IS_VERTEX12) {
+      return *lhs.p2 < *rhs.p1;
+    }
+    else if (retval == IS_VERTEX21) {
+      return *lhs.p1 < *rhs.p2;
+    }
+    else if (retval == IS_VERTEX22) {
+      return *lhs.p1 < *rhs.p1;
+    }
+    else if (retval == IS_TRUE) {}
+    else if (retval == IS_FALSE) {}
+    else if (retval == IS_COLLINEAR) {}
 
     // calculate the y-axis order of the 2 edges at idx
     // use Yval in case of x1-x2 = 0, hopefully this will be a better comparison function..
