@@ -67,57 +67,6 @@ public:
   }
 };
 
-
-struct setComp2 {
-  bool operator() (const Edge& lhs, const Edge& rhs) const {
-    std::cout << "lhs: " << lhs << std::endl;
-    std::cout << "rhs: " << rhs << std::endl;
-    Point L1 = lhs.getLexLow();
-    Point L2 = lhs.getLexHigh();
-    Point R1 = rhs.getLexLow();
-    Point R2 = rhs.getLexHigh();
-
-    if (L1 < R1) return true;
-    else if (L2 < R2) return true;
-    else return false;
-  }
-};
-
-
-// comparison class for the 'edgeS' set in "opt2.cpp"
-struct setComp1 {
-  bool operator() (const Edge& lhs, const Edge& rhs) const {
-    std::cout << "lhs: " << lhs << std::endl;
-    std::cout << "rhs: " << rhs << std::endl;
-    Point L1 = lhs.getLexLow();
-    L1.v = 0;
-    Point L2 = lhs.getLexHigh();
-    L2.v = 1;
-    Edge L = Edge(&L1, &L2);
-
-    Point R1 = rhs.getLexLow();
-    R1.v = 0;
-    Point R2 = rhs.getLexHigh();
-    R2.v = 1;
-    Edge R = Edge(&R1, &R2);
-
-    double det_a = det(L,*R.p1);
-    double det_b = det(L,*R.p2);
-    double det_c = det(R,*L.p1);
-    double det_d = det(R,*L.p2);
-    std::cout << "s(a): " << signbit(det_a) << ", s(b): " << signbit(det_b) << ", s(c): " << signbit(det_c) << ", s(d): " << signbit(det_d) << std::endl;
-
-    if ( (!signbit(det_a) || !signbit(det_b)) && (signbit(det_c) || signbit(det_d)) ) {
-      std::cout << "return rhs" << std::endl;
-      return false;
-    }
-    else {
-      std::cout << "return lhs" << std::endl;
-      return true;
-    }
-  }
-};
-
 enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg);
 void test();
 

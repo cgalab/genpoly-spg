@@ -67,10 +67,19 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   p1.set(1,1);
   p2.set(2,2);
+  p3.set(1,1);
+  p4.set(2,2);
+  itest = checkIntersection(e1, e2);
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << ", value: ";
+  printEnum(itest);
+  std::cerr << std::endl;
+
+  p1.set(1,1);
+  p2.set(2,2);
   p3.set(3,3);
   p4.set(4,4);
   itest = checkIntersection(e1, e2);
-  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be false : " << ((itest) ? "true" : "false") << ", value: ";
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest) ? "true" : "false") << ", value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
