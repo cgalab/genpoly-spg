@@ -42,15 +42,12 @@ double det(const Edge& e, const Point& p) {
 enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;
+	bool same11 = false, same12 = false, same21 = false, same22 = false;
 
 	//std::cout << "e1.p1 == e2.p1: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << ", e1.p1: " << *e1.p1 << std::endl;
 	//std::cout << "e1.p1 == e2.p2: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << ", e1.p2: " << *e1.p2 << std::endl;
 	//std::cout << "e1.p2 == e2.p1: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << ", e2.p1: " << *e2.p1 << std::endl;
 	//std::cout << "e1.p2 == e2.p2: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << ", e2.p2: " << *e2.p2 << std::endl;
-
-	//quick check if the edges share a vertex
-	if ( (*(e1.p1) == *(e2.p1)) || (*(e1.p1) == *(e2.p2)) || (*(e1.p2) == *(e2.p1)) || (*(e1.p2) == *(e2.p2)) )
-		return IS_VERTEX;
 
 	// determinant between edge 1 and a point in edge 2
 	det_a = det(e1, *e2.p1);
@@ -60,7 +57,13 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	det_d = det(e2, *e1.p2);
 
 	if (det_a*det_b*det_c*det_b == 0) {
-		bool col = false; // if true, check for collinearity
+		bool col = false;
+
+		//quick check if the edges share a vertex
+		if (*(e1.p1) == *(e2.p1)) same11 = true;
+		if (*(e1.p1) == *(e2.p2)) same12 = true;
+		if (*(e1.p2) == *(e2.p1)) same21 = true;
+		if (*(e1.p2) == *(e2.p2)) same22 = true;
 
 		// some determinant was 0, need to check if it's inside an edge or outside.
 		dp_1 = reldist(e1, *e2.p1);
@@ -73,19 +76,15 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		//std::cout << "dp3: " << dp_3 << std::endl;
 		//std::cout << "dp4: " << dp_4 << std::endl;
 
-		if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) )
-			col = true;
-		else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) )
-			col = true;
-		else if ( (det_c == 0) && (dp_3 > 0) && (dp_3 < 1) )
-			col = true;
-		else if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) )
-			col = true;
+		if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) ) col = true;
+		else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) )	col = true;
+		else if ( (det_c == 0) && (dp_3 > 0) && (dp_3 < 1) )	col = true;
+		else if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) )	col = true;
 
-		if (col && (det_a == 0) && (det_b == 0) && (det_c == 0) && (det_d == 0))
+		if (col)
 			return IS_COLLINEAR;
-		else if (col)
-			return IS_TRUE;
+		else if ( same11 || same12 || same21 || same22 )
+			return IS_VERTEX;
 		else
 			return IS_FALSE;
 	}
@@ -103,7 +102,7 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	//std::cout << "inside flip" << std::endl;
 
-	// edge case, one edge goes from index 0 to last index 
+	// edge case, one edge goes from index 0 to last index
 	if ( (((*e1.p1).v ==0) && ((*e1.p2).v == points.size()-1)) || (((*e2.p1).v == 0) && ((*e2.p2).v == points.size()-1)) ) {
 		//std::cout << "one edge is on the boundary" << std::endl;
 		Edge middle, boundary;
@@ -193,5 +192,5 @@ void poldisplay (std::vector<unsigned int>& p) {
 	for (unsigned int i = 0; i < p.size();++i) {
 		std::cout << p[i] << " ";
 	}
-	std::cout  << std::endl; 
+	std::cout  << std::endl;
 }
