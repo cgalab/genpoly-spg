@@ -13,7 +13,7 @@
 #include "randomGenerator.h"
 
 // comparison function for sorting pairs by secondary value
-bool sortbysec(const std::pair<Point*,double> &a, const std::pair<Point*,double> &b) { 
+bool sortbysec(const std::pair<Point*,double> &a, const std::pair<Point*,double> &b) {
     return (a.second > b.second);
 }
 
@@ -202,7 +202,7 @@ enum edge_t edgeCheck1(unsigned int& index, Edge& e, std::list<Edge>& edges, std
 			// need to sort the points into lexicographical order relative to themselves
 			// check relative distances between points in e and *it
 
-			// first create a vector of a pair of points and and double 
+			// first create a vector of a pair of points and and double
 			std::vector< std::pair<Point*, double> > sortP;
 			std::vector<unsigned int> sortPol;
 
@@ -239,7 +239,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points);
 
-	// the point set 'points' now has x/y coordinates as well as 
+	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'
 	// Now it can be sorted lexicographically
 	std::vector<unsigned int> lex (points.size());
@@ -258,7 +258,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
 	//std::list<Edge> edgesL; // a list for edges
-	std::set<Edge, setComp> edgeS; // a set of edges.
+	std::set<Edge, setComp> edgeS(d_idx); // a set of edges.
 
 	while (index < points.size()) {
 		std::cout << "index: " << index << std::endl;
@@ -274,9 +274,15 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 		p3 = &points[polygon[after]];
 
 		// construct the edges
-		e1 = Edge (p1, p2, d_idx);
-		e2 = Edge (p1, p3, d_idx);
-		
+		if (p2 < p3) {
+			e1 = Edge (p1, p2, index);
+			e2 = Edge (p1, p3, index);
+		}
+		else {
+			e1 = Edge (p1, p3, index);
+			e2 = Edge (p1, p2, index);
+		}
+
 		std::cout << "processing e1: " << e1 << std::endl;
 		val1 = processEdge(index, e1, edgeS, polygon, points);
 		if (val1 == E_SKIP) continue; // swapping invalidates 'e2' so start again from the lower index before processing 'e2'
@@ -285,13 +291,12 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 		val2 = processEdge(index, e2, edgeS, polygon, points);
 		//std::cout << "after edgecheck2." << std::endl;
 		if (val2 == E_SKIP) continue;
- 
+
     //std::cout << "edges in 'edges':" << std::endl;
     //for (std::list<Edge>::iterator it=edges.begin(); it!=edges.end(); ++it) std::cout << *it << std::endl;
-		
+
 		index++;
 	}
 
 	return SUCCESS;
 }
-

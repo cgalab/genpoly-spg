@@ -3,3 +3,4 @@ in.*
 out.*
 tkn
 .atom-dbg.cson
+obj/

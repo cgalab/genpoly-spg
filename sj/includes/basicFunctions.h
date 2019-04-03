@@ -23,11 +23,15 @@ public:
 };
 
 struct setComp {
+private:
+  double& t;
+public:
+  setComp(double& T) : t(T) {}
   bool operator() (const Edge& lhs, const Edge& rhs) const {
     std::cout << "lhs: " << lhs << std::endl;
     std::cout << "rhs: " << rhs << std::endl;
+    std::cout << "t: " << t << std::endl;
     // I think the lhs is always the one being compared to all the others
-    double idx = lhs.l_idx;
     Yval Ly, Ry;
 
 
@@ -42,8 +46,8 @@ struct setComp {
       Ly.setX(L1.x);
     } else {
       double slope = (L2.y-L1.y) / (L2.x-L1.x);
-      Ly.set(slope * (idx - L1.x) + L1.y);
-      Ly.setX(idx);
+      Ly.set(slope * (t - L1.x) + L1.y);
+      Ly.setX(t);
     }
 
     Point R1 = *rhs.p1;
@@ -54,8 +58,8 @@ struct setComp {
       Ry.setX(R1.x);
     } else {
       double slope = (R2.y-R1.y) / (R2.x-R1.x);
-      Ry.set(slope * (idx - R1.x) + R1.y);
-      Ry.setX(idx);
+      Ry.set(slope * (t - R1.x) + R1.y);
+      Ry.setX(t);
     }
 
     std::cerr << Ly << " < " << Ry << " : " << ((Ly < Ry)? "true" : "false") << std::endl;
@@ -90,13 +94,13 @@ struct setComp1 {
     Point L2 = lhs.getLexHigh();
     L2.v = 1;
     Edge L = Edge(&L1, &L2);
-    
+
     Point R1 = rhs.getLexLow();
     R1.v = 0;
     Point R2 = rhs.getLexHigh();
     R2.v = 1;
     Edge R = Edge(&R1, &R2);
-    
+
     double det_a = det(L,*R.p1);
     double det_b = det(L,*R.p2);
     double det_c = det(R,*L.p1);

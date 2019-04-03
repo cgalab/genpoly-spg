@@ -2,7 +2,7 @@
 #include <set>
 #include "edge.h"
 #include "point.h"
-#include "bst.h"
+//#include "bst.h"
 #include "basicFunctions.h" //for setComp (Edge set test)
 
 
@@ -24,7 +24,7 @@ void printEnum(enum intersect_t val) {
       break;
   }
 }
-
+/*
 void printEnum(enum bst_t val) {
   switch (val) {
     case BST_SUCCESS:
@@ -43,6 +43,7 @@ void printEnum(enum bst_t val) {
       break;
   }
 }
+*/
 
 void test() {
 /*
@@ -60,7 +61,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   Edge e2 = Edge(&p3, &p4);
 
   itest = checkIntersection(e1, e2);
-  std::cerr << "intersection should be true : " << ((itest) ? "true" : "false") << " , value: ";
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -69,7 +70,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p3.set(3,3);
   p4.set(4,4);
   itest = checkIntersection(e1, e2);
-  std::cerr << "intersection should be false: " << ((itest) ? "true" : "false") << ", value: ";
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be false : " << ((itest) ? "true" : "false") << ", value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -78,7 +79,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p3.set(0,1);
   p4.set(0,3);
   itest = checkIntersection(e1, e2);
-  std::cerr << "intersection should be true : " << ((itest) ? "true" : "false") << " , value: ";
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -87,7 +88,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p3.set(0,2);
   p4.set(0,3);
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection should be true : " << ((itest) ? "true" : "false") << " , value: ";
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -96,7 +97,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p3.set(1,0);
   p4.set(0,1);
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection should be true : " << ((itest) ? "true" : "false") << " , value: ";
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -136,7 +137,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << y1 << " < " << y2 << " should be false : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   std::cerr << std:: endl;
-
+/*
   std::cerr << "=== Edge class >< comparison tests ===" << std::endl;
 
   // reuse the points variables from above, p1 & p2 are connected to e1 and p3 & p4 are connected to e2
@@ -201,22 +202,24 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(1,2.8);
   std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
 
+  std::cerr << std:: endl;
+*/
   std::cerr << "=== Edge set tests ===" << std::endl;
 
-  std::set<Edge, setComp> edgeS; // a set of an edge with 'setComp' as a '<' comparison function.
+  double d_idx=0;
+  std::set<Edge, setComp> edgeS(d_idx); // a set of an edge with 'setComp' as a '<' comparison function.
   std::pair<std::set<Edge, setComp>::iterator,bool> retval; // return value
 
   p1.set(0,0);
   p2.set(3,3);
-  e1.l_idx = 0;
   p3.set(1,0);
   p4.set(1,3);
-  e2.l_idx = 1;
   std::cerr << "inserting e1:" << e1 << std::endl;
   retval = edgeS.insert(e1);
   std::cerr << "r.1: " << (*retval.first) << std::endl;
   std::cerr << "r.2 should be true for a correct insertion: " << (retval.second ? "true" : "false") << std::endl;
   std::cerr << "inserting e2:" << e2 << std::endl;
+  d_idx = 1;
   retval = edgeS.insert(e2);
   std::cerr << "r.1: " << (*retval.first) << std::endl;
   std::cerr << "r.2 should be true for a correct insertion: " << (retval.second ? "true" : "false") << std::endl;
@@ -227,7 +230,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   Point p6 = Point(2,3,6,6);
 
   Edge e3 = Edge(&p5, &p6);
-  e3.l_idx = 2;
+  d_idx = 2;
 
   std::cerr << "inserting e3:" << e3 << std::endl;
   retval = edgeS.insert(e3);
