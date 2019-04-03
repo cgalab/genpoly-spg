@@ -100,27 +100,30 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 	std::cout << "retval.first : " << *retval.first << std::endl;
 	std::cout << "retval.second: " << retval.second << std::endl;
 
+  // I need to know neighbours for both a successful insert as well as unsuccessful
+  Edge before, after;
+
+  std::cout << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
+  if (retval.first != edgeS.begin()) {
+    before = *(std::prev(retval.first));
+    std::cout << "before: " << before << std::endl;
+    bef = true;
+  }
+  std::cout << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
+  if (retval.first != --edgeS.end()) {
+    after  = *(std::next(retval.first));
+    std::cout << "after : " << after << std::endl;
+    af = true;
+  }
+
 	if (retval.second) {
 		// 'e' was successfully inserted into 'edgeS' as a new element
 		// check if it intersects with its neighbours
-		Edge before, after;
-
-		std::cout << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
-		if (retval.first != edgeS.begin()) {
-			before = *(std::prev(retval.first));
-			std::cout << "before: " << before << std::endl;
-			bef = true;
-		}
-		std::cout << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
-		if (retval.first != --edgeS.end()) {
-			after  = *(std::next(retval.first));
-			std::cout << "after : " << after << std::endl;
-			af = true;
-		}
 
 		if (bef) {
 			cross = checkIntersection(e, before);
-			if ((cross < IS_TRUE)) {
+      std::cerr << "cross: " << cross << std::endl;
+			if (cross < IS_TRUE) {
 				std::cout << "no intersection between 'e' and 'before'" << std::endl;
 				valid = E_VALID;
 			}
@@ -137,7 +140,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 		if (valid != E_SKIP) {
 			if(af) {
 				cross  = checkIntersection(e, after);
-				if (af && (valid == E_VALID) && (cross < IS_TRUE)) {
+				if (af && (cross < IS_TRUE)) {
 					// edge inserted, and does not intersect its neighbours.
 					std::cout << "no intersection between 'e' and 'after'" << std::endl;
 					valid = E_VALID;
@@ -156,9 +159,29 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 	}
 	else {
 		// 'e' already existed and needs to be removed from 'edgeS'
-		std::cout << "'e' found in 'edgeS', removing it." << std::endl;
-		edgeS.erase(retval.first);
-		valid = E_NOT_VALID;
+		std::cout << "'e' found in 'edgeS'.  Need to remove, then (possibly) check neighbours after removal." << std::endl;
+    if (e == *retval.first) {
+      edgeS.erase(retval.first);
+      if (bef && af) {
+        cross = checkIntersection(before, after);
+        if (cross < IS_TRUE) {
+          std::cout << "no intersection between 'before' and 'after'" << std::endl;
+        }
+        else {
+          std::cout << "intersection between 'before' and 'after'" << std::endl;
+          flip(e, after, polygon, points);
+					index = 0;
+					//index = (e.l_idx < after.l_idx) ? e.l_idx : after.l_idx;
+					decrementEdges(index, edgeS);
+					valid = E_SKIP;
+        }
+      }
+    }
+    else {
+      std::cerr << "retval.first was not 'e'!!!" << std::endl;
+      valid = E_NOT_VALID;
+    }
+
 	}
 
 	return valid;
