@@ -4,3 +4,4 @@ out.*
 tkn
 .atom-dbg.cson
 obj/
+app
