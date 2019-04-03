@@ -4,9 +4,11 @@
 #ifndef __TEDGE_H_
 #define __TEDGE_H_
 
+class Triangulation;
 class Triangle;
 class Vertex;
 
+#include "triangulation.h"
 #include "triangle.h"
 #include "vertex.h"
 
@@ -15,6 +17,8 @@ enum class EdgeType {POLYGON, FRAME, TRIANGULATION};
 class TEdge {
 
 private:
+	Triangulation* T;
+
 	Vertex* v1;
 	Vertex* v2;
 
@@ -30,6 +34,8 @@ public:
 	TEdge(Vertex* V1, Vertex* V2);
 	TEdge(Vertex* V1, Vertex* V2, EdgeType tp);
 
+	void setTriangulation(Triangulation* t);
+
 	void setEdgeType(EdgeType tp){
 		type = tp;
 	}
@@ -37,6 +43,7 @@ public:
 	EdgeType getEdgeType(){ return type;}
 
 	void setTriangle(Triangle* t);
+	void removeTriangle(Triangle* t);
 	int nrAssignedTriangles();
 
 	void print(FILE* f);
@@ -45,6 +52,8 @@ public:
 
 	Vertex* getV1();
 	Vertex* getV2();
+
+	~TEdge();
 };
 
 #endif

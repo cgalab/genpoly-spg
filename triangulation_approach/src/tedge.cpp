@@ -4,8 +4,10 @@
 TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp){ 
 	v1 = V1;
 	v2 = V2;
+
 	t1 = NULL;
 	t2 = NULL;
+
 	type = tp;
 
 	(*V1).addEdge(this);
@@ -31,10 +33,24 @@ TEdge::TEdge(Vertex* V1, Vertex* V2){
 	n++;
 }
 
+void TEdge::setTriangulation(Triangulation* t){
+	T = t;
+}
+
 void TEdge::setTriangle(Triangle* t){
 	if(t1 == NULL) t1 = t;
 	else if(t2 == NULL) t2 = t;
 	else printf("This edge already has two triangles\n");
+}
+
+void TEdge::removeTriangle(Triangle* t){
+
+	if(t1 == t)
+	 	t1 = NULL;
+	else if(t2 == t) 
+		t2 = NULL;
+	else 
+		printf("Removed triangle was not adjacent to edge from vertex %d to vertex %d \n", (*v1).getID(), (*v2).getID());
 }
 
 int TEdge::nrAssignedTriangles(){
@@ -60,7 +76,7 @@ void TEdge::print(){
 	else if(type == EdgeType::FRAME) tp = "FRAME";
 	else tp = "TRIANGULATION";
 
-	printf("Edge from point %d to point %d of type %s \n", (*v1).getID(), (*v2).getID(), tp.c_str());
+	printf("Edge %d from point %d to point %d of type %s \n", id, (*v1).getID(), (*v2).getID(), tp.c_str());
 }
 
 Vertex* TEdge::getV1(){
@@ -69,6 +85,14 @@ Vertex* TEdge::getV1(){
 
 Vertex* TEdge::getV2(){
 	return v2;
+}
+
+// Attention: don't remove edges before there triangles are removed
+TEdge::~TEdge(){
+	(*v1).removeEdge(this);
+	(*v2).removeEdge(this);
+
+	(*T).removeEdge(this);
 }
 
 int TEdge::n = 0;

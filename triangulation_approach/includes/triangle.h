@@ -29,6 +29,8 @@ public:
 	void print();
 	bool contains(Vertex* v);
 	int getID(){ return id;}
+	~Triangle();
+	TEdge* getEdge(int i);
 };
 
 #endif

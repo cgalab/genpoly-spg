@@ -5,15 +5,19 @@
 #ifndef __VERTEX_H_
 #define __VERTEX_H_
 
+class Triangulation;
 class TEdge;
 class Triangle;
 
+#include "triangulation.h"
 #include "tedge.h"
 #include "triangle.h"
 
 class Vertex {
 
 private:
+	Triangulation* T;
+
 	double x;
 	double y;
 
@@ -44,8 +48,13 @@ public:
 		n++;
 	}
 
+	void setTriangulation(Triangulation* t);
+
 	void addEdge(TEdge* e);
+	void removeEdge(TEdge* e);
 	void addTriangle(Triangle* t);
+	void removeTriangle(Triangle* t);
+	Triangle* getTriangle(int index);
 
 	void print(FILE* f){
 		fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * 10, y * 10, id, id);
@@ -71,6 +80,8 @@ public:
 	std::list<Triangle*> getAllAdjacentTrianglesNotContaining(Vertex* v);
 
 	std::list<TEdge*> getPolygonEdges();
+
+	~Vertex();
 };
 
 #endif

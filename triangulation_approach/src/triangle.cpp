@@ -38,4 +38,26 @@ void Triangle::print(){
 	(*e2).print();
 }
 
+TEdge* Triangle::getEdge(int i){
+	if(i == 0)
+		return e0;
+	else if(i == 1)
+		return e1;
+	else if(i == 2)
+		return e2;
+	else
+		printf("error: index must be 0, 1 or 2\n");
+	return NULL;
+}
+
+Triangle::~Triangle(){
+	(*v0).removeTriangle(this);
+	(*v1).removeTriangle(this);
+	(*v2).removeTriangle(this);
+	
+	(*e2).removeTriangle(this);
+	(*e1).removeTriangle(this);
+	(*e0).removeTriangle(this);
+}
+
 int Triangle::n = 0;
