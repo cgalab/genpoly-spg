@@ -39,9 +39,11 @@ struct setComp {
 
     if ((L2.x - L1.x) == 0) {
       Ly.set(L1.y, L2.y);
+      Ly.setX(L1.x);
     } else {
       double slope = (L2.y-L1.y) / (L2.x-L1.x);
       Ly.set(slope * (idx - L1.x) + L1.y);
+      Ly.setX(idx);
     }
 
     Point R1 = *rhs.p1;
@@ -49,11 +51,14 @@ struct setComp {
 
     if ((R2.x - R1.x) == 0) {
       Ry.set(R1.y, R2.y);
+      Ry.setX(R1.x);
     } else {
       double slope = (R2.y-R1.y) / (R2.x-R1.x);
       Ry.set(slope * (idx - R1.x) + R1.y);
+      Ry.setX(idx);
     }
 
+    std::cerr << Ly << " < " << Ry << " : " << ((Ly < Ry)? "true" : "false") << std::endl;
     return Ly < Ry;
   }
 };

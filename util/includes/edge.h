@@ -1,5 +1,6 @@
 #include <iostream> // for endl
 #include <vector>
+#include "math.h"
 #include "basicDefinitions.h"
 #include "point.h"
 
@@ -9,11 +10,12 @@
 // class for when an edge is vertical on the x axis
 class Yval {
 private:
-public:
   double max, min;
+  double x;
+public:
 
-  Yval() {max=0;min=0;}
-  Yval(double val) {max=val;min=val;}
+  Yval() {max=0;min=0;x=NAN;}
+  Yval(double val) {max=val;min=val;x=NAN;}
   Yval(double a, double b) {
     if (a<b) {min=a;max=b;}
     else {min=b;max=a;}
@@ -24,14 +26,19 @@ public:
     if (a<b) {min=a;max=b;}
     else {min=b;max=a;}
   }
+  void setX(double X) {x=X;}
+  double getX() const {return x;}
+  double getMin() const {return min;}
+  double getMax() const {return max;}
 
   bool operator < (const double s) const {
     if (min < s) return true;
     else return false;
   }
   bool operator < (const Yval s) const {
-         if (min < s.min) return true;
-    else if ((min == s.min) && (max < s.max)) return true;
+    if (x < s.getX()) return true;
+    else if (min < s.getMin()) return true;
+    else if ((min == s.getMin()) && (max < s.getMax())) return true;
     else return false;
   }
   bool operator > (const double s) const {
@@ -39,13 +46,17 @@ public:
     else return false;
   }
   bool operator > (const Yval s) const {
-         if (min > s.min) return true;
-    else if ((min == s.min) && (max > s.max)) return true;
+    if (x > s.getX()) return true;
+    else if (min > s.getMin()) return true;
+    else if ((min == s.getMin()) && (max > s.getMax())) return true;
     else return false;
   }
 
   friend std::ostream& operator<<(std::ostream& os, const Yval& y) {
-    os << "(" << y.min << "," << y.max << ")";
+    if (y.getMin() == y.getMax())
+      os << "x:" << y.getX() << ", (" << y.min << "," << y.max << ")";
+    else
+      os << "x:" << y.getX() << ", [" << y.min << "," << y.max << "]";
     return os;
   }
 };
