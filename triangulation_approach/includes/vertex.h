@@ -1,4 +1,5 @@
 #include <list>
+#include <vector>
 #include <stdio.h>
 
 
@@ -77,7 +78,7 @@ public:
 		return edges;
 	}
 
-	std::list<Triangle*> getAllAdjacentTrianglesNotContaining(Vertex* v);
+	std::vector<TEdge*> getSurroundingEdges();
 
 	std::list<TEdge*> getPolygonEdges();
 

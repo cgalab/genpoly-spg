@@ -90,6 +90,12 @@ Vertex* TEdge::getV2(){
 	return v2;
 }
 
+bool TEdge::contains(Vertex* v){
+	if((*v).getID() == (*v1).getID()) return true;
+	if((*v).getID() == (*v2).getID()) return true;
+	return false;
+}
+
 // Attention: don't remove edges before there triangles are removed
 TEdge::~TEdge(){
 	(*v1).removeEdge(this);

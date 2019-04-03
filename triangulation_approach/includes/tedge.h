@@ -52,6 +52,7 @@ public:
 
 	Vertex* getV1();
 	Vertex* getV2();
+	bool contains(Vertex* v);
 
 	~TEdge();
 };

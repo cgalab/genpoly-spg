@@ -50,6 +50,15 @@ TEdge* Triangle::getEdge(int i){
 	return NULL;
 }
 
+TEdge* Triangle::getEdgeNotContaining(Vertex* v){
+	if(!(*e0).contains(v)) return e0;
+	if(!(*e1).contains(v)) return e1;
+	if(!(*e2).contains(v)) return e2;
+
+	printf("error: all edges are containing the vertex %d \n", (*v).getID());
+	return NULL;
+}
+
 Triangle::~Triangle(){
 	(*v0).removeTriangle(this);
 	(*v1).removeTriangle(this);

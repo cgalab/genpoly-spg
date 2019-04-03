@@ -6,7 +6,7 @@
 #include "timer.h"
 #include "triangle.h"
 #include <list>
+#include <vector>
 
 void transformPolygon(Triangulation* T, int iterations, Timer t);
-void checkSimplicityAndExecute(Triangulation* T, Vertex* newV, int index);
-//bool checkSimplicityOfTranslation(Polygon* p, int index);
+bool checkSimplicityOfTranslation(Triangulation* T, int index, Vertex *oldV, Vertex* newV);

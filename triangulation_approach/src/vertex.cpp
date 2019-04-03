@@ -28,24 +28,26 @@ Triangle* Vertex::getTriangle(int index){
 }
 
 TEdge* Vertex::getEdgeTo(Vertex* toV){
-	int id = (*toV).getID();
+	int toID = (*toV).getID();
 	Vertex* v;
 
 	for(auto const& i : edges){
 		v = (*i).getV1();
-		if(id == (*v).getID()) return i;
+		if(toID == (*v).getID()) return i;
 		v = (*i).getV2();
-		if(id == (*v).getID()) return i;
+		if(toID == (*v).getID()) return i;
 	}
-
+	printf("no connection from vertex %d to vertex %d found\n", id, toID);
 	return NULL;
 }
 
-std::list<Triangle*> Vertex::getAllAdjacentTrianglesNotContaining(Vertex* v){
-	std::list<Triangle*> out;
+std::vector<TEdge*> Vertex::getSurroundingEdges(){
+	std::vector<TEdge*> out(triangles.size());
+	int n = 0;
 
 	for(auto const& i : triangles){
-		if(!(*i).contains(v)) out.push_back(i);
+		out[n] = (*i).getEdgeNotContaining(this);
+		n++;
 	}
 
 	return out;

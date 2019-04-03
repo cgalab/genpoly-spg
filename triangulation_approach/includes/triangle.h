@@ -31,6 +31,7 @@ public:
 	int getID(){ return id;}
 	~Triangle();
 	TEdge* getEdge(int i);
+	TEdge* getEdgeNotContaining(Vertex* v);
 };
 
 #endif
