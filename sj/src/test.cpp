@@ -1,7 +1,9 @@
 #include <iostream> // for endl
+#include <set>
 #include "edge.h"
 #include "point.h"
 #include "bst.h"
+#include "basicFunctions.h" //for setComp (Edge set test)
 
 
 void printEnum(enum intersect_t val) {
@@ -199,7 +201,40 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(1,2.8);
   std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
 
-  std::cerr << "=== Edge Binary Search Tree class tests ===" << std::endl;
+  std::cerr << "=== Edge set tests ===" << std::endl;
+
+  std::set<Edge, setComp> edgeS; // a set of an edge with 'setComp' as a '<' comparison function.
+  std::pair<std::set<Edge, setComp>::iterator,bool> retval; // return value
+
+  p1.set(0,0);
+  p2.set(3,3);
+  e1.l_idx = 0;
+  p3.set(1,0);
+  p4.set(1,3);
+  e2.l_idx = 1;
+  std::cerr << "inserting e1:" << e1 << std::endl;
+  retval = edgeS.insert(e1);
+  std::cerr << "r.1: " << (*retval.first) << std::endl;
+  std::cerr << "r.2 should be true for a correct insertion: " << (retval.second ? "true" : "false") << std::endl;
+  std::cerr << "inserting e2:" << e2 << std::endl;
+  retval = edgeS.insert(e2);
+  std::cerr << "r.1: " << (*retval.first) << std::endl;
+  std::cerr << "r.2 should be true for a correct insertion: " << (retval.second ? "true" : "false") << std::endl;
+  std::cerr << "set.begin(): " << (*edgeS.begin()) << std::endl;
+  std::cerr << "set.end()  : " << *(--edgeS.end()) << std::endl;
+
+  Point p5 = Point(2,0,5,5);
+  Point p6 = Point(2,3,6,6);
+
+  Edge e3 = Edge(&p5, &p6);
+  e3.l_idx = 2;
+
+  std::cerr << "inserting e3:" << e3 << std::endl;
+  retval = edgeS.insert(e3);
+  std::cerr << "r.1: " << (*retval.first) << std::endl;
+  std::cerr << "r.2 should be true for a correct insertion: " << (retval.second ? "true" : "false") << std::endl;
+  std::cerr << "set.begin(): " << (*edgeS.begin()) << std::endl;
+  std::cerr << "set.end()  : " << *(--edgeS.end()) << std::endl;
 
 
 /*
