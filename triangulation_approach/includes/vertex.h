@@ -51,6 +51,14 @@ public:
 
 	void setTriangulation(Triangulation* t);
 
+	double getX(){
+		return x;
+	}
+
+	double getY(){
+		return y;
+	}
+
 	void addEdge(TEdge* e);
 	void removeEdge(TEdge* e);
 	void addTriangle(Triangle* t);

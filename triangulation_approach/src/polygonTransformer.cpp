@@ -3,7 +3,7 @@
 void transformPolygon(Triangulation* T, int iterations, Timer t){
 	int index = 1;
 	RandomGenerator* generator = new RandomGenerator();
-	double dx = 3, dy = 0;
+	double dx = -50, dy = 10; // radius of the initial polygon was 30
 	Vertex *newV, *oldV;
 
 	oldV = (*T).getVertex(index);
@@ -14,8 +14,9 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 
 bool checkSimplicityOfTranslation(Triangulation* T, int index, Vertex *oldV, Vertex* newV){
 	Vertex *prevV, *nextV;
-	TEdge *prevE, *nextE;
-	std::vector<TEdge*> prevSur, nextSur; 
+	TEdge *prevE, *nextE, *prevNewE, *nextNewE;
+	std::vector<TEdge*> prevSur, nextSur;
+	enum intersect_t iType;
 
 	prevV = (*T).getVertex(index - 1);
 	nextV = (*T).getVertex(index + 1);
@@ -38,6 +39,17 @@ bool checkSimplicityOfTranslation(Triangulation* T, int index, Vertex *oldV, Ver
 	for(auto const& i : nextSur){
 		(*i).print();
 	}
+
+	prevNewE = new TEdge(prevV, newV, EdgeType::POLYGON);
+	nextNewE = new TEdge(newV, nextV, EdgeType::POLYGON);
+
+	for(auto const& i : nextSur){
+		iType = checkIntersection(nextNewE, i);
+		printf("intersection type with edge from vertex %d to vertex %d: %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID(), iType);
+	}
+
+
+
 
 	(*prevE).setEdgeType(EdgeType::POLYGON);
 	(*nextE).setEdgeType(EdgeType::POLYGON);

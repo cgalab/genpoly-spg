@@ -7,6 +7,7 @@
 #include "triangle.h"
 #include <list>
 #include <vector>
+#include "basicDefinitions.h"
 
 void transformPolygon(Triangulation* T, int iterations, Timer t);
 bool checkSimplicityOfTranslation(Triangulation* T, int index, Vertex *oldV, Vertex* newV);

@@ -1,5 +1,7 @@
 #include <list>
 #include <stdio.h>
+#include <math.h> 
+#include "basicDefinitions.h"
 
 #ifndef __TEDGE_H_
 #define __TEDGE_H_
@@ -54,7 +56,13 @@ public:
 	Vertex* getV2();
 	bool contains(Vertex* v);
 
+	
+
 	~TEdge();
 };
 
 #endif
+
+enum intersect_t checkIntersection(TEdge* e1, TEdge* e2);
+double det(TEdge* e, Vertex* p);
+double reldist(TEdge* e, Vertex* p); 
