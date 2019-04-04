@@ -279,6 +279,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	unsigned int index=0, before, after;
 	double d_idx;
 	enum edge_t val1, val2;
+  enum intersect_t val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
 	//std::list<Edge> edgesL; // a list for edges
@@ -306,6 +307,14 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 			e1 = Edge (p1, p3, index);
 			e2 = Edge (p1, p2, index);
 		}
+
+    val3 = checkIntersection(e1, e2);
+    if (!(val3 < IS_TRUE)) {
+      // the 2 edges are collinear
+      flip(e1, e2, polygon, points);
+      index = 0;
+      decrementEdges(index, edgeS);
+    }
 
 		std::cout << "processing e1: " << e1 << std::endl;
 		val1 = processEdge(index, e1, edgeS, polygon, points);
