@@ -61,6 +61,7 @@ void test() {
 test:  bool checkIntersection(const Edge e1, const Edge e2)
 */
   std::cerr << "=== checkIntersection tests ===" << std::endl;
+  std::cerr << "=== 'should be true' is a comparison 'itest >= IS_TRUE' : true when intersection exists ===" << std::endl;
   enum intersect_t itest;
 
   Point p1 = Point(0,0,1,1);
@@ -72,7 +73,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   Edge e2 = Edge(&p3, &p4);
 
   itest = checkIntersection(e1, e2);
-  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -83,7 +84,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(2,2);
   e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
-  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << ", value: ";
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest >= IS_TRUE) ? "true" : "false") << ", value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -94,7 +95,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(4,4);
   e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
-  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest) ? "true" : "false") << ", value: ";
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << ", value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -105,7 +106,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(0,3);
   e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
-  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -116,7 +117,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(0,3);
   e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -127,7 +128,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(0,1);
   e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest) ? "true" : "false") << " , value: ";
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -137,10 +138,8 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p3.set(0.1,0.1);
   p4.set(0.2,0);
   e2.set(p3,p4);
-  double test = reldist(e2, *e1.p1);
-  std::cerr << "test: " << test << std::endl;
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false : " << ((itest) ? "true" : "false") << " , value: ";
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 

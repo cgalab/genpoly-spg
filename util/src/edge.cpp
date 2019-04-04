@@ -74,11 +74,11 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		dp_3 = reldist(e2, *e1.p1);
 		dp_4 = reldist(e2, *e1.p2);
 
-		std::cerr.precision(17);
-		std::cerr << "det_a: " << det_a << ", dp1: " << dp_1 << std::endl;
-		std::cerr << "det_b: " << det_b << ", dp2: " << dp_2 << std::endl;
-		std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << std::endl;
-		std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << std::endl;
+		//std::cerr.precision(17);
+		//std::cerr << "det_a: " << det_a << ", dp1: " << dp_1 << std::endl;
+		//std::cerr << "det_b: " << det_b << ", dp2: " << dp_2 << std::endl;
+		//std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << std::endl;
+		//std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << std::endl;
 
 		if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) ) col = true;
 		else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) )	col = true;
