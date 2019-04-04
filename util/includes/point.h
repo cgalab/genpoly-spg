@@ -38,7 +38,7 @@ public:
   }
 
   friend std::ostream& operator<<(std::ostream& os, const Point& p) {
-  os << " x: " << p.x << ", y: " << p.y << ", i:" << p.i << ", v: " << p.v;
+  os << "(" << p.x << "," << p.y << "), [" << p.i << "," << p.v << "]";
   return os;
   }
 };

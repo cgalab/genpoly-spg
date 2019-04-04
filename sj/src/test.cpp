@@ -131,6 +131,19 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   printEnum(itest);
   std::cerr << std::endl;
 
+  p1.set(0.2,0);
+  p2.set(0.2,0.2);
+  e1.set(p1,p2);
+  p3.set(0.1,0.1);
+  p4.set(0.2,0);
+  e2.set(p3,p4);
+  double test = reldist(e2, *e1.p1);
+  std::cerr << "test: " << test << std::endl;
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false : " << ((itest) ? "true" : "false") << " , value: ";
+  printEnum(itest);
+  std::cerr << std::endl;
+
   std::cerr << std:: endl;
 /*
   Testing Yval class in edge.h
