@@ -100,14 +100,14 @@ public:
     l_idx = val.l_idx;
   }
 
-  Point getLexLow() const {
-    if ((*p1) < (*p2))
+  Point getPLow() const {
+    if ((*p1).v < (*p2).v)
       return *p1;
     else
       return *p2;
   }
-  Point getLexHigh() const {
-    if ((*p1) < (*p2))
+  Point getPHigh() const {
+    if ((*p1).v < (*p2).v)
       return *p2;
     else
       return *p1;

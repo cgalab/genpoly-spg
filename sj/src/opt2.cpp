@@ -177,6 +177,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 					valid = E_SKIP;
         }
       }
+      else std::cerr << "removal ok, continue." << std::endl;
     }
     else {
       std::cerr << "retval.first was not 'e'!!!" << std::endl;

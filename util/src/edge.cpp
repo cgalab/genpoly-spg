@@ -56,6 +56,11 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	det_c = det(e2, *e1.p1);
 	det_d = det(e2, *e1.p2);
 
+	std::cerr.precision(17);
+	int sig,ex;
+	sig = frexp(det_d, &ex);
+	std::cerr << "sig: " << sig << ", exp: " << ex << std::endl;
+
 	if (det_a*det_b*det_c*det_b == 0) {
 		bool col = false;
 
@@ -74,11 +79,11 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		dp_3 = reldist(e2, *e1.p1);
 		dp_4 = reldist(e2, *e1.p2);
 
-		//std::cerr.precision(17);
-		//std::cerr << "det_a: " << det_a << ", dp1: " << dp_1 << std::endl;
-		//std::cerr << "det_b: " << det_b << ", dp2: " << dp_2 << std::endl;
-		//std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << std::endl;
-		//std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << std::endl;
+		std::cerr.precision(17);
+		std::cerr << "det_a: " << det_a << ", dp1: " << dp_1 << std::endl;
+		std::cerr << "det_b: " << det_b << ", dp2: " << dp_2 << std::endl;
+		std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << std::endl;
+		std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << std::endl;
 
 		if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) ) col = true;
 		else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) )	col = true;
@@ -107,39 +112,39 @@ void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Po
 	//std::cout << "inside flip" << std::endl;
 
 	// edge case, one edge goes from index 0 to last index
-	if ( (((*e1.p1).v ==0) && ((*e1.p2).v == points.size()-1)) || (((*e2.p1).v == 0) && ((*e2.p2).v == points.size()-1)) ) {
+	if ( ((e1.getPLow().v == 0) && (e1.getPHigh().v == points.size()-1)) || ((e2.getPLow().v == 0) && (e2.getPHigh().v == points.size()-1)) ) {
 		//std::cout << "one edge is on the boundary" << std::endl;
 		Edge middle, boundary;
-		middle = ((*e1.p1).v == 0) ? e2 : e1;
+		middle = (e1.getPLow().v == 0) ? e2 : e1;
 		boundary = (middle == e1) ? e2 : e1;
 		//std::cout << "middle: " << middle << std::endl;
 		//std::cout << "boundary: " << boundary << std::endl;
 
 		unsigned int lower, higher;
-		lower = (*middle.p1).v +1;
-		higher = points.size() - (*middle.p2).v;
+		lower = middle.getPLow().v +1;
+		higher = points.size() - middle.getPHigh().v;
 		//std::cout << "lower: " << lower << std::endl;
 		//std::cout << "higher: " << higher << std::endl;
 
-		if (lower < higher) doFlip(0, (*middle.p1).v, polygon, points);
-		else doFlip((*middle.p2).v, points.size()-1, polygon, points);
+		if (lower < higher) doFlip(0, middle.getPLow().v, polygon, points);
+		else doFlip(middle.getPHigh().v, points.size()-1, polygon, points);
 
 	}
 	else {
 		//std::cout << "both edges are inside boundary" << std::endl;
 		Edge lower, higher;
-		lower = ((*e1.p2).v < (*e2.p1).v) ? e1 : e2;
+		lower = (e1.getPHigh().v < e2.getPLow().v) ? e1 : e2;
 		higher = (lower == e1) ? e2 : e1;
 		//std::cout << "lower: " << lower << std::endl;
 		//std::cout << "higher: " << higher << std::endl;
 
 		unsigned int inner, outer;
-		inner = (*higher.p1).v - (*lower.p2).v +1;
-		outer = (points.size() - (*higher.p2).v) + (*lower.p1).v +1;
+		inner = higher.getPLow().v - lower.getPHigh().v +1;
+		outer = (points.size() - higher.getPHigh().v) + lower.getPLow().v +1;
 		//std::cout << "inner: " << inner << ", outer: " << outer << std::endl;
 
-		if (inner < outer) doFlip((*lower.p2).v, (*higher.p1).v, polygon, points);
-		else doFlip((*higher.p2).v, (*lower.p1).v, polygon, points);
+		if (inner < outer) doFlip(lower.getPHigh().v, higher.getPLow().v, polygon, points);
+		else doFlip(higher.getPHigh().v, lower.getPLow().v, polygon, points);
 	}
 }
 
