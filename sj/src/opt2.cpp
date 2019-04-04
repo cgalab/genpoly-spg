@@ -161,6 +161,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 		// 'e' already existed and needs to be removed from 'edgeS'
 		std::cout << "'e' found in 'edgeS'.  Need to remove, then (possibly) check neighbours after removal." << std::endl;
     if (e == *retval.first) {
+    	std::cerr << "'e' same as r.1" << std::endl;
       edgeS.erase(retval.first);
       if (bef && af) {
         cross = checkIntersection(before, after);

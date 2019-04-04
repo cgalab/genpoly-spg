@@ -28,9 +28,9 @@ private:
 public:
   setComp(double& T) : t(T) {}
   bool operator() (const Edge& lhs, const Edge& rhs) const {
-    std::cout << "lhs: " << lhs << std::endl;
-    std::cout << "rhs: " << rhs << std::endl;
-    std::cout << "t: " << t << std::endl;
+    //std::cout << "lhs: " << lhs << std::endl;
+    //std::cout << "rhs: " << rhs << std::endl;
+    //std::cout << "t: " << t << std::endl;
 
     enum intersect_t retval = checkIntersection(lhs, rhs);
     if (retval == IS_SAME_EDGE) return false;
