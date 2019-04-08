@@ -313,10 +313,13 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 
     val3 = checkIntersection(e1, e2);
     if (!(val3 < IS_TRUE)) {
+      std::cerr << "check in 'while' found an intersection. Resetting."  << std::endl;
+      std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
       // the 2 edges are collinear
       flip(e1, e2, polygon, points);
       index = 0;
       decrementEdges(index, edgeS);
+      continue;
     }
 
 		std::cout << "processing e1: " << e1 << std::endl;

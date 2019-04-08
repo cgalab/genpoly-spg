@@ -120,7 +120,7 @@ public:
         return lenl < lenr;
       }
 
-      std::cerr << "neither: "<< slopel << " > " << sloper << " : " << ((slopel > sloper)? "true" : "false") << std::endl;
+      std::cerr << "neither: "<< slopel << " < " << sloper << " : " << ((slopel < sloper)? "true" : "false") << std::endl;
       return slopel < sloper;
     }
     // Kind of sad and stupid that I can't break out of the comparison when the below 3 conditions apply
