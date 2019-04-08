@@ -173,7 +173,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
         }
         else {
           std::cout << "intersection between 'before' and 'after'" << std::endl;
-          flip(e, after, polygon, points);
+          flip(before, after, polygon, points);
 					index = 0;
 					//index = (e.l_idx < after.l_idx) ? e.l_idx : after.l_idx;
 					decrementEdges(index, edgeS);
@@ -289,7 +289,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	std::set<Edge, setComp> edgeS(d_idx); // a set of edges.
 
 	while (index < points.size()) {
-		std::cout << "index: " << index << std::endl;
+		std::cout << std::endl << "index: " << index << std::endl;
 		val1 = E_VALID; val2 = E_VALID;
 		// get the current point at 'index'
 		p1 = &points[lex[index]];

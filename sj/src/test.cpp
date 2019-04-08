@@ -166,6 +166,17 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   printEnum(itest);
   std::cerr << std::endl;
 
+  p1.set(0.2,0);
+  p2.set(0.6,0);
+  e1.set(p1,p2);
+  p3.set(0.2,0);
+  p4.set(1,0);
+  e2.set(p3,p4);
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  printEnum(itest);
+  std::cerr << std::endl;
+
   std::cerr << std:: endl;
 /*
   Testing Yval class in edge.h
@@ -307,6 +318,30 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "set.end()  : " << *(--edgeS.end()) << std::endl;
 
   std::cerr << std::endl;
+
+  std::cerr << "=== Determinant test ===" << std::endl;
+
+  bool detBool = false;
+
+  if (detBool) {
+    double max=0, current=0.0, area=0;
+    unsigned int counter = 0;
+
+    p1.set(current, current);
+    p2.set(1.0,1.0);
+    e1.set(p1,p2);
+    std::cerr.precision(17);
+
+    while (current != 1.0) {
+      current = nextafter(current, 1.0);
+      p1.set(current, current);
+      area = det(e1, p1);
+      if (area > max) max = area;
+      ++counter;
+      if (counter % 1000000 == 0) std::cerr << "max: " << max << std::endl;
+    }
+    std::cerr << "max: " << max << std::endl;
+  } else std::cerr << "Det test disabled." << std::endl;
 
 
 /*

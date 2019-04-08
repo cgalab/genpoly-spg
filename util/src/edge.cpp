@@ -124,8 +124,7 @@ void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Po
 		Edge middle, boundary;
 		middle = (e1.getPLow().v == 0) ? e2 : e1;
 		boundary = (middle == e1) ? e2 : e1;
-		//std::cout << "middle: " << middle << std::endl;
-		//std::cout << "boundary: " << boundary << std::endl;
+		//std::cout << "middle: " << middle << ", boundary: " << boundary << std::endl;
 
 		unsigned int lower, higher;
 		lower = middle.getPLow().v +1;
@@ -135,7 +134,6 @@ void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Po
 
 		if (lower < higher) doFlip(0, middle.getPLow().v, polygon, points);
 		else doFlip(middle.getPHigh().v, points.size()-1, polygon, points);
-
 	}
 	else {
 		//std::cout << "both edges are inside boundary" << std::endl;

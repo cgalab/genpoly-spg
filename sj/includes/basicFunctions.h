@@ -29,28 +29,110 @@ private:
 public:
   setComp(double& T) : t(T) {}
   bool operator() (const Edge& lhs, const Edge& rhs) const {
-    //std::cout << "lhs: " << lhs << std::endl;
-    //std::cout << "rhs: " << rhs << std::endl;
+    std::cout << "lhs: " << lhs << " < rhs: " << rhs << std::endl;
     //std::cout << "t: " << t << std::endl;
 
     enum intersect_t retval = checkIntersection(lhs, rhs);
     if (retval == IS_SAME_EDGE) return false;
     else if (retval == IS_VERTEX11) {
-      return *lhs.p2 < *rhs.p2;
+      std::cerr << "IS_VERTEX11" << std::endl;
+      double slopel, sloper;
+      bool isLvertical=false, isRvertical=false;
+      // can't be lexicographical ordering or y values of the other end points in case they are the same...
+      // try to compare slopes and treat the special case when line is vertical or has same slope.
+      if (((*lhs.p2).x - (*lhs.p1).x) != 0) {
+        slopel = ((*lhs.p2).y - (*lhs.p1).y) / ((*lhs.p2).x - (*lhs.p1).x);
+      } else {
+        slopel = (*lhs.p2).y; // catching condition when one line is vertical and the other isn't.
+        isLvertical = true;
+      }
+      if (((*rhs.p2).x - (*rhs.p1).x) != 0) {
+        sloper = ((*rhs.p2).y - (*rhs.p1).y) / ((*rhs.p2).x - (*rhs.p1).x);
+      } else {
+        sloper = (*rhs.p2).y;
+        isRvertical = true;
+      }
+
+      if(isLvertical && isRvertical) {
+        std::cerr << "both: "<< slopel << " < " << sloper << " : " << ((slopel < sloper)? "true" : "false") << std::endl;
+        return slopel < sloper;
+      } else if (isLvertical || isRvertical) {
+        std::cerr << "one: " << (*lhs.p2).x << " < " << (*rhs.p2).x << " : " << (((*lhs.p2).x < (*rhs.p2).x)? "true" : "false") << std::endl;
+        return (*lhs.p2).x < (*rhs.p2).x;
+      }
+
+      if (slopel == sloper) {
+        // if the 2 segments have the same slope, the lesser is the smaller line segment
+        double lenl, lenr;
+        lenl = ((*lhs.p2).y - (*lhs.p1).y) * ((*lhs.p2).y - (*lhs.p1).y) + ((*lhs.p2).x - (*lhs.p1).x) * ((*lhs.p2).x - (*lhs.p1).x);
+        lenr = ((*rhs.p2).y - (*rhs.p1).y) * ((*rhs.p2).y - (*rhs.p1).y) + ((*rhs.p2).x - (*rhs.p1).x) * ((*rhs.p2).x - (*rhs.p1).x);
+        std::cerr << "samelen: "<< lenl << " < " << lenr << " : " << ((lenl < lenr)? "true" : "false") << std::endl;
+        return lenl < lenr;
+      }
+
+      std::cerr << "neither: "<< slopel << " < " << sloper << " : " << ((slopel < sloper)? "true" : "false") << std::endl;
+      return slopel < sloper;
     }
     else if (retval == IS_VERTEX12) {
+      std::cerr << "IS_VERTEX12" << std::endl;
+      // I believe lexicographical comparison should be fine here.
+      std::cerr << *lhs.p2 << " < " << *rhs.p1 << " : " << ((*lhs.p2 < *rhs.p1)? "true" : "false") << std::endl;
       return *lhs.p2 < *rhs.p1;
     }
     else if (retval == IS_VERTEX21) {
+      std::cerr << "IS_VERTEX21" << std::endl;
+      std::cerr << *lhs.p1 << " < " << *rhs.p2 << " : " << ((*lhs.p1 < *rhs.p2)? "true" : "false") << std::endl;
       return *lhs.p1 < *rhs.p2;
     }
     else if (retval == IS_VERTEX22) {
-      return *lhs.p1 < *rhs.p1;
+      std::cerr << "IS_VERTEX22" << std::endl;
+      double slopel, sloper;
+      bool isLvertical=false, isRvertical=false;
+      // can't be lexicographical ordering or y values of the other end points in case they are the same...
+      // try to compare slopes and treat the special case when line is vertical or has same slope.
+      if (((*lhs.p2).x - (*lhs.p1).x) != 0) {
+        slopel = ((*lhs.p2).y - (*lhs.p1).y) / ((*lhs.p2).x - (*lhs.p1).x);
+      } else {
+        slopel = (*lhs.p1).y; // catching condition when one line is vertical and the other isn't.
+        isLvertical = true;
+      }
+      if (((*rhs.p2).x - (*rhs.p1).x) != 0) {
+        sloper = ((*rhs.p2).y - (*rhs.p1).y) / ((*rhs.p2).x - (*rhs.p1).x);
+      } else {
+        sloper = (*rhs.p1).y;
+        isRvertical = true;
+      }
+
+      if(isLvertical && isRvertical) {
+        std::cerr << "both: "<< slopel << " < " << sloper << " : " << ((slopel < sloper)? "true" : "false") << std::endl;
+        return slopel < sloper;
+      } else if (isLvertical || isRvertical) {
+        std::cerr << "one: " << (*lhs.p1).x << " < " << (*rhs.p1).x << " : " << (((*lhs.p1).x < (*rhs.p1).x)? "true" : "false") << std::endl;
+        return (*lhs.p1).x < (*rhs.p1).x;
+      }
+
+      if (slopel == sloper) {
+        // if the 2 segments have the same slope, the lesser is the larger line segment
+        double lenl, lenr;
+        lenl = ((*lhs.p2).y - (*lhs.p1).y) * ((*lhs.p2).y - (*lhs.p1).y) + ((*lhs.p2).x - (*lhs.p1).x) * ((*lhs.p2).x - (*lhs.p1).x);
+        lenr = ((*rhs.p2).y - (*rhs.p1).y) * ((*rhs.p2).y - (*rhs.p1).y) + ((*rhs.p2).x - (*rhs.p1).x) * ((*rhs.p2).x - (*rhs.p1).x);
+        std::cerr << "samelen: "<< lenl << " > " << lenr << " : " << ((lenl > lenr)? "true" : "false") << std::endl;
+        return lenl < lenr;
+      }
+
+      std::cerr << "neither: "<< slopel << " > " << sloper << " : " << ((slopel > sloper)? "true" : "false") << std::endl;
+      return slopel < sloper;
     }
     // Kind of sad and stupid that I can't break out of the comparison when the below 3 conditions apply
     //else if (retval == IS_TRUE) {}
     //else if (retval == IS_FALSE) {}
-    //else if (retval == IS_COLLINEAR) {}
+    else if (retval == IS_COLLINEAR) {
+      double lenl, lenr;
+      lenl = ((*lhs.p2).y - (*lhs.p1).y) * ((*lhs.p2).y - (*lhs.p1).y) + ((*lhs.p2).x - (*lhs.p1).x) * ((*lhs.p2).x - (*lhs.p1).x);
+      lenr = ((*rhs.p2).y - (*rhs.p1).y) * ((*rhs.p2).y - (*rhs.p1).y) + ((*rhs.p2).x - (*rhs.p1).x) * ((*rhs.p2).x - (*rhs.p1).x);
+      std::cerr << "coll: "<< lenl << " < " << lenr << " : " << ((lenl < lenr)? "true" : "false") << std::endl;
+      return lenl < lenr;
+    }
 
     Yval Ly, Ry;
 
