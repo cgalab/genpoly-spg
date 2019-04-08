@@ -15,6 +15,8 @@ TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp){
 
 	id = n;
 	n++;
+
+	T = NULL;
 }
 
 TEdge::TEdge(Vertex* V1, Vertex* V2){ 
@@ -31,6 +33,8 @@ TEdge::TEdge(Vertex* V1, Vertex* V2){
 
 	id = n;
 	n++;
+
+	T = NULL;
 }
 
 void TEdge::setTriangulation(Triangulation* t){
@@ -111,7 +115,10 @@ TEdge::~TEdge(){
 	(*v1).removeEdge(this);
 	(*v2).removeEdge(this);
 
-	(*T).removeEdge(this);
+	if(T != NULL) (*T).removeEdge(this);
+
+	if(t1 != NULL) delete t1;
+	if(t2 != NULL) delete t2;
 }
 
 int TEdge::n = 0;

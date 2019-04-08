@@ -81,6 +81,8 @@ Vertex::~Vertex(){
 	for(i = 0; i < nEdges; i++){
 		delete edgeArray[i];
 	}
+
+	(*T).removeVertex(id);
 }
 
 int Vertex::n = 0;

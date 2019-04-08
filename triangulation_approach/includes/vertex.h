@@ -23,7 +23,7 @@ private:
 	double y;
 
 	static int n;
-	int id;
+	int id; // the id is always assumed to be equal to the index in the vertex vector of the triangulation
 
 	std::list<TEdge*> edges;
 	std::list<Triangle*> triangles;
@@ -47,6 +47,14 @@ public:
 
 		id = n;
 		n++;
+	}
+	Vertex(double X, double Y, int ID){
+		x = X;
+		y = Y;
+
+		id = ID;
+
+		rectangleVertex = false;
 	}
 
 	void setTriangulation(Triangulation* t);
@@ -78,7 +86,7 @@ public:
 
 	Vertex* getTranslated(double dx, double dy){
 		// TODO: keep id
-		return new Vertex(x + dx, y + dy);
+		return new Vertex(x + dx, y + dy, id);
 	}
 
 	TEdge* getEdgeTo(Vertex* v);

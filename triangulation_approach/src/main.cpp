@@ -25,6 +25,8 @@ int main(){
 
 	transformPolygon(T, translations, t);
 	printf("Transformed polygon with %d translations in %f seconds\n", translations, t.elapsedTime());
+
+	(*T).check();
 	
 	(*T).print("polygon.graphml");
 	//printStats(p);

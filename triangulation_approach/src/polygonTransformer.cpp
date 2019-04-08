@@ -4,9 +4,10 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 	int index = 1;
 	RandomGenerator* generator = new RandomGenerator();
 	double dx = -45, dy = 0; // radius of the initial polygon was 30
-	Vertex *newV, *oldV;
+	Vertex *newV, *oldV, *prevV, *nextV;
 	bool simple;
 	std::map<int, TEdge*> intersected;
+	TEdge* e;
 
 	oldV = (*T).getVertex(index);
 	newV = (*oldV).getTranslated(dx, dy);
@@ -15,7 +16,23 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 
 	printf("simplicity check gives result %d \n", simple);
 
-	(*T).addVertex(newV);
+	if(simple){
+		for(std::pair<int, TEdge*> element : intersected) {
+			e = element.second;
+
+			delete e;
+		}
+
+		delete oldV;
+
+		(*T).setVertex(index, newV);
+
+		prevV = (*T).getVertex(index - 1);
+		nextV = (*T).getVertex(index + 1);
+
+		(*T).addEdge(new TEdge(prevV, newV, EdgeType::POLYGON));
+		(*T).addEdge(new TEdge(newV, nextV, EdgeType::POLYGON));
+	}
 }
 
 bool checkSimplicityOfTranslation(Triangulation* T, int index, Vertex *oldV, Vertex* newV, std::map<int, TEdge*> &intersected){

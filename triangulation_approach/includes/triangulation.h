@@ -30,6 +30,9 @@ public:
 	void check();
 	void deleteVertex(int index);
 	int getNumberOfVertices(){ return (int)vertices.size();}
+	void setVertex(int index, Vertex* v){
+		vertices[index] = v;
+	}
 };
 
 #endif

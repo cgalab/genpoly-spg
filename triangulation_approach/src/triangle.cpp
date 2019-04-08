@@ -84,9 +84,9 @@ Triangle::~Triangle(){
 	(*v1).removeTriangle(this);
 	(*v2).removeTriangle(this);
 	
-	(*e2).removeTriangle(this);
-	(*e1).removeTriangle(this);
 	(*e0).removeTriangle(this);
+	(*e1).removeTriangle(this);
+	(*e2).removeTriangle(this);
 }
 
 int Triangle::n = 0;
