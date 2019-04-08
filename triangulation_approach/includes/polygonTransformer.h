@@ -11,4 +11,5 @@
 #include "basicDefinitions.h"
 
 void transformPolygon(Triangulation* T, int iterations, Timer t);
-bool checkSimplicityOfTranslation(Triangulation* T, int index, Vertex *oldV, Vertex* newV);
+bool checkSimplicityOfTranslation(Triangulation* T, int index, Vertex *oldV, Vertex* newV, std::map<int, TEdge*> &intersected);
+bool checkEdge(Vertex* fromV, TEdge* newE, std::map<int, TEdge*> &intersected);
