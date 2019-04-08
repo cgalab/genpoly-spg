@@ -1,5 +1,6 @@
 #include <iostream> // for endl
 #include <set>
+#include <math.h>
 #include "edge.h"
 #include "point.h"
 //#include "bst.h"
@@ -154,6 +155,17 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   printEnum(itest);
   std::cerr << std::endl;
 
+  p1.set(0.2,0.2);
+  p2.set(0.3,0.5);
+  e1.set(p1,p2);
+  p3.set(0.2,0.2);
+  p4.set(1,0);
+  e2.set(p3,p4);
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  printEnum(itest);
+  std::cerr << std::endl;
+
   std::cerr << std:: endl;
 /*
   Testing Yval class in edge.h
@@ -293,6 +305,8 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "r.2 should be true for a correct insertion: " << (retval.second ? "true" : "false") << std::endl;
   std::cerr << "set.begin(): " << (*edgeS.begin()) << std::endl;
   std::cerr << "set.end()  : " << *(--edgeS.end()) << std::endl;
+
+  std::cerr << std::endl;
 
 
 /*

@@ -42,6 +42,7 @@ void decrementEdges1(unsigned int index, std::list<Edge>& edges) {
 }
 */
 
+/*
 // function that erases points in 'moveP' from the polygon and adds them to the end in order of 'moveP'.
 void movePoints(std::vector<unsigned int>& moveP, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 
@@ -87,6 +88,8 @@ void movePoints(std::vector<unsigned int>& moveP, std::vector<unsigned int>& pol
 		std::cout << "it: " << moveP[j]+i << ", point: " << points[*it] << std::endl;
 	}
 }
+*/
+
 
 // checks if an edge 'e' is: already in 'edgeS', if not checks if it intersects its neighbours and either cleans 'edgeS' or add 'e' into it.
 enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
@@ -185,7 +188,6 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
     }
 
 	}
-
 	return valid;
 }
 
