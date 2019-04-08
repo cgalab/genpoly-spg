@@ -30,13 +30,15 @@ void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& point
 double reldist(const Edge& e, const Point& p) {
 	const Point& pa = *e.p1;
 	const Point& pb = *e.p2;
-	return ((p.x-pa.x)*(pb.x-pa.x) + (p.y-pa.y)*(pb.y-pa.y)) / ((pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y));
+	double ans = ((p.x-pa.x)*(pb.x-pa.x) + (p.y-pa.y)*(pb.y-pa.y)) / ((pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y));
+	return (abs(ans) < EPSILON) ? 0 : ans;
 }
 
 double det(const Edge& e, const Point& p) {
 	const Point& pa = *e.p1;
 	const Point& pb = *e.p2;
-	return (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
+	double ans = (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
+	return (abs(ans) < EPSILON) ? 0 : ans;
 }
 
 enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
@@ -60,6 +62,11 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	//int sig,ex;
 	//sig = frexp(det_d, &ex);
 	//std::cerr << "sig: " << sig << ", exp: " << ex << std::endl;
+	//std::cerr.precision(17);
+	//std::cerr << "det_a: " << det_a << std::endl;
+	//std::cerr << "det_b: " << det_b << std::endl;
+	//std::cerr << "det_c: " << det_c << std::endl;
+	//std::cerr << "det_d: " << det_d << std::endl;
 
 	if (det_a*det_b*det_c*det_d == 0) {
 		bool col = false;

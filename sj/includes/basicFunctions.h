@@ -22,6 +22,7 @@ public:
     }
 };
 
+// comparison class for the set of edges in 'opt2.cpp'
 struct setComp {
 private:
   double& t;
