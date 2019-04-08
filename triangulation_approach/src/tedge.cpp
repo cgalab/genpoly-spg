@@ -43,6 +43,16 @@ void TEdge::setTriangle(Triangle* t){
 	else printf("This edge already has two triangles\n");
 }
 
+Triangle* TEdge::getTriangleNotContaining(Vertex* v){
+	if((*t1).contains(v)) return t2;
+	else return t1;
+}
+
+Triangle* TEdge::getOtherTriangle(Triangle* t){
+	if(t == t1) return t2;
+	else return t1;
+}
+
 void TEdge::removeTriangle(Triangle* t){
 
 	if(t1 == t)
@@ -137,10 +147,7 @@ double det(TEdge* e, Vertex* p){
 enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;
-
-	//quick check if the edges share a vertex
-	if ((*e1).getV1() == (*e2).getV1() || (*e1).getV1() == (*e2).getV2() || (*e1).getV2() == (*e2).getV1() || (*e1).getV2() == (*e2).getV2())
-		return IS_VERTEX;
+	bool same11 = false, same12 = false, same21 = false, same22 = false;
 
 	// determinant between edge 1 and a point in edge 2
 	det_a = det(e1, (*e2).getV1());
@@ -149,8 +156,17 @@ enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
 	det_c = det(e2, (*e1).getV1());
 	det_d = det(e2, (*e1).getV2());
 
-	if(det_a * det_b * det_c * det_b == 0){
+	if(det_a * det_b * det_c * det_d == 0){
 		bool col = false; // if true, check for collinearity
+
+		//quick check if the edges share a vertex
+		if((*e1).getV1() == (*e2).getV2()) same11 = true;
+		if((*e1).getV1() == (*e2).getV2()) same12 = true;
+		if((*e1).getV2() == (*e2).getV1()) same21 = true;
+		if((*e1).getV2() == (*e2).getV2()) same22 = true;
+
+		// is e1 and e2 the same edge? then return IS_TRUE
+		if (same11 && same22) return IS_SAME_EDGE;
 
 		// some determinant was 0, need to check if it's inside an edge or outside.
 		dp_1 = reldist(e1, (*e2).getV1());
@@ -172,12 +188,13 @@ enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
 		else if((det_d == 0) && (dp_4 > 0) && (dp_4 < 1))
 			col = true;
 
-		if(col && (det_a == 0) && (det_b == 0) && (det_c == 0) && (det_d == 0))
-			return IS_COLLINEAR;
-		else if(col)
-			return IS_TRUE;
-		else
-			return IS_FALSE;
+		if(col) return IS_COLLINEAR;
+		else if(same11) return IS_VERTEX11;
+		else if(same12) return IS_VERTEX12;
+		else if(same21) return IS_VERTEX21;
+		else if(same22) return IS_VERTEX22;
+		else return IS_FALSE;
+
 	}else{
 		// none of the determinants were 0, so just need to check the sign for intersection.
 		if((signbit(det_a) ^ signbit(det_b)) && (signbit(det_c) ^ signbit(det_d)))

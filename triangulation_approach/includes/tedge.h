@@ -1,4 +1,5 @@
 #include <list>
+#include <vector>
 #include <stdio.h>
 #include <math.h> 
 #include "basicDefinitions.h"
@@ -43,6 +44,7 @@ public:
 	}
 
 	EdgeType getEdgeType(){ return type;}
+	int getID(){ return id;}
 
 	void setTriangle(Triangle* t);
 	void removeTriangle(Triangle* t);
@@ -56,7 +58,8 @@ public:
 	Vertex* getV2();
 	bool contains(Vertex* v);
 
-	
+	Triangle* getTriangleNotContaining(Vertex* v);
+	Triangle* getOtherTriangle(Triangle* t);
 
 	~TEdge();
 };

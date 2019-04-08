@@ -77,6 +77,7 @@ public:
 	bool isRectangleVertex(){ return rectangleVertex;}
 
 	Vertex* getTranslated(double dx, double dy){
+		// TODO: keep id
 		return new Vertex(x + dx, y + dy);
 	}
 

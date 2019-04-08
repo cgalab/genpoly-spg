@@ -59,6 +59,26 @@ TEdge* Triangle::getEdgeNotContaining(Vertex* v){
 	return NULL;
 }
 
+std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
+	std::vector<TEdge*> out(2);
+	int index = 0;
+
+	if(e0 != e){
+		out[index] = e0;
+		index++;
+	}
+	if(e1 != e){
+		out[index] = e1;
+		index++;
+	}
+	if(e2 != e){
+		out[index] = e2;
+		index++;
+	}
+
+	return out;
+}
+
 Triangle::~Triangle(){
 	(*v0).removeTriangle(this);
 	(*v1).removeTriangle(this);

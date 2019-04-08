@@ -1,5 +1,6 @@
 #include <list>
 #include <stdio.h>
+#include <vector>
 
 #ifndef __TRIANGLE_H_
 #define __TRIANGLE_H_
@@ -32,6 +33,8 @@ public:
 	~Triangle();
 	TEdge* getEdge(int i);
 	TEdge* getEdgeNotContaining(Vertex* v);
+	std::vector<TEdge*> getOtherEdges(TEdge* e);
+
 };
 
 #endif

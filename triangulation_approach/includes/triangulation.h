@@ -29,6 +29,7 @@ public:
 	void print(char* filename);
 	void check();
 	void deleteVertex(int index);
+	int getNumberOfVertices(){ return (int)vertices.size();}
 };
 
 #endif

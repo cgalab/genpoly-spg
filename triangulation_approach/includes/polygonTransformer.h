@@ -7,6 +7,7 @@
 #include "triangle.h"
 #include <list>
 #include <vector>
+#include <map>
 #include "basicDefinitions.h"
 
 void transformPolygon(Triangulation* T, int iterations, Timer t);

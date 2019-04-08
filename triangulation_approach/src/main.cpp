@@ -20,7 +20,7 @@ int main(){
 	T = generateRegularPolygon(n);
 	(*T).check();
 	//p = generateRectangularPolygon(n, RPShapes::RPS_FLAT);
-	printf("Initial polygon with regular shape computed after %f seconds\n", t.elapsedTime());
+	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", (*T).getNumberOfVertices(), t.elapsedTime());
 
 
 	transformPolygon(T, translations, t);
