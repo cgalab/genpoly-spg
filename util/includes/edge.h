@@ -37,13 +37,13 @@ public:
   double getMax() const {return max;}
 
   bool operator < (const double s) const {
-    if (min < s) return true;
+    if (max < s) return true;
     else return false;
   }
   bool operator < (const Yval s) const {
     if (x < s.getX()) return true;
-    else if (min < s.getMin()) return true;
-    else if ((min == s.getMin()) && (max < s.getMax())) return true;
+    else if (max < s.getMin()) return true;
+    //else if ((min == s.getMin()) && (max < s.getMax())) return true;
     else return false;
   }
   bool operator > (const double s) const {
@@ -70,7 +70,7 @@ class Edge {
 public:
 	Point *p1;
 	Point *p2;
-  double l_idx;
+  unsigned int l_idx;
 
 	Edge() {p1=NULL; p2=NULL;l_idx=0;}
 	Edge(const Edge& e) {p1=e.p1; p2=e.p2;l_idx=e.l_idx;}

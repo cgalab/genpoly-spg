@@ -22,18 +22,34 @@ public:
     }
 };
 
+struct compObject{
+  double t;
+  Edge lhs;
+  Edge rhs;
+  enum intersect_t isect;
+};
+
 // comparison class for the set of edges in 'opt2.cpp'
 struct setComp {
 private:
-  double& t;
 public:
-  setComp(double& T) : t(T) {}
-  bool operator() (const Edge& lhs, const Edge& rhs) const {
-    std::cout << "lhs: " << lhs << " < rhs: " << rhs << std::endl;
-    //std::cout << "t: " << t << std::endl;
+  compObject& o;
 
+  setComp(compObject& O) : o(O) {}
+  bool operator() (const Edge& lhs, const Edge& rhs) const {
+    //if (o.isect >= IS_TRUE) return false;
+    std::cout << "lhs: " << lhs << " < rhs: " << rhs << std::endl;
+    //std::cout << "o.t: " << o.t << std::endl;
+/*
     enum intersect_t retval = checkIntersection(lhs, rhs);
     if (retval == IS_SAME_EDGE) return false;
+    if (retval >= IS_TRUE) {
+      o.isect = retval;
+      o.lhs = lhs;
+      o.rhs = rhs;
+      std::cerr << "inserting: Found an intersection!" << std::endl;
+      return false;
+    }
     else if (retval == IS_VERTEX11) {
       std::cerr << "IS_VERTEX11" << std::endl;
       double slopel, sloper;
@@ -133,12 +149,26 @@ public:
       std::cerr << "coll: "<< lenl << " < " << lenr << " : " << ((lenl < lenr)? "true" : "false") << std::endl;
       return lenl < lenr;
     }
+*/
+    enum intersect_t retval = checkIntersection(lhs, rhs);
+    if (retval == IS_VERTEX11) {
+      // the 2 edges have the same starting point, use a determinant test to check if left or right of lhs.
+      bool detsign = signbit(det(lhs, *rhs.p2));
+      return !detsign;
+    }
+    else if (retval >= IS_TRUE) {
+      std::cerr << "found intersection between: " << lhs << ", and " << rhs << std::endl;
+      if (o.isect == IS_FALSE) {
+        o.lhs = lhs;
+        o.rhs = rhs;
+        o.isect = retval;
+      }
+    }
 
     Yval Ly, Ry;
 
     // calculate the y-axis order of the 2 edges at idx
-    // use Yval in case of x1-x2 = 0, hopefully this will be a better comparison function..
-    // Line for lhs:
+    // use Yval in case of x1-x2 = 0
     Point L1 = *lhs.p1;
     Point L2 = *lhs.p2;
 
@@ -147,8 +177,10 @@ public:
       Ly.setX(L1.x);
     } else {
       double slope = (L2.y-L1.y) / (L2.x-L1.x);
-      Ly.set(slope * (t - L1.x) + L1.y);
-      Ly.setX(t);
+      double val = slope * (o.t - L1.x) + L1.y;
+      if (abs(val) < EPSILON) Ly.set(0);
+      else Ly.set(val);
+      Ly.setX(o.t);
     }
 
     Point R1 = *rhs.p1;
@@ -159,8 +191,10 @@ public:
       Ry.setX(R1.x);
     } else {
       double slope = (R2.y-R1.y) / (R2.x-R1.x);
-      Ry.set(slope * (t - R1.x) + R1.y);
-      Ry.setX(t);
+      double val = slope * (o.t - R1.x) + R1.y;
+      if (abs(val) < EPSILON) Ry.set(0);
+      else Ry.set(val);
+      Ry.setX(o.t);
     }
 
     std::cerr << Ly << " < " << Ry << " : " << ((Ly < Ry)? "true" : "false") << std::endl;

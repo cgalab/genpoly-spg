@@ -41,6 +41,215 @@ void decrementEdges1(unsigned int index, std::list<Edge>& edges) {
 	}
 }
 */
+bool lexSwap(Point* p1, Point* p2, std::vector<unsigned int>& polygon) {
+  bool swapped = false;
+  unsigned int temp;
+  if ( abs(int((*p1).v - (*p2).v)) == 1 ) {
+    if ((*p1).v > (*p2).v) {
+      std::cerr << "p1.v: " << (*p1).v << " > p2.v: " << (*p2).v << std::endl;
+      temp = (*p1).v;
+      (*p1).v = (*p2).v;
+      (*p2).v = temp;
+      polygon[(*p1).v] = (*p1).i;
+      polygon[(*p2).v] = (*p2).i;
+      swapped = true;
+    }
+  } else if ((*p1).v == 0) {
+    if (abs(int(polygon.size()-(*p2).v)) == 1 ) {
+      if ((*p1).v > (*p2).v) {
+        std::cerr << "p1.v: " << (*p1).v << " > p2.v: " << (*p2).v << std::endl;
+        temp = (*p1).v;
+        (*p1).v = (*p2).v;
+        (*p2).v = temp;
+        polygon[(*p1).v] = (*p1).i;
+        polygon[(*p2).v] = (*p2).i;
+        swapped = true;
+      }
+    }
+  } else if ((*p2).v == 0) {
+    if (abs(int(polygon.size()-(*p1).v)) == 1 ) {
+      if ((*p1).v > (*p2).v) {
+        std::cerr << "p1.v: " << (*p1).v << " > p2.v: " << (*p2).v << std::endl;
+        temp = (*p1).v;
+        (*p1).v = (*p2).v;
+        (*p2).v = temp;
+        polygon[(*p1).v] = (*p1).i;
+        polygon[(*p2).v] = (*p2).i;
+        swapped = true;
+      }
+    }
+  }
+  return swapped;
+}
+
+// p1, p2 and p3 are collinear, which won't work for the purpose of 2opt without reordering them in the polygon
+bool lexReorder(Point* p1, Point* p2, Point* p3, std::vector<unsigned int>& polygon) {
+  bool swapped = false;
+  unsigned int temp;
+  if (*p1 < *p2) {
+    if ((*p1).v > (*p2).v) {
+      std::cerr << "p1.v: " << (*p1).v << " > p2.v: " << (*p2).v << std::endl;
+      temp = (*p1).v;
+      (*p1).v = (*p2).v;
+      (*p2).v = temp;
+      polygon[(*p1).v] = (*p1).i;
+      polygon[(*p2).v] = (*p2).i;
+      swapped = true;
+    }
+  } else {
+    if ((*p1).v < (*p2).v) {
+      std::cerr << "p1.v: " << (*p1).v << " < p2.v: " << (*p2).v << std::endl;
+      temp = (*p1).v;
+      (*p1).v = (*p2).v;
+      (*p2).v = temp;
+      polygon[(*p1).v] = (*p1).i;
+      polygon[(*p2).v] = (*p2).i;
+      swapped = true;
+    }
+  }
+  if (*p1 < *p3) {
+    if ((*p1).v > (*p3).v) {
+      std::cerr << "p1.v: " << (*p1).v << " > p3.v: " << (*p3).v << std::endl;
+      temp = (*p1).v;
+      (*p1).v = (*p3).v;
+      (*p3).v = temp;
+      polygon[(*p1).v] = (*p1).i;
+      polygon[(*p3).v] = (*p3).i;
+      swapped = true;
+    }
+  } else {
+    if ((*p1).v < (*p3).v) {
+      std::cerr << "p1.v: " << (*p1).v << " < p3.v: " << (*p3).v << std::endl;
+      temp = (*p1).v;
+      (*p1).v = (*p3).v;
+      (*p3).v = temp;
+      polygon[(*p1).v] = (*p1).i;
+      polygon[(*p3).v] = (*p3).i;
+      swapped = true;
+    }
+  }
+  if (*p2 > *p3) {
+    if ((*p2).v < (*p3).v) {
+      std::cerr << "p2.v: " << (*p2).v << " < p3.v: " << (*p3).v << std::endl;
+      temp = (*p1).v;
+      (*p1).v = (*p3).v;
+      (*p3).v = temp;
+      polygon[(*p2).v] = (*p2).i;
+      polygon[(*p3).v] = (*p3).i;
+      swapped = true;
+    }
+  } else {
+    if ((*p2).v > (*p3).v) {
+      std::cerr << "p2.v: " << (*p2).v << " > p3.v: " << (*p3).v << std::endl;
+      temp = (*p2).v;
+      (*p2).v = (*p3).v;
+      (*p3).v = temp;
+      polygon[(*p2).v] = (*p2).i;
+      polygon[(*p3).v] = (*p3).i;
+      swapped = true;
+    }
+  }
+  std::cerr << "reorder: p1: " << *p1 << ", p2: " << *p2 << ", p3: " << *p3 << std::endl;
+  return swapped;
+}
+
+bool lexReorder(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon) {
+  bool swapped = false;
+  // if one vertex is the same
+  if (*e1.p1 == *e2.p1) {
+    swapped = lexReorder(e1.p1, e1.p2, e2.p2, polygon);
+    return swapped;
+  } else if (*e1.p1 == *e2.p2) {
+    swapped = lexReorder(e1.p1, e1.p2, e2.p1, polygon);
+    return swapped;
+  }
+  else if (*e1.p2 == *e2.p1) {
+    swapped = lexReorder(e1.p2, e1.p1, e2.p2, polygon);
+    return swapped;
+  }
+  else if (*e1.p2 == *e2.p2) {
+    swapped = lexReorder(e1.p2, e1.p1, e2.p1, polygon);
+    return swapped;
+  }
+
+  // check if it's really 4 point collinearity
+  double det_a = det(e1, *e2.p1);
+  double det_b = det(e1, *e2.p2);
+  double det_c = det(e2, *e1.p1);
+  double det_d = det(e2, *e1.p2);
+
+  if (abs(det_a)+abs(det_b)+abs(det_c)+abs(det_d) > 0) {
+    // only 3 point collinearity
+         if (det_a == 0) swapped = lexReorder(e1.p1, e1.p2, e2.p1, polygon);
+    else if (det_b == 0) swapped = lexReorder(e1.p1, e1.p2, e2.p2, polygon);
+    else if (det_c == 0) swapped = lexReorder(e2.p1, e2.p2, e1.p1, polygon);
+    else if (det_d == 0) swapped = lexReorder(e2.p1, e2.p2, e1.p2, polygon);
+    return swapped;
+  }
+
+  unsigned int temp;
+  // sort the e1.p1...
+  if (*e1.p1 < *e1.p2) {
+    if ((*e1.p1).v > (*e1.p2).v) {
+      temp = (*e1.p1).v;
+      (*e1.p1).v = (*e1.p2).v;
+      (*e1.p2).v = temp;
+      polygon[(*e1.p1).v] = (*e1.p1).i;
+      polygon[(*e1.p2).v] = (*e1.p2).i;
+      swapped = true;
+    }
+  } else {
+    if ((*e1.p1).v < (*e1.p2).v) {
+      temp = (*e1.p1).v;
+      (*e1.p1).v = (*e1.p2).v;
+      (*e1.p2).v = temp;
+      polygon[(*e1.p1).v] = (*e1.p1).i;
+      polygon[(*e1.p2).v] = (*e1.p2).i;
+      swapped = true;
+    }
+  }
+  if (*e1.p1 < *e2.p1) {
+    if ((*e1.p1).v > (*e2.p1).v) {
+      temp = (*e1.p1).v;
+      (*e1.p1).v = (*e2.p1).v;
+      (*e2.p1).v = temp;
+      polygon[(*e1.p1).v] = (*e1.p1).i;
+      polygon[(*e2.p1).v] = (*e2.p1).i;
+      swapped = true;
+    }
+  } else {
+    if ((*e1.p1).v < (*e2.p1).v) {
+      temp = (*e1.p1).v;
+      (*e1.p1).v = (*e2.p1).v;
+      (*e2.p1).v = temp;
+      polygon[(*e1.p1).v] = (*e1.p1).i;
+      polygon[(*e2.p1).v] = (*e2.p1).i;
+      swapped = true;
+    }
+  }
+  if (*e1.p1 < *e2.p2) {
+    if ((*e1.p1).v > (*e2.p2).v) {
+      temp = (*e1.p1).v;
+      (*e1.p1).v = (*e2.p2).v;
+      (*e2.p2).v = temp;
+      polygon[(*e1.p1).v] = (*e1.p1).i;
+      polygon[(*e2.p2).v] = (*e2.p2).i;
+      swapped = true;
+    }
+  } else {
+    if ((*e1.p1).v < (*e2.p2).v) {
+      temp = (*e1.p1).v;
+      (*e1.p1).v = (*e2.p2).v;
+      (*e2.p2).v = temp;
+      polygon[(*e1.p1).v] = (*e1.p1).i;
+      polygon[(*e2.p2).v] = (*e2.p2).i;
+      swapped = true;
+    }
+  }
+  // ...then the rest can be sorted with the other lexReorder
+  swapped = lexReorder(e1.p2, e2.p1, e2.p2, polygon);
+  return swapped;
+}
 
 /*
 // function that erases points in 'moveP' from the polygon and adds them to the end in order of 'moveP'.
@@ -90,7 +299,6 @@ void movePoints(std::vector<unsigned int>& moveP, std::vector<unsigned int>& pol
 }
 */
 
-
 // checks if an edge 'e' is: already in 'edgeS', if not checks if it intersects its neighbours and either cleans 'edgeS' or add 'e' into it.
 enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	enum edge_t valid = E_VALID;
@@ -98,8 +306,31 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 	bool bef = false, af = false;
 	// ok to try and insert the edge into 'edgeS', if it's already there, we have an iterator for removal of the value, if it isn't, we have an iterator to check neighbours.
 	std::pair<std::set<Edge, setComp>::iterator,bool> retval;
-
+  std::set<Edge, setComp>::key_compare mycomp = edgeS.key_comp();
+  mycomp.o.isect = IS_FALSE;
 	retval = edgeS.insert(e);
+
+  // handle if the insert found an intersection.
+  std::cerr << "setComp isect: " << ((mycomp.o.isect >= IS_TRUE) ? "true" : "false") << std::endl;
+  if (mycomp.o.isect == IS_TRUE) {
+    std::cerr << "intersection between " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
+    flip(mycomp.o.lhs, mycomp.o.rhs, polygon, points);
+    index = 0;
+    decrementEdges(index, edgeS);
+    valid = E_SKIP;
+    mycomp.o.isect = IS_FALSE;
+    return valid;
+  } else if (mycomp.o.isect == IS_COLLINEAR) {
+    std::cerr << "collinearity between " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
+    if (lexReorder(mycomp.o.lhs, mycomp.o.rhs, polygon)) {
+      index = 0;
+      decrementEdges(index, edgeS);
+      valid = E_SKIP;
+      mycomp.o.isect = IS_FALSE;
+      return valid;
+    }
+  }
+
 	std::cout << "retval.first : " << *retval.first << std::endl;
 	std::cout << "retval.second: " << retval.second << std::endl;
 
@@ -135,7 +366,6 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 				std::cout << "intersection with 'before'" << std::endl;
 				flip(e, before, polygon, points);
 				index = 0;
-				//index = (e.l_idx < before.l_idx) ? e.l_idx : after.l_idx;
 				decrementEdges(index, edgeS);
 				valid = E_SKIP;
 			}
@@ -153,7 +383,6 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 					std::cout << "intersection with 'after'" << std::endl;
 					flip(e, after, polygon, points);
 					index = 0;
-					//index = (e.l_idx < after.l_idx) ? e.l_idx : after.l_idx;
 					decrementEdges(index, edgeS);
 					valid = E_SKIP;
 				}
@@ -175,7 +404,6 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
           std::cout << "intersection between 'before' and 'after'" << std::endl;
           flip(before, after, polygon, points);
 					index = 0;
-					//index = (e.l_idx < after.l_idx) ? e.l_idx : after.l_idx;
 					decrementEdges(index, edgeS);
 					valid = E_SKIP;
         }
@@ -183,7 +411,8 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
       else std::cerr << "removal ok, continue." << std::endl;
     }
     else {
-      std::cerr << "retval.first was not 'e'!!!" << std::endl;
+      std::cerr << "retval.first WAS NOT 'e'!!!" << std::endl;
+      std::cerr << "o.lhs: " << mycomp.o.lhs << ", o.rhs: " << mycomp.o.rhs << std::endl;
       valid = E_NOT_VALID;
     }
 
@@ -280,20 +509,22 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
 	unsigned int index=0, before, after;
-	double d_idx;
+	//double d_idx;
+  compObject comp;
 	enum edge_t val1, val2;
   enum intersect_t val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
 	//std::list<Edge> edgesL; // a list for edges
-	std::set<Edge, setComp> edgeS(d_idx); // a set of edges.
+	std::set<Edge, setComp> edgeS(comp); // a set of edges.
 
 	while (index < points.size()) {
 		std::cout << std::endl << "index: " << index << std::endl;
 		val1 = E_VALID; val2 = E_VALID;
 		// get the current point at 'index'
 		p1 = &points[lex[index]];
-		d_idx = (*p1).x;
+		comp.t = (*p1).x;
+    //std::cerr << "t in while: " << comp.t << std::endl;
 		// get the 2 points it is connected to in 'polygon', treating the edge case when the point 'p1' is on the ends
 		before = ((*p1).v + points.size() -1) % points.size();
 		after =  ((*p1).v + points.size() +1) % points.size();
@@ -302,7 +533,8 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 		p3 = &points[polygon[after]];
 
 		// construct the edges
-		if (p2 < p3) {
+    //std::cerr << *p2 << " < " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
+		if (*p2 < *p3) {
 			e1 = Edge (p1, p2, index);
 			e2 = Edge (p1, p3, index);
 		}
@@ -313,12 +545,14 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 
     val3 = checkIntersection(e1, e2);
     if (!(val3 < IS_TRUE)) {
-      std::cerr << "check in 'while' found an intersection. Resetting."  << std::endl;
-      std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
       // the 2 edges are collinear
-      flip(e1, e2, polygon, points);
-      index = 0;
-      decrementEdges(index, edgeS);
+      std::cerr << "collinear check found an intersection. Resetting."  << std::endl;
+      std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+
+      if(lexReorder(p1, p2, p3, polygon)) {
+        index = 0;
+        decrementEdges(index, edgeS);
+      }
       continue;
     }
 

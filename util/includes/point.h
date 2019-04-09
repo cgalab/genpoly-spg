@@ -32,6 +32,12 @@ public:
     else return false;
   }
 
+  bool operator > (const Point& s) const {
+    if (x > s.x) return true;
+    else if ((x == s.x) && (y > s.y)) return true;
+    else return false;
+  }
+
   friend bool operator==(const Point & lhs, const Point & rhs) {
     if ((lhs.x == rhs.x) && (lhs.y == rhs.y)) return true;
     else return false;

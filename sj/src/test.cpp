@@ -282,8 +282,8 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 */
   std::cerr << "=== Edge set tests ===" << std::endl;
 
-  double d_idx=0;
-  std::set<Edge, setComp> edgeS(d_idx); // a set of an edge with 'setComp' as a '<' comparison function.
+  compObject o;
+  std::set<Edge, setComp> edgeS(o); // a set of an edge with 'setComp' as a '<' comparison function.
   std::pair<std::set<Edge, setComp>::iterator,bool> retval; // return value
 
   p1.set(0,0);
@@ -297,7 +297,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "r.1: " << (*retval.first) << std::endl;
   std::cerr << "r.2 should be true for a correct insertion: " << (retval.second ? "true" : "false") << std::endl;
   std::cerr << "inserting e2:" << e2 << std::endl;
-  d_idx = 1;
+  o.t = 1;
   retval = edgeS.insert(e2);
   std::cerr << "r.1: " << (*retval.first) << std::endl;
   std::cerr << "r.2 should be true for a correct insertion: " << (retval.second ? "true" : "false") << std::endl;
@@ -308,7 +308,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   Point p6 = Point(2,3,6,6);
 
   Edge e3 = Edge(&p5, &p6);
-  d_idx = 2;
+  o.t = 2;
 
   std::cerr << "inserting e3:" << e3 << std::endl;
   retval = edgeS.insert(e3);

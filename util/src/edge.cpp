@@ -27,11 +27,12 @@ void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& point
 }
 
 // returns relative distance of a point to an edge.
-double reldist(const Edge& e, const Point& p) {
-	const Point& pa = *e.p1;
-	const Point& pb = *e.p2;
+double reldist(const Point& pa, const Point& pb, const Point& p) {
 	double ans = ((p.x-pa.x)*(pb.x-pa.x) + (p.y-pa.y)*(pb.y-pa.y)) / ((pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y));
 	return (abs(ans) < EPSILON) ? 0 : ans;
+}
+double reldist(const Edge& e, const Point& p) {
+	return reldist(*e.p1, *e.p2, p);
 }
 
 double det(const Edge& e, const Point& p) {
@@ -92,10 +93,10 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		//std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << std::endl;
 		//std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << std::endl;
 
-		if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) ) col = true;
-		else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) )	col = true;
-		else if ( (det_c == 0) && (dp_3 > 0) && (dp_3 < 1) )	col = true;
-		else if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) )	col = true;
+				 if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) ) col = true;
+		else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) ) col = true;
+		else if ( (det_c == 0) && (dp_3 > 0) && (dp_3 < 1) ) col = true;
+		else if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) ) col = true;
 
 		if (col) return IS_COLLINEAR;
 		else if (same11) return IS_VERTEX11;
