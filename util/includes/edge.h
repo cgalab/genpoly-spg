@@ -42,6 +42,7 @@ public:
   }
   bool operator < (const Yval s) const {
     if (x < s.getX()) return true;
+    else if (max == s.getMin() && (min < s.getMin())) return true;
     else if (max < s.getMin()) return true;
     //else if ((min == s.getMin()) && (max < s.getMax())) return true;
     else return false;
@@ -127,6 +128,20 @@ public:
   double getyMax() const {
     if ((*p1).y < (*p2).y) return (*p2).y;
     else return (*p1).y;
+  }
+
+  // check for if p1 is a 'left' vertex compared to p2
+  bool checkPolLoHi() {
+    if ((*p1).v == 0) {
+      if ((*p2).v != 1) return false;
+      else return true;
+    }
+    if ((*p2).v == 0) {
+      if ((*p1).v == 1) return false;
+      else return true;
+    }
+    else
+      return (*p1).v < (*p2).v;
   }
 
 /*

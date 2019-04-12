@@ -7,35 +7,6 @@
 #include "basicFunctions.h" //for setComp (Edge set test)
 
 
-void printEnum(enum intersect_t val) {
-  switch (val) {
-    case IS_FALSE:
-      std::cerr << "IS_FALSE";
-      break;
-    case IS_VERTEX11:
-      std::cerr << "IS_VERTEX11";
-      break;
-    case IS_VERTEX12:
-      std::cerr << "IS_VERTEX12";
-      break;
-    case IS_VERTEX21:
-      std::cerr << "IS_VERTEX21";
-      break;
-    case IS_VERTEX22:
-      std::cerr << "IS_VERTEX22";
-      break;
-    case IS_TRUE:
-      std::cerr << "IS_TRUE";
-      break;
-    case IS_COLLINEAR:
-      std::cerr << "IS_COLLINEAR";
-      break;
-    case IS_SAME_EDGE:
-      std::cerr << "IS_SAME_EDGE";
-    default:
-      break;
-  }
-}
 /*
 void printEnum(enum bst_t val) {
   switch (val) {
@@ -96,7 +67,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(4,4);
   e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
-  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << ", value: ";
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << ", value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -173,7 +144,40 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(1,0);
   e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  printEnum(itest);
+  std::cerr << std::endl;
+
+  p1.set(0.2,0);
+  p2.set(0.2,0.2);
+  e1.set(p1,p2);
+  p3.set(0.1,0.1);
+  p4.set(0.9,0.9);
+  e2.set(p3,p4);
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  printEnum(itest);
+  std::cerr << std::endl;
+
+  p1.set(0.2,0);
+  p2.set(0.3,0.5);
+  e1.set(p1,p2);
+  p3.set(0.2,0.2);
+  p4.set(0.3,0.5);
+  e2.set(p3,p4);
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  printEnum(itest);
+  std::cerr << std::endl;
+
+  p1.set(2,15);
+  p2.set(2,17);
+  e1.set(p1,p2);
+  p3.set(2,14);
+  p4.set(2,17);
+  e2.set(p3,p4);
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 

@@ -7,6 +7,8 @@
 #ifndef __BASICFUNCTIONS_H_
 #define __BASICFUNCTIONS_H_
 
+
+
 class lexComp {
 public:
     const std::vector<Point>& value_vector;
@@ -156,8 +158,13 @@ public:
       bool detsign = signbit(det(lhs, *rhs.p2));
       return !detsign;
     }
+    else if (retval == IS_VERTEX22) {
+      // the 2 edges have the same end point, use a determinant test to check if left or right of lhs.
+      bool detsign = signbit(det(lhs, *rhs.p1));
+      return !detsign;
+    }
     else if (retval >= IS_TRUE) {
-      std::cerr << "found intersection between: " << lhs << ", and " << rhs << std::endl;
+      std::cerr << "IS: " << retval << ", found intersection between: " << lhs << ", and " << rhs << std::endl;
       if (o.isect == IS_FALSE) {
         o.lhs = lhs;
         o.rhs = rhs;
@@ -203,6 +210,7 @@ public:
 };
 
 enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg);
+void printEnum(enum intersect_t val);
 void test();
 
 #endif
