@@ -397,6 +397,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 	std::pair<std::set<Edge, setComp>::iterator,bool> retval;
   std::set<Edge, setComp>::key_compare mycomp = edgeS.key_comp();
   mycomp.o.isect = IS_FALSE;
+  mycomp.o.l_idx = index;
 	retval = edgeS.insert(e);
 
   // handle if the insert found an intersection.
@@ -407,9 +408,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
   if ((mycomp.o.isect == IS_TRUE) || (mycomp.o.isect == IS_3P_COLLINEAR)) {
     std::cerr << "intersection between " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
     flip(mycomp.o.lhs, mycomp.o.rhs, polygon, points);
-    if (mycomp.o.lhs.l_idx < mycomp.o.rhs.l_idx)
-      index = mycomp.o.lhs.l_idx;
-    else index = mycomp.o.rhs.l_idx;
+    index = mycomp.o.l_idx;
     decrementEdges(index, edgeS);
     valid = E_SKIP;
     mycomp.o.isect = IS_FALSE;
@@ -420,9 +419,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
       std::cerr << "collinearity after swap: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
       //flip(mycomp.o.lhs, mycomp.o.rhs, polygon, points);
       //std::cerr << "collinearity after flip: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
-      if (mycomp.o.lhs.l_idx < mycomp.o.rhs.l_idx)
-        index = mycomp.o.lhs.l_idx;
-      else index = mycomp.o.rhs.l_idx;
+      index = mycomp.o.l_idx;
       decrementEdges(index, edgeS);
       valid = E_SKIP;
       mycomp.o.isect = IS_FALSE;
@@ -437,9 +434,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
       std::cerr << "3 point collinearity found at: " << mycomp.o.lhs << " and " << mycomp.o.rhs;
       if (*mycomp.o.lhs.p1 < *mycomp.o.rhs.p1) collSwap(mycomp.o.lhs.p1, mycomp.o.lhs.p2, mycomp.o.rhs.p1, polygon);
       else  collSwap(mycomp.o.rhs.p1, mycomp.o.rhs.p2, mycomp.o.lhs.p1, polygon);
-      if (mycomp.o.lhs.l_idx < mycomp.o.rhs.l_idx)
-        index = mycomp.o.lhs.l_idx;
-      else index = mycomp.o.rhs.l_idx;
+      index = mycomp.o.l_idx;
       decrementEdges(index, edgeS);
       valid = E_SKIP;
       mycomp.o.isect = IS_FALSE;
@@ -480,9 +475,14 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
         else {
           std::cout << "intersection between 'before' and 'after'" << std::endl;
           flip(before, after, polygon, points);
-          if (before.l_idx < after.l_idx)
-            index = before.l_idx;
-          else index = after.l_idx;
+          if (before.l_idx < after.l_idx) {
+            if (before.l_idx < mycomp.o.l_idx)  index = before.l_idx;
+            else index = mycomp.o.l_idx;
+          }
+          else {
+            if (after.l_idx < mycomp.o.l_idx) index = after.l_idx;
+            else index = mycomp.o.l_idx;
+          }
 					decrementEdges(index, edgeS);
 					valid = E_SKIP;
         }
@@ -512,9 +512,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 				// edge intersects with 'before'.  Need to flip 'e' and 'before' in polygon, then remove edges in 'edgeS'
 				std::cout << "intersection with 'before'" << std::endl;
 				flip(e, before, polygon, points);
-        if (mycomp.o.lhs.l_idx < mycomp.o.rhs.l_idx)
-          index = mycomp.o.lhs.l_idx;
-        else index = mycomp.o.rhs.l_idx;
+        index = mycomp.o.l_idx;
 				decrementEdges(index, edgeS);
 				valid = E_SKIP;
 			}
@@ -531,9 +529,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 					// edge intersects with 'after'.  Need to flip 'e' and 'after' in polygon, then remove edges in 'edgeS'
 					std::cout << "intersection with 'after'" << std::endl;
 					flip(e, after, polygon, points);
-          if (mycomp.o.lhs.l_idx < mycomp.o.rhs.l_idx)
-            index = mycomp.o.lhs.l_idx;
-          else index = mycomp.o.rhs.l_idx;
+          index = mycomp.o.l_idx;
 					decrementEdges(index, edgeS);
 					valid = E_SKIP;
 				}

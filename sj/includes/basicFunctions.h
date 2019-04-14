@@ -29,6 +29,7 @@ struct compObject{
   Edge lhs;
   Edge rhs;
   enum intersect_t isect;
+  unsigned int l_idx;
 };
 
 // comparison class for the set of edges in 'opt2.cpp'
@@ -170,6 +171,13 @@ public:
         o.rhs = rhs;
         o.isect = retval;
       }
+      if (lhs.l_idx < rhs.l_idx) {
+        if (lhs.l_idx < o.l_idx) o.l_idx = lhs.l_idx;
+      } else {
+        if (rhs.l_idx < o.l_idx) o.l_idx = rhs.l_idx;
+      }
+
+
     }
 
     Yval Ly, Ry;
