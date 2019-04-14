@@ -10,6 +10,7 @@ public:
   double y;
   unsigned int i; // index in input file
   unsigned int v; // index in polygon
+  unsigned int l; // index in lexicographical order.
 
   Point() {x=0; y=0; i=0; v=0;}
   Point(const Point& p) {x=p.x;y=p.y;i=p.i;v=p.v;}

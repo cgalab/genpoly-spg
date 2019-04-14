@@ -156,12 +156,24 @@ public:
     enum intersect_t retval = checkIntersection(lhs, rhs);
     if (retval == IS_VERTEX11) {
       // the 2 edges have the same starting point, use a determinant test to check if left or right of lhs.
-      bool detsign = signbit(det(lhs, *rhs.p2));
+      double detval = det(lhs, *rhs.p2);
+      if (detval == 0) {
+        double relval = reldist(lhs, *rhs.p2);
+        if (relval > 1) return true;
+        else return false;
+      }
+      bool detsign = signbit(detval);
       return !detsign;
     }
     else if (retval == IS_VERTEX22) {
       // the 2 edges have the same end point, use a determinant test to check if left or right of lhs.
-      bool detsign = signbit(det(lhs, *rhs.p1));
+      double detval = det(lhs, *rhs.p1);
+      if (detval == 0) {
+        double relval = reldist(lhs, *rhs.p1);
+        if (relval > 1) return true;
+        else return false;
+      }
+      bool detsign = signbit(detval);
       return !detsign;
     }
     else if (retval >= IS_TRUE) {

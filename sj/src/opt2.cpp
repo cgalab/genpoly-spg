@@ -49,8 +49,37 @@ void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon) {
 // a is assumed to be the lowest point lexicographically as well as the middle point in polygon of the 3 points.
 bool collSwap(Point* a, Point* b, Point* c, std::vector<unsigned int>& polygon) {
   bool retval = false;
+  double dp = reldist(*a, *b, *c);
+  if (dp > 1) {
+    if ((*a).v > (*b).v) {polSwap(a, b, polygon); retval = true;}
+    if ((*a).v > (*c).v) {polSwap(a, c, polygon); retval = true;}
+    if ((*b).v > (*c).v) {polSwap(b, c, polygon); retval = true;}
+    return retval;
+  }
+  dp = reldist(*a, *c, *b);
+  if (dp > 1) {
+    if ((*a).v > (*b).v) {polSwap(a, b, polygon); retval = true;}
+    if ((*a).v > (*c).v) {polSwap(a, c, polygon); retval = true;}
+    if ((*c).v > (*b).v) {polSwap(b, c, polygon); retval = true;}
+    return retval;
+  }
+  return retval;
+}
+
+
+
+/*
   if ((*a) < (*b))  {
-    if ((*a).v > (*b).v) {
+    int left, right; // how far away b is from a in either direction
+    if (((*a).v - (*b).v) < 0) {
+      left = ((*a).v + polygon.size() - (*b).v) % polygon.size();
+      right = (*b).v - (*a).v)
+    } else {
+      left = polygon.size() - (*a).v;
+      right = (*a).v - (*b).v;
+    }
+
+    if (left < right) {
       polSwap(a, b, polygon);
       retval = true;
     }
@@ -86,9 +115,31 @@ bool collSwap(Point* a, Point* b, Point* c, std::vector<unsigned int>& polygon) 
   //if (*b < *c) polSwap(a, b, polygon);
   //else polSwap(a, c, polygon);
 }
+*/
+
 
 // Function that takes 2 edges, e1 and e2 that both intersect and are collinear
 bool collSwap (Edge& e1, Edge& e2, std::vector<unsigned int>& polygon) {
+  double dp1 = reldist(e1, *e2.p1);
+  double dp2 = reldist(e1, *e2.p2);
+  std::cerr << "edge collswap: dp1: " << dp1 << ", dp2: " << dp2 << std::endl;
+
+  if ((dp1 > 1) && (dp2 > 1)) return false;
+  if ((dp1 < 0) && (dp2 < 0)) return false;
+  if ((dp1 < 0) && (dp2 > 1)) {polSwap(e1.p1, e2.p2, polygon); polSwap(e1.p1, e1.p2, polygon); return true;}
+  if ((dp1 > 1) && (dp2 < 0)) {polSwap(e1.p2, e2.p2, polygon); return true;}
+  if ((dp1 > 0) && (dp1 < 1) && dp2 > 1) {polSwap(e1.p2, e2.p1, polygon); return true;}
+  if ((dp1 > 0) && (dp1 < 1) && dp2 < 0) {polSwap(e1.p1, e2.p1, polygon); return true;}
+  if ((dp2 > 0) && (dp2 < 1) && dp1 > 1) {polSwap(e1.p2, e2.p2, polygon); return true;}
+  if ((dp2 > 0) && (dp2 < 1) && dp1 < 0) {polSwap(e1.p1, e2.p2, polygon); return true;}
+  if ((dp1 > 0) && (dp1 < 1) && (dp2 > 0) && (dp2 < 1)) {polSwap(e1.p2, e2.p1, polygon);return true;}
+
+  std::cerr << "2 EDGE collSwap ERROR, all conditions should have been caught earlier." << std::endl;
+  std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+  return false;
+}
+/*
+{
   if (  ((*e1.p1) > (*e1.p2)) ||
         ((*e1.p1) > (*e2.p1)) ||
         ((*e1.p1) > (*e2.p2)) ||
@@ -100,7 +151,8 @@ bool collSwap (Edge& e1, Edge& e2, std::vector<unsigned int>& polygon) {
     collSwap(e1.p1, e1.p2, e2.p1, polygon);
     return true;
   } else return false;
-  /*
+*/
+/*
   if (e1.checkPolLoHi()) {
     if (e2.checkPolLoHi()) return false;
     else {
@@ -113,8 +165,9 @@ bool collSwap (Edge& e1, Edge& e2, std::vector<unsigned int>& polygon) {
       return true;
     } else return false;
   }
-  */
 }
+*/
+
 
 /*
 // function to remove edges from 'edges' up to and including value of 'index'
@@ -417,9 +470,16 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
     std::cerr << "collinearity before swap:" << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
     if (collSwap(mycomp.o.lhs, mycomp.o.rhs, polygon)) {
       std::cerr << "collinearity after swap: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
-      flip(mycomp.o.lhs, mycomp.o.rhs, polygon, points);
-      std::cerr << "collinearity after flip: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
-      index = mycomp.o.l_idx;
+      //flip(mycomp.o.lhs, mycomp.o.rhs, polygon, points);
+      //std::cerr << "collinearity after flip: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
+      //index = mycomp.o.l_idx;
+      if (mycomp.o.lhs.getLowerLexIdx() < mycomp.o.rhs.getLowerLexIdx()) {
+        if (mycomp.o.lhs.getLowerLexIdx() < mycomp.o.l_idx) index = mycomp.o.lhs.getLowerLexIdx();
+        else index = mycomp.o.l_idx;
+      } else {
+        if (mycomp.o.rhs.getLowerLexIdx() < mycomp.o.l_idx) index = mycomp.o.rhs.getLowerLexIdx();
+        else index = mycomp.o.l_idx;
+      }
       decrementEdges(index, edgeS);
       valid = E_SKIP;
       mycomp.o.isect = IS_FALSE;
@@ -623,8 +683,11 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 
 	// lex contains a vector of 'points' indexes sorted lexicographically
 	std::sort(lex.begin(), lex.end(), lexComp(points));
-	//std::cout << "lexicographical order:" << std::endl;
-	//poldisplay(lex);
+  unsigned int counter = 0;
+  for (std::vector<unsigned int>::iterator it = lex.begin(); it != lex.end(); ++it) {
+    points[(*it)].l = counter;
+    ++counter;
+  }
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
 	unsigned int index=0, before, after;
@@ -642,8 +705,8 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 		val1 = E_VALID; val2 = E_VALID;
 		// get the current point at 'index'
 		p1 = &points[lex[index]];
-		comp.t = (*p1).x;
-    //std::cerr << "t in while: " << comp.t << std::endl;
+		comp.t = (*p1).x; // the x index used as the comparison.
+
 		// get the 2 points it is connected to in 'polygon', treating the edge case when the point 'p1' is on the ends
 		before = ((*p1).v + points.size() -1) % points.size();
 		after =  ((*p1).v + points.size() +1) % points.size();
@@ -671,8 +734,14 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
         std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
         if (collSwap(p1, p2, p3, polygon)) {
           std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-          //index = 0;
-          //decrementEdges(index, edgeS);
+          if ((*p1).l < (*p2).l) {
+            if ((*p1).l < (*p3).l) index = (*p1).l;
+            else index = (*p3).l;
+          } else {
+            if ((*p2).l < (*p3).l) index = (*p2).l;
+            else index = (*p3).l;
+          }
+          decrementEdges(index, edgeS);
           continue;
         }
       } else std::cerr << "false alarm." << std::endl;

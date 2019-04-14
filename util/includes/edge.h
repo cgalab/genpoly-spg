@@ -129,6 +129,10 @@ public:
     if ((*p1).y < (*p2).y) return (*p2).y;
     else return (*p1).y;
   }
+  double getLowerLexIdx() const {
+    if ((*p1).l < (*p2).l) return (*p1).l;
+    else return (*p2).l;
+  }
 
   // check for if p1 is a 'left' vertex compared to p2
   bool checkPolLoHi() {
@@ -230,6 +234,7 @@ public:
 };
 
 void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points);
+double reldist(const Point& pa, const Point& pb, const Point& p);
 double reldist(const Edge& e, const Point& p);
 double det(const Edge& e, const Point& p);
 enum intersect_t checkIntersection(const Edge e1, const Edge e2);
