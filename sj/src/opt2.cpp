@@ -417,8 +417,8 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
     std::cerr << "collinearity before swap:" << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
     if (collSwap(mycomp.o.lhs, mycomp.o.rhs, polygon)) {
       std::cerr << "collinearity after swap: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
-      //flip(mycomp.o.lhs, mycomp.o.rhs, polygon, points);
-      //std::cerr << "collinearity after flip: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
+      flip(mycomp.o.lhs, mycomp.o.rhs, polygon, points);
+      std::cerr << "collinearity after flip: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
       index = mycomp.o.l_idx;
       decrementEdges(index, edgeS);
       valid = E_SKIP;
