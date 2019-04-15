@@ -45,9 +45,22 @@ void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon) {
   polygon[(*b).v] = (*b).i;
 }
 
-// function that takes 3 points: a, b, and c that are already collinear
+// function that takes 3 points: a, b, and c that are already assumed collinear
 // a is assumed to be the lowest point lexicographically as well as the middle point in polygon of the 3 points.
+// swaps the points in the polygon so that the lex. order of the points is also the vertex order of the points.
 bool collSwap(Point* a, Point* b, Point* c, std::vector<unsigned int>& polygon) {
+  bool swapped = false;
+  if ((*b) < (*c)) {
+    if ((*b).v < (*a).v) {polSwap(a, b, polygon); swapped = true;}
+    else {polSwap(a, c, polygon); polSwap(c, b, polygon); swapped = true;}
+  } else {
+    if ((*c).v < (*a).v) {polSwap(a, c, polygon); swapped = true;}
+    else {polSwap(a, b, polygon); polSwap(c, b, polygon); swapped = true;}
+  }
+  if (!swapped) std::cerr << "Unexpected error in 3P collSwap!" << std::endl;
+  return swapped;
+}
+/*
   bool retval = false;
   double dp = reldist(*a, *b, *c);
   if (dp > 1) {
@@ -65,7 +78,7 @@ bool collSwap(Point* a, Point* b, Point* c, std::vector<unsigned int>& polygon) 
   }
   return retval;
 }
-
+*/
 
 
 /*
@@ -120,10 +133,102 @@ bool collSwap(Point* a, Point* b, Point* c, std::vector<unsigned int>& polygon) 
 
 // Function that takes 2 edges, e1 and e2 that both intersect and are collinear
 bool collSwap (Edge& e1, Edge& e2, std::vector<unsigned int>& polygon) {
-  double dp1 = reldist(e1, *e2.p1);
-  double dp2 = reldist(e1, *e2.p2);
-  std::cerr << "edge collswap: dp1: " << dp1 << ", dp2: " << dp2 << std::endl;
+  double rd1 = reldist(e1, *e2.p1);
+  double rd2 = reldist(e1, *e2.p2);
+  bool d1 = ((int)(*e1.p1).v - (int)(*e1.p2).v) < 0; // true  means edge order in poly is : [...p1p2...]
+  bool d2 = ((int)(*e2.p1).v - (int)(*e2.p2).v) < 0; // false means edge order in poly is : [...p2p1...]
 
+  if ((rd1 > 1) && (rd2 > 1)) return false;
+  if ((rd1 < 0) && (rd2 < 0)) return false;
+  if ( d1 &&  d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 1)) {
+    polSwap(e2.p1, e1.p2, polygon);
+    return true;
+  }
+  if ( d1 && !d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 1)) {
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e1.p2, e2.p2, polygon);
+    return true;
+  }
+  if (!d1 &&  d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 1)) {
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e1.p1, e2.p1, polygon);
+    return true;
+  }
+  if (!d1 && !d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 1)) {
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e1.p1, e2.p1, polygon);
+    polSwap(e1.p2, e2.p2, polygon);
+    return true;
+  }
+
+  if ( d1 &&  d2 && (rd1 < 0) && (rd2 > 0) && (rd2 < 1)) {
+    polSwap(e1.p1, e2.p2, polygon);
+    return true;
+  }
+  if (!d1 &&  d2 && (rd1 < 0) && (rd2 > 0) && (rd2 < 1)) {
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e2.p2, e1.p2, polygon);
+    return true;
+  }
+  if ( d1 && !d2 && (rd1 < 0) && (rd2 > 0) && (rd2 < 1)) {
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e2.p1, e1.p1, polygon);
+    return true;
+  }
+  if (!d1 && !d2 && (rd1 < 0) && (rd2 > 0) && (rd2 < 1)) {
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e2.p1, e1.p1, polygon);
+    polSwap(e2.p2, e1.p2, polygon);
+    return true;
+  }
+
+  if ( d1 &&  d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 0) && (rd2 < 1)) {
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e2.p2, e1.p2, polygon);
+    return true;
+  }
+  if ( d1 && !d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 0) && (rd2 < 1)) {
+    polSwap(e2.p1, e1.p2, polygon);
+    return true;
+  }
+  if (!d1 &&  d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 0) && (rd2 < 1)) {
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e1.p1, e2.p1, polygon);
+    polSwap(e2.p2, e1.p2, polygon);
+    return true;
+  }
+  if (!d1 && !d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 0) && (rd2 < 1)) {
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e1.p1, e2.p1, polygon);
+    return true;
+  }
+
+  if ( d1 &&  d2 && (rd1 < 0) && (rd2 > 1)) {
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e1.p2, e2.p2, polygon);
+    return true;
+  }
+  if (!d1 &&  d2 && (rd1 < 0) && (rd2 > 1)) {
+    polSwap(e1.p1, e2.p2, polygon);
+    return true;
+  }
+  if ( d1 && !d2 && (rd1 < 0) && (rd2 > 1)) {
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e2.p1, e1.p1, polygon);
+    polSwap(e1.p2, e2.p2, polygon);
+    return true;
+  }
+  if (!d1 && !d2 && (rd1 < 0) && (rd2 > 1)) {
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e2.p1, e1.p1, polygon);
+    return true;
+  }
+  std::cerr << "ERROR in 4P collSwap!" << std::endl;
+  std::cerr << "edge collswap: rd1: " << rd1 << ", dp2: " << rd2 << std::endl;
+  std::cerr << "d1: " << ((d1) ? "true" : "false") << ", d2: " << ((d2) ? "true" : "false") << std::endl;
+  return true;
+}
+/*
   if ((dp1 > 1) && (dp2 > 1)) return false;
   if ((dp1 < 0) && (dp2 < 0)) return false;
   if ((dp1 < 0) && (dp2 > 1)) {polSwap(e1.p1, e2.p2, polygon); polSwap(e1.p1, e1.p2, polygon); return true;}
@@ -138,6 +243,8 @@ bool collSwap (Edge& e1, Edge& e2, std::vector<unsigned int>& polygon) {
   std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
   return false;
 }
+*/
+
 /*
 {
   if (  ((*e1.p1) > (*e1.p2)) ||
