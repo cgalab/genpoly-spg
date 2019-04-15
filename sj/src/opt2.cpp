@@ -702,80 +702,11 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
 				}
 			}
 		}
-	}
+	} else if ((mycomp.o.isect != IS_SAME_EDGE) && !retval.second) {
+    std::cerr << "ERROR: Insert failed!!!" << std::endl;
+  }
 	return valid;
 }
-
-/*
-// old version that checks all edges in 'edges' list to the edge 'e'
-enum edge_t edgeCheck1(unsigned int& index, Edge& e, std::list<Edge>& edges, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
-	enum edge_t valid = E_VALID;
-	enum intersect_t cross = IS_FALSE;
-
-	// check if 'e1' intersects other edges already in 'edges'
-	for (std::list<Edge>::iterator it=edges.begin(); it!=edges.end(); ++it) {
-		// if either edge is already in the 'edges' list: remove it and do not process the edge.
-		//std::cout << "*it: " << *it << std::endl;
-		if (e == *it) {
-			//std::cout << "e1 found in edges." << std::endl;
-			it = edges.erase(it);
-			valid = E_NOT_VALID;
-			break;
-		}
-
-		cross = checkIntersection(e, *it);
-		if((valid == E_VALID) && (cross == IS_TRUE)) {
-			//std::cout << "found an intersection for e1 and *it." << (*it) << std::endl;
-			//std::cout << "polygon before flip: ";
-			//poldisplay(polygon);
-			flip(e, *it, polygon, points);
-			//std::cout << "polygon after flip: ";
-			//poldisplay(polygon);
-			// after flipping, the index needs to be reset to the lower of 'e1' and '*it'
-			//std::cout << "old index: " << index << std::endl;
-			index = (e.l_idx < (*it).l_idx) ? e.l_idx : (*it).l_idx;
-			//std::cout << "new index: " << index << std::endl;
-			decrementEdges(index, edges);
-			valid = E_SKIP;
-			break;
-		}
-		else if ((valid == E_VALID) && (cross == IS_COLLINEAR)) {
-			//std::cout << "Inside collinear part" << std::endl;
-			// need to sort the points into lexicographical order relative to themselves
-			// check relative distances between points in e and *it
-
-			// first create a vector of a pair of points and and double
-			std::vector< std::pair<Point*, double> > sortP;
-			std::vector<unsigned int> sortPol;
-
-			sortP.push_back( std::make_pair(e.p1, 0.0) );
-			sortP.push_back( std::make_pair(e.p2, 1.0) );
-			sortP.push_back( std::make_pair((*it).p1, reldist(e, *(*it).p1)) );
-			sortP.push_back( std::make_pair((*it).p2, reldist(e, *(*it).p2)) );
-
-			// sort it by the secondary double value
-			std::sort(sortP.begin(), sortP.end(), sortbysec);
-			for (unsigned int i = 0; i < sortP.size(); ++i) {
-				sortPol.push_back((*sortP[i].first).v);
-				//std::cout << "sortP[" << i << "]: " << points[polygon[sortPol[i]]] << std::endl;
-			}
-
-			// move the points in 'moveP' to end of 'polygon' in the right order
-			movePoints(sortPol, polygon, points);
-
-			// index needs to be reset to lowest l_idx of 'e' or '*it'
-			//std::cout << "old index: " << index << std::endl;
-			index = (e.l_idx < (*it).l_idx) ? e.l_idx : (*it).l_idx;
-			//std::cout << "new index: " << index << std::endl;
-			decrementEdges(index, edges);
-			//std::cout << "Decrement successful." << std::endl;
-			valid = E_SKIP;
-			break;
-		}
-	}
-	return valid;
-}
-*/
 
 enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	// initialise and create a random permutation for the polygon
@@ -804,9 +735,11 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
   double val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
+  bool reset;
 	//std::list<Edge> edgesL; // a list for edges
 	std::set<Edge, setComp> edgeS(comp); // a set of edges.
 
+  reset = false;
 	while (index < points.size()) {
 		std::cout << std::endl << "index: " << index << std::endl;
 		val1 = E_VALID; val2 = E_VALID;
@@ -821,52 +754,131 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 		p2 = &points[polygon[before]];
 		p3 = &points[polygon[after]];
 
-		// construct the edges
-    //std::cerr << *p2 << " < " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
-		if (*p2 < *p3) {
-			e1 = Edge (p1, p2, index);
-			e2 = Edge (p1, p3, index);
-      val3 = det(e1, *p3);
-		}
-		else {
-			e1 = Edge (p1, p3, index);
-			e2 = Edge (p1, p2, index);
-      val3 = det(e1, *p2);
-		}
+    if (reset && (p1 < p2) && (p1 < p3)) {
+      reset = false;
+		  // construct the edges
+      //std::cerr << *p2 << " < " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
+		  if (*p2 < *p3) {
+			  e1 = Edge (p1, p2, index);
+			  e2 = Edge (p1, p3, index);
+        val3 = det(e1, *p3);
+		  }
+		  else {
+			  e1 = Edge (p1, p3, index);
+			  e2 = Edge (p1, p2, index);
+        val3 = det(e1, *p2);
+		  }
 
-    if (val3 == 0) {
-      // the 2 edges are collinear
-      std::cerr << "collinear check found a possible match."  << std::endl;
-      if ((*p1 < *p2) && (*p1 < *p3)) {
-        std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-        if (collSwap(p1, p2, p3, polygon)) {
-          std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-          if ((*p1).l < (*p2).l) {
-            if ((*p1).l < (*p3).l) index = (*p1).l;
-            else index = (*p3).l;
-          } else {
-            if ((*p2).l < (*p3).l) index = (*p2).l;
-            else index = (*p3).l;
+      if (val3 == 0) {
+        // the 2 edges are collinear
+        std::cerr << "collinear check found a possible match."  << std::endl;
+        if ((*p1 < *p2) && (*p1 < *p3)) {
+          std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+          if (collSwap(p1, p2, p3, polygon)) {
+            std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+            if ((*p1).l < (*p2).l) {
+              if ((*p1).l < (*p3).l) index = (*p1).l;
+              else index = (*p3).l;
+            } else {
+              if ((*p2).l < (*p3).l) index = (*p2).l;
+              else index = (*p3).l;
+            }
+            decrementEdges(index, edgeS);
+            reset = true;
+            continue;
           }
-          decrementEdges(index, edgeS);
-          continue;
-        }
-      } else std::cerr << "false alarm." << std::endl;
+        } else std::cerr << "false alarm." << std::endl;
+      }
+
+		  std::cout << "processing e1: " << e1 << std::endl;
+		  val1 = processEdge(index, e1, edgeS, polygon, points);
+		  if (val1 == E_SKIP) {
+        reset = true;
+        continue; // swapping invalidates 'e2' so start again from the lower index before processing 'e2'
+      }
+
+		  std::cout << "processing e2: " << e2 << std::endl;
+		  val2 = processEdge(index, e2, edgeS, polygon, points);
+		  //std::cout << "after edgecheck2." << std::endl;
+		  if (val2 == E_SKIP) {
+        reset = true;
+        continue;
+      }
+    } else if (reset && (p1 < p2)) {
+      reset = false;
+      e1 = Edge (p1, p2, index);
+      std::cout << "processing e1: " << e1 << std::endl;
+		  val1 = processEdge(index, e1, edgeS, polygon, points);
+		  if (val1 == E_SKIP) {
+        reset = true;
+        continue;
+      }
+    } else if (reset && (p1 < p3) ) {
+      reset = false;
+      e1 = Edge (p1, p3, index);
+      std::cout << "processing e1: " << e1 << std::endl;
+		  val1 = processEdge(index, e1, edgeS, polygon, points);
+		  if (val1 == E_SKIP) {
+        reset = true;
+        continue;
+      }
     }
+    else {
+      reset = false;
+      // construct the edges
+      //std::cerr << *p2 << " < " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
+		  if (*p2 < *p3) {
+			  e1 = Edge (p1, p2, index);
+			  e2 = Edge (p1, p3, index);
+        val3 = det(e1, *p3);
+		  }
+		  else {
+			  e1 = Edge (p1, p3, index);
+			  e2 = Edge (p1, p2, index);
+        val3 = det(e1, *p2);
+		  }
 
-		std::cout << "processing e1: " << e1 << std::endl;
-		val1 = processEdge(index, e1, edgeS, polygon, points);
-		if (val1 == E_SKIP) continue; // swapping invalidates 'e2' so start again from the lower index before processing 'e2'
+      if (val3 == 0) {
+        // the 2 edges are collinear
+        std::cerr << "collinear check found a possible match."  << std::endl;
+        if ((*p1 < *p2) && (*p1 < *p3)) {
+          std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+          if (collSwap(p1, p2, p3, polygon)) {
+            std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+            if ((*p1).l < (*p2).l) {
+              if ((*p1).l < (*p3).l) index = (*p1).l;
+              else index = (*p3).l;
+            } else {
+              if ((*p2).l < (*p3).l) index = (*p2).l;
+              else index = (*p3).l;
+            }
+            decrementEdges(index, edgeS);
+            reset = true;
+            continue;
+          }
+        } else std::cerr << "false alarm." << std::endl;
+      }
 
-		std::cout << "processing e2: " << e2 << std::endl;
-		val2 = processEdge(index, e2, edgeS, polygon, points);
-		//std::cout << "after edgecheck2." << std::endl;
-		if (val2 == E_SKIP) continue;
+		  std::cout << "processing e1: " << e1 << std::endl;
+		  val1 = processEdge(index, e1, edgeS, polygon, points);
+		  if (val1 == E_SKIP) {
+        reset = true;
+        continue; // swapping invalidates 'e2' so start again from the lower index before processing 'e2'
+      }
+
+		  std::cout << "processing e2: " << e2 << std::endl;
+		  val2 = processEdge(index, e2, edgeS, polygon, points);
+		  //std::cout << "after edgecheck2." << std::endl;
+		  if (val2 == E_SKIP) {
+        reset = true;
+        continue;
+      }
+    }
 
     //std::cout << "edges in 'edges':" << std::endl;
     //for (std::list<Edge>::iterator it=edges.begin(); it!=edges.end(); ++it) std::cout << *it << std::endl;
-
 		index++;
+    reset = false;
 	}
 
 	return SUCCESS;

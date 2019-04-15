@@ -42,8 +42,8 @@ public:
   }
   bool operator < (const Yval s) const {
     if (x < s.getX()) return true;
-    else if (max == s.getMin() && (min < s.getMin())) return true;
-    else if (max < s.getMin()) return true;
+    else if ((x == s.getX()) && (max == s.getMin()) && (min < s.getMin())) return true;
+    else if ((x == s.getX()) && (max < s.getMin())) return true;
     //else if ((min == s.getMin()) && (max < s.getMax())) return true;
     else return false;
   }

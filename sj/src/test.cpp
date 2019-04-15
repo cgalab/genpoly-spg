@@ -227,6 +227,12 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   y2.set(1);
   std::cerr << y1 << " < " << y2 << " should be false : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
+  y1.set(10);
+  y1.setX(7);
+  y2.set(15,16);
+  y2.setX(6);
+  std::cerr << y1 << " < " << y2 << " should be false : " << ((y1 < y2) ? "true" : "false") << std::endl;
+
   std::cerr << std:: endl;
 /*
   std::cerr << "=== Edge class >< comparison tests ===" << std::endl;
