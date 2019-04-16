@@ -19,6 +19,8 @@ Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vert
 
 	id = n;
 	n++;
+
+	isEnqueued = false;
 }
 
 bool Triangle::contains(Vertex* v){

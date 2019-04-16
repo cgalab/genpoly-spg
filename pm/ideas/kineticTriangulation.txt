@@ -1,0 +1,63 @@
+Conditions for the triangulation:
+- must contain all polygon edges
+- must contain the four edges of a rectangle enclosing the polygon without touching it
+- no  other vertices than the polygon vertices and the four vertices of the rectangle
+
+Types of edges:
+- polygon edges called PE
+- edges of the enclosing rectangle called RE
+- other edges of the triangulation called TE
+
+Initial triangulation:
+- triangulate the initial (convex) polygon by zigzag
+- generate the rectangle around
+- triangulate the space between the rectangle and the polygon
+
+simplicity_check():
+- be C the vertex to translate, P its previous vertex in the polygon and N the next vertex
+- be p the PE from P to C and n the PE from C to N
+- be C' the translated vertex of C, p' the PE from P to C' and n' the PE from C' to N
+
+- set p and n to TE
+- get all triangles surrounding P into the list TP and all triangles surrounding N into the list TN
+- get all edges of the triangles in TP not incident to P into list EP
+- get all edges of the triangles in TN not incident to N into list EN
+
+- check for intersection of p' with any edges ei of the set EP
+- if no intersection: accept translation
+- else:
+	- take intersecting edge as e
+	- while p' intersects with e
+		- if e is PE or TE: reject translation
+		- take other triangle T of e
+		- check for intersection of p' with one of the other two edges of T
+		- if no intersection: accept translation
+		- else: take intersecting edge as e
+
+- do the same with n' and EN
+- if both accept, than accept the translation and repair_triangulation()
+- otherwise reject the translation and set n and p to PE
+
+Questions to answer: 
+- can the moving vertex M move throw another vertex V? Yes, but only if the two vertices are connected by a PE! This seems to be a hard special case which can maybe be detected by the fact that two points must be coincident in this case and two triangles collapse at the same time....maybe just claim, that this is not allowed?!
++ number of triangles stays the same
++ add triangles M, V and the previous/next polygon point
++ switch triangles between M and V (but not all :O )...edges to the next/previous vertex must be replaced by the SE of the new triangles of the last step
+- can D1 and D2 both be elements of Q? yes!
+- what if the longest edge is a PE? simply ignore? This corresponds to the problem that the vertex moves across a PE! Then the polygon is temporarly not simple!
++ could potentially be solved by changing the order of the vertices in the polygon (which undermine the basic strategy of of just translating the vertices and not changing their order a bit!)
+
+
+repair_triangulation():
+- assume translation speed 1
+- calculate time T when translation is finished
+- init priority queue Q containing all triangles which will vanish before T is reached sorted by there vanishing time
+- while Q is not empty:
+	- get next element D1 of Q
+	- get edge e of D1 which hits third vertex (the longest edge!?)
+	- get second triangle D2 of e and delete D2 from Q (if necessary)
+	- delete D1 and D2 => quadrangle V with diagonal e appears
+	- split V by other diagonal (not e) into triangles D1' and D2'
+	- compute vanishing times t1 and t2 for D1' and D2'
+	- if t1 resp. t2 < T
+		- insert D1' resp. D2' into Q

@@ -9,7 +9,10 @@
 #include <vector>
 #include <map>
 #include "basicDefinitions.h"
+#include <math.h>
+#include "translation.h"
 
 void transformPolygon(Triangulation* T, int iterations, Timer t);
-bool checkSimplicityOfTranslation(Triangulation* T, int index, Vertex *oldV, Vertex* newV, std::map<int, TEdge*> &intersected);
-bool checkEdge(Vertex* fromV, TEdge* newE, std::map<int, TEdge*> &intersected);
+bool checkSimplicityOfTranslation(Translation* trans);
+bool checkEdge(Vertex* fromV, TEdge* newE);
+double signedArea(Vertex* v0, Vertex* v1, Vertex* v2);
