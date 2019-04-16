@@ -37,13 +37,14 @@ public:
   double getMax() const {return max;}
 
   bool operator < (const double s) const {
-    if (min < s) return true;
+    if (max < s) return true;
     else return false;
   }
   bool operator < (const Yval s) const {
     if (x < s.getX()) return true;
-    else if (min < s.getMin()) return true;
-    else if ((min == s.getMin()) && (max < s.getMax())) return true;
+    else if ((x == s.getX()) && (max == s.getMin()) && (min < s.getMin())) return true;
+    else if ((x == s.getX()) && (max < s.getMin())) return true;
+    //else if ((min == s.getMin()) && (max < s.getMax())) return true;
     else return false;
   }
   bool operator > (const double s) const {
@@ -70,7 +71,7 @@ class Edge {
 public:
 	Point *p1;
 	Point *p2;
-  double l_idx;
+  unsigned int l_idx;
 
 	Edge() {p1=NULL; p2=NULL;l_idx=0;}
 	Edge(const Edge& e) {p1=e.p1; p2=e.p2;l_idx=e.l_idx;}
@@ -127,6 +128,24 @@ public:
   double getyMax() const {
     if ((*p1).y < (*p2).y) return (*p2).y;
     else return (*p1).y;
+  }
+  double getLowerLexIdx() const {
+    if ((*p1).l < (*p2).l) return (*p1).l;
+    else return (*p2).l;
+  }
+
+  // check for if p1 is a 'left' vertex compared to p2
+  bool checkPolLoHi() {
+    if ((*p1).v == 0) {
+      if ((*p2).v != 1) return false;
+      else return true;
+    }
+    if ((*p2).v == 0) {
+      if ((*p1).v == 1) return false;
+      else return true;
+    }
+    else
+      return (*p1).v < (*p2).v;
   }
 
 /*
@@ -215,6 +234,7 @@ public:
 };
 
 void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points);
+double reldist(const Point& pa, const Point& pb, const Point& p);
 double reldist(const Edge& e, const Point& p);
 double det(const Edge& e, const Point& p);
 enum intersect_t checkIntersection(const Edge e1, const Edge e2);
