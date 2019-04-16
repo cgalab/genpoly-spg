@@ -6,7 +6,7 @@ Triangulation* generateRegularPolygon(int n){
 	Vertex* v;
 	Vertex* v0 = NULL, *v1 = NULL, *v2 = NULL;
 	TEdge* e0 = NULL, *e1 = NULL, *e2 = NULL;
-	Triangulation* T = new Triangulation(n + 4); // 4 additional vertices for the rectangle
+	Triangulation* T = new Triangulation(n); // 4 additional vertices for the rectangle
 	Triangle* t;
 
 	alpha = 2 * M_PI / n;

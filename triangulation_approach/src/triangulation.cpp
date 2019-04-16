@@ -22,6 +22,17 @@ Vertex* Triangulation::getVertex(int i){
 	return vertices[i];
 }
 
+Vertex* Triangulation::getPVertex(int i){ 	
+	if(i < 0){
+		return vertices[N + i];
+	}else if(i >= N){
+		return vertices[i - N];
+	}else{
+		return vertices[i];
+	}
+	 return NULL;
+}
+
 // prints triangulation as graph into a graphml file
 // https://de.wikipedia.org/wiki/GraphML
 // works here: http://graphonline.ru/en/

@@ -1,48 +1,38 @@
 #include "polygonTransformer.h"
 
 void transformPolygon(Triangulation* T, int iterations, Timer t){
-	int index = 1;
+	int index = 9;
 	RandomGenerator* generator = new RandomGenerator();
 	double dx = -45, dy = 0; // radius of the initial polygon was 30
-	Vertex *newV, *oldV, *prevV, *nextV;
-	bool simple;
-	std::map<int, TEdge*> intersected;
-	TEdge* e;
+	bool simple, split;
+	Translation* trans;
 
-	oldV = (*T).getVertex(index);
-	newV = (*oldV).getTranslated(dx, dy);
+	trans = new Translation(T, index, dx, dy);
 
-	simple = checkSimplicityOfTranslation(T, index, oldV, newV, intersected);
+	simple = checkSimplicityOfTranslation(trans);
 
 	printf("simplicity check gives result %d \n", simple);
 
 	if(simple){
-		for(std::pair<int, TEdge*> element : intersected) {
-			e = element.second;
-
-			delete e;
+		// check whether the translation can be done at once or must be split to move around a polygon edge
+		split = checkEdge((*trans).getOldV(), (*trans).getTranslationPath());
+		if(!split){
+			(*trans).setSplit();
+			printf("translation must be split \n");
 		}
-
-		delete oldV;
-
-		(*T).setVertex(index, newV);
-
-		prevV = (*T).getVertex(index - 1);
-		nextV = (*T).getVertex(index + 1);
-
-		(*T).addEdge(new TEdge(prevV, newV, EdgeType::POLYGON));
-		(*T).addEdge(new TEdge(newV, nextV, EdgeType::POLYGON));
 	}
 }
 
-bool checkSimplicityOfTranslation(Triangulation* T, int index, Vertex *oldV, Vertex* newV, std::map<int, TEdge*> &intersected){
-	Vertex *prevV, *nextV;
+bool checkSimplicityOfTranslation(Translation* trans){
+	Vertex *oldV, *newV, *prevV, *nextV;
 	TEdge *prevE, *nextE, *prevNewE, *nextNewE;
 	bool simple;
 	
+	oldV = (*trans).getOldV();
+	newV = (*trans).getNewV();
 
-	prevV = (*T).getVertex(index - 1);
-	nextV = (*T).getVertex(index + 1);
+	prevV = (*trans).getPrevV();
+	nextV = (*trans).getNextV();
 
 	prevE = (*prevV).getEdgeTo(oldV);
 	nextE = (*nextV).getEdgeTo(oldV);
@@ -54,16 +44,19 @@ bool checkSimplicityOfTranslation(Triangulation* T, int index, Vertex *oldV, Ver
 	prevNewE = new TEdge(prevV, newV, EdgeType::POLYGON);
 	nextNewE = new TEdge(newV, nextV, EdgeType::POLYGON);
 
-	simple = checkEdge(prevV, prevNewE, intersected);
-	simple = simple && checkEdge(nextV, nextNewE, intersected);
+	simple = checkEdge(prevV, prevNewE);
+	simple = simple && checkEdge(nextV, nextNewE);
 
 	(*prevE).setEdgeType(EdgeType::POLYGON);
 	(*nextE).setEdgeType(EdgeType::POLYGON);
 
+	delete prevNewE;
+	delete nextNewE;
+
 	return simple;
 }
 
-bool checkEdge(Vertex* fromV, TEdge* newE, std::map<int, TEdge*> &intersected){
+bool checkEdge(Vertex* fromV, TEdge* newE){
 	std::vector<TEdge*> surEdges;
 	enum intersect_t iType = intersect_t::IS_FALSE;
 	EdgeType eType;
@@ -93,7 +86,6 @@ bool checkEdge(Vertex* fromV, TEdge* newE, std::map<int, TEdge*> &intersected){
 			// intersected edge is just a triangulation edge
 			}else{
 				printf("edge hit triangulation edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
-				intersected.insert(std::pair<int, TEdge*>((*i).getID(), i));
 				nextT = (*i).getTriangleNotContaining(fromV);
 				surEdges = (*nextT).getOtherEdges(i);
 				break;
@@ -115,16 +107,15 @@ bool checkEdge(Vertex* fromV, TEdge* newE, std::map<int, TEdge*> &intersected){
 
 				// intersected edge is polygon edge
 				if(eType == EdgeType::POLYGON){
-					printf("prev hit polygon edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
+					printf("edge hit polygon edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
 					return false;
 				// intersected edge is frame edge
 				}else if(eType == EdgeType::FRAME){
-					printf("prev hit frame edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
+					printf("edge hit frame edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
 					return false;
 				// intersected edge is just a triangulation edge
 				}else{
-					printf("prev hit triangulation edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
-					intersected.insert(std::pair<int, TEdge*>((*i).getID(), i));
+					printf("edge hit triangulation edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
 					nextT = (*i).getOtherTriangle(nextT);
 					surEdges = (*nextT).getOtherEdges(i);
 					break;
@@ -135,3 +126,24 @@ bool checkEdge(Vertex* fromV, TEdge* newE, std::map<int, TEdge*> &intersected){
 
 	return true;
 }
+
+
+double signedArea(Vertex* v0, Vertex* v1, Vertex* v2){
+	double area;
+	double ax, ay, bx, by, cx, cy;
+
+	ax = (*v0).getX();
+	ay = (*v0).getY();
+
+	bx = (*v1).getX();
+	by = (*v1).getY();
+
+	cx = (*v2).getX();
+	cy = (*v2).getY();
+
+	area = 0.5 * (- ay * bx + ax * by + ay * cx - by * cx - ax * cy + bx * cy);
+
+	return area;
+}
+
+

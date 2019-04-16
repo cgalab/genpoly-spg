@@ -11,7 +11,7 @@ class Vertex;
 #include "tedge.h"
 #include "vertex.h"
 
-class Triangle {
+class Triangle{
 
 private:
 	TEdge* e0;
@@ -21,6 +21,8 @@ private:
 	Vertex* v0;
 	Vertex* v1;
 	Vertex* v2;
+
+	bool isEnqueued;
 
 	int id;
 	static int n;
@@ -34,7 +36,9 @@ public:
 	TEdge* getEdge(int i);
 	TEdge* getEdgeNotContaining(Vertex* v);
 	std::vector<TEdge*> getOtherEdges(TEdge* e);
-
+	void enqueue(){
+		isEnqueued = true;
+	}
 };
 
 #endif
