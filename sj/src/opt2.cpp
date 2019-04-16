@@ -50,13 +50,14 @@ void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon) {
 // swaps the points in the polygon so that the lex. order of the points is also the vertex order of the points.
 bool collSwap(Point* a, Point* b, Point* c, std::vector<unsigned int>& polygon) {
   bool swapped = false;
+  /*
   unsigned int left=-1, mid=-1, right=-1;
   //need to be able to catch boundary conditions.
   if ((*a).v == 0) {
     if ((*b).v == polygon.size()-1) {
       if ((*c).v == polygon.size()-2) {
         left = (*c).v; mid = (*b).v; right = (*a).v;
-        
+
       } else {
         left = (*b).v; mid = (*a).v; right = (*c).v;
       }
@@ -98,7 +99,7 @@ bool collSwap(Point* a, Point* b, Point* c, std::vector<unsigned int>& polygon) 
       }
     }
   }
-
+*/
   if ((*b) < (*c)) {
     if ((*b).v < (*a).v) {polSwap(a, b, polygon); swapped = true;}
     else {polSwap(a, c, polygon); polSwap(c, b, polygon); swapped = true;}
