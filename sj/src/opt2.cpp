@@ -50,6 +50,55 @@ void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon) {
 // swaps the points in the polygon so that the lex. order of the points is also the vertex order of the points.
 bool collSwap(Point* a, Point* b, Point* c, std::vector<unsigned int>& polygon) {
   bool swapped = false;
+  unsigned int left=-1, mid=-1, right=-1;
+  //need to be able to catch boundary conditions.
+  if ((*a).v == 0) {
+    if ((*b).v == polygon.size()-1) {
+      if ((*c).v == polygon.size()-2) {
+        left = (*c).v; mid = (*b).v; right = (*a).v;
+        
+      } else {
+        left = (*b).v; mid = (*a).v; right = (*c).v;
+      }
+    } else if ((*c).v == polygon.size()-1) {
+        if ((*b).v == polygon.size()-2) {
+          left = (*b).v; mid = (*c).v; right = (*a).v;
+        } else {
+          left = (*c).v; mid = (*a).v; right = (*b).v;
+        }
+      }
+  }
+  if ((*b).v == 0) {
+    if ((*a).v == polygon.size()-1) {
+      if ((*c).v == polygon.size()-2) {
+        left = (*c).v; mid = (*a).v; right = (*b).v;
+      } else {
+        left = (*a).v; mid = (*b).v; right = (*c).v;
+      }
+    } else if ((*c).v == polygon.size()-1) {
+      if ((*a).v == polygon.size()-2) {
+        left = (*a).v; mid = (*c).v; right = (*b).v;
+      } else {
+        left = (*c).v; mid = (*b).v; right = (*a).v;
+      }
+    }
+  }
+  if ((*c).v == 0) {
+    if ((*a).v == polygon.size()-1) {
+      if ((*b).v == polygon.size()-2) {
+        left = (*b).v; mid = (*a).v; right = (*c).v;
+      } else {
+        left = (*a).v; mid = (*c).v; right = (*b).v;
+      }
+    } else if ((*b).v == polygon.size()-1) {
+      if ((*a).v == polygon.size()-2) {
+        left = (*a).v; mid = (*b).v; right = (*c).v;
+      } else {
+        left = (*b).v; mid = (*c).v; right = (*a).v;
+      }
+    }
+  }
+
   if ((*b) < (*c)) {
     if ((*b).v < (*a).v) {polSwap(a, b, polygon); swapped = true;}
     else {polSwap(a, c, polygon); polSwap(c, b, polygon); swapped = true;}
@@ -209,9 +258,10 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
     // need to check if edges are 3 point collinear and swap if necessary.
     double val3 = det(mycomp.o.lhs, *mycomp.o.rhs.p1);
     if (val3 == 0) {
-      std::cerr << "3 point collinearity found at: " << mycomp.o.lhs << " and " << mycomp.o.rhs;
+      std::cerr << "3 point collinearity found at: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
       if (*mycomp.o.lhs.p1 < *mycomp.o.rhs.p1) collSwap(mycomp.o.lhs.p1, mycomp.o.lhs.p2, mycomp.o.rhs.p1, polygon);
       else  collSwap(mycomp.o.rhs.p1, mycomp.o.rhs.p2, mycomp.o.lhs.p1, polygon);
+      std::cerr << "after swap: lhs: " << mycomp.o.lhs << ", rhs: " << mycomp.o.rhs << std::endl;
       index = mycomp.o.l_idx;
       decrementEdges(index, edgeS);
       valid = E_SKIP;

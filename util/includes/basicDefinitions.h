@@ -63,7 +63,7 @@ enum intersect_t {
   IS_VERTEX12 = 2,
   IS_VERTEX21 = 3,
   IS_VERTEX22 = 4,
-  IS_TRUE = 50,  // value 10 is required for a easy recognized non-vertex intersections in a sum
+  IS_TRUE = 50,  // value 50 is required for a easy recognized non-vertex intersections in a sum
   IS_4P_COLLINEAR = 51,
   IS_3P_COLLINEAR = 52,
   IS_SAME_EDGE = 53

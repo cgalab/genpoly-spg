@@ -46,6 +46,7 @@ public:
 
     enum intersect_t retval = checkIntersection(lhs, rhs);
     if (retval == IS_VERTEX11) {
+      if (o.isect == IS_FALSE) {o.lhs = lhs; o.rhs = rhs; o.isect = retval;}
       // the 2 edges have the same starting point, use a determinant test to check if left or right of lhs.
       double detval = det(lhs, *rhs.p2);
       if (detval == 0) {
@@ -57,64 +58,77 @@ public:
       return !detsign;
     }
     else if (retval == IS_VERTEX22) {
-      // the 2 edges have the same end point, use a determinant test to check if left or right of lhs.
-      double detval = det(lhs, *rhs.p1);
-      if (detval == 0) {
-        double relval = reldist(lhs, *rhs.p1);
-        if (relval > 1) return true;
-        else return false;
-      }
-      bool detsign = signbit(detval);
-      return !detsign;
-    }
-    else if (retval >= IS_TRUE) {
-      std::cerr << "IS: " << retval << ", found intersection between: " << lhs << ", and " << rhs << std::endl;
-      if (o.isect == IS_FALSE) {
-        o.lhs = lhs;
-        o.rhs = rhs;
-        o.isect = retval;
-      }
+      if (o.isect == IS_FALSE) {o.lhs = lhs; o.rhs = rhs; o.isect = retval;}
       if (lhs.l_idx < rhs.l_idx) {
         if (lhs.l_idx < o.l_idx) o.l_idx = lhs.l_idx;
       } else {
         if (rhs.l_idx < o.l_idx) o.l_idx = rhs.l_idx;
       }
+      // the 2 edges have the same end point, use a determinant test to check if left or right of lhs.
+      double detval = det(lhs, *rhs.p1);
+      if (detval == 0) {
+        double relval = reldist(lhs, *rhs.p1);
+        if (relval < 0) return true;
+        else return false;
+      }
+      bool detsign = signbit(detval);
+      return !detsign;
     }
+    else if (retval == IS_SAME_EDGE) {
+      if (o.isect == IS_FALSE) {o.lhs = lhs; o.rhs = rhs; o.isect = retval;}
+      return false;
+    }
+    else if (retval >= IS_TRUE) {
+      std::cerr << "IS: " << retval << ", found intersection between: " << lhs << ", and " << rhs << std::endl;
+      if (o.isect < IS_TRUE) {o.lhs = lhs; o.rhs = rhs; o.isect = retval;}
+      // grab the lowest lex index if more than one edge intersects the current edge.
+      if (lhs.l_idx < rhs.l_idx) {
+        if (lhs.l_idx < o.l_idx) o.l_idx = lhs.l_idx;
+      } else {
+        if (rhs.l_idx < o.l_idx) o.l_idx = rhs.l_idx;
+      }
 
-    Yval Ly, Ry;
+      Yval Ly, Ry;
+      // calculate the y-axis order of the 2 edges at idx
+      // use Yval in case of x1-x2 = 0
+      Point L1 = *lhs.p1;
+      Point L2 = *lhs.p2;
 
-    // calculate the y-axis order of the 2 edges at idx
-    // use Yval in case of x1-x2 = 0
-    Point L1 = *lhs.p1;
-    Point L2 = *lhs.p2;
+      if ((L2.x - L1.x) == 0) {
+        Ly.set(L1.y, L2.y);
+        Ly.setX(L1.x);
+      } else {
+        double slope = (L2.y-L1.y) / (L2.x-L1.x);
+        double val = slope * (o.t - L1.x) + L1.y;
+        if (abs(val) < EPSILON) Ly.set(0);
+        else Ly.set(val);
+        Ly.setX(o.t);
+      }
 
-    if ((L2.x - L1.x) == 0) {
-      Ly.set(L1.y, L2.y);
-      Ly.setX(L1.x);
+      Point R1 = *rhs.p1;
+      Point R2 = *rhs.p2;
+
+      if ((R2.x - R1.x) == 0) {
+        Ry.set(R1.y, R2.y);
+        Ry.setX(R1.x);
+      } else {
+        double slope = (R2.y-R1.y) / (R2.x-R1.x);
+        double val = slope * (o.t - R1.x) + R1.y;
+        if (abs(val) < EPSILON) Ry.set(0);
+        else Ry.set(val);
+        Ry.setX(o.t);
+      }
+
+      std::cerr << Ly << " < " << Ry << " : " << ((Ly < Ry)? "true" : "false") << std::endl;
+      return Ly < Ry;
     } else {
-      double slope = (L2.y-L1.y) / (L2.x-L1.x);
-      double val = slope * (o.t - L1.x) + L1.y;
-      if (abs(val) < EPSILON) Ly.set(0);
-      else Ly.set(val);
-      Ly.setX(o.t);
+      // the 2 edges have the same end point, use a determinant test to check if left or right of lhs.
+      double detl = det(lhs, *rhs.p1);
+      double detr = det(lhs, *rhs.p2);
+
+      bool detsign = signbit(detl) && signbit(detr);
+      return !detsign;
     }
-
-    Point R1 = *rhs.p1;
-    Point R2 = *rhs.p2;
-
-    if ((R2.x - R1.x) == 0) {
-      Ry.set(R1.y, R2.y);
-      Ry.setX(R1.x);
-    } else {
-      double slope = (R2.y-R1.y) / (R2.x-R1.x);
-      double val = slope * (o.t - R1.x) + R1.y;
-      if (abs(val) < EPSILON) Ry.set(0);
-      else Ry.set(val);
-      Ry.setX(o.t);
-    }
-
-    std::cerr << Ly << " < " << Ry << " : " << ((Ly < Ry)? "true" : "false") << std::endl;
-    return Ly < Ry;
   }
 };
 
