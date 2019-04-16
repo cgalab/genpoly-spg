@@ -67,6 +67,8 @@ public:
 		return y;
 	}
 
+	std::list<Triangle*> getTriangles(){ return triangles;}
+
 	void addEdge(TEdge* e);
 	void removeEdge(TEdge* e);
 	void addTriangle(Triangle* t);

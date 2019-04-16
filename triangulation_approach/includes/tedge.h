@@ -54,6 +54,8 @@ public:
 
 	void print();
 
+	double length();
+
 	Vertex* getV1();
 	Vertex* getV2();
 	bool contains(Vertex* v);

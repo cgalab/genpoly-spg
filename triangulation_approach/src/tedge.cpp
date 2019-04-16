@@ -96,6 +96,18 @@ void TEdge::print(){
 	printf("Edge %d from point %d to point %d of type %s \n", id, (*v1).getID(), (*v2).getID(), tp.c_str());
 }
 
+double TEdge::length(){
+	double x1, x2, y1, y2;
+
+	x1 = (*v1).getX();
+	y1 = (*v1).getY();
+
+	x2 = (*v2).getX();
+	y2 = (*v2).getY();
+
+	return sqrt(pow((x1 - x2), 2) + pow((y1 - y2), 2));	
+}
+
 Vertex* TEdge::getV1(){
 	return v1;
 }
@@ -195,7 +207,7 @@ enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
 		else if((det_d == 0) && (dp_4 > 0) && (dp_4 < 1))
 			col = true;
 
-		if(col) return IS_COLLINEAR;
+		if(col) return IS_4P_COLLINEAR;
 		else if(same11) return IS_VERTEX11;
 		else if(same12) return IS_VERTEX12;
 		else if(same21) return IS_VERTEX21;
