@@ -81,6 +81,51 @@ std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
 	return out;
 }
 
+double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
+	double ax, ay, bx, by, cx, cy;
+	double numerator, denominator;
+
+	cx = (*moving).getX();
+	cy = (*moving).getY();
+
+	if(moving == v0){
+		ax = (*v1).getX();
+		ay = (*v1).getY();
+		bx = (*v2).getX();
+		by = (*v2).getY();
+	}else if(moving == v1){
+		ax = (*v0).getX();
+		ay = (*v0).getY();
+		bx = (*v2).getX();
+		by = (*v2).getY();
+	}else{
+		ax = (*v0).getX();
+		ay = (*v0).getY();
+		bx = (*v1).getX();
+		by = (*v1).getY();
+	}
+
+	numerator = bx * ay - ax * by - cx * (ay - by) - cy * (bx - ax);
+	denominator = dx * (ay - by) + dy * (bx - ax);
+
+	return numerator / denominator;
+}
+
+TEdge* Triangle::getLongestEdge(){
+	double l0 = (*e0).length();
+	double l1 = (*e1).length();
+	double l2 = (*e2).length();
+
+	if(l0 >= l1 && l0 >= l2)
+		return e0;
+	else if(l1 >= l2)
+		return e1;
+	else
+		return e2;
+
+	return 0;
+}
+
 Triangle::~Triangle(){
 	(*v0).removeTriangle(this);
 	(*v1).removeTriangle(this);

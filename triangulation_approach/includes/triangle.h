@@ -39,6 +39,8 @@ public:
 	void enqueue(){
 		isEnqueued = true;
 	}
+	double calculateCollapseTime(Vertex* moving, double dx, double dy);
+	TEdge* getLongestEdge();
 };
-
+	
 #endif
