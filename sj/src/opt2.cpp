@@ -6,6 +6,7 @@
 #include <stdlib.h>  // for abs
 #include <algorithm>    // std::sort
 #include <iterator> // for std:prev and std::next
+#include <assert.h>
 #include "basicDefinitions.h"
 #include "basicFunctions.h"
 #include "point.h"
@@ -209,6 +210,82 @@ bool collSwap (Edge& e1, Edge& e2, std::vector<unsigned int>& polygon) {
   return true;
 }
 
+enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  enum edge_t valid = E_VALID;
+  enum intersect_t isval;
+  bool bef = false, af = false;
+  Edge before, after;
+  std::pair<std::set<Edge, setComp>::iterator,bool> retval;
+
+  retval = edgeS.insert(e);
+
+  std::cout << "retval.first : " << *retval.first << std::endl;
+	std::cout << "retval.second: " << retval.second << std::endl;
+  assert(*retval.first == e);
+
+  std::cout << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
+  if (retval.first != edgeS.begin()) {
+    before = *(std::prev(retval.first));
+    std::cout << "before: " << before << std::endl;
+    bef = true;
+  }
+  std::cout << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
+  if (retval.first != --edgeS.end()) {
+    after  = *(std::next(retval.first));
+    std::cout << "after : " << after << std::endl;
+    af = true;
+  }
+
+  if(retval.second) {  // successfully inserted edge.
+    // check incidental edges if they intersect with 'e'
+    if (bef) {
+      isval = checkIntersection(e, before);
+      if (isval < IS_TRUE) {
+        std::cerr << "No intersection." << std::endl;
+      }
+      else {
+        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+        flip(e, before, polygon, points);
+        index = 0;
+				decrementEdges(index, edgeS);
+				valid = E_SKIP;
+      }
+    }
+    if (af && (valid == E_VALID)) {
+      isval = checkIntersection(e, after);
+      if (isval < IS_TRUE) {
+        std::cerr << "No intersection." << std::endl;
+      }
+      else {
+        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
+        flip(e, after, polygon, points);
+        index = 0;
+				decrementEdges(index, edgeS);
+				valid = E_SKIP;
+      }
+    }
+
+  } else {
+    // edge already existed in set.
+    // remove edge and check if incidental edges intersect
+    std::cout << "'e' found in 'edgeS'." << std::endl;
+    edgeS.erase(retval.first);
+    if (bef && af) {
+      isval = checkIntersection(before, after);
+      if (isval < IS_TRUE) {
+        std::cout << "No intersection between 'before': " << before << ", and 'after': " << after << std::endl;
+      } else {
+        std::cout << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
+        flip(before, after, polygon, points);
+        index = 0;
+        decrementEdges(index, edgeS);
+				valid = E_SKIP;
+      }
+    }
+  }
+  return valid;
+}
+/*
 // checks if an edge 'e' is: already in 'edgeS', if not checks if it intersects its neighbours and either cleans 'edgeS' or add 'e' into it.
 enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	enum edge_t valid = E_VALID;
@@ -369,7 +446,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
   }
 	return valid;
 }
-
+*/
 enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points);
@@ -459,7 +536,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
         continue; // swapping invalidates 'e2' so start again from the lower index before processing 'e2'
       }
 
-		  std::cout << "processing e2: " << e2 << std::endl;
+		  std::cout << std::endl << "processing e2: " << e2 << std::endl;
 		  val2 = processEdge(index, e2, edgeS, polygon, points);
 		  //std::cout << "after edgecheck2." << std::endl;
 		  if (val2 == E_SKIP) {
@@ -528,7 +605,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
         continue; // swapping invalidates 'e2' so start again from the lower index before processing 'e2'
       }
 
-		  std::cout << "processing e2: " << e2 << std::endl;
+		  std::cout << std::endl << "processing e2: " << e2 << std::endl;
 		  val2 = processEdge(index, e2, edgeS, polygon, points);
 		  //std::cout << "after edgecheck2." << std::endl;
 		  if (val2 == E_SKIP) {

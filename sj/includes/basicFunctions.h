@@ -40,10 +40,37 @@ public:
 
   setComp(compObject& O) : o(O) {}
   bool operator() (const Edge& lhs, const Edge& rhs) const {
-    //if (o.isect >= IS_TRUE) return false;
     std::cout << "lhs: " << lhs << " < rhs: " << rhs << std::endl;
-    //std::cout << "o.t: " << o.t << std::endl;
+    double det1;
 
+    if (*lhs.p1 == *rhs.p1) {     // if same starting point
+      det1 = det(lhs, *rhs.p2);
+      if (det1 == 0) {            // if lhs and rhs.p2 collinear
+        std::cerr << *lhs.p2 << " < " << *rhs.p2 << " : " << ((*lhs.p2 < *rhs.p2)? "true" : "false") << std::endl;
+        return *lhs.p2 < *rhs.p2;
+      }
+      bool detsign = signbit(det1);
+      std::cerr << "lhs < rhs : " << ((detsign)? "true" : "false") << std::endl;
+      return !detsign;
+    }
+
+    det1 = det(lhs, *rhs.p1);
+    if (det1 == 0) {            // if lhs and rhs.p1 are collinear
+      det1 = det(lhs, *rhs.p2);
+      if (det1 == 0) {          // if lhs and rhs.p2 are collinear
+        std::cerr << *lhs.p1 << " < " << *rhs.p1 << " : " << ((*lhs.p1 < *rhs.p1)? "true" : "false") << std::endl;
+        return *lhs.p1 < *rhs.p1;
+      }
+      bool detsign = signbit(det1);
+      std::cerr << "lhs < rhs : " << ((detsign)? "true" : "false") << std::endl;
+      return !detsign;
+    }
+
+    bool detsign = signbit(det1);
+    std::cerr << "lhs < rhs : " << ((detsign)? "true" : "false") << std::endl;
+    return !detsign;
+
+/*
     enum intersect_t retval = checkIntersection(lhs, rhs);
     if (retval == IS_VERTEX11) {
       if (o.isect == IS_FALSE) {o.lhs = lhs; o.rhs = rhs; o.isect = retval;}
@@ -129,6 +156,7 @@ public:
       bool detsign = signbit(detl) && signbit(detr);
       return !detsign;
     }
+*/
   }
 };
 
