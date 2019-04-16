@@ -67,7 +67,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(4,4);
   e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
-  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << ", value: ";
+  std::cerr << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << ", value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -144,7 +144,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(1,0);
   e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -234,73 +234,21 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << y1 << " < " << y2 << " should be false : " << ((y1 < y2) ? "true" : "false") << std::endl;
 
   std::cerr << std:: endl;
-/*
+
   std::cerr << "=== Edge class >< comparison tests ===" << std::endl;
 
   // reuse the points variables from above, p1 & p2 are connected to e1 and p3 & p4 are connected to e2
   p1.set(1,1);
   p2.set(1,2);
-  p3.set(1,3);
-  p4.set(1,4);
-  e1.l_idx = 1;
-  e2.l_idx = 1;
-
-  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
-
-  // check if l_idx changes has an effect.
-  p1.set(0,0);
-  p2.set(1,1);
-  p3.set(0,1);
-  p4.set(1,0);
-  e1.l_idx = 0;
-  e2.l_idx = 0;
-
-  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
-  e1.l_idx = 1;
-  std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
-
-  p1.set(1,0);
-  e1.l_idx = 1;
-
-  std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
-
-  // testing if an interval on y axis: [0,1] at x coord: 1 is < of a point at (1,1)
-  p4.set(1,1);
-  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
-
-  //moving the interval up 0.5
-  p1.set(1,0.5);
-  p2.set(1,1.5);
-  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
-  // it is true because an interval at e1's l_idx uses its min value.
-
-  // 2 interval comparison at x coord: 1
-  p1.set(1,1);
-  p2.set(1,2);
-  p3.set(1,3);
-  p4.set(1,4);
-  e1.l_idx = 1;
-  e2.l_idx = 1;
-
-  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
-
-  p2.set(1,3);
-  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
-
-  p3.set(1,1.1);
-  std::cerr << e1 << " < " << e2 << " should be true : " << ((e1 < e2) ? "true" : "false") << std::endl;
-
-  p1.set(1,1);
-  p2.set(1,3);
   p3.set(1,1);
-  p4.set(1,3);
-  std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  p4.set(1,2);
+  e1.l_idx = 1;
+  e2.l_idx = 1;
 
-  p4.set(1,2.8);
-  std::cerr << e1 << " < " << e2 << " should be false: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << e1 << " == " << e2 << " should be true : " << ((e1 == e2) ? "true" : "false") << std::endl;
 
-  std::cerr << std:: endl;
-*/
+
+  std::cerr << std::endl;
   std::cerr << "=== Edge set tests ===" << std::endl;
 
   compObject o;

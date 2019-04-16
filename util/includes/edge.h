@@ -148,82 +148,8 @@ public:
       return (*p1).v < (*p2).v;
   }
 
-/*
-  IMPORTANT:
-  1) Given that the 2 edges both exist at xcoord: lhs.l_idx, the comparison of the 2 edges is made at lhs.l_idx
-*/
-/*
-  friend bool operator<(const Edge& lhs, const Edge& rhs) {
-    //std::cout << "lhs: " << lhs << std::endl;
-    //std::cout << "rhs: " << rhs << std::endl;
-    // The lhs is always the one being compared to all the others
-    double idx = lhs.l_idx;
-    //std::cout << "idx: " << idx << std::endl;
-
-    Yval Ly, Ry;
-
-    // calculate the y-axis order of the 2 edges at idx
-    // use Yval in case of x1-x2 = 0, hopefully this will be a better comparison function..
-    // Line for lhs:
-    Point L1 = *lhs.p1;
-    Point L2 = *lhs.p2;
-
-    if ((L2.x - L1.x) == 0) {
-      Ly.set(L1.y, L2.y);
-    } else {
-      double slope = (L2.y-L1.y) / (L2.x-L1.x);
-      Ly.set(slope * (idx - L1.x) + L1.y);
-    }
-
-    Point R1 = *rhs.p1;
-    Point R2 = *rhs.p2;
-
-    if ((R2.x - R1.x) == 0) {
-      Ry.set(R1.y, R2.y);
-    } else {
-      double slope = (R2.y-R1.y) / (R2.x-R1.x);
-      Ry.set(slope * (idx - R1.x) + R1.y);
-    }
-
-    return Ly < Ry;
-  }
-*/
-/*
-  friend bool operator>(const Edge& lhs, const Edge& rhs) {
-    //std::cout << "lhs: " << lhs << std::endl;
-    //std::cout << "rhs: " << rhs << std::endl;
-    // The lhs is always the one being compared to all the others
-    double idx = lhs.l_idx;
-    Yval Ly, Ry;
-
-    // calculate the y-axis order of the 2 edges at idx
-    // use Yval in case of x1-x2 = 0, hopefully this will be a better comparison function..
-    // Line for lhs:
-    Point L1 = *lhs.p1;
-    Point L2 = *lhs.p2;
-
-    if ((L2.x - L1.x) == 0) {
-      Ly.set(L1.y, L2.y);
-    } else {
-      double slope = (L2.y-L1.y) / (L2.x-L1.x);
-      Ly.set(slope * (idx - L1.x) + L1.y);
-    }
-
-    Point R1 = *rhs.p1;
-    Point R2 = *rhs.p2;
-
-    if ((R2.x - R1.x) == 0) {
-      Ry.set(R1.y, R2.y);
-    } else {
-      double slope = (R2.y-R1.y) / (R2.x-R1.x);
-      Ry.set(slope * (idx - R1.x) + R1.y);
-    }
-
-    return Ly > Ry;
-  }
-*/
 	friend bool operator==(const Edge& lhs, const Edge& rhs) {
-		if ((lhs.p1 == rhs.p1) && (lhs.p2 == rhs.p2)) return true;
+		if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
 		else return false;
 	};
 
