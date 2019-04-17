@@ -20,7 +20,7 @@ Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vert
 	id = n;
 	n++;
 
-	isEnqueued = false;
+	enqueued = false;
 }
 
 bool Triangle::contains(Vertex* v){
@@ -81,9 +81,21 @@ std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
 	return out;
 }
 
+Vertex* Triangle::getOtherVertex(TEdge* e){
+	if(!(*e).contains(v0)) 
+		return v0;
+	else if(!(*e).contains(v1))
+		return v1;
+	else
+		return v2; 
+}
+
 double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	double ax, ay, bx, by, cx, cy;
 	double numerator, denominator;
+
+	if(!contains(moving))
+		return -1;
 
 	cx = (*moving).getX();
 	cy = (*moving).getY();

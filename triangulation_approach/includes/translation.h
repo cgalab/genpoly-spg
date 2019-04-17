@@ -10,6 +10,7 @@ class Translation{
 private:
 	Triangulation* T;
 
+	Vertex* original;
 	Vertex* oldV;
 	Vertex* newV;
 	Vertex* prevV;
@@ -28,10 +29,10 @@ private:
 
 	void generateInitialQueue(){
 		double t;
-		std::list<Triangle*> triangles = (*oldV).getTriangles();
+		std::list<Triangle*> triangles = (*original).getTriangles();
 
 		for(auto& i : triangles){
-			t = (*i).calculateCollapseTime(oldV, dx, dy);
+			t = (*i).calculateCollapseTime(original, dx, dy);
 
 			if(t >= 0 && t <= 1){
 				(*i).enqueue();
@@ -52,11 +53,13 @@ public:
 		dx = dX;
 		dy = dY;
 
-		oldV = (*T).getVertex(index);
+		original = (*T).getVertex(index);
 		prevV = (*T).getPVertex(index - 1);
 		nextV = (*T).getPVertex(index + 1);
 
-		newV = (*oldV).getTranslated(dx, dy);
+		oldV = (*original).getTranslated(0, 0);
+		newV = (*original).getTranslated(dx, dy);
+		(*T).addVertex(newV);
 
 		transPath = new TEdge(oldV, newV);
 
@@ -73,7 +76,7 @@ public:
 	TEdge* getTranslationPath(){ return transPath;}
 
 	void execute(){
-		Triangle* t;
+		Triangle* t = NULL;
 		std::pair<double, Triangle*> e;
 
 		if(split){
@@ -89,13 +92,67 @@ public:
 
 				flip(t);
 			}
+
+			(*original).setPosition((*oldV).getX() + dx, (*oldV).getY() + dy);
 		}
 	}
 
-	void flip(Triangle* t1){
-		TEdge* e = (*t1).getLongestEdge();
-		// remove old triangles and insert new ones
-		// attention: shift old point to new one and don't forget to add the actual time to the triangle collapse time of the new triangles!
+	void flip(Triangle* t0){
+		Triangle *t1;
+		Vertex *vj0, *vj1; // joint vertices
+		Vertex *vn0, *vn1; // non joint vertices
+		TEdge *e, *e1, *e2;
+		double t;
+
+		// move vertex to event time
+		(*original).setPosition((*oldV).getX() + dx * actualTime, (*oldV).getY() + dy * actualTime);
+
+
+		e = (*t0).getLongestEdge();
+		t1 =(*e).getOtherTriangle(t0); // TODO: take care, whether other triangle must be removed from queue
+		if((*t1).isEnqueued())
+			Q.remove(t1);
+
+		vj0 = (*e).getV1();
+		vj1 = (*e).getV2();
+		vn0 = (*t0).getOtherVertex(e);
+		vn1 = (*t1).getOtherVertex(e);
+
+		delete e;
+
+		// new triangle vn0, vn1, vj0
+		e = new TEdge(vn0, vn1);
+		(*T).addEdge(e);
+
+		e1 = (*vj0).getEdgeTo(vn0);
+		e2 = (*vj0).getEdgeTo(vn1);
+
+		t0 = new Triangle(e, e1, e2, vn0, vn1, vj0);
+
+		// new triangle vn0, vn1, vj1
+		(*T).addEdge(e);
+
+		e1 = (*vj1).getEdgeTo(vn0);
+		e2 = (*vj1).getEdgeTo(vn1);
+
+		t1 = new Triangle(e, e1, e2, vn0, vn1, vj1);
+
+		// add new triangles to queue if necessary
+		t = (*t0).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
+		t = t + actualTime;
+
+		if(t >= actualTime && t <= 1){
+			(*t0).enqueue();
+			Q.push(std::make_pair(t, t0));
+		}
+
+		t = (*t1).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
+		t = t + actualTime;
+
+		if(t >= actualTime && t <= 1){
+			(*t1).enqueue();
+			Q.push(std::make_pair(t, t1));
+		}
 	}
 
 };

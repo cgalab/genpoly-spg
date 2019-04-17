@@ -22,7 +22,7 @@ private:
 	Vertex* v1;
 	Vertex* v2;
 
-	bool isEnqueued;
+	bool enqueued;
 
 	int id;
 	static int n;
@@ -36,9 +36,11 @@ public:
 	TEdge* getEdge(int i);
 	TEdge* getEdgeNotContaining(Vertex* v);
 	std::vector<TEdge*> getOtherEdges(TEdge* e);
+	Vertex* getOtherVertex(TEdge* e);
 	void enqueue(){
-		isEnqueued = true;
+		enqueued = true;
 	}
+	bool isEnqueued(){ return enqueued;}
 	double calculateCollapseTime(Vertex* moving, double dx, double dy);
 	TEdge* getLongestEdge();
 };

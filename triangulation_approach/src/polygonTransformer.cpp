@@ -3,7 +3,7 @@
 void transformPolygon(Triangulation* T, int iterations, Timer t){
 	int index = 1;
 	RandomGenerator* generator = new RandomGenerator();
-	double dx = -45, dy = 0; // radius of the initial polygon was 30
+	double dx = -25, dy = 30; // radius of the initial polygon was 30
 	bool simple, split;
 	Translation* trans;
 

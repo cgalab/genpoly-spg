@@ -75,6 +75,11 @@ public:
 	void removeTriangle(Triangle* t);
 	Triangle* getTriangle(int index);
 
+	void setPosition(double X, double Y){
+		x = X;
+		y = Y;
+	}
+
 	void print(FILE* f){
 		fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * 10, y * 10, id, id);
 	}
