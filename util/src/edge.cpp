@@ -42,6 +42,26 @@ double det(const Edge& e, const Point& p) {
 	return (abs(ans) < EPSILON) ? 0 : ans;
 }
 
+Yval getYatX(const Edge& e, const double x) {
+	Yval y;
+	// calculate the y-axis order of the 2 edges at idx
+	// use Yval in case of x1-x2 = 0
+	Point P1 = *e.p1;
+	Point P2 = *e.p2;
+
+	if ((P2.x - P1.x) == 0) {
+		y.set(P1.y, P2.y);
+		y.setX(x);
+	} else {
+		double slope = (P2.y-P1.y) / (P2.x-P1.x);
+		double val = slope * x + P1.y;
+		if (abs(val) < EPSILON) y.set(0);
+		else y.set(val);
+		y.setX(x);
+	}
+	return y;
+}
+
 enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;

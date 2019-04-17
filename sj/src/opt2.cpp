@@ -242,6 +242,16 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
       isval = checkIntersection(e, before);
       if (isval < IS_TRUE) {
         std::cerr << "No intersection." << std::endl;
+        valid = E_VALID;
+      }
+      else if (isval == IS_4P_COLLINEAR) {
+        std::cerr << "4P collinearity between:" << e << " and " << before << std::endl;
+        if (collSwap(e, before, polygon)) {
+          std::cerr << "4P coll. after swap: " << e << " and " << before << std::endl;
+          index = 0;
+          decrementEdges(index, edgeS);
+          valid = E_SKIP;
+        }
       }
       else {
         std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
@@ -255,6 +265,16 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
       isval = checkIntersection(e, after);
       if (isval < IS_TRUE) {
         std::cerr << "No intersection." << std::endl;
+        valid = E_VALID;
+      }
+      else if (isval == IS_4P_COLLINEAR) {
+        std::cerr << "4P collinearity between:" << e << " and " << after << std::endl;
+        if (collSwap(e, after, polygon)) {
+          std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
+          index = 0;
+          decrementEdges(index, edgeS);
+          valid = E_SKIP;
+        }
       }
       else {
         std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
@@ -268,13 +288,23 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
   } else {
     // edge already existed in set.
     // remove edge and check if incidental edges intersect
-    std::cout << "'e' found in 'edgeS'." << std::endl;
+    std::cout << "'e' found in 'edgeS', remove." << std::endl;
     edgeS.erase(retval.first);
     if (bef && af) {
       isval = checkIntersection(before, after);
       if (isval < IS_TRUE) {
         std::cout << "No intersection between 'before': " << before << ", and 'after': " << after << std::endl;
-      } else {
+      }
+      else if (isval == IS_4P_COLLINEAR) {
+        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
+        if (collSwap(before, after, polygon)) {
+          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
+          index = 0;
+          decrementEdges(index, edgeS);
+          valid = E_SKIP;
+        }
+      }
+      else {
         std::cout << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
         flip(before, after, polygon, points);
         index = 0;
@@ -493,57 +523,13 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 		p2 = &points[polygon[before]];
 		p3 = &points[polygon[after]];
 
-    if (reset && (p1 < p2) && (p1 < p3)) {
+    // reset catches when the index was reset to a lower index,
+    // From that lower index you do not want to add edges to a lower lex point,
+    // so only process both edges if p2 and p3 are higher lex. order.
+    if (reset && (*p1 > *p2) && (*p1 > *p3)) {
+      // do nothing.  Skip this index, reset 'reset' and continue.
       reset = false;
-		  // construct the edges
-      //std::cerr << *p2 << " < " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
-		  if (*p2 < *p3) {
-			  e1 = Edge (p1, p2, index);
-			  e2 = Edge (p1, p3, index);
-        val3 = det(e1, *p3);
-		  }
-		  else {
-			  e1 = Edge (p1, p3, index);
-			  e2 = Edge (p1, p2, index);
-        val3 = det(e1, *p2);
-		  }
-
-      if (val3 == 0) {
-        // the 2 edges are collinear
-        std::cerr << "collinear check found a possible match."  << std::endl;
-        if ((*p1 < *p2) && (*p1 < *p3)) {
-          std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-          if (collSwap(p1, p2, p3, polygon)) {
-            std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-            if ((*p1).l < (*p2).l) {
-              if ((*p1).l < (*p3).l) index = (*p1).l;
-              else index = (*p3).l;
-            } else {
-              if ((*p2).l < (*p3).l) index = (*p2).l;
-              else index = (*p3).l;
-            }
-            decrementEdges(index, edgeS);
-            reset = true;
-            continue;
-          }
-        } else std::cerr << "false alarm." << std::endl;
-      }
-
-		  std::cout << "processing e1: " << e1 << std::endl;
-		  val1 = processEdge(index, e1, edgeS, polygon, points);
-		  if (val1 == E_SKIP) {
-        reset = true;
-        continue; // swapping invalidates 'e2' so start again from the lower index before processing 'e2'
-      }
-
-		  std::cout << std::endl << "processing e2: " << e2 << std::endl;
-		  val2 = processEdge(index, e2, edgeS, polygon, points);
-		  //std::cout << "after edgecheck2." << std::endl;
-		  if (val2 == E_SKIP) {
-        reset = true;
-        continue;
-      }
-    } else if (reset && (p1 < p2)) {
+    } else if (reset && (*p1 < *p2) && (*p1 > *p3)) {
       reset = false;
       e1 = Edge (p1, p2, index);
       std::cout << "processing e1: " << e1 << std::endl;
@@ -552,7 +538,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
         reset = true;
         continue;
       }
-    } else if (reset && (p1 < p3) ) {
+    } else if (reset && (*p1 > *p2) && (*p1 < *p3) ) {
       reset = false;
       e1 = Edge (p1, p3, index);
       std::cout << "processing e1: " << e1 << std::endl;
@@ -566,7 +552,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
       reset = false;
       // construct the edges
       //std::cerr << *p2 << " < " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
-		  if (*p2 < *p3) {
+		  if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
 			  e1 = Edge (p1, p2, index);
 			  e2 = Edge (p1, p3, index);
         val3 = det(e1, *p3);

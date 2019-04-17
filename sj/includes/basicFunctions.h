@@ -46,12 +46,12 @@ public:
     if (*lhs.p1 == *rhs.p1) {     // if same starting point
       det1 = det(lhs, *rhs.p2);
       if (det1 == 0) {            // if lhs and rhs.p2 collinear
-        std::cerr << *lhs.p2 << " < " << *rhs.p2 << " : " << ((*lhs.p2 < *rhs.p2)? "true" : "false") << std::endl;
+        std::cerr << "same p1, coll: "<< *lhs.p2 << " < " << *rhs.p2 << " : " << ((*lhs.p2 < *rhs.p2)? "true" : "false") << std::endl;
         return *lhs.p2 < *rhs.p2;
       }
-      bool detsign = signbit(det1);
-      std::cerr << "lhs < rhs : " << ((detsign)? "true" : "false") << std::endl;
-      return !detsign;
+      bool detsign = !signbit(det1);
+      std::cerr << "same p1, lhs < rhs : " << ((detsign)? "true" : "false") << std::endl;
+      return detsign;
     }
 
     det1 = det(lhs, *rhs.p1);
@@ -61,14 +61,14 @@ public:
         std::cerr << *lhs.p1 << " < " << *rhs.p1 << " : " << ((*lhs.p1 < *rhs.p1)? "true" : "false") << std::endl;
         return *lhs.p1 < *rhs.p1;
       }
-      bool detsign = signbit(det1);
+      bool detsign = !signbit(det1);
       std::cerr << "lhs < rhs : " << ((detsign)? "true" : "false") << std::endl;
-      return !detsign;
+      return detsign;
     }
 
-    bool detsign = signbit(det1);
+    bool detsign = !signbit(det1);
     std::cerr << "lhs < rhs : " << ((detsign)? "true" : "false") << std::endl;
-    return !detsign;
+    return detsign;
 
 /*
     enum intersect_t retval = checkIntersection(lhs, rhs);
