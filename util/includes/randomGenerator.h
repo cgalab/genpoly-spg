@@ -28,6 +28,10 @@ class RandomGenerator{
 			
 			return new Point(x + dx, y + dy, i);
 		}
+
+		double getTranslationNormal(double mean, double stddev){
+			return std::normal_distribution<double> {mean, stddev} (generator);	
+		}
 /*
 		Vertex* translateVertexNormal(Vertex* v, double mean, double stddev){
 			double dx, dy;

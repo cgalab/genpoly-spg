@@ -81,6 +81,7 @@ public:
 		Translation* trans;
 		double middleX, middleY, transX, transY;
 
+		// ATTENTIONE: just works, if the chosen vertex changes its side relative to the edge between its neighbors or at least the triangle with its neighbors exist
 		if(split){
 			// get translation to end position for first translation which is the middle between the nieghboring vertices
 			middleX = ((*prevV).getX() + (*nextV).getX()) / 2;

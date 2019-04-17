@@ -1,13 +1,40 @@
 #include "polygonTransformer.h"
+#include <string>
 
 void transformPolygon(Triangulation* T, int iterations, Timer t){
-	int index = 1;
-	RandomGenerator* generator = new RandomGenerator();
-	double dx = -20, dy = 30; // radius of the initial polygon was 30
+	int index;
+	RandomGenerator* generator = new RandomGenerator(); // could maybe be a object instead of a pointer
+	double dx, dy; // radius of the initial polygon was 30
 	bool simple, split;
 	Translation* trans;
+	int n = (*T).getNumberOfVertices();
 
-	trans = new Translation(T, index, dx, dy);
+	for(int i = 0; i < iterations; i++){
+		index = (*generator).getRandomIndex(n);
+
+		dx = (*generator).getTranslationNormal(0, 5);
+		dy = (*generator).getTranslationNormal(0, 5);
+		trans = new Translation(T, index, dx, dy);
+
+		simple = checkSimplicityOfTranslation(trans);
+
+		//printf("simplicity check gives result %d \n", simple);
+
+		if(simple){
+			// check whether the translation can be done at once or must be split to move around a polygon edge
+			split = checkEdge((*trans).getOriginal(), (*trans).getTranslationPath());
+			if(!split){
+				(*trans).setSplit();
+				//printf("translation must be split \n");
+			}
+
+			(*trans).execute();
+		}
+
+		delete trans;
+	}
+
+	/*trans = new Translation(T, index, dx, dy);
 
 	simple = checkSimplicityOfTranslation(trans);
 
@@ -45,7 +72,7 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 		(*trans).execute();
 	}
 
-	delete trans;
+	delete trans;*/
 }
 
 bool checkSimplicityOfTranslation(Translation* trans){
@@ -102,15 +129,15 @@ bool checkEdge(Vertex* fromV, TEdge* newE){
 
 			// intersected edge is polygon edge
 			if(eType == EdgeType::POLYGON){
-				printf("edge hit polygon edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
+				//printf("edge hit polygon edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
 				return false;
 			// intersected edge is frame edge
 			}else if(eType == EdgeType::FRAME){
-				printf("edge hit frame edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
+				//printf("edge hit frame edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
 				return false;
 			// intersected edge is just a triangulation edge
 			}else{
-				printf("edge hit triangulation edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
+				//printf("edge hit triangulation edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
 				nextT = (*i).getTriangleNotContaining(fromV);
 				surEdges = (*nextT).getOtherEdges(i);
 				break;
@@ -132,15 +159,15 @@ bool checkEdge(Vertex* fromV, TEdge* newE){
 
 				// intersected edge is polygon edge
 				if(eType == EdgeType::POLYGON){
-					printf("edge hit polygon edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
+					//printf("edge hit polygon edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
 					return false;
 				// intersected edge is frame edge
 				}else if(eType == EdgeType::FRAME){
-					printf("edge hit frame edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
+					//printf("edge hit frame edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
 					return false;
 				// intersected edge is just a triangulation edge
 				}else{
-					printf("edge hit triangulation edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
+					//printf("edge hit triangulation edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
 					nextT = (*i).getOtherTriangle(nextT);
 					surEdges = (*nextT).getOtherEdges(i);
 					break;

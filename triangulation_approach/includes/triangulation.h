@@ -31,7 +31,8 @@ public:
 	Vertex* getVertex(int i);
 	Vertex* getPVertex(int i);
 	void removeVertex(int i);
-	void print(char* filename);
+	void print(const char* filename);
+	void printPolygon(const char* filename);
 	void check();
 	void deleteVertex(int index);
 	int getNumberOfVertices(){ return N;}

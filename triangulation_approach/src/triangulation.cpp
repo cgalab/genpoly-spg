@@ -36,7 +36,7 @@ Vertex* Triangulation::getPVertex(int i){
 // prints triangulation as graph into a graphml file
 // https://de.wikipedia.org/wiki/GraphML
 // works here: http://graphonline.ru/en/
-void Triangulation::print(char* filename){
+void Triangulation::print(const char* filename){
 	FILE* f;
 
 	f = fopen(filename, "w");
@@ -54,6 +54,33 @@ void Triangulation::print(char* filename){
 	fprintf(f, "<edges>\n");
 	for(auto const& i : edges){
 		(*i).print(f);
+	}
+	fprintf(f, "</edges>\n");
+
+	fprintf(f, "</graph>\n");
+	fprintf(f, "</graphml>\n");
+
+	fclose(f);
+}
+
+void Triangulation::printPolygon(const char* filename){
+	FILE* f;
+
+	f = fopen(filename, "w");
+
+	fprintf(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+	fprintf(f, "<graphml>\n");
+	fprintf(f, "<graph id=\"Graph\" edgeDefault=\"undirected\">\n");
+
+	fprintf(f, "<nodes>\n");
+	for(auto const& i : vertices){
+		if(i != NULL && !(*i).isRectangleVertex()) (*i).print(f);
+	}
+	fprintf(f, "</nodes>\n");
+
+	fprintf(f, "<edges>\n");
+	for(auto const& i : edges){
+		if((*i).getEdgeType() == EdgeType::POLYGON)(*i).print(f);
 	}
 	fprintf(f, "</edges>\n");
 

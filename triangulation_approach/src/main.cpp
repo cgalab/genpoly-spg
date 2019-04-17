@@ -10,7 +10,7 @@
 int main(){
 	Triangulation* T;
 	int n = 10;
-	int translations = 50 * n;
+	int translations = 1000 * n;
 	Timer t;
 	Vertex* v;
 	TEdge* e;
@@ -28,8 +28,8 @@ int main(){
 
 	(*T).check();
 	
-	(*T).print("polygon.graphml");
+	(*T).print("triangulation.graphml");
 	//printStats(p);
 
-	//printPolygonToDat(*p, "test.dat");
+	(*T).printPolygon("polygon.graphml");
 }

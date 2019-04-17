@@ -42,3 +42,4 @@ clean:
 	rm -f app $(ODIR)/*.o $(UODIR)/*.o
 	rm -f -d $(ODIR) $(UODIR)
 	rm -f *.dat
+	rm -f output/*.graphml
