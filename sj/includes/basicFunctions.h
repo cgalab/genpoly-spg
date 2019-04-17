@@ -56,10 +56,13 @@ public:
 
     det1 = det(lhs, *rhs.p1);
     if (det1 == 0) {            // if lhs and rhs.p1 are collinear
-      det1 = det(lhs, *rhs.p2);
-      if (det1 == 0) {          // if lhs and rhs.p2 are collinear
-        std::cerr << *lhs.p1 << " < " << *rhs.p1 << " : " << ((*lhs.p1 < *rhs.p1)? "true" : "false") << std::endl;
-        return *lhs.p1 < *rhs.p1;
+      double reld1 = reldist(lhs, *rhs.p1);
+      if (reld1 < 0) {          // if lhs and rhs.p2 are collinear
+        std::cerr << "coll: lhs < rhs: false" << std::endl;
+        return false;
+      } else {
+        std::cerr << "coll: lhs < rhs: true" << std::endl;
+        return true;
       }
       bool detsign = !signbit(det1);
       std::cerr << "lhs < rhs : " << ((detsign)? "true" : "false") << std::endl;

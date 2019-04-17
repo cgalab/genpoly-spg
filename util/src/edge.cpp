@@ -35,9 +35,21 @@ double reldist(const Edge& e, const Point& p) {
 	return reldist(*e.p1, *e.p2, p);
 }
 
-double det(const Edge& e, const Point& p) {
+double det(const Edge e, const Point p) {
 	const Point& pa = *e.p1;
 	const Point& pb = *e.p2;
+	double ans = (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
+	return (abs(ans) < EPSILON) ? 0 : ans;
+}
+
+double dety(const Edge e, const Point p) {
+	Point pa = *e.p1;
+	Point pb = *e.p2;
+	if ((*e.p1).y > (*e.p2).y) {
+		pa = *e.p2;
+		pb = *e.p1;
+	}
+
 	double ans = (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
 	return (abs(ans) < EPSILON) ? 0 : ans;
 }

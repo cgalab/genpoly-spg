@@ -162,7 +162,8 @@ public:
 void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points);
 double reldist(const Point& pa, const Point& pb, const Point& p);
 double reldist(const Edge& e, const Point& p);
-double det(const Edge& e, const Point& p);
+double det(const Edge e, const Point p);
+double dety(const Edge e, const Point p);
 enum intersect_t checkIntersection(const Edge e1, const Edge e2);
 void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
