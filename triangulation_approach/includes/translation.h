@@ -59,13 +59,13 @@ public:
 
 		oldV = (*original).getTranslated(0, 0);
 		newV = (*original).getTranslated(dx, dy);
-		(*T).addVertex(newV);
 
 		transPath = new TEdge(oldV, newV);
 
 		maxTime = (*transPath).length();
 	}
 
+	Vertex* getOriginal(){ return original;}
 	Vertex* getOldV(){ return oldV;}
 	Vertex* getNewV(){ return newV;}
 	Vertex* getPrevV(){ return prevV;}
@@ -78,8 +78,30 @@ public:
 	void execute(){
 		Triangle* t = NULL;
 		std::pair<double, Triangle*> e;
+		Translation* trans;
+		double middleX, middleY, transX, transY;
 
 		if(split){
+			// get translation to end position for first translation which is the middle between the nieghboring vertices
+			middleX = ((*prevV).getX() + (*nextV).getX()) / 2;
+			middleY = ((*prevV).getY() + (*nextV).getY()) / 2;
+			// compute translation vector
+			transX = middleX - (*oldV).getX();
+			transY = middleY - (*oldV).getY();
+
+			trans = new Translation(T, index, transX, transY);
+			(*trans).execute();
+
+			delete trans;
+
+			// get translation from middle to end
+			transX = (*newV).getX() - (*original).getX();
+			transY = (*newV).getY() - (*original).getY();
+
+			trans = new Translation(T, index, transX, transY);
+			(*trans).execute();
+
+			delete trans;
 
 		}else{
 			generateInitialQueue();
@@ -153,6 +175,12 @@ public:
 			(*t1).enqueue();
 			Q.push(std::make_pair(t, t1));
 		}
+	}
+
+	~Translation(){
+		delete transPath;
+		delete oldV;
+		delete newV;
 	}
 
 };

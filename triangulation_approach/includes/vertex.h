@@ -38,6 +38,8 @@ public:
 
 		id = n;
 		n++;
+
+		T = NULL;
 	}
 
 	Vertex(double X, double Y, bool RV){ 
@@ -47,7 +49,10 @@ public:
 
 		id = n;
 		n++;
+
+		T = NULL;
 	}
+
 	Vertex(double X, double Y, int ID){
 		x = X;
 		y = Y;
@@ -55,6 +60,8 @@ public:
 		id = ID;
 
 		rectangleVertex = false;
+
+		T = NULL;
 	}
 
 	void setTriangulation(Triangulation* t);

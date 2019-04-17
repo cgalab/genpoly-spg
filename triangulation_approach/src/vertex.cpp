@@ -82,7 +82,7 @@ Vertex::~Vertex(){
 		delete edgeArray[i];
 	}
 
-	(*T).removeVertex(id);
+	if(T != NULL) (*T).removeVertex(id);
 }
 
 int Vertex::n = 0;

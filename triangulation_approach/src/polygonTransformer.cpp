@@ -3,7 +3,7 @@
 void transformPolygon(Triangulation* T, int iterations, Timer t){
 	int index = 1;
 	RandomGenerator* generator = new RandomGenerator();
-	double dx = -25, dy = 30; // radius of the initial polygon was 30
+	double dx = -20, dy = 30; // radius of the initial polygon was 30
 	bool simple, split;
 	Translation* trans;
 
@@ -15,7 +15,7 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 
 	if(simple){
 		// check whether the translation can be done at once or must be split to move around a polygon edge
-		split = checkEdge((*trans).getOldV(), (*trans).getTranslationPath());
+		split = checkEdge((*trans).getOriginal(), (*trans).getTranslationPath());
 		if(!split){
 			(*trans).setSplit();
 			printf("translation must be split \n");
@@ -23,6 +23,29 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 
 		(*trans).execute();
 	}
+
+	delete trans;
+
+	printf("second translation\n");
+
+	trans = new Translation(T, index, 0, -30);
+
+	simple = checkSimplicityOfTranslation(trans);
+
+	printf("simplicity check gives result %d \n", simple);
+
+	if(simple){
+		// check whether the translation can be done at once or must be split to move around a polygon edge
+		split = checkEdge((*trans).getOriginal(), (*trans).getTranslationPath());
+		if(!split){
+			(*trans).setSplit();
+			printf("translation must be split \n");
+		}
+
+		(*trans).execute();
+	}
+
+	delete trans;
 }
 
 bool checkSimplicityOfTranslation(Translation* trans){
@@ -30,7 +53,7 @@ bool checkSimplicityOfTranslation(Translation* trans){
 	TEdge *prevE, *nextE, *prevNewE, *nextNewE;
 	bool simple;
 	
-	oldV = (*trans).getOldV();
+	oldV = (*trans).getOriginal();
 	newV = (*trans).getNewV();
 
 	prevV = (*trans).getPrevV();
