@@ -75,6 +75,13 @@ Yval getYatX(const Edge& e, const double x) {
 	return y;
 }
 
+unsigned int getLowestLexIdx(const Edge e1, const Edge e2) {
+	unsigned int le1 = e1.getLowerLexIdx();
+	unsigned int le2 = e2.getLowerLexIdx();
+	if (le1 < le2) return le1;
+	else return le2;
+}
+
 enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;

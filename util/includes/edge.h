@@ -162,6 +162,8 @@ public:
 		else return false;
 	}
 
+  // to print out an edge, gives the format:
+  // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
 	friend std::ostream& operator<<(std::ostream& os, const Edge& e) {
 		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "]";
 		return os;
@@ -174,6 +176,7 @@ double reldist(const Edge& e, const Point& p);
 double det(const Edge e, const Point p);
 double dety(const Edge e, const Point p);
 Yval getYatX(const Edge& e, const double x);
+unsigned int getLowestLexIdx(const Edge e1, const Edge e2);
 enum intersect_t checkIntersection(const Edge e1, const Edge e2);
 void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points);

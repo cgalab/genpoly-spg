@@ -51,56 +51,7 @@ void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon) {
 // swaps the points in the polygon so that the lex. order of the points is also the vertex order of the points.
 bool collSwap(Point* a, Point* b, Point* c, std::vector<unsigned int>& polygon) {
   bool swapped = false;
-  /*
-  unsigned int left=-1, mid=-1, right=-1;
-  //need to be able to catch boundary conditions.
-  if ((*a).v == 0) {
-    if ((*b).v == polygon.size()-1) {
-      if ((*c).v == polygon.size()-2) {
-        left = (*c).v; mid = (*b).v; right = (*a).v;
 
-      } else {
-        left = (*b).v; mid = (*a).v; right = (*c).v;
-      }
-    } else if ((*c).v == polygon.size()-1) {
-        if ((*b).v == polygon.size()-2) {
-          left = (*b).v; mid = (*c).v; right = (*a).v;
-        } else {
-          left = (*c).v; mid = (*a).v; right = (*b).v;
-        }
-      }
-  }
-  if ((*b).v == 0) {
-    if ((*a).v == polygon.size()-1) {
-      if ((*c).v == polygon.size()-2) {
-        left = (*c).v; mid = (*a).v; right = (*b).v;
-      } else {
-        left = (*a).v; mid = (*b).v; right = (*c).v;
-      }
-    } else if ((*c).v == polygon.size()-1) {
-      if ((*a).v == polygon.size()-2) {
-        left = (*a).v; mid = (*c).v; right = (*b).v;
-      } else {
-        left = (*c).v; mid = (*b).v; right = (*a).v;
-      }
-    }
-  }
-  if ((*c).v == 0) {
-    if ((*a).v == polygon.size()-1) {
-      if ((*b).v == polygon.size()-2) {
-        left = (*b).v; mid = (*a).v; right = (*c).v;
-      } else {
-        left = (*a).v; mid = (*c).v; right = (*b).v;
-      }
-    } else if ((*b).v == polygon.size()-1) {
-      if ((*a).v == polygon.size()-2) {
-        left = (*a).v; mid = (*b).v; right = (*c).v;
-      } else {
-        left = (*b).v; mid = (*c).v; right = (*a).v;
-      }
-    }
-  }
-*/
   if ((*b) < (*c)) {
     if ((*b).v < (*a).v) {polSwap(a, b, polygon); swapped = true;}
     else {polSwap(a, c, polygon); polSwap(c, b, polygon); swapped = true;}
@@ -216,6 +167,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
   bool bef = false, af = false;
   Edge before, after;
   std::pair<std::set<Edge, setComp>::iterator,bool> retval;
+  std::set<Edge, setComp>::key_compare mycomp = edgeS.key_comp();
 
   retval = edgeS.insert(e);
 
@@ -249,6 +201,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
         if (collSwap(e, before, polygon)) {
           std::cerr << "4P coll. after swap: " << e << " and " << before << std::endl;
           index = 0;
+          mycomp.o.lower_idx = getLowestLexIdx(e, before);
           decrementEdges(index, edgeS);
           valid = E_SKIP;
         }
@@ -257,6 +210,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
         std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
         flip(e, before, polygon, points);
         index = 0;
+        mycomp.o.lower_idx = getLowestLexIdx(e, before);
 				decrementEdges(index, edgeS);
 				valid = E_SKIP;
       }
@@ -272,6 +226,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
         if (collSwap(e, after, polygon)) {
           std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
           index = 0;
+          mycomp.o.lower_idx = getLowestLexIdx(e, after);
           decrementEdges(index, edgeS);
           valid = E_SKIP;
         }
@@ -280,6 +235,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
         std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
         flip(e, after, polygon, points);
         index = 0;
+        mycomp.o.lower_idx = getLowestLexIdx(e, after);
 				decrementEdges(index, edgeS);
 				valid = E_SKIP;
       }
@@ -300,6 +256,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
         if (collSwap(before, after, polygon)) {
           std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
           index = 0;
+          mycomp.o.lower_idx = getLowestLexIdx(before, after);
           decrementEdges(index, edgeS);
           valid = E_SKIP;
         }
@@ -308,6 +265,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
         std::cout << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
         flip(before, after, polygon, points);
         index = 0;
+        mycomp.o.lower_idx = getLowestLexIdx(before, after);
         decrementEdges(index, edgeS);
 				valid = E_SKIP;
       }
@@ -315,168 +273,7 @@ enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& e
   }
   return valid;
 }
-/*
-// checks if an edge 'e' is: already in 'edgeS', if not checks if it intersects its neighbours and either cleans 'edgeS' or add 'e' into it.
-enum edge_t processEdge(unsigned int& index, Edge& e, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
-	enum edge_t valid = E_VALID;
-	enum intersect_t cross = IS_FALSE;
-	bool bef = false, af = false;
-	// ok to try and insert the edge into 'edgeS', if it's already there, we have an iterator for removal of the value, if it isn't, we have an iterator to check neighbours.
-	std::pair<std::set<Edge, setComp>::iterator,bool> retval;
-  std::set<Edge, setComp>::key_compare mycomp = edgeS.key_comp();
-  mycomp.o.isect = IS_FALSE;
-  mycomp.o.l_idx = index;
-	retval = edgeS.insert(e);
 
-  // handle if the insert found an intersection.
-  std::cerr << "setComp isect: ";
-  printEnum(mycomp.o.isect);
-  std::cerr << std::endl;
-
-  if ((mycomp.o.isect == IS_TRUE) || (mycomp.o.isect == IS_3P_COLLINEAR)) {
-    std::cerr << "intersection between " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
-    flip(mycomp.o.lhs, mycomp.o.rhs, polygon, points);
-    index = mycomp.o.l_idx;
-    decrementEdges(index, edgeS);
-    valid = E_SKIP;
-    mycomp.o.isect = IS_FALSE;
-    return valid;
-  } else if (mycomp.o.isect == IS_4P_COLLINEAR) {
-    std::cerr << "collinearity before swap:" << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
-    if (collSwap(mycomp.o.lhs, mycomp.o.rhs, polygon)) {
-      std::cerr << "collinearity after swap: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
-      //flip(mycomp.o.lhs, mycomp.o.rhs, polygon, points);
-      //std::cerr << "collinearity after flip: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
-      //index = mycomp.o.l_idx;
-      if (mycomp.o.lhs.getLowerLexIdx() < mycomp.o.rhs.getLowerLexIdx()) {
-        if (mycomp.o.lhs.getLowerLexIdx() < mycomp.o.l_idx) index = mycomp.o.lhs.getLowerLexIdx();
-        else index = mycomp.o.l_idx;
-      } else {
-        if (mycomp.o.rhs.getLowerLexIdx() < mycomp.o.l_idx) index = mycomp.o.rhs.getLowerLexIdx();
-        else index = mycomp.o.l_idx;
-      }
-      decrementEdges(index, edgeS);
-      valid = E_SKIP;
-      mycomp.o.isect = IS_FALSE;
-    } else {
-      std::cerr << "false alarm." << std::endl;
-    }
-    return valid;
-  } else if (mycomp.o.isect == IS_VERTEX22) {
-    // need to check if edges are 3 point collinear and swap if necessary.
-    double val3 = det(mycomp.o.lhs, *mycomp.o.rhs.p1);
-    if (val3 == 0) {
-      std::cerr << "3 point collinearity found at: " << mycomp.o.lhs << " and " << mycomp.o.rhs << std::endl;
-      if (*mycomp.o.lhs.p1 < *mycomp.o.rhs.p1) collSwap(mycomp.o.lhs.p1, mycomp.o.lhs.p2, mycomp.o.rhs.p1, polygon);
-      else  collSwap(mycomp.o.rhs.p1, mycomp.o.rhs.p2, mycomp.o.lhs.p1, polygon);
-      std::cerr << "after swap: lhs: " << mycomp.o.lhs << ", rhs: " << mycomp.o.rhs << std::endl;
-      index = mycomp.o.l_idx;
-      decrementEdges(index, edgeS);
-      valid = E_SKIP;
-      mycomp.o.isect = IS_FALSE;
-      return valid;
-    }
-  }
-
-	std::cout << "retval.first : " << *retval.first << std::endl;
-	std::cout << "retval.second: " << retval.second << std::endl;
-
-  // I need to know neighbours for both a successful insert as well as unsuccessful
-  Edge before, after;
-
-  std::cout << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
-  if (retval.first != edgeS.begin()) {
-    before = *(std::prev(retval.first));
-    std::cout << "before: " << before << std::endl;
-    bef = true;
-  }
-  std::cout << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
-  if (retval.first != --edgeS.end()) {
-    after  = *(std::next(retval.first));
-    std::cout << "after : " << after << std::endl;
-    af = true;
-  }
-
-  if (mycomp.o.isect == IS_SAME_EDGE) {
-    // 'e' already existed and needs to be removed from 'edgeS'
-		std::cout << "'e' found in 'edgeS'.  Need to remove, then (possibly) check neighbours after removal." << std::endl;
-    if (e == *retval.first) {
-    	std::cerr << "'e' same as r.1" << std::endl;
-      edgeS.erase(retval.first);
-      if (bef && af) {
-        cross = checkIntersection(before, after);
-        if (cross < IS_TRUE) {
-          std::cout << "no intersection between 'before' and 'after'" << std::endl;
-        }
-        else {
-          std::cout << "intersection between 'before' and 'after'" << std::endl;
-          flip(before, after, polygon, points);
-          if (before.l_idx < after.l_idx) {
-            if (before.l_idx < mycomp.o.l_idx)  index = before.l_idx;
-            else index = mycomp.o.l_idx;
-          }
-          else {
-            if (after.l_idx < mycomp.o.l_idx) index = after.l_idx;
-            else index = mycomp.o.l_idx;
-          }
-					decrementEdges(index, edgeS);
-					valid = E_SKIP;
-        }
-      }
-      else std::cerr << "removal ok, continue." << std::endl;
-    }
-    else {
-      std::cerr << "retval.first WAS NOT 'e'!!!" << std::endl;
-      std::cerr << "o.lhs: " << mycomp.o.lhs << ", o.rhs: " << mycomp.o.rhs << std::endl;
-      valid = E_NOT_VALID;
-      return valid;
-    }
-  }
-
-	if (retval.second) {
-		// 'e' was successfully inserted into 'edgeS' as a new element
-		// check if it intersects with its neighbours
-
-		if (bef) {
-			cross = checkIntersection(e, before);
-      std::cerr << "cross: " << cross << std::endl;
-			if (cross < IS_TRUE) {
-				std::cout << "no intersection between 'e' and 'before'" << std::endl;
-				valid = E_VALID;
-			}
-			else {
-				// edge intersects with 'before'.  Need to flip 'e' and 'before' in polygon, then remove edges in 'edgeS'
-				std::cout << "intersection with 'before'" << std::endl;
-				flip(e, before, polygon, points);
-        index = mycomp.o.l_idx;
-				decrementEdges(index, edgeS);
-				valid = E_SKIP;
-			}
-		}
-		if (valid != E_SKIP) {
-			if(af) {
-				cross  = checkIntersection(e, after);
-				if (af && (cross < IS_TRUE)) {
-					// edge inserted, and does not intersect its neighbours.
-					std::cout << "no intersection between 'e' and 'after'" << std::endl;
-					valid = E_VALID;
-				}
-				else {
-					// edge intersects with 'after'.  Need to flip 'e' and 'after' in polygon, then remove edges in 'edgeS'
-					std::cout << "intersection with 'after'" << std::endl;
-					flip(e, after, polygon, points);
-          index = mycomp.o.l_idx;
-					decrementEdges(index, edgeS);
-					valid = E_SKIP;
-				}
-			}
-		}
-	} else if ((mycomp.o.isect != IS_SAME_EDGE) && !retval.second) {
-    std::cerr << "ERROR: Insert failed!!!" << std::endl;
-  }
-	return valid;
-}
-*/
 enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points);
@@ -508,8 +305,10 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	std::set<Edge, setComp> edgeS(comp); // a set of edges.
 
   reset = false;
+  comp.lower_idx = 0;
 	while (index < points.size()) {
 		std::cout << std::endl << "index: " << index << std::endl;
+
 		val1 = E_VALID; val2 = E_VALID;
 		// get the current point at 'index'
 		p1 = &points[lex[index]];
@@ -521,7 +320,17 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 
 		p2 = &points[polygon[before]];
 		p3 = &points[polygon[after]];
-
+/*
+    if (index < comp.lower_idx) {
+      // if either p2 or p3 is past the point in comp.lower_idx, then the edge has to be added
+      Point p4 = points[lex[comp.lower_idx]];
+      if ((*p2 < p4) && (*p3 < p4)) {
+        ++index;
+        comp.lower_idx = 0;
+        continue;
+      }
+    }
+*/
     // reset catches when the index was reset to a lower index,
     // From that lower index you do not want to add edges to a lower lex point,
     // so only process both edges if p2 and p3 are higher lex. order.
@@ -569,14 +378,9 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
           std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
           if (collSwap(p1, p2, p3, polygon)) {
             std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-            if ((*p1).l < (*p2).l) {
-              if ((*p1).l < (*p3).l) index = (*p1).l;
-              else index = (*p3).l;
-            } else {
-              if ((*p2).l < (*p3).l) index = (*p2).l;
-              else index = (*p3).l;
-            }
+            index = 0;
             decrementEdges(index, edgeS);
+            comp.lower_idx = getLowestLexIdx(e1, e2);
             reset = true;
             continue;
           }

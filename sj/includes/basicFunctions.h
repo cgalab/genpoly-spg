@@ -26,10 +26,7 @@ public:
 
 struct compObject{
   double t;
-  Edge lhs;
-  Edge rhs;
-  enum intersect_t isect;
-  unsigned int l_idx;
+  unsigned int lower_idx;
 };
 
 // comparison class for the set of edges in 'opt2.cpp'
