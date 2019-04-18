@@ -40,6 +40,107 @@ public:
 
   setComp(compObject& O) : o(O) {}
   bool operator() (const Edge& lhs, const Edge& rhs) const {
+    // compares 2 edges at x-coordinate 't'
+    // have to catch 5 cases, general case, t is in same beginning point, same end point, 3P collinear and 4P collinear
+    // all 4 specific cases happen when y value is the same for lhs and rhs.
+    std::cout << "lhs: " << lhs << " < rhs: " << rhs << std::endl;
+    Yval yl, yr;
+    yl = getYatX(lhs, o.t);
+    yr = getYatX(rhs, o.t);
+    if (yl == yr) {
+      bool pickP1;
+
+      // check for case 1: same beginning point in 't'
+      if ((*lhs.p1 == *rhs.p1) && ((*lhs.p1).x == o.t)) {
+        // pick the lower of the p2s as the 't' point
+        pickP1 = false;
+      }
+      // check for case 2: same endpoint in 't'
+      else if ((*lhs.p2 == *rhs.p2) && ((*lhs.p2).x == o.t)) {
+        // pick the higher of the p1s as the 't' point
+        pickP1 = true;
+      }
+      // check for case 3 and 4:
+      // same y value because at t lhs and rhs intersect;
+      // case 3: 3P collinear
+      // case 4: 4P collinear
+      else {
+        double det1, det2;
+        det1 = det(lhs, *rhs.p1);
+        det2 = det(lhs, *rhs.p2);
+
+        // 4P
+        if ((abs(det1) < EPSILON) && (abs(det2) < EPSILON)) {
+          std::cerr << "4P collinearity: " << *lhs.p1 << " < " << *rhs.p1 << " : " <<
+          ((*lhs.p1 < *rhs.p1) ? "true" : "false") << std::endl;
+          return *lhs.p1 < *rhs.p1;
+        }
+        // 3P and technically any other situation where yl == yr
+        else {
+          std::cerr << "3P collinearity" << std::endl;
+          // find what point is at 't'
+          if ((*lhs.p1).x == o.t) {
+            // pick the lower of the p2s as the x point
+            pickP1 = false;
+          }
+          else if ((*lhs.p2).x == o.t) {
+            // pick the higher of the p1s as the x point
+            pickP1 = true;
+          }
+          else if ((*rhs.p1).x == o.t) {
+            // pick the lower of the p2s
+            pickP1 = false;
+          }
+          else if ((*rhs.p2).x == o.t) {
+            // pick the higher of the p1s
+            pickP1 = true;
+          }
+          else {
+            std::cerr << "ERROR: Unexpected fallthrough in comparison!" << std::endl;
+          }
+        }
+      }
+
+      if (pickP1) {
+        // pick the higher of the p1s as the 't' point
+        if (*lhs.p1 < *rhs.p1) {
+          std::cerr << "higher of P1, at rhs.p1: " <<
+          getYatX(lhs, (*rhs.p1).x) << " < " << getYatX(rhs, (*rhs.p1).x) << " : "<<
+          ((getYatX(lhs, (*rhs.p1).x) < getYatX(rhs, (*rhs.p1).x)) ? "true" : "false") << std::endl;
+          return getYatX(lhs, (*rhs.p1).x) < getYatX(rhs, (*rhs.p1).x);
+        }
+        else {
+          std::cerr << "higher of P1, at lhs.p1: " <<
+          getYatX(lhs, (*lhs.p1).x) << " < " << getYatX(rhs, (*lhs.p1).x) << " : "<<
+          ((getYatX(lhs, (*lhs.p1).x) < getYatX(rhs, (*lhs.p1).x)) ? "true" : "false") << std::endl;
+          return getYatX(lhs, (*lhs.p1).x) < getYatX(rhs, (*lhs.p1).x);
+        }
+      } else {
+        // pick the lower of the p2s as the 't' point
+        if (*lhs.p2 < *rhs.p2) {
+          std::cerr << "lower of p2, at lhs.p2: " <<
+          getYatX(lhs, (*lhs.p2).x) << " < " << getYatX(rhs, (*lhs.p2).x) << " : "<<
+          ((getYatX(lhs, (*lhs.p2).x) < getYatX(rhs, (*lhs.p2).x)) ? "true" : "false") << std::endl;
+          return getYatX(lhs, (*lhs.p2).x) < getYatX(rhs, (*lhs.p2).x);
+        }
+        else {
+          std::cerr << "lower of p2, at rhs.p2: " <<
+          getYatX(lhs, (*rhs.p2).x) << " < " << getYatX(rhs, (*rhs.p2).x) << " : "<<
+          ((getYatX(lhs, (*rhs.p2).x) < getYatX(rhs, (*rhs.p2).x)) ? "true" : "false") << std::endl;
+          return getYatX(lhs, (*rhs.p2).x) < getYatX(rhs, (*rhs.p2).x);
+        }
+      }
+    }
+    else {
+      std::cerr << "general: " << yl << " < " << yr << " : " << ((yl < yr) ? "true" : "false") << std::endl;
+      return yl < yr; // general case:
+    }
+  }
+
+
+
+
+/*  Old version that used determinants, wasn't consistent enough.
     std::cout << "lhs: " << lhs << " < rhs: " << rhs << std::endl;
     double det1;
 
@@ -72,8 +173,9 @@ public:
     bool detsign = !signbit(det1);
     std::cerr << "lhs < rhs : " << ((detsign)? "true" : "false") << std::endl;
     return detsign;
+*/
 
-/*
+/*  //Old version that used intersection checks and yVals
     enum intersect_t retval = checkIntersection(lhs, rhs);
     if (retval == IS_VERTEX11) {
       if (o.isect == IS_FALSE) {o.lhs = lhs; o.rhs = rhs; o.isect = retval;}
@@ -159,8 +261,8 @@ public:
       bool detsign = signbit(detl) && signbit(detr);
       return !detsign;
     }
-*/
   }
+*/
 };
 
 enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg);

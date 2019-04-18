@@ -66,7 +66,8 @@ Yval getYatX(const Edge& e, const double x) {
 		y.setX(x);
 	} else {
 		double slope = (P2.y-P1.y) / (P2.x-P1.x);
-		double val = slope * x + P1.y;
+		double bias = P1.y - slope*P1.x;
+		double val = slope * x + bias;
 		if (abs(val) < EPSILON) y.set(0);
 		else y.set(val);
 		y.setX(x);

@@ -505,7 +505,6 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
   bool reset;
-	//std::list<Edge> edgesL; // a list for edges
 	std::set<Edge, setComp> edgeS(comp); // a set of edges.
 
   reset = false;
