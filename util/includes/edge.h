@@ -67,6 +67,13 @@ public:
 		else return false;
 	}
 
+  friend bool operator!=(const Yval lhs, const Yval rhs) {
+		if ((abs(lhs.min - rhs.min) > EPSILON) ||
+        (abs(lhs.max - rhs.max) > EPSILON) ||
+        (abs(lhs.x - rhs.x) > EPSILON)) return true;
+		else return false;
+	}
+
   friend std::ostream& operator<<(std::ostream& os, const Yval& y) {
     if (y.getMin() == y.getMax())
       os << "x:" << y.getX() << ", (" << y.min << "," << y.max << ")";
