@@ -92,7 +92,7 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
           strcpy(outFile, tempOutFile);
     }
   }
-  
+
   fout = fopen(outFile, "w");
 
   switch(outFormat) {

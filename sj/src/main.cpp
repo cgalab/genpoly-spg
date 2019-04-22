@@ -13,6 +13,7 @@
 #include "io.h"
 #include "point.h"
 #include "edge.h"
+#include "polygon.h"
 
 int main(int argc, char *argv[]) {
 
@@ -28,10 +29,18 @@ int main(int argc, char *argv[]) {
   enum in_format_t inFormat = IF_UNDEFINED;
   enum out_format_t outFormat = OF_UNDEFINED;
   bool writeNew = false;
+  bool calcArea = false;
+  double areaMin = -1, areaMax = -1;
+  int runAreaLoopFor, areaLoopCounter;
+  clock_t areaTimerStart, areaTimerEnd;
+  double maxTime, areaTimerElapsed;
 
   // parse command line arguments
-  returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat, writeNew);
+  returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat, writeNew, calcArea, areaMin, areaMax);
+
   if (returnValue == SUCCESS) {
+    runAreaLoopFor = 1000;
+    maxTime = 600;
     //std::cout << "all good to go" << std::endl;
 
     // points from input file saved in a vector
@@ -46,6 +55,42 @@ int main(int argc, char *argv[]) {
 
       // get a simple polygon with a given method
       returnValue = getSP(polygon, points, alg);
+
+
+      if (calcArea)
+      {
+        double area = 0;
+        areaLoopCounter = 0;
+        areaTimerStart = clock();
+        do
+        {
+          ++areaLoopCounter;
+
+          // get a simple polygon with a given method
+          returnValue = getSP(polygon, points, alg);
+
+          area = pol_calc_area(polygon, points);
+          areaTimerEnd = clock();
+          areaTimerElapsed = (areaTimerEnd - areaTimerStart) / CLOCKS_PER_SEC;
+          if ((areaMin > 0) && (area > 0) && (area > areaMin)) break;
+          if ((areaMax > 0) && (area > 0) && (area < areaMax)) break;
+        } while ((areaLoopCounter < runAreaLoopFor) && (areaTimerElapsed < maxTime));
+        //std::cerr << "areaMin: " << areaMin << ", areaMax: " << areaMax << ", area: " << area << std::endl;
+        //std::cerr << "time elapsed: " << areaTimerElapsed << ", areaLoopCounter: " << areaLoopCounter << std::endl;
+
+        if(area < 0)
+          returnValue = ERR_AREA_NEGATIVE;
+        else if (((areaMin > 0) && (area > areaMin)) || ((areaMax > 0) && (area < areaMax)))
+          std::cout << std::setprecision(15) << area << std::endl;
+        else
+          returnValue = ERR_AREA_NOT_BETTER;
+      }
+      else {
+        // get a simple polygon with a given method
+        returnValue = getSP(polygon, points, alg);
+      }
+
+
 
       if (returnValue == SUCCESS) {
         returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);

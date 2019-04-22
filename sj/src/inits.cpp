@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+#include <stdlib.h>     /* atof */
+#include <math.h> // INFINITY
 #include "basicDefinitions.h"
 #include "point.h"
 
@@ -51,7 +53,7 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	}
 	else {
 		*alg = A_UNDEFINED;
-		std::cerr << "Error:  --alg input incorrect.  Use -? for help. Input: '" << optarg << "', should be '2opt', 'space', or 'quick'." << std::endl;
+		std::cerr << "Error:  --alg input incorrect.  Use -? for help. Input: '" << optarg << "', should be '2opt'." << std::endl;
 		returnValue = NO_ALGORITHM;
 	}
 	return returnValue;
@@ -64,7 +66,7 @@ enum error ifInit(enum in_format_t *inFormat, char *optarg) {
 	else if (strcmp(optarg,"comp") == 0) *inFormat = IF_COMP;
 	else {
 		*inFormat = IF_UNDEFINED;
-		std::cerr << "Error:  --informat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'points', 'json', or 'comp'." << std::endl;
+		std::cerr << "Error:  --informat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'points', 'poly', or 'comp'." << std::endl;
 		returnValue = READ_ERROR_IFORMAT;
 	}
 	return returnValue;
@@ -77,13 +79,14 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 	else if (strcmp(optarg,"dat") == 0) *outFormat = OF_DAT;
 	else {
 		*outFormat = OF_UNDEFINED;
-		std::cerr << "Error:  --outformat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'perm', 'json', or 'poly'." << std::endl;
+		std::cerr << "Error:  --outformat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'perm', 'dat', or 'poly'." << std::endl;
 		returnValue = READ_ERROR_OFORMAT;
 	}
 	return returnValue;
 }
 
-enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg, enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew) {
+enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg,
+	enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew, bool& area, double& areaMin, double& areaMax) {
 	enum error returnValue = SUCCESS;
 	int comm;
 
@@ -95,10 +98,12 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 		{"informat", required_argument, NULL, 'b'},
 		{"outformat", required_argument, NULL, 'c'},
 		{"writeNew", no_argument, NULL, 'w'},
+		{"areamin", optional_argument, NULL, 'n'},
+		{"areamax", optional_argument, NULL, 'x'},
 		{0, 0, 0, 0}
 	};
 
-	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:w?t", long_options, NULL)) != -1 ) {
+	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:w?tn::x::", long_options, NULL)) != -1 ) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -121,6 +126,16 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 			case 't':
 				returnValue = RUN_TESTS;
 				break;
+			case 'n':
+				area = true;
+				if (optarg) areaMin = atof(optarg);
+				else areaMin = 0;
+				break;
+			case 'x':
+				area = true;
+				if (optarg) areaMax = atof(optarg);
+				else areaMax = INFINITY;
+				break;
 			case '?':
 				returnValue = NO_ARGUMENTS;
 				std::cerr << "Command line arguments:" << std::endl;
@@ -139,6 +154,12 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 				std::cerr << " --writenew         |OR| -w" << std::endl;
 				std::cerr << " :: option to not overwrite the output file if it already exists," << std::endl;
 				std::cerr << "    a new file is created with an increment number added to the end." << std::endl << std::endl;
+				std::cerr << " --areamin<arg>     |OR| -n<arg>" << std::endl;
+				std::cerr << " :: no space allowed between areamin and <arg> or n and <arg> as it's an optional argument" << std::endl;
+				std::cerr << " :: option to calculate and return the area of a returned simple polygon (optional: if it's above <arg>)" << std::endl << std::endl;
+				std::cerr << " --areamax<arg>     |OR| -x<arg>" << std::endl;
+				std::cerr << " :: no space allowed between areamax and <arg> or x and <arg> as it's an optional argument" << std::endl;
+				std::cerr << " :: option to calculate and return the area of a returned simple polygon (optional: if it's below <arg>)" << std::endl << std::endl;
 				std::cerr << " -t" << std::endl;
 				std::cerr << " :: ignores all other arguments and runs the test-bed." << std::endl;
 				break;

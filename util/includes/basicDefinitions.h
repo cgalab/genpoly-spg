@@ -21,7 +21,9 @@ enum error {
   NO_ARGUMENTS  = 9,
   ALGORITHM_UNDEFINED = 10,
   ALGORITHM_IDLE = 11,
-  RUN_TESTS = 12
+  RUN_TESTS = 12,
+  ERR_AREA_NEGATIVE = 13,
+  ERR_AREA_NOT_BETTER = 14
 };
 
 // the algorithms that should be selectable.
