@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
           area = pol_calc_area(polygon, points);
           areaTimerEnd = clock();
           areaTimerElapsed = (areaTimerEnd - areaTimerStart) / CLOCKS_PER_SEC;
-          if ((areaMin > 0) && (area > 0) && (area > areaMin)) break;
+          if ((areaMin >= 0) && (area > 0) && (area > areaMin)) break;
           if ((areaMax > 0) && (area > 0) && (area < areaMax)) break;
         } while ((areaLoopCounter < runAreaLoopFor) && (areaTimerElapsed < maxTime));
         //std::cerr << "areaMin: " << areaMin << ", areaMax: " << areaMax << ", area: " << area << std::endl;
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 
         if(area < 0)
           returnValue = ERR_AREA_NEGATIVE;
-        else if (((areaMin > 0) && (area > areaMin)) || ((areaMax > 0) && (area < areaMax)))
+        else if (((areaMin >= 0) && (area > areaMin)) || ((areaMax > 0) && (area < areaMax)))
           std::cout << std::setprecision(15) << area << std::endl;
         else
           returnValue = ERR_AREA_NOT_BETTER;
