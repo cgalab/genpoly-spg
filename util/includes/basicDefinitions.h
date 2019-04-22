@@ -3,7 +3,7 @@
 
 // largest number a double can take that works with ++/-- operation.
 #define DBL_MAX_ITER_INT 9007199254740992
-#define EPSILON 1e-15
+#define EPSILON 1e-11
 
 #define Swap(X,Y)  do{ __typeof__ (X) _T = X; X = Y; Y = _T; }while(0)
 

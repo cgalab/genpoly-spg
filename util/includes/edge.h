@@ -1,5 +1,6 @@
 #include <iostream> // for endl
 #include <vector>
+#include <iomanip>      // std::setprecision
 #include "basicDefinitions.h"
 #include "point.h"
 
@@ -61,7 +62,10 @@ public:
   }
 
   friend bool operator==(const Yval lhs, const Yval rhs) {
-		if ((abs(lhs.min - rhs.min) < EPSILON) &&
+    //std::cerr << std::setprecision(15) << (abs(lhs.min - rhs.min)) << " < " << EPSILON << " should be true : " << ((abs(lhs.min - rhs.min) < EPSILON) ? "true" : "false") << std::endl;
+    //std::cerr << std::setprecision(15) << (abs(lhs.max - rhs.max)) << " < " << EPSILON << " should be true : " << ((abs(lhs.max - rhs.max) < EPSILON) ? "true" : "false") << std::endl;
+    //std::cerr << std::setprecision(15) << (abs(lhs.x - rhs.x)) << " < " << EPSILON << " should be true : " << ((abs(lhs.x - rhs.x) < EPSILON) ? "true" : "false") << std::endl;
+    if ((abs(lhs.min - rhs.min) < EPSILON) &&
         (abs(lhs.max - rhs.max) < EPSILON) &&
         (abs(lhs.x - rhs.x) < EPSILON)) return true;
 		else return false;
@@ -76,9 +80,9 @@ public:
 
   friend std::ostream& operator<<(std::ostream& os, const Yval& y) {
     if (y.getMin() == y.getMax())
-      os << "x:" << y.getX() << ", (" << y.min << "," << y.max << ")";
+      os << std::setprecision(15) << "x:" << y.getX() << ", (" << y.min << "," << y.max << ")";
     else
-      os << "x:" << y.getX() << ", [" << y.min << "," << y.max << "]";
+      os << std::setprecision(15) << "x:" << y.getX() << ", [" << y.min << "," << y.max << "]";
     return os;
   }
 };
