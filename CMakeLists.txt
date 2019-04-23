@@ -39,4 +39,5 @@ message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}." )
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-subdirs (src)
+add_subdirectory (sj)
+add_subdirectory (util)
