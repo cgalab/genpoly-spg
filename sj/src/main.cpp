@@ -13,7 +13,7 @@
 #include "io.h"
 #include "point.h"
 #include "edge.h"
-#include "polygon.h"
+#include "pol.h"
 
 int main(int argc, char *argv[]) {
 
