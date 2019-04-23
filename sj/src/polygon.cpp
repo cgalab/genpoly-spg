@@ -17,6 +17,5 @@ double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& poi
   }
 
   Area = Area / 2;
-
   return Area;
 }
