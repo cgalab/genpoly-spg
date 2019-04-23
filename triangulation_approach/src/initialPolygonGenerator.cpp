@@ -10,7 +10,7 @@ Triangulation* generateRegularPolygon(int n){
 	Triangle* t;
 
 	alpha = 2 * M_PI / n;
-	r = 30.0;
+	r = 5; //n * 5 / (2 * M_PI); // maybe a good choice for the radius = n * sigma / (2 * pi)
 
 	for(i = 0; i < n; i++){
 		v = new Vertex(r * cos(i * alpha), r * sin(i * alpha));
@@ -80,6 +80,7 @@ void boxPolygon(Triangulation* T, double r, int n){
 	TEdge *start, *prev, *next;
 	Vertex *v0, *v1;
 	Triangle *t;
+	double a = 20 * r; // lenght of a side
 
 	// generate the rectangle
 	/*
@@ -87,10 +88,10 @@ void boxPolygon(Triangulation* T, double r, int n){
 		|   |
 		2 - 3
 	*/
-	rv0 = new Vertex(2 * r, 2 * r, true);
-	rv1 = new Vertex(-2 * r, 2 * r, true);
-	rv2 = new Vertex(-2 * r, -2 * r, true);
-	rv3 = new Vertex(2 * r, -2 * r, true);
+	rv0 = new Vertex(a / 2, a / 2, true);
+	rv1 = new Vertex(-a / 2, a / 2, true);
+	rv2 = new Vertex(- a / 2, - a / 2, true);
+	rv3 = new Vertex(a / 2, - a / 2, true);
 	(*T).addVertex(rv0);
 	(*T).addVertex(rv1);
 	(*T).addVertex(rv2);

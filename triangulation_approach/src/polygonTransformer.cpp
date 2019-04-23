@@ -1,7 +1,7 @@
 #include "polygonTransformer.h"
 #include <string>
 
-void transformPolygon(Triangulation* T, int iterations, Timer t){
+int transformPolygon(Triangulation* T, int iterations, Timer t){
 	int index = 1;
 	RandomGenerator* generator = new RandomGenerator(); // could maybe be a object instead of a pointer
 	double dx = 0, dy = -50; // radius of the initial polygon was 30
@@ -9,6 +9,7 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 	Translation* trans;
 	int n = (*T).getNumberOfVertices();
 	std::string filename;
+	int performedTranslations = 0;
 
 	for(int i = 0; i < iterations; i++){
 		filename = "output/triangulation" + std::to_string(i) + ".graphml";
@@ -20,7 +21,7 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 		dy = (*generator).getTranslationNormal(0, 5);
 		trans = new Translation(T, index, dx, dy);
 
-		printf("iteration: %d index: %d dx: %f dy: %f \n", i, index, dx, dy);
+		//printf("iteration: %d index: %d dx: %f dy: %f \n", i, index, dx, dy);
 
 		overroll = (*trans).checkOverroll();
 
@@ -38,11 +39,14 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 				}
 
 				(*trans).execute();
+				performedTranslations++;
 			}
 
 			delete trans;
 		}
 	}
+
+	return performedTranslations;
 
 	/*trans = new Translation(T, 0, 0, -40);
 

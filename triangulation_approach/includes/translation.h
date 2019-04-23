@@ -140,7 +140,7 @@ public:
 
 		simple = simple || insideQuadrilateral(randomV, oldV, nextV, newV, prevV);
 
-		if(simple) printf("Potential overroll detected! \n");
+		//if(simple) printf("Potential overroll detected! \n");
 
 		return simple;
 	}
@@ -221,8 +221,11 @@ public:
 
 
 		e = (*t0).getLongestEdge();
-		if((*e).getEdgeType() == EdgeType::POLYGON) printf("attention: polygon edge gets deleted :O \n");
-		t1 =(*e).getOtherTriangle(t0); // TODO: take care, whether other triangle must be removed from queue
+		if((*e).getEdgeType() == EdgeType::POLYGON){
+			printf("attention: polygon edge gets deleted :O \n");
+			exit(1);
+		}
+		t1 =(*e).getOtherTriangle(t0);
 		if((*t1).isEnqueued())
 			Q.remove(t1);
 

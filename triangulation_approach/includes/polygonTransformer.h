@@ -12,7 +12,7 @@
 #include <math.h>
 #include "translation.h"
 
-void transformPolygon(Triangulation* T, int iterations, Timer t);
+int transformPolygon(Triangulation* T, int iterations, Timer t);
 bool checkSimplicityOfTranslation(Translation* trans);
 bool checkEdge(Vertex* fromV, TEdge* newE);
 double signedArea(Vertex* v0, Vertex* v1, Vertex* v2);
