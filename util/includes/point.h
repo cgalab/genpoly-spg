@@ -1,5 +1,6 @@
 #include <iostream> // for endl
 #include <vector>
+#include "basicDefinitions.h"
 
 #ifndef __POINT_H_
 #define __POINT_H_
@@ -40,12 +41,17 @@ public:
   }
 
   friend bool operator==(const Point & lhs, const Point & rhs) {
-    if ((lhs.x == rhs.x) && (lhs.y == rhs.y)) return true;
+    if ((abs(lhs.x - rhs.x) < EPSILON) && (abs(lhs.y - rhs.y)) < EPSILON) return true;
+    else return false;
+  }
+
+  friend bool operator!=(const Point & lhs, const Point & rhs) {
+    if ((abs(lhs.x - rhs.x) > EPSILON) || (abs(lhs.y - rhs.y)) > EPSILON) return true;
     else return false;
   }
 
   friend std::ostream& operator<<(std::ostream& os, const Point& p) {
-  os << "(" << p.x << "," << p.y << "), [" << p.i << "," << p.v << "]";
+  os << "(" << p.x << "," << p.y << "), [" << p.i << "," << p.v << "," << p.l << "]";
   return os;
   }
 };

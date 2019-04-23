@@ -1,0 +1,8 @@
+/home/pma/sjas/projects/spg/test/CMakeFiles/rebuild_cache.dir
+/home/pma/sjas/projects/spg/test/CMakeFiles/edit_cache.dir
+/home/pma/sjas/projects/spg/test/sj/CMakeFiles/rebuild_cache.dir
+/home/pma/sjas/projects/spg/test/sj/CMakeFiles/spg.dir
+/home/pma/sjas/projects/spg/test/sj/CMakeFiles/edit_cache.dir
+/home/pma/sjas/projects/spg/test/util/CMakeFiles/rebuild_cache.dir
+/home/pma/sjas/projects/spg/test/util/CMakeFiles/util.dir
+/home/pma/sjas/projects/spg/test/util/CMakeFiles/edit_cache.dir

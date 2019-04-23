@@ -1,6 +1,7 @@
 #include <iostream> // for endl
 #include <set>
 #include <math.h>
+#include <iomanip>      // std::setprecision
 #include "edge.h"
 #include "point.h"
 //#include "bst.h"
@@ -32,14 +33,43 @@ void test() {
 /*
 test:  bool checkIntersection(const Edge e1, const Edge e2)
 */
+  Point p1 = Point(0,0,1,1);
+  p1.l = 1;
+  Point p2 = Point(0,0,2,2);
+  p2.l = 2;
+  Point p3 = Point(0,0,3,3);
+  p3.l = 3;
+  Point p4 = Point(0,0,4,4);
+  p4.l = 4;
+
+  std::cerr << "=== Point comparison tests ===" << std::endl;
+
+  p1.set(1,1);
+  p2.set(2,1);
+  p3.set(1,2);
+
+  std::cerr << p1 << "  < " << p1 << ", should be false: " << ((p1 < p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  > " << p1 << ", should be false: " << ((p1 > p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " == " << p1 << ", should be true : " << ((p1 == p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " != " << p1 << ", should be false: " << ((p1 != p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  < " << p2 << ", should be true : " << ((p1 < p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  > " << p2 << ", should be false: " << ((p1 > p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " == " << p2 << ", should be false: " << ((p1 == p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " != " << p2 << ", should be true : " << ((p1 != p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  < " << p3 << ", should be true : " << ((p1 < p3) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  > " << p3 << ", should be false: " << ((p1 > p3) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " == " << p3 << ", should be false: " << ((p1 == p3) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " != " << p3 << ", should be true : " << ((p1 != p3) ? "true" : "false") << std::endl;
+
+  std::cerr << std::endl;
+
   std::cerr << "=== checkIntersection tests ===" << std::endl;
   std::cerr << "=== 'should be true' is a comparison 'itest >= IS_TRUE' : true when intersection exists ===" << std::endl;
   enum intersect_t itest;
 
-  Point p1 = Point(0,0,1,1);
-  Point p2 = Point(0,0,2,2);
-  Point p3 = Point(0,0,3,3);
-  Point p4 = Point(0,0,4,4);
+  p1.set(0,0);
+  p2.set(0,0);
+  p3.set(0,0);
 
   Edge e1 = Edge(&p1, &p2);
   Edge e2 = Edge(&p3, &p4);
@@ -187,6 +217,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p3.set(4,6);
   p4.set(4,7);
   e2.set(p3,p4);
+
   itest = checkIntersection(e1, e2);
   std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
   printEnum(itest);
@@ -232,6 +263,20 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   y2.set(15,16);
   y2.setX(6);
   std::cerr << y1 << " < " << y2 << " should be false : " << ((y1 < y2) ? "true" : "false") << std::endl;
+
+  y1.set(4342);
+  y1.setX(4972);
+  y2.set(4342);
+  y2.setX(4972);
+  std::cerr << y1 << " == " << y2 << " should be true : " << ((y1 == y2) ? "true" : "false") << std::endl;
+
+  p1.set(49720,4342);
+  p2.set(76260,670);
+  p3.set(49720,4342);
+  p4.set(66520,4596);
+  y1 = getYatX(e1, 49720);
+  y2 = getYatX(e2, 49720);
+  std::cerr << std::setprecision(15) << y1 << " == " << y2 << " should be true : " << ((y1 == y2) ? "true" : "false") << std::endl;
 
   std::cerr << std:: endl;
 
