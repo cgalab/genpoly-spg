@@ -8,33 +8,43 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 	bool simple, split, overroll;
 	Translation* trans;
 	int n = (*T).getNumberOfVertices();
+	std::string filename;
 
-	/*for(int i = 0; i < iterations; i++){
+	for(int i = 0; i < iterations; i++){
+		filename = "output/triangulation" + std::to_string(i) + ".graphml";
+		//(*T).print(filename.c_str());
+
 		index = (*generator).getRandomIndex(n);
 
 		dx = (*generator).getTranslationNormal(0, 5);
 		dy = (*generator).getTranslationNormal(0, 5);
 		trans = new Translation(T, index, dx, dy);
 
-		simple = checkSimplicityOfTranslation(trans);
+		printf("iteration: %d index: %d dx: %f dy: %f \n", i, index, dx, dy);
 
-		//printf("simplicity check gives result %d \n", simple);
+		overroll = (*trans).checkOverroll();
 
-		if(simple){
-			// check whether the translation can be done at once or must be split to move around a polygon edge
-			split = checkEdge((*trans).getOriginal(), (*trans).getTranslationPath());
-			if(!split){
-				(*trans).setSplit();
-				//printf("translation must be split \n");
+		if(!overroll){
+			simple = checkSimplicityOfTranslation(trans);
+
+			//printf("simplicity check gives result %d \n", simple);
+
+			if(simple){
+				// check whether the translation can be done at once or must be split to move around a polygon edge
+				split = checkEdge((*trans).getOriginal(), (*trans).getTranslationPath());
+				if(!split){
+					(*trans).setSplit();
+					//printf("translation must be split \n");
+				}
+
+				(*trans).execute();
 			}
 
-			(*trans).execute();
+			delete trans;
 		}
+	}
 
-		delete trans;
-	}*/
-
-	trans = new Translation(T, 0, 0, -40);
+	/*trans = new Translation(T, 0, 0, -40);
 
 	overroll = (*trans).checkOverroll();
 
@@ -104,7 +114,7 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 		}
 	}
 
-	delete trans;
+	delete trans;*/
 }
 
 bool checkSimplicityOfTranslation(Translation* trans){

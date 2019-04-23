@@ -9,8 +9,8 @@
 
 int main(){
 	Triangulation* T;
-	int n = 10;
-	int translations = 1000 * n;
+	int n = 20;
+	int translations = 100000 * n;
 	Timer t;
 	Vertex* v;
 	TEdge* e;

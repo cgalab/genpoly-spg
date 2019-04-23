@@ -61,6 +61,7 @@ public:
 	bool contains(Vertex* v);
 
 	Triangle* getTriangleNotContaining(Vertex* v);
+	Triangle* getTriangleContaining(Vertex* v);
 	Triangle* getOtherTriangle(Triangle* t);
 
 	~TEdge();

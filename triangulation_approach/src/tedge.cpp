@@ -44,12 +44,20 @@ void TEdge::setTriangulation(Triangulation* t){
 void TEdge::setTriangle(Triangle* t){
 	if(t1 == NULL) t1 = t;
 	else if(t2 == NULL) t2 = t;
-	else printf("This edge already has two triangles\n");
+	else{
+		printf("The edge from vertex %d to vertex %d already has two triangles!\n", (*v1).getID(), (*v2).getID());
+		exit(1);
+	}
 }
 
 Triangle* TEdge::getTriangleNotContaining(Vertex* v){
 	if((*t1).contains(v)) return t2;
 	else return t1;
+}
+
+Triangle* TEdge::getTriangleContaining(Vertex* v){
+	if((*t1).contains(v)) return t1;
+	else return t2;
 }
 
 Triangle* TEdge::getOtherTriangle(Triangle* t){

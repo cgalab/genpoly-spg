@@ -149,30 +149,49 @@ public:
 		Triangle* t = NULL;
 		std::pair<double, Triangle*> e;
 		Translation* trans;
-		double middleX, middleY, transX, transY;
+		double middleX, middleY, transX, transY, oldArea, newArea;
+		TEdge* edge;
 
 		// ATTENTIONE: just works, if the chosen vertex changes its side relative to the edge between its neighbors or at least the triangle with its neighbors exist
 		if(split){
-			// get translation to end position for first translation which is the middle between the nieghboring vertices
-			middleX = ((*prevV).getX() + (*nextV).getX()) / 2;
-			middleY = ((*prevV).getY() + (*nextV).getY()) / 2;
-			// compute translation vector
-			transX = middleX - (*oldV).getX();
-			transY = middleY - (*oldV).getY();
+			oldArea = signedArea(prevV, nextV, oldV);
+			newArea = signedArea(prevV, nextV, newV);
 
-			trans = new Translation(T, index, transX, transY);
-			(*trans).execute();
+			// vertex stays on the same side of the edge between the neigboring vertices
+			if(signbit(oldArea) == signbit(newArea)){
 
-			delete trans;
+			// vertex changes side
+			}else{
+				// get translation to end position for first translation which is the middle between the neighboring vertices
+				middleX = ((*prevV).getX() + (*nextV).getX()) / 2;
+				middleY = ((*prevV).getY() + (*nextV).getY()) / 2;
+				// compute translation vector
+				transX = middleX - (*oldV).getX();
+				transY = middleY - (*oldV).getY();
 
-			// get translation from middle to end
-			transX = (*newV).getX() - (*original).getX();
-			transY = (*newV).getY() - (*original).getY();
+				trans = new Translation(T, index, transX, transY);
+				(*trans).execute();
 
-			trans = new Translation(T, index, transX, transY);
-			(*trans).execute();
+				delete trans;
 
-			delete trans;
+				// for numerical reasons its possible that the triangle of the old vertex and the neighboring vertices doesn't vanish at the time when the vertex arrives between its neighbors
+				// therefore this must be checked and corrected before starting the second translation
+				edge = (*prevV).getEdgeTo(nextV);
+				if(edge != NULL){
+					t = (*edge).getTriangleContaining(original);
+					flip(t, true);
+				}
+				
+
+				// get translation from middle to end
+				transX = (*newV).getX() - (*original).getX();
+				transY = (*newV).getY() - (*original).getY();
+
+				trans = new Translation(T, index, transX, transY);
+				(*trans).execute();
+
+				delete trans;
+			}
 
 		}else{
 			generateInitialQueue();
@@ -183,14 +202,14 @@ public:
 				actualTime = e.first;
 				t = e.second;
 
-				flip(t);
+				flip(t, false);
 			}
 
 			(*original).setPosition((*oldV).getX() + dx, (*oldV).getY() + dy);
 		}
 	}
 
-	void flip(Triangle* t0){
+	void flip(Triangle* t0, bool singleFlip){
 		Triangle *t1;
 		Vertex *vj0, *vj1; // joint vertices
 		Vertex *vn0, *vn1; // non joint vertices
@@ -198,10 +217,11 @@ public:
 		double t;
 
 		// move vertex to event time
-		(*original).setPosition((*oldV).getX() + dx * actualTime, (*oldV).getY() + dy * actualTime);
+		if(!singleFlip) (*original).setPosition((*oldV).getX() + dx * actualTime, (*oldV).getY() + dy * actualTime);
 
 
 		e = (*t0).getLongestEdge();
+		if((*e).getEdgeType() == EdgeType::POLYGON) printf("attention: polygon edge gets deleted :O \n");
 		t1 =(*e).getOtherTriangle(t0); // TODO: take care, whether other triangle must be removed from queue
 		if((*t1).isEnqueued())
 			Q.remove(t1);
@@ -231,20 +251,22 @@ public:
 		t1 = new Triangle(e, e1, e2, vn0, vn1, vj1);
 
 		// add new triangles to queue if necessary
-		t = (*t0).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
-		t = t + actualTime;
+		if(!singleFlip){
+			t = (*t0).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
+			t = t + actualTime;
 
-		if(t >= actualTime && t <= 1){
-			(*t0).enqueue();
-			Q.push(std::make_pair(t, t0));
-		}
+			if(t >= actualTime && t <= 1){
+				(*t0).enqueue();
+				Q.push(std::make_pair(t, t0));
+			}
 
-		t = (*t1).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
-		t = t + actualTime;
+			t = (*t1).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
+			t = t + actualTime;
 
-		if(t >= actualTime && t <= 1){
-			(*t1).enqueue();
-			Q.push(std::make_pair(t, t1));
+			if(t >= actualTime && t <= 1){
+				(*t1).enqueue();
+				Q.push(std::make_pair(t, t1));
+			}
 		}
 	}
 
