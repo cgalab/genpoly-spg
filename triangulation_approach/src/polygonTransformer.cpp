@@ -2,14 +2,14 @@
 #include <string>
 
 void transformPolygon(Triangulation* T, int iterations, Timer t){
-	int index;
+	int index = 1;
 	RandomGenerator* generator = new RandomGenerator(); // could maybe be a object instead of a pointer
-	double dx, dy; // radius of the initial polygon was 30
-	bool simple, split;
+	double dx = 0, dy = -50; // radius of the initial polygon was 30
+	bool simple, split, overroll;
 	Translation* trans;
 	int n = (*T).getNumberOfVertices();
 
-	for(int i = 0; i < iterations; i++){
+	/*for(int i = 0; i < iterations; i++){
 		index = (*generator).getRandomIndex(n);
 
 		dx = (*generator).getTranslationNormal(0, 5);
@@ -32,47 +32,79 @@ void transformPolygon(Triangulation* T, int iterations, Timer t){
 		}
 
 		delete trans;
-	}
+	}*/
 
-	/*trans = new Translation(T, index, dx, dy);
+	trans = new Translation(T, 0, 0, -40);
 
-	simple = checkSimplicityOfTranslation(trans);
+	overroll = (*trans).checkOverroll();
 
-	printf("simplicity check gives result %d \n", simple);
+	if(!overroll){
 
-	if(simple){
-		// check whether the translation can be done at once or must be split to move around a polygon edge
-		split = checkEdge((*trans).getOriginal(), (*trans).getTranslationPath());
-		if(!split){
-			(*trans).setSplit();
-			printf("translation must be split \n");
+		simple = checkSimplicityOfTranslation(trans);
+
+		printf("simplicity check gives result %d \n", simple);
+
+		if(simple){
+			// check whether the translation can be done at once or must be split to move around a polygon edge
+			split = checkEdge((*trans).getOriginal(), (*trans).getTranslationPath());
+			if(!split){
+				(*trans).setSplit();
+				printf("translation must be split \n");
+			}
+
+			(*trans).execute();
 		}
-
-		(*trans).execute();
 	}
 
 	delete trans;
 
-	printf("second translation\n");
+	trans = new Translation(T, 2, -40, 10);
 
-	trans = new Translation(T, index, 0, -30);
+	overroll = (*trans).checkOverroll();
 
-	simple = checkSimplicityOfTranslation(trans);
+	if(!overroll){
 
-	printf("simplicity check gives result %d \n", simple);
+		simple = checkSimplicityOfTranslation(trans);
 
-	if(simple){
-		// check whether the translation can be done at once or must be split to move around a polygon edge
-		split = checkEdge((*trans).getOriginal(), (*trans).getTranslationPath());
-		if(!split){
-			(*trans).setSplit();
-			printf("translation must be split \n");
+		printf("simplicity check gives result %d \n", simple);
+
+		if(simple){
+			// check whether the translation can be done at once or must be split to move around a polygon edge
+			split = checkEdge((*trans).getOriginal(), (*trans).getTranslationPath());
+			if(!split){
+				(*trans).setSplit();
+				printf("translation must be split \n");
+			}
+
+			(*trans).execute();
 		}
-
-		(*trans).execute();
 	}
 
-	delete trans;*/
+	delete trans;
+
+	trans = new Translation(T, index, -50, -50);
+
+	overroll = (*trans).checkOverroll();
+
+	if(!overroll){
+
+		simple = checkSimplicityOfTranslation(trans);
+
+		printf("simplicity check gives result %d \n", simple);
+
+		if(simple){
+			// check whether the translation can be done at once or must be split to move around a polygon edge
+			split = checkEdge((*trans).getOriginal(), (*trans).getTranslationPath());
+			if(!split){
+				(*trans).setSplit();
+				printf("translation must be split \n");
+			}
+
+			(*trans).execute();
+		}
+	}
+
+	delete trans;
 }
 
 bool checkSimplicityOfTranslation(Translation* trans){

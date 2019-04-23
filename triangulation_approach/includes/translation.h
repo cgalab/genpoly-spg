@@ -4,6 +4,7 @@
 #include "triangulation.h"
 #include "customPriorityQueue.h"
 #include <list>
+#include <math.h>
 
 class Translation{
 
@@ -17,6 +18,10 @@ private:
 	Vertex* nextV;
 
 	TEdge* transPath;
+	TEdge* prevOldE;
+	TEdge* nextOldE;
+	TEdge* prevNewE;
+	TEdge* nextNewE;
 
 	int index;
 
@@ -43,6 +48,40 @@ private:
 		//Q.check();
 	}
 
+	double signedArea(Vertex* v0, Vertex* v1, Vertex* v2){
+		double area;
+		double ax, ay, bx, by, cx, cy;
+
+		ax = (*v0).getX();
+		ay = (*v0).getY();
+
+		bx = (*v1).getX();
+		by = (*v1).getY();
+
+		cx = (*v2).getX();
+		cy = (*v2).getY();
+
+		area = 0.5 * (- ay * bx + ax * by + ay * cx - by * cx - ax * cy + bx * cy);
+
+		return area;
+	}
+
+	bool insideQuadrilateral(Vertex* v, Vertex* q0, Vertex* q1, Vertex* q2, Vertex* q3){
+		double a0, a1, a2, a3;
+		bool inside;
+
+		a0 = signedArea(q0, q1, v);
+		a1 = signedArea(q1, q2, v);
+		a2 = signedArea(q2, q3, v);
+		a3 = signedArea(q3, q0, v);
+
+		inside = (signbit(a0) == signbit(a1));
+		inside = inside && (signbit(a0) == signbit(a2));
+		inside = inside && (signbit(a0) == signbit(a3));
+
+		return inside;
+	}
+
 public:
 	Translation(Triangulation* Tr, int i, double dX, double dY){
 		T = Tr;
@@ -62,6 +101,12 @@ public:
 
 		transPath = new TEdge(oldV, newV);
 
+		prevOldE = (*original).getEdgeTo(prevV);
+		nextOldE = (*original).getEdgeTo(nextV);
+
+		prevNewE = new TEdge(prevV, newV);
+		nextNewE = new TEdge(newV, nextV);
+
 		maxTime = (*transPath).length();
 	}
 
@@ -74,6 +119,31 @@ public:
 	void setSplit(){ split = true;}
 
 	TEdge* getTranslationPath(){ return transPath;}
+
+	bool checkOverroll(){
+		bool simple;
+		Vertex* randomV;
+
+		// check whether the quadrilateral of the chosen Vertex P, its translated version P' and the two neighbors M and N is simple
+		// otherwise there can not be any overroll
+		simple = !(checkIntersection(prevOldE, nextNewE) || checkIntersection(nextOldE, prevNewE));
+
+		if(!simple) return false;
+
+		// check for the next vertex whether its inside the quadrilateral
+		randomV = (*T).getPVertex(index - 2);
+
+		simple = insideQuadrilateral(randomV, oldV, nextV, newV, prevV);
+
+		// check also for a second vertex to increase the chance the reject non-simple translation
+		randomV = (*T).getPVertex(index + 2);
+
+		simple = simple || insideQuadrilateral(randomV, oldV, nextV, newV, prevV);
+
+		if(simple) printf("Potential overroll detected! \n");
+
+		return simple;
+	}
 
 	void execute(){
 		Triangle* t = NULL;
