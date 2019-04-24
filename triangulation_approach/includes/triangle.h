@@ -22,27 +22,34 @@ private:
 	Vertex* v1;
 	Vertex* v2;
 
-	bool enqueued;
+	bool enqueued; // indicates whether the triangle is in the actual event queue
 
 	int id;
 	static int n;
 
 public:
+	
+	// Constructors
 	Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2);
-	void print();
-	bool contains(Vertex* v);
-	int getID(){ return id;}
-	~Triangle();
-	TEdge* getEdge(int i);
+
+	// Getter
+	int getID();
+	Vertex* getOtherVertex(TEdge* e);
 	TEdge* getEdgeNotContaining(Vertex* v);
 	std::vector<TEdge*> getOtherEdges(TEdge* e);
-	Vertex* getOtherVertex(TEdge* e);
-	void enqueue(){
-		enqueued = true;
-	}
-	bool isEnqueued(){ return enqueued;}
-	double calculateCollapseTime(Vertex* moving, double dx, double dy);
 	TEdge* getLongestEdge();
+
+	// Printer
+	void print();
+
+	// Others
+	bool contains(Vertex* v);
+	void enqueue();
+	bool isEnqueued();
+	double calculateCollapseTime(Vertex* moving, double dx, double dy);
+	
+	// Destructor
+	~Triangle();	
 };
 	
 #endif

@@ -1,5 +1,6 @@
 #include "triangle.h"
 
+// Constructors
 Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2){ 
 	e0 = E0;
 	e1 = E1;
@@ -23,33 +24,18 @@ Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vert
 	enqueued = false;
 }
 
-bool Triangle::contains(Vertex* v){
-	int id = (*v).getID();
-
-	if((*v0).getID() == id) return true;
-	if((*v1).getID() == id) return true;
-	if((*v2).getID() == id) return true;
-	return false;
+// Getter
+int Triangle::getID(){
+	return id;
 }
 
-
-void Triangle::print(){
-	printf("Triangle:\n");
-	(*e0).print();
-	(*e1).print();
-	(*e2).print();
-}
-
-TEdge* Triangle::getEdge(int i){
-	if(i == 0)
-		return e0;
-	else if(i == 1)
-		return e1;
-	else if(i == 2)
-		return e2;
+Vertex* Triangle::getOtherVertex(TEdge* e){
+	if(!(*e).contains(v0)) 
+		return v0;
+	else if(!(*e).contains(v1))
+		return v1;
 	else
-		printf("error: index must be 0, 1 or 2\n");
-	return NULL;
+		return v2; 
 }
 
 TEdge* Triangle::getEdgeNotContaining(Vertex* v){
@@ -81,13 +67,45 @@ std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
 	return out;
 }
 
-Vertex* Triangle::getOtherVertex(TEdge* e){
-	if(!(*e).contains(v0)) 
-		return v0;
-	else if(!(*e).contains(v1))
-		return v1;
+TEdge* Triangle::getLongestEdge(){
+	double l0 = (*e0).length();
+	double l1 = (*e1).length();
+	double l2 = (*e2).length();
+
+	if(l0 >= l1 && l0 >= l2)
+		return e0;
+	else if(l1 >= l2)
+		return e1;
 	else
-		return v2; 
+		return e2;
+
+	return 0;
+}
+
+// Printer
+void Triangle::print(){
+	printf("Triangle:\n");
+	(*e0).print();
+	(*e1).print();
+	(*e2).print();
+}
+
+// Others
+bool Triangle::contains(Vertex* v){
+	int id = (*v).getID();
+
+	if((*v0).getID() == id) return true;
+	if((*v1).getID() == id) return true;
+	if((*v2).getID() == id) return true;
+	return false;
+}
+
+void Triangle::enqueue(){
+	enqueued = true;
+}
+
+bool Triangle::isEnqueued(){
+	return enqueued;
 }
 
 double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
@@ -123,21 +141,7 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	return numerator / denominator;
 }
 
-TEdge* Triangle::getLongestEdge(){
-	double l0 = (*e0).length();
-	double l1 = (*e1).length();
-	double l2 = (*e2).length();
-
-	if(l0 >= l1 && l0 >= l2)
-		return e0;
-	else if(l1 >= l2)
-		return e1;
-	else
-		return e2;
-
-	return 0;
-}
-
+// Destructor
 Triangle::~Triangle(){
 	(*v0).removeTriangle(this);
 	(*v1).removeTriangle(this);
@@ -148,4 +152,5 @@ Triangle::~Triangle(){
 	(*e2).removeTriangle(this);
 }
 
+// static member variables
 int Triangle::n = 0;
