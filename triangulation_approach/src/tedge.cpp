@@ -230,3 +230,43 @@ enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
 			return IS_FALSE;
 	}
 }
+
+// From: "Intersection of two lines in three-space" by Ronald Goldman
+// edges from s0 to e0 and s1 to e1
+Vertex* getIntersectionPoint(Vertex* s0, Vertex* e0, Vertex* s1, Vertex* e1){
+	double s0x, s0y, e0x, e0y, s1x, s1y, e1x, e1y;
+	double d0x, d0y, d1x, d1y; // compenents of the displacement vectors
+	double t, s; // intersection time
+	double crossD;
+
+	s0x = (*s0).getX();
+	s0y = (*s0).getY();
+	e0x = (*e0).getX();
+	e0y = (*e0).getY();
+	s1x = (*s1).getX();
+	s1y = (*s1).getY();
+	e1x = (*e1).getX();
+	e1y = (*e1).getY();
+
+	d0x = e0x - s0x;
+	d0y = e0y - s0y;
+	d1x = e1x - s1x;
+	d1y = e1y - s1y;
+
+	// compute cross product of the translation vectors, if d0 x d1 = 0 then there is no single intersection point
+	crossD = crossProduct2D(d0x, d0y, d1x, d1y);
+	
+	if(crossD == 0) return NULL;
+
+	// compute time of intersection
+	t = crossProduct2D(s1x - s0x, s1y - s0y, d1x, d1y) / crossD;
+	s = - crossProduct2D(s0x - s1x, s0y - s1y, d0x, d0y) / crossD; // don't understand why we need a minus here :O
+
+	if(0 <= t && t <= 1 && 0 <= s && s <= 1) return new Vertex(s0x + t * d0x, s0y + t * d0y);
+
+	return NULL;
+}
+
+double crossProduct2D(double x0, double y0, double x1, double y1){
+	return x0 * y1 - y0 * x1;
+}

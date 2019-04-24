@@ -151,15 +151,44 @@ public:
 		Translation* trans;
 		double middleX, middleY, transX, transY, oldArea, newArea;
 		TEdge* edge;
+		Vertex* intersectionPoint;
 
-		// ATTENTIONE: just works, if the chosen vertex changes its side relative to the edge between its neighbors or at least the triangle with its neighbors exist
 		if(split){
 			oldArea = signedArea(prevV, nextV, oldV);
 			newArea = signedArea(prevV, nextV, newV);
 
 			// vertex stays on the same side of the edge between the neigboring vertices
 			if(signbit(oldArea) == signbit(newArea)){
+				
+				// compute the intersection point to split the translation
+				intersectionPoint = getIntersectionPoint(prevV, oldV, nextV, newV);
+				if(intersectionPoint == NULL)
+					intersectionPoint = getIntersectionPoint(nextV, oldV, prevV, newV);
+				if(intersectionPoint == NULL){
+					printf("something went wrong computing the intersection point to split the translation \n");
+					printf("index: %d dx: %f dy: %f \n", index, dx, dy);
+					(*T).addVertex(newV);
+					(*T).print("triangulation.graphml");
+					exit(1);
+				}
 
+				// first part of the translation
+				transX = (*intersectionPoint).getX() - (*oldV).getX();
+				transY = (*intersectionPoint).getY() - (*oldV).getY();
+
+				trans = new Translation(T, index, transX, transY);
+				(*trans).execute();
+
+				delete trans;
+
+				// second part of the translation
+				transX = (*newV).getX() - (*original).getX();
+				transY = (*newV).getY() - (*original).getY();
+
+				trans = new Translation(T, index, transX, transY);
+				(*trans).execute();
+
+				delete trans;
 			// vertex changes side
 			}else{
 				// get translation to end position for first translation which is the middle between the neighboring vertices
@@ -180,8 +209,7 @@ public:
 				if(edge != NULL){
 					t = (*edge).getTriangleContaining(original);
 					flip(t, true);
-				}
-				
+				}				
 
 				// get translation from middle to end
 				transX = (*newV).getX() - (*original).getX();

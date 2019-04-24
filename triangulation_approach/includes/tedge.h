@@ -71,4 +71,6 @@ public:
 
 enum intersect_t checkIntersection(TEdge* e1, TEdge* e2);
 double det(TEdge* e, Vertex* p);
-double reldist(TEdge* e, Vertex* p); 
+double reldist(TEdge* e, Vertex* p);
+Vertex* getIntersectionPoint(Vertex* s0, Vertex* e0, Vertex* s1, Vertex* e1);
+double crossProduct2D(double x0, double y0, double x1, double y1);

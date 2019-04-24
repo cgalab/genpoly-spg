@@ -80,7 +80,7 @@ void boxPolygon(Triangulation* T, double r, int n){
 	TEdge *start, *prev, *next;
 	Vertex *v0, *v1;
 	Triangle *t;
-	double a = 20 * r; // lenght of a side
+	double a = 5 * r; // lenght of a side
 
 	// generate the rectangle
 	/*
