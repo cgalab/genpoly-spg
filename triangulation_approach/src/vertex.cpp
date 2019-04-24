@@ -1,30 +1,58 @@
 #include "vertex.h"
 
-void Vertex::setTriangulation(Triangulation* t){
-	T = t;
+// Constructors
+Vertex::Vertex(double X, double Y){ 
+	x = X,
+	y = Y;
+	rectangleVertex = false;
+
+	id = n;
+	n++;
+
+	T = NULL;
 }
 
-void Vertex::addEdge(TEdge* e){
-	edges.push_back(e);
+Vertex::Vertex(double X, double Y, bool RV){ 
+	x = X,
+	y = Y;
+	rectangleVertex = RV;
+
+	id = n;
+	n++;
+
+	T = NULL;
 }
 
-void Vertex::removeEdge(TEdge* e){
-	edges.remove(e);
+Vertex::Vertex(double X, double Y, int ID){
+	x = X;
+	y = Y;
+
+	id = ID;
+
+	rectangleVertex = false;
+
+	T = NULL;
 }
 
-void Vertex::addTriangle(Triangle* t){
-	triangles.push_back(t);
+Vertex* Vertex::getTranslated(double dx, double dy){
+	return new Vertex(x + dx, y + dy, id);
 }
 
-void Vertex::removeTriangle(Triangle* t){
-	triangles.remove(t);
+// Getter
+double Vertex::getX(){
+	return x;
 }
 
-Triangle* Vertex::getTriangle(int index){
-	std::list<Triangle*>::iterator it = triangles.begin();
-    std::advance(it, index);
+double Vertex::getY(){
+	return y;
+}
 
-	return *it;
+std::list<Triangle*> Vertex::getTriangles(){ 
+	return triangles;
+}
+
+int Vertex::getID(){
+	return id;
 }
 
 TEdge* Vertex::getEdgeTo(Vertex* toV){
@@ -63,6 +91,47 @@ std::list<TEdge*> Vertex::getPolygonEdges(){
 	return out;
 }
 
+bool Vertex::isRectangleVertex(){
+	return rectangleVertex;
+}
+
+// Setter
+void Vertex::setTriangulation(Triangulation* t){
+	T = t;
+}
+
+void Vertex::setPosition(double X, double Y){
+	x = X;
+	y = Y;
+}
+
+void Vertex::addEdge(TEdge* e){
+	edges.push_back(e);
+}
+
+void Vertex::addTriangle(Triangle* t){
+	triangles.push_back(t);
+}
+
+// Remover
+void Vertex::removeEdge(TEdge* e){
+	edges.remove(e);
+}
+
+void Vertex::removeTriangle(Triangle* t){
+	triangles.remove(t);
+}
+
+//Printer
+void Vertex::print(FILE* f){
+	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * 10, y * 10, id, id);
+}
+
+void Vertex::print(){
+	printf("Vertex %d at (%f, %f)\n", id, x, y);
+}
+
+// Destructor
 Vertex::~Vertex(){
 	TEdge *e0, *e1, *e2;
 	int nEdges = edges.size();
@@ -85,4 +154,5 @@ Vertex::~Vertex(){
 	if(T != NULL) (*T).removeVertex(id);
 }
 
+// static member variables
 int Vertex::n = 0;

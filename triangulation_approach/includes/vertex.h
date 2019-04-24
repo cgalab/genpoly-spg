@@ -22,97 +22,47 @@ private:
 	double x;
 	double y;
 
-	static int n;
-	int id; // the id is always assumed to be equal to the index in the vertex vector of the triangulation
-
 	std::list<TEdge*> edges;
 	std::list<Triangle*> triangles;
 
-	bool rectangleVertex;
+	bool rectangleVertex; // determines whether the vertex is part of the rectangle surrounding the polygon
+
+	static int n;
+	int id; // the id is always assumed to be equal to the index in the vertex vector of the triangulation
 
 public:
-	Vertex(double X, double Y){ 
-		x = X,
-		y = Y;
-		rectangleVertex = false;
 
-		id = n;
-		n++;
+	// Constructors
+	Vertex(double X, double Y);
+	Vertex(double X, double Y, bool RV);
+	Vertex(double X, double Y, int ID);
+	Vertex* getTranslated(double dx, double dy);
 
-		T = NULL;
-	}
-
-	Vertex(double X, double Y, bool RV){ 
-		x = X,
-		y = Y;
-		rectangleVertex = RV;
-
-		id = n;
-		n++;
-
-		T = NULL;
-	}
-
-	Vertex(double X, double Y, int ID){
-		x = X;
-		y = Y;
-
-		id = ID;
-
-		rectangleVertex = false;
-
-		T = NULL;
-	}
-
-	void setTriangulation(Triangulation* t);
-
-	double getX(){
-		return x;
-	}
-
-	double getY(){
-		return y;
-	}
-
-	std::list<Triangle*> getTriangles(){ return triangles;}
-
-	void addEdge(TEdge* e);
-	void removeEdge(TEdge* e);
-	void addTriangle(Triangle* t);
-	void removeTriangle(Triangle* t);
-	Triangle* getTriangle(int index);
-
-	void setPosition(double X, double Y){
-		x = X;
-		y = Y;
-	}
-
-	void print(FILE* f){
-		fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * 10, y * 10, id, id);
-	}
-
-	void print(){
-		printf("Vertex %d at (%f, %f)\n", id, x, y);
-	}
-
-	int getID(){ return id;}
-	bool isRectangleVertex(){ return rectangleVertex;}
-
-	Vertex* getTranslated(double dx, double dy){
-		// TODO: keep id
-		return new Vertex(x + dx, y + dy, id);
-	}
-
+	// Getters
+	double getX();
+	double getY();
+	std::list<Triangle*> getTriangles();
+	int getID();
 	TEdge* getEdgeTo(Vertex* v);
-
-	std::list<TEdge*> getAdjacentEdges(){
-		return edges;
-	}
-
 	std::vector<TEdge*> getSurroundingEdges();
-
 	std::list<TEdge*> getPolygonEdges();
+	bool isRectangleVertex();
 
+	// Setters
+	void setTriangulation(Triangulation* t);
+	void setPosition(double X, double Y);
+	void addEdge(TEdge* e);	
+	void addTriangle(Triangle* t);
+
+	// Remover
+	void removeEdge(TEdge* e);
+	void removeTriangle(Triangle* t);
+	
+	// Printer
+	void print(FILE* f);
+	void print();
+	
+	// Destructor
 	~Vertex();
 };
 
