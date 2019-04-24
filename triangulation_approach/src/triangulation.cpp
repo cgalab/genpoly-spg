@@ -1,21 +1,14 @@
 #include "triangulation.h"
 
-void Triangulation::addVertex(Vertex* v){
-	vertices.push_back(v);
-	(*v).setTriangulation(this);
+// Constructors
+Triangulation::Triangulation(int n){ 
+	vertices.reserve(n + 4);
+	N = n;
 }
 
-void Triangulation::removeVertex(int index){
-	vertices[index] = NULL;
-}
-
-void Triangulation::addEdge(TEdge* e){
-	edges.push_back(e);
-	(*e).setTriangulation(this);
-}
-
-void Triangulation::removeEdge(TEdge* e){
-	edges.remove(e);
+// Getter
+int Triangulation::getNumberOfVertices(){
+	return N;
 }
 
 Vertex* Triangulation::getVertex(int i){ 	
@@ -32,6 +25,38 @@ Vertex* Triangulation::getPVertex(int i){
 	}
 	 return NULL;
 }
+
+TEdge* Triangulation::getEdge(int index){
+	std::list<TEdge*>::iterator it = edges.begin();
+    std::advance(it, index);
+
+    return *it;
+}
+
+// Setter
+void Triangulation::addVertex(Vertex* v){
+	vertices.push_back(v);
+	(*v).setTriangulation(this);
+}
+
+void Triangulation::addEdge(TEdge* e){
+	edges.push_back(e);
+	(*e).setTriangulation(this);
+}
+
+// Remover
+void Triangulation::removeVertex(int index){
+	vertices[index] = NULL;
+}
+
+void Triangulation::removeEdge(TEdge* e){
+	edges.remove(e);
+}
+
+
+
+
+// Printer
 
 // prints triangulation as graph into a graphml file
 // https://de.wikipedia.org/wiki/GraphML
@@ -90,6 +115,7 @@ void Triangulation::printPolygon(const char* filename){
 	fclose(f);
 }
 
+// Others
 void Triangulation::check(){
 	EdgeType type;
 	int n;
@@ -110,19 +136,4 @@ void Triangulation::check(){
 			}
 		}			
 	}
-}
-
-TEdge* Triangulation::getEdge(int index){
-	std::list<TEdge*>::iterator it = edges.begin();
-    std::advance(it, index);
-
-    return *it;
-}
-
-void Triangulation::deleteVertex(int index){
-	Vertex* v;
-	
-	v = vertices[index];
-	vertices[index] = NULL;
-	delete v;
 }

@@ -17,28 +17,34 @@ class Triangulation {
 private:
 	std::vector<Vertex*> vertices;
 	std::list<TEdge*> edges;
-	int N;
+
+	int N; // number of polygon vertices in the vertex vector
 
 public:
-	Triangulation(int n){ 
-		vertices.reserve(n + 4);
-		N = n;
-	}
-	void addVertex(Vertex* v);
-	void addEdge(TEdge* e);
-	TEdge* getEdge(int index);
-	void removeEdge(TEdge* e);
+	
+	// Constructors
+	Triangulation(int n);
+
+	// Getter
+	int getNumberOfVertices();
 	Vertex* getVertex(int i);
 	Vertex* getPVertex(int i);
+	TEdge* getEdge(int index);
+
+	// Setter
+	void addVertex(Vertex* v);
+	void addEdge(TEdge* e);
+
+	// Remover
 	void removeVertex(int i);
+	void removeEdge(TEdge* e);
+
+	// Printer	
 	void print(const char* filename);
 	void printPolygon(const char* filename);
+
+	// Others
 	void check();
-	void deleteVertex(int index);
-	int getNumberOfVertices(){ return N;}
-	void setVertex(int index, Vertex* v){
-		vertices[index] = v;
-	}
 };
 
 #endif
