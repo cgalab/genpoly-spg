@@ -13,6 +13,3 @@
 #include "translation.h"
 
 int transformPolygon(Triangulation* T, int iterations, Timer t);
-bool checkSimplicityOfTranslation(Translation* trans);
-bool checkEdge(Vertex* fromV, TEdge* newE);
-double signedArea(Vertex* v0, Vertex* v1, Vertex* v2);

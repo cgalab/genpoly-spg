@@ -88,7 +88,7 @@ public:
 	}
 
 	void print(FILE* f){
-		fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * 50, y * 50, id, id);
+		fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * 10, y * 10, id, id);
 	}
 
 	void print(){

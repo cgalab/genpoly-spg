@@ -232,6 +232,7 @@ enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
 }
 
 // From: "Intersection of two lines in three-space" by Ronald Goldman
+// https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 // edges from s0 to e0 and s1 to e1
 Vertex* getIntersectionPoint(Vertex* s0, Vertex* e0, Vertex* s1, Vertex* e1){
 	double s0x, s0y, e0x, e0y, s1x, s1y, e1x, e1y;
@@ -255,7 +256,7 @@ Vertex* getIntersectionPoint(Vertex* s0, Vertex* e0, Vertex* s1, Vertex* e1){
 
 	// compute cross product of the translation vectors, if d0 x d1 = 0 then there is no single intersection point
 	crossD = crossProduct2D(d0x, d0y, d1x, d1y);
-	
+
 	if(crossD == 0) return NULL;
 
 	// compute time of intersection
