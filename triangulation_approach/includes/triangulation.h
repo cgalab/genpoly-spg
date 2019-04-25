@@ -16,7 +16,7 @@ class Triangulation {
 
 private:
 	std::vector<Vertex*> vertices;
-	std::list<TEdge*> edges;
+	std::list<TEdge*> edges; // TODO: replace by tree map such that removes can be made more efficient!
 
 	int N; // number of polygon vertices in the vertex vector
 
