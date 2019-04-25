@@ -1,7 +1,6 @@
-#include <list>
-#include <vector>
 #include <stdio.h>
-#include <math.h> 
+#include <math.h>
+#include <string>
 #include "basicDefinitions.h"
 
 #ifndef __TEDGE_H_
@@ -34,36 +33,38 @@ private:
 	static int n;
 
 public:
+	
+	// Constructors
 	TEdge(Vertex* V1, Vertex* V2);
 	TEdge(Vertex* V1, Vertex* V2, EdgeType tp);
 
-	void setTriangulation(Triangulation* t);
-
-	void setEdgeType(EdgeType tp){
-		type = tp;
-	}
-
-	EdgeType getEdgeType(){ return type;}
-	int getID(){ return id;}
-
-	void setTriangle(Triangle* t);
-	void removeTriangle(Triangle* t);
-	int nrAssignedTriangles();
-
-	void print(FILE* f);
-
-	void print();
-
-	double length();
-
+	// Getter
+	int getID();
+	EdgeType getEdgeType();
 	Vertex* getV1();
 	Vertex* getV2();
-	bool contains(Vertex* v);
-
 	Triangle* getTriangleNotContaining(Vertex* v);
 	Triangle* getTriangleContaining(Vertex* v);
 	Triangle* getOtherTriangle(Triangle* t);
 
+	// Setter
+	void setTriangulation(Triangulation* t);
+	void setEdgeType(EdgeType tp);
+	void setTriangle(Triangle* t);
+
+	// Remover
+	void removeTriangle(Triangle* t);
+	
+	// Printer
+	void print(FILE* f);
+	void print();
+
+	// Others
+	double length();	
+	bool contains(Vertex* v);
+	int nrAssignedTriangles();
+
+	// Destructor
 	~TEdge();
 };
 

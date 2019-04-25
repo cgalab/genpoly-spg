@@ -1,6 +1,6 @@
 #include "tedge.h"
-#include <string>
 
+// Constructors
 TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp){ 
 	v1 = V1;
 	v2 = V2;
@@ -37,17 +37,21 @@ TEdge::TEdge(Vertex* V1, Vertex* V2){
 	T = NULL;
 }
 
-void TEdge::setTriangulation(Triangulation* t){
-	T = t;
+// Getter
+int TEdge::getID(){
+	return id;
 }
 
-void TEdge::setTriangle(Triangle* t){
-	if(t1 == NULL) t1 = t;
-	else if(t2 == NULL) t2 = t;
-	else{
-		printf("The edge from vertex %d to vertex %d already has two triangles!\n", (*v1).getID(), (*v2).getID());
-		exit(1);
-	}
+EdgeType TEdge::getEdgeType(){
+	return type;
+}
+
+Vertex* TEdge::getV1(){
+	return v1;
+}
+
+Vertex* TEdge::getV2(){
+	return v2;
 }
 
 Triangle* TEdge::getTriangleNotContaining(Vertex* v){
@@ -65,6 +69,25 @@ Triangle* TEdge::getOtherTriangle(Triangle* t){
 	else return t1;
 }
 
+// Setter
+void TEdge::setTriangulation(Triangulation* t){
+	T = t;
+}
+
+void TEdge::setEdgeType(EdgeType tp){
+	type = tp;
+}
+
+void TEdge::setTriangle(Triangle* t){
+	if(t1 == NULL) t1 = t;
+	else if(t2 == NULL) t2 = t;
+	else{
+		printf("The edge from vertex %d to vertex %d already has two triangles!\n", (*v1).getID(), (*v2).getID());
+		exit(1);
+	}
+}
+
+// Remover
 void TEdge::removeTriangle(Triangle* t){
 
 	if(t1 == t)
@@ -75,15 +98,7 @@ void TEdge::removeTriangle(Triangle* t){
 		printf("Removed triangle was not adjacent to edge from vertex %d to vertex %d \n", (*v1).getID(), (*v2).getID());
 }
 
-int TEdge::nrAssignedTriangles(){
-	int n = 0;
-
-	if(t1 != NULL) n++;
-	if(t2 != NULL) n++;
-
-	return n;
-}
-
+// Printer
 void TEdge::print(FILE* f){
 	int w = 0;
 	if(t1 != NULL) w++;
@@ -104,6 +119,7 @@ void TEdge::print(){
 	printf("Edge %d from point %d to point %d of type %s \n", id, (*v1).getID(), (*v2).getID(), tp.c_str());
 }
 
+// Others
 double TEdge::length(){
 	double x1, x2, y1, y2;
 
@@ -116,20 +132,22 @@ double TEdge::length(){
 	return sqrt(pow((x1 - x2), 2) + pow((y1 - y2), 2));	
 }
 
-Vertex* TEdge::getV1(){
-	return v1;
-}
-
-Vertex* TEdge::getV2(){
-	return v2;
-}
-
 bool TEdge::contains(Vertex* v){
 	if((*v).getID() == (*v1).getID()) return true;
 	if((*v).getID() == (*v2).getID()) return true;
 	return false;
 }
 
+int TEdge::nrAssignedTriangles(){
+	int n = 0;
+
+	if(t1 != NULL) n++;
+	if(t2 != NULL) n++;
+
+	return n;
+}
+
+// Destructor
 // Attention: don't remove edges before there triangles are removed
 TEdge::~TEdge(){
 	(*v1).removeEdge(this);
@@ -141,9 +159,10 @@ TEdge::~TEdge(){
 	if(t2 != NULL) delete t2;
 }
 
+// Static member variables
 int TEdge::n = 0;
 
-
+// Other non-member stuff
 // from steinthors Edge class
 double reldist(TEdge* e, Vertex* p){
 	Vertex* pa = (*e).getV1();
