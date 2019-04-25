@@ -47,6 +47,7 @@ public:
 	std::vector<TEdge*> getSurroundingEdges();
 	std::list<TEdge*> getPolygonEdges();
 	bool isRectangleVertex();
+	double getMediumEdgeLength();
 
 	// Setters
 	void setTriangulation(Triangulation* t);

@@ -65,7 +65,7 @@ TEdge* Vertex::getEdgeTo(Vertex* toV){
 		v = (*i).getV2();
 		if(toID == (*v).getID()) return i;
 	}
-	printf("no connection from vertex %d to vertex %d found\n", id, toID);
+	//printf("no connection from vertex %d to vertex %d found\n", id, toID);
 	return NULL;
 }
 
@@ -93,6 +93,17 @@ std::list<TEdge*> Vertex::getPolygonEdges(){
 
 bool Vertex::isRectangleVertex(){
 	return rectangleVertex;
+}
+
+double Vertex::getMediumEdgeLength(){
+	int n = edges.size();
+	double sum = 0;
+
+	for(auto const& i : edges){
+		sum = sum + (*i).length();
+	}
+
+	return sum / n;
 }
 
 // Setter
@@ -124,7 +135,7 @@ void Vertex::removeTriangle(Triangle* t){
 
 //Printer
 void Vertex::print(FILE* f){
-	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * 10, y * 10, id, id);
+	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x, y, id, id);
 }
 
 void Vertex::print(){

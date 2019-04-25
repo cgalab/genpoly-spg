@@ -32,6 +32,10 @@ class RandomGenerator{
 		double getTranslationNormal(double mean, double stddev){
 			return std::normal_distribution<double> {mean, stddev} (generator);	
 		}
+
+		double getTranslationUniform(double min, double max){
+			return std::uniform_real_distribution<double> {min, max} (generator);
+		}
 /*
 		Vertex* translateVertexNormal(Vertex* v, double mean, double stddev){
 			double dx, dy;

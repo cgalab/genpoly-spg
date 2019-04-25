@@ -10,7 +10,7 @@ Triangulation* generateRegularPolygon(int n){
 	Triangle* t;
 
 	alpha = 2 * M_PI / n;
-	r = n * 5 / (2 * M_PI); // maybe a good choice for the radius = n * sigma / (2 * pi)
+	r = n * 10 / (2 * M_PI); // maybe a good choice for the radius = n * sigma / (2 * pi)
 
 	for(i = 0; i < n; i++){
 		v = new Vertex(r * cos(i * alpha), r * sin(i * alpha));
