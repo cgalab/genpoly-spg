@@ -257,6 +257,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   y2.set(1);
   std::cerr << y1 << " < " << y2 << " should be false : " << ((y1 < y2) ? "true" : "false") << std::endl;
+  std::cerr << y2 << " < " << y1 << " should be true : " << ((y2 < y1) ? "true" : "false") << std::endl;
 
   y1.set(10);
   y1.setX(7);
@@ -292,7 +293,6 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   std::cerr << e1 << " == " << e2 << " should be true : " << ((e1 == e2) ? "true" : "false") << std::endl;
 
-
   std::cerr << std::endl;
   std::cerr << "=== Edge set tests ===" << std::endl;
 
@@ -300,11 +300,11 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::set<Edge, setComp> edgeS(o); // a set of an edge with 'setComp' as a '<' comparison function.
   std::pair<std::set<Edge, setComp>::iterator,bool> retval; // return value
 
-  p1.set(0,0);
-  p2.set(3,3);
+  p1.set(0,0.6);
+  p2.set(1,0);
   e1.set(p1,p2);
-  p3.set(1,0);
-  p4.set(1,3);
+  p3.set(0,0.6);
+  p4.set(0.8,0.9);
   e2.set(p3,p4);
   std::cerr << "inserting e1:" << e1 << std::endl;
   retval = edgeS.insert(e1);
@@ -328,8 +328,8 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   retval = edgeS.insert(e3);
   std::cerr << "r.1: " << (*retval.first) << std::endl;
   std::cerr << "r.2 should be true for a correct insertion: " << (retval.second ? "true" : "false") << std::endl;
-  std::cerr << "set.begin(): " << (*edgeS.begin()) << std::endl;
-  std::cerr << "set.end()  : " << *(--edgeS.end()) << std::endl;
+  std::cerr << "edges in set" << std::endl;
+  for (std::set<Edge, setComp>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
 
   std::cerr << std::endl;
 
