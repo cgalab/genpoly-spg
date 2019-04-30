@@ -9,7 +9,7 @@
 
 int main(){
 	Triangulation* T;
-	int n = 10000;
+	int n = 100000;
 	int translations = 100 * n;
 	Timer t;
 	Vertex* v;
@@ -20,7 +20,6 @@ int main(){
 	t.start();
 	T = generateRegularPolygon(n);
 	(*T).check();
-	//p = generateRectangularPolygon(n, RPShapes::RPS_FLAT);
 	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", (*T).getNumberOfVertices(), t.elapsedTime());
 
 

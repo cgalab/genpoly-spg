@@ -2,7 +2,7 @@
 
 // Constructors
 Triangulation::Triangulation(int n){ 
-	vertices.reserve(n + 4);
+	vertices.reserve(n + 5);
 	N = n;
 }
 
