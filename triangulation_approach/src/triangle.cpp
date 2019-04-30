@@ -82,6 +82,53 @@ TEdge* Triangle::getLongestEdge(){
 	return 0;
 }
 
+// assumption: - pi <= alpha <= pi
+// returns -1 if the direction is not inside the triangle
+double Triangle::getRange(Vertex* v, double alpha){
+	TEdge *e, *f, *g;
+	double alpha1, alpha2, l;
+	Vertex *test;
+	bool inside;
+
+	if(!(*e0).contains(v)){
+		e = e1;
+		f = e2;
+	}else if(!(*e1).contains(v)){
+		e = e0;
+		f = e2;
+	}else{
+		e = e0;
+		f = e1;
+	}
+
+	alpha1 = (*e).getAngle(v);
+	alpha2 = (*f).getAngle(v);
+
+	if(alpha1 < alpha2){
+		l = alpha1;
+		alpha1 = alpha2;
+		alpha2 = l;
+
+		g = e;
+		e = f;
+		f = g;
+	}
+
+	l = ((*e).length() + (*f).length()) / 2;
+	
+	// assume: alpha1 >= alpha2
+	if(alpha1 - alpha2 <= M_PI){
+		if(alpha <= alpha1 && alpha >= alpha2)
+			return l;
+	}else{
+		if(alpha >= alpha1 || alpha <= alpha2)
+			return l;
+	}
+
+	// alpha is not inside this triangle
+	return -1;
+}
+
 // Printer
 void Triangle::print(){
 	printf("Triangle:\n");

@@ -63,6 +63,7 @@ public:
 	double length();	
 	bool contains(Vertex* v);
 	int nrAssignedTriangles();
+	double getAngle(Vertex* v);
 
 	// Destructor
 	~TEdge();

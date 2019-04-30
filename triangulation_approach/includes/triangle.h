@@ -38,6 +38,7 @@ public:
 	TEdge* getEdgeNotContaining(Vertex* v);
 	std::vector<TEdge*> getOtherEdges(TEdge* e);
 	TEdge* getLongestEdge();
+	double getRange(Vertex* v, double alpha);
 
 	// Printer
 	void print();
@@ -47,6 +48,7 @@ public:
 	void enqueue();
 	bool isEnqueued();
 	double calculateCollapseTime(Vertex* moving, double dx, double dy);
+	bool isInside(Vertex* v);
 	
 	// Destructor
 	~Triangle();	

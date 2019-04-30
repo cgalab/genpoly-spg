@@ -48,6 +48,7 @@ public:
 	std::list<TEdge*> getPolygonEdges();
 	bool isRectangleVertex();
 	double getMediumEdgeLength();
+	double getDirectedEdgeLength(double alpha);
 
 	// Setters
 	void setTriangulation(Triangulation* t);

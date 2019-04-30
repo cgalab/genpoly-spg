@@ -17,14 +17,14 @@ int transformPolygon(Triangulation* T, int iterations, Timer t){
 		//filename = "output/triangulation" + std::to_string(i) + ".graphml";
 		//(*T).print(filename.c_str());
 
-		//index = (*generator).getRandomIndex(n);
-		index = i % n;
+		index = (*generator).getRandomIndex(n);
+		/*index = i % n;
 
 		v = (*T).getVertex(index);
 		if(i % (n / 23) == 0){
 			
 
-			alpha = (*generator).getTranslationUniform(0, 2 * M_PI);
+			alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
 			
 		}
 
@@ -32,7 +32,20 @@ int transformPolygon(Triangulation* T, int iterations, Timer t){
 		r = (*generator).getTranslationUniform(0, stddev / 2);
 
 		dx = r * cos(alpha);
+		dy = r * sin(alpha);*/
+
+		v = (*T).getVertex(index);
+
+		alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
+		stddev = (*v).getDirectedEdgeLength(alpha);
+
+		r = (*generator).getTranslationUniform(stddev / 2, stddev / 4);
+
+		dx = r * cos(alpha);
 		dy = r * sin(alpha);
+
+		//dx = (*generator).getTranslationNormal(0, stddev);
+		//dy = (*generator).getTranslationNormal(0, stddev);
 
 		trans = new Translation(T, index, dx, dy);
 

@@ -1,5 +1,6 @@
 #include <vector>
 #include <stdio.h>
+#include <map>
 
 #ifndef __TRIANGULATION_H_
 #define __TRIANGULATION_H_
@@ -16,7 +17,7 @@ class Triangulation {
 
 private:
 	std::vector<Vertex*> vertices;
-	std::list<TEdge*> edges; // TODO: replace by tree map such that removes can be made more efficient!
+	std::map<int, TEdge*> edges; // maybe an unordered_amp would be even better, but I'm not sure because of deleting elements from hashtables
 
 	int N; // number of polygon vertices in the vertex vector
 

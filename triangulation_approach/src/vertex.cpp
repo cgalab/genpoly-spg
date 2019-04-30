@@ -106,6 +106,22 @@ double Vertex::getMediumEdgeLength(){
 	return sum / n;
 }
 
+double Vertex::getDirectedEdgeLength(double alpha){
+	double length;
+	int count = 0;
+
+	for(auto const& i : triangles){
+		length = (*i).getRange(this, alpha);
+
+		if(length > 0){
+			return length;
+		}
+	}
+	
+	printf("was not able to find the right triangle\n");
+	exit(1);
+}
+
 // Setter
 void Vertex::setTriangulation(Triangulation* t){
 	T = t;
@@ -135,7 +151,9 @@ void Vertex::removeTriangle(Triangle* t){
 
 //Printer
 void Vertex::print(FILE* f){
-	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x, y, id, id);
+	double factor = 1000.0 / (*T).getNumberOfVertices();
+
+	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * factor, y * factor, id, id);
 }
 
 void Vertex::print(){

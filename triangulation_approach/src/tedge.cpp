@@ -147,6 +147,37 @@ int TEdge::nrAssignedTriangles(){
 	return n;
 }
 
+// computes angle between edge and x-axis in range between -pi and pi
+// starting point is v
+double TEdge::getAngle(Vertex* v){
+	double x0, y0, x1, y1, dx, dy;
+	double cosa, alpha;
+
+	if(v == v1){
+		x0 = (*v1).getX();
+		y0 = (*v1).getY();
+		x1 = (*v2).getX();
+		y1 = (*v2).getY();
+	}else{
+		x0 = (*v2).getX();
+		y0 = (*v2).getY();
+		x1 = (*v1).getX();
+		y1 = (*v1).getY();
+	}
+
+	dx = x1 - x0;
+	dy = y1 - y0;
+
+	cosa = dx / sqrt(pow((x1 - x0), 2) + pow((y1 - y0), 2));
+
+	alpha = acos(cosa);
+
+	if(dy < 0)
+		alpha = - alpha;
+
+	return alpha;
+}
+
 // Destructor
 // Attention: don't remove edges before there triangles are removed
 TEdge::~TEdge(){

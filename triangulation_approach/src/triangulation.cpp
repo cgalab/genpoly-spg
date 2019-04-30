@@ -26,13 +26,6 @@ Vertex* Triangulation::getPVertex(int i){
 	 return NULL;
 }
 
-TEdge* Triangulation::getEdge(int index){
-	std::list<TEdge*>::iterator it = edges.begin();
-    std::advance(it, index);
-
-    return *it;
-}
-
 // Setter
 void Triangulation::addVertex(Vertex* v){
 	vertices.push_back(v);
@@ -40,7 +33,7 @@ void Triangulation::addVertex(Vertex* v){
 }
 
 void Triangulation::addEdge(TEdge* e){
-	edges.push_back(e);
+	edges.insert(std::pair<int, TEdge*>((*e).getID(), e));
 	(*e).setTriangulation(this);
 }
 
@@ -50,7 +43,7 @@ void Triangulation::removeVertex(int index){
 }
 
 void Triangulation::removeEdge(TEdge* e){
-	edges.remove(e);
+	edges.erase((*e).getID());
 }
 
 
@@ -63,6 +56,7 @@ void Triangulation::removeEdge(TEdge* e){
 // works here: http://graphonline.ru/en/
 void Triangulation::print(const char* filename){
 	FILE* f;
+	TEdge* e;
 
 	f = fopen(filename, "w");
 
@@ -78,7 +72,8 @@ void Triangulation::print(const char* filename){
 
 	fprintf(f, "<edges>\n");
 	for(auto const& i : edges){
-		(*i).print(f);
+		e = i.second;
+		(*e).print(f);
 	}
 	fprintf(f, "</edges>\n");
 
@@ -90,6 +85,7 @@ void Triangulation::print(const char* filename){
 
 void Triangulation::printPolygon(const char* filename){
 	FILE* f;
+	TEdge* e;
 
 	f = fopen(filename, "w");
 
@@ -105,7 +101,8 @@ void Triangulation::printPolygon(const char* filename){
 
 	fprintf(f, "<edges>\n");
 	for(auto const& i : edges){
-		if((*i).getEdgeType() == EdgeType::POLYGON)(*i).print(f);
+		e = i.second;
+		if((*e).getEdgeType() == EdgeType::POLYGON)(*e).print(f);
 	}
 	fprintf(f, "</edges>\n");
 
@@ -119,20 +116,22 @@ void Triangulation::printPolygon(const char* filename){
 void Triangulation::check(){
 	EdgeType type;
 	int n;
+	TEdge* e;
 
 	for(auto const& i : edges){
-		type = (*i).getEdgeType();
-		n = (*i).nrAssignedTriangles();
+		e = i.second;
+		type = (*e).getEdgeType();
+		n = (*e).nrAssignedTriangles();
 
 		if(type == EdgeType::FRAME){
 			if(n != 1){
 				printf("Edge of type FRAME with %d triangles:\n \t", n);
-				(*i).print();
+				(*e).print();
 			}
 		}else{
 			if(n != 2){
 				printf("Edge of type not FRAME with %d triangles:\n \t", n);
-				(*i).print();
+				(*e).print();
 			}
 		}			
 	}
