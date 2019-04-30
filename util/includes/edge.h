@@ -43,6 +43,7 @@ public:
   }
   bool operator < (const Yval s) const {
     if (x < s.getX()) {return true;}
+    else if (s.getX() < x) {return false;}
     else {
       if (min == s.getMin()) return (max < s.getMax());
       else return (min < s.getMin());
