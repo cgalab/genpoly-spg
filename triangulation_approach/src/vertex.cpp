@@ -162,6 +162,22 @@ void Vertex::print(){
 	printf("Vertex %d at (%f, %f)\n", id, x, y);
 }
 
+// Others
+void Vertex::check(){
+	int n = 0;
+
+	if(!rectangleVertex){
+		for(auto const& i : edges){
+			if((*i).getEdgeType() == EdgeType::POLYGON) 
+				n++;
+		}
+
+		if(n != 2){
+			printf("Vertex %d has %d polygon edges\n", id, n);
+		}
+	}
+}
+
 // Destructor
 Vertex::~Vertex(){
 	TEdge *e0, *e1, *e2;

@@ -135,4 +135,8 @@ void Triangulation::check(){
 			}
 		}			
 	}
+
+	for(auto const& i : vertices){
+		(*i).check();
+	}
 }

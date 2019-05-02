@@ -63,6 +63,9 @@ public:
 	// Printer
 	void print(FILE* f);
 	void print();
+
+	// Others
+	void check();
 	
 	// Destructor
 	~Vertex();

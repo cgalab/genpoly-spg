@@ -119,7 +119,7 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 	// the inital triangulation contains n-2 triangles
 	v0 = (*T).getVertex(0);
 	v1 = (*T).getVertex(n - 1);
-	e0 = new TEdge(v0, v1, EdgeType::POLYGON);
+	e0 = new TEdge(v1, v0, EdgeType::POLYGON);
 	(*T).addEdge(e0);
 	for(i = 0; i < n - 2; i++){
 		if(i % 2 == 0){
