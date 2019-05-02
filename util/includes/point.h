@@ -13,17 +13,20 @@ public:
   unsigned int v; // index in polygon
   unsigned int l; // index in lexicographical order.
 
-  Point() {x=0; y=0; i=0; v=0;}
-  Point(const Point& p) {x=p.x;y=p.y;i=p.i;v=p.v;}
-  Point(double X, double Y, unsigned int I) {x=X; y=Y; i=I; v=0;}
-  Point(double X, double Y, unsigned int I, unsigned int V) {x=X; y=Y; i=I; v=V;}
+  Point() {x=0; y=0; i=0; v=0;l=0;}
+  Point(const Point& p) {x=p.x;y=p.y;i=p.i;v=p.v;l=p.l;}
+  Point(double X, double Y, unsigned int I) {x=X;y=Y;i=I;v=0;l=0;}
+  Point(double X, double Y, unsigned int I, unsigned int V) {x=X;y=Y;i=I;v=V;l=0;}
+  Point(double X, double Y, unsigned int I, unsigned int V, unsigned int L) {x=X;y=Y;i=I;v=V;l=L;}
   void set(double X, double Y) {x=X; y=Y;}
   void set(double X, double Y, unsigned int I) {x=X; y=Y; i=I;}
   void set(double X, double Y, unsigned int I, unsigned int V) {x=X; y=Y; i=I; v=V;}
+  void set(double X, double Y, unsigned int I, unsigned int V, unsigned int L) {x=X; y=Y; i=I; v=V;l=L;}
   void setX(double X) {x=X;}
   void setY(double Y) {y=Y;}
   void setI(unsigned int I) {i=I;}
   void setV(unsigned int V) {v=V;}
+  void setL(unsigned int L) {l=L;}
   void printCoord(){
     printf("x=%f y=%f \n", x, y);
   }
