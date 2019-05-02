@@ -129,13 +129,11 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 
 			// e0 becomes e2
 			e2 = e0;
-			e0 = new TEdge(v0, v1);
+			e0 = new TEdge(v0, v1, EdgeType::POLYGON);
 			e1 = new TEdge(v1, v2);
 
 			(*T).addEdge(e0);
 			(*T).addEdge(e1);
-
-			(*e0).setEdgeType(EdgeType::POLYGON);
 
 			t = new Triangle(e0, e1, e2, v0, v1, v2);		
 		}else{
@@ -146,12 +144,10 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 			// e1 becomes e2
 			e2 = e1;
 			e0 = new TEdge(v0, v1);
-			e1 = new TEdge(v1, v2);
+			e1 = new TEdge(v1, v2, EdgeType::POLYGON);
 
 			(*T).addEdge(e0);
 			(*T).addEdge(e1);
-			
-			(*e1).setEdgeType(EdgeType::POLYGON);
 
 			t = new Triangle(e0, e1, e2, v0, v1, v2);
 		}

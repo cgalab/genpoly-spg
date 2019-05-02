@@ -46,6 +46,7 @@ public:
 	Triangle* getTriangleNotContaining(Vertex* v);
 	Triangle* getTriangleContaining(Vertex* v);
 	Triangle* getOtherTriangle(Triangle* t);
+	Vertex* getOtherVertex(Vertex* v);
 
 	// Setter
 	void setTriangulation(Triangulation* t);

@@ -11,16 +11,17 @@ Translation::Translation(Triangulation* Tr, int i, double dX, double dY){
 	dy = dY;
 
 	original = (*T).getVertex(index);
-	prevV = (*T).getPVertex(index - 1);
-	nextV = (*T).getPVertex(index + 1);
+	
+	prevV = (*original).getPrev();
+	nextV = (*original).getNext();
 
 	oldV = (*original).getTranslated(0, 0);
 	newV = (*original).getTranslated(dx, dy);
 
 	transPath = new TEdge(oldV, newV);
 
-	prevOldE = (*original).getEdgeTo(prevV);
-	nextOldE = (*original).getEdgeTo(nextV);
+	prevOldE = (*original).getToPrev();
+	nextOldE = (*original).getToNext();
 
 	prevNewE = new TEdge(prevV, newV);
 	nextNewE = new TEdge(newV, nextV);

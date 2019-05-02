@@ -10,6 +10,11 @@ TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp){
 
 	type = tp;
 
+	if(tp == EdgeType::POLYGON){
+		(*V1).setToNext(this);
+		(*V2).setToPrev(this);
+	}
+
 	(*V1).addEdge(this);
 	(*V2).addEdge(this);
 
@@ -69,6 +74,13 @@ Triangle* TEdge::getOtherTriangle(Triangle* t){
 	else return t1;
 }
 
+Vertex* TEdge::getOtherVertex(Vertex* v){
+	if(v == v1)
+		return v2;
+	else
+		return v1;
+}
+
 // Setter
 void TEdge::setTriangulation(Triangulation* t){
 	T = t;
@@ -76,6 +88,11 @@ void TEdge::setTriangulation(Triangulation* t){
 
 void TEdge::setEdgeType(EdgeType tp){
 	type = tp;
+
+	if(tp == EdgeType::POLYGON){
+		(*v1).setToNext(this);
+		(*v2).setToPrev(this);
+	}
 }
 
 void TEdge::setTriangle(Triangle* t){

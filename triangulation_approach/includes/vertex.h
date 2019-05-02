@@ -22,6 +22,9 @@ private:
 	double x;
 	double y;
 
+	TEdge* toPrev;
+	TEdge* toNext;
+
 	std::list<TEdge*> edges;
 	std::list<Triangle*> triangles;
 
@@ -49,12 +52,18 @@ public:
 	bool isRectangleVertex();
 	double getMediumEdgeLength();
 	double getDirectedEdgeLength(double alpha);
+	TEdge* getToPrev();
+	TEdge* getToNext();
+	Vertex* getPrev();
+	Vertex* getNext();
 
 	// Setters
 	void setTriangulation(Triangulation* t);
 	void setPosition(double X, double Y);
 	void addEdge(TEdge* e);	
 	void addTriangle(Triangle* t);
+	void setToPrev(TEdge* e);
+	void setToNext(TEdge* e);
 
 	// Remover
 	void removeEdge(TEdge* e);

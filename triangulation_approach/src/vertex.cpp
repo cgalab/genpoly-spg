@@ -9,6 +9,9 @@ Vertex::Vertex(double X, double Y){
 	id = n;
 	n++;
 
+	toPrev = NULL;
+	toNext = NULL;
+
 	T = NULL;
 }
 
@@ -20,16 +23,21 @@ Vertex::Vertex(double X, double Y, bool RV){
 	id = n;
 	n++;
 
+	toPrev = NULL;
+	toNext = NULL;
+
 	T = NULL;
 }
 
 Vertex::Vertex(double X, double Y, int ID){
 	x = X;
 	y = Y;
+	rectangleVertex = false;
 
 	id = ID;
 
-	rectangleVertex = false;
+	toPrev = NULL;
+	toNext = NULL;
 
 	T = NULL;
 }
@@ -84,9 +92,8 @@ std::vector<TEdge*> Vertex::getSurroundingEdges(){
 std::list<TEdge*> Vertex::getPolygonEdges(){
 	std::list<TEdge*> out;
 
-	for(auto const& i : edges){
-		if((*i).getEdgeType() == EdgeType::POLYGON) out.push_back(i);
-	}
+	out.push_back(toPrev);
+	out.push_back(toNext);
 
 	return out;
 }
@@ -122,6 +129,22 @@ double Vertex::getDirectedEdgeLength(double alpha){
 	exit(1);
 }
 
+TEdge* Vertex::getToPrev(){
+	return toPrev;
+}
+
+TEdge* Vertex::getToNext(){
+	return toNext;
+}
+
+Vertex* Vertex::getPrev(){
+	return (*toPrev).getOtherVertex(this);
+}
+
+Vertex* Vertex::getNext(){
+	return (*toNext).getOtherVertex(this);
+}
+
 // Setter
 void Vertex::setTriangulation(Triangulation* t){
 	T = t;
@@ -138,6 +161,14 @@ void Vertex::addEdge(TEdge* e){
 
 void Vertex::addTriangle(Triangle* t){
 	triangles.push_back(t);
+}
+
+void Vertex::setToPrev(TEdge* e){
+	toPrev = e;
+}
+
+void Vertex::setToNext(TEdge* e){
+	toNext = e;
 }
 
 // Remover
@@ -175,6 +206,12 @@ void Vertex::check(){
 		if(n != 2){
 			printf("Vertex %d has %d polygon edges\n", id, n);
 		}
+
+		if(toPrev == NULL)
+			printf("Edge to previous vertex is missing for vertex %d \n", id);
+
+		if(toNext == NULL)
+			printf("Edge to next vertex is missing for vertex %d \n", id);
 	}
 }
 
