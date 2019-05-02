@@ -6,7 +6,7 @@ add_executable(spg
 					          src/inits.cpp
                     src/io.cpp
                     src/opt2.cpp
-                    src/polygon.cpp
+                    src/pol.cpp
                     src/test.cpp
                     )
 
