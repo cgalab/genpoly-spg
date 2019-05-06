@@ -9,7 +9,7 @@
 
 int main(){
 	Triangulation* T;
-	int n = 20;
+	int n = 5000;
 	int translations = 1000 * n;
 	Timer t;
 	Vertex* v;
@@ -20,7 +20,7 @@ int main(){
 	t.start();
 	T = generateRegularPolygon(n);
 	(*T).check();
-	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", (*T).getNumberOfVertices(), t.elapsedTime());
+	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", (*T).getActualNumberOfVertices(), t.elapsedTime());
 
 
 	performed = transformPolygon(T, translations, t);

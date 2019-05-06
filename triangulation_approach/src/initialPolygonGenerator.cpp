@@ -4,7 +4,7 @@ Triangulation* generateRegularPolygon(int n){
 	double r, alpha;
 	int i;
 	Vertex* v;
-	Triangulation* T = new Triangulation(n); // 4 additional vertices for the rectangle
+	Triangulation* T = new Triangulation(n);
 	
 	alpha = 2 * M_PI / n;
 	r = n * 10 / (2 * M_PI); // maybe a good choice for the radius = n * sigma / (2 * pi)
@@ -23,6 +23,7 @@ Triangulation* generateRegularPolygon(int n){
 }
 
 // boxPolygon startindex 1
+// works in principle, but is slow as shit
 void initialTriangulationPseudoStar(Triangulation* T, int n){
 	int i;
 	Vertex *center, *v0, *v1;
@@ -67,6 +68,7 @@ void initialTriangulationPseudoStar(Triangulation* T, int n){
 }
 
 // boxPolygon startindex 0
+// doesn't work at all
 void initialTriangulationStar(Triangulation* T, int n){
 	int i;
 	Vertex *center, *v0, *v1;
@@ -182,10 +184,7 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 	rv1 = new Vertex(-a / 2, a / 2, true);
 	rv2 = new Vertex(- a / 2, - a / 2, true);
 	rv3 = new Vertex(a / 2, - a / 2, true);
-	(*T).addVertex(rv0);
-	(*T).addVertex(rv1);
-	(*T).addVertex(rv2);
-	(*T).addVertex(rv3);
+	(*T).setRectangle(rv0, rv1, rv2, rv3);
 	re0 = new TEdge(rv0, rv1, EdgeType::FRAME);
 	re1 = new TEdge(rv1, rv2, EdgeType::FRAME);
 	re2 = new TEdge(rv2, rv3, EdgeType::FRAME);

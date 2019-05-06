@@ -161,12 +161,12 @@ bool Translation::checkOverroll(){
 	if(!simple) return false;
 
 	// check for the next vertex whether its inside the quadrilateral
-	randomV = (*T).getPVertex(index - 2);
+	randomV = (*T).getVertex(index - 2);
 
 	simple = insideQuadrilateral(randomV, oldV, nextV, newV, prevV);
 
 	// check also for a second vertex to increase the chance the reject non-simple translation
-	randomV = (*T).getPVertex(index + 2);
+	randomV = (*T).getVertex(index + 2);
 
 	simple = simple || insideQuadrilateral(randomV, oldV, nextV, newV, prevV);
 

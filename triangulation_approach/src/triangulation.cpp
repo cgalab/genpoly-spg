@@ -2,20 +2,20 @@
 
 // Constructors
 Triangulation::Triangulation(int n){ 
-	vertices.reserve(n + 5);
+	vertices.reserve(n);
 	N = n;
 }
 
 // Getter
-int Triangulation::getNumberOfVertices(){
+int Triangulation::getTargetNumberOfVertices(){
 	return N;
 }
 
-Vertex* Triangulation::getVertex(int i){ 	
-	return vertices[i];
+int Triangulation::getActualNumberOfVertices(){
+	return vertices.size();
 }
 
-Vertex* Triangulation::getPVertex(int i){ 	
+Vertex* Triangulation::getVertex(int i){ 	
 	if(i < 0){
 		return vertices[N + i];
 	}else if(i >= N){
@@ -35,6 +35,13 @@ void Triangulation::addVertex(Vertex* v){
 void Triangulation::addEdge(TEdge* e){
 	edges.insert(std::pair<int, TEdge*>((*e).getID(), e));
 	(*e).setTriangulation(this);
+}
+
+void Triangulation::setRectangle(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3){
+	Rectangle0 = v0;
+	Rectangle1 = v1;
+	Rectangle2 = v2;
+	Rectangle3 = v3;
 }
 
 // Remover

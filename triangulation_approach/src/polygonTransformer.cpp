@@ -4,11 +4,11 @@
 
 int transformPolygon(Triangulation* T, int iterations, Timer t){
 	int index = 1;
-	RandomGenerator* generator = new RandomGenerator(); // could maybe be a object instead of a pointer
-	double dx = 0, dy = -50, stddev, alpha, r; // radius of the initial polygon was 30
+	RandomGenerator* generator = new RandomGenerator(); // could maybe be an object instead of a pointer
+	double dx = 0, dy = 0, stddev, alpha, r; // radius of the initial polygon was 30
 	bool simple, split, overroll;
 	Translation* trans;
-	int n = (*T).getNumberOfVertices();
+	int n = (*T).getActualNumberOfVertices();
 	std::string filename;
 	int performedTranslations = 0;
 	Vertex* v;
@@ -18,21 +18,6 @@ int transformPolygon(Triangulation* T, int iterations, Timer t){
 		//(*T).print(filename.c_str());
 
 		index = (*generator).getRandomIndex(n);
-		/*index = i % n;
-
-		v = (*T).getVertex(index);
-		if(i % (n / 23) == 0){
-			
-
-			alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
-			
-		}
-
-		stddev = (*v).getMediumEdgeLength();
-		r = (*generator).getTranslationUniform(0, stddev / 2);
-
-		dx = r * cos(alpha);
-		dy = r * sin(alpha);*/
 
 		v = (*T).getVertex(index);
 
@@ -43,9 +28,6 @@ int transformPolygon(Triangulation* T, int iterations, Timer t){
 
 		dx = r * cos(alpha);
 		dy = r * sin(alpha);
-
-		//dx = (*generator).getTranslationNormal(0, stddev);
-		//dy = (*generator).getTranslationNormal(0, stddev);
 
 		trans = new Translation(T, index, dx, dy);
 
