@@ -62,7 +62,7 @@ Yval getYatX(const Edge& e, const double x) {
 	Point P1 = *e.p1;
 	Point P2 = *e.p2;
 
-	assert((x <= P2.x) && (P1.x <= x));
+	//assert((x <= P2.x) && (P1.x <= x));
 
 	if ((P2.x - P1.x) == 0) {
 		y.set(P1.y, P2.y);
