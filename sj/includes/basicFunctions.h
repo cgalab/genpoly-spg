@@ -43,7 +43,7 @@ public:
     // *Problem 1: if the comparison was true at p1, it might be false at p2 if there is
     //            an intersection between the first comparison at p1 and at p2 when the edge will be removed.
     // possible solution: always compare at higher p1 value(?)
-    std::cerr << "lhs: " << lhs << " < rhs: " << rhs << std::endl;
+//    std::cerr << "lhs: " << lhs << " < rhs: " << rhs << std::endl;
     Yval yl, yr;
     double s;
     // comparison always starts at lex. higher of the P1 points.
@@ -60,25 +60,25 @@ public:
 
       // 4P coll.
       if ((abs(det1) < EPSILON) && (abs(det2) < EPSILON)) {
-        std::cerr << "4Pc: " << std::endl;
+//        std::cerr << "4Pc: " << std::endl;
         if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return false;
         if (*lhs.p1 == *rhs.p1) return *lhs.p2 < *rhs.p2;
-        std::cerr << ((*lhs.p1 < *rhs.p1) ? "true" : "false") << std::endl;
+//        std::cerr << ((*lhs.p1 < *rhs.p1) ? "true" : "false") << std::endl;
         return *lhs.p1 < *rhs.p1;
       }
       // 3P coll. pick the lower of the p2s
       else {
-        std::cerr << "3Pc: ";
+//        std::cerr << "3Pc: ";
         if (*lhs.p2 < *rhs.p2) s = (*lhs.p2).x;
         else s = (*rhs.p2).x;
         yl = getYatX(lhs, s);
         yr = getYatX(rhs, s);
-        std::cerr << ((yl < yr) ? "true" : "false") << std::endl;
+//        std::cerr << ((yl < yr) ? "true" : "false") << std::endl;
         return yl < yr;
       }
     }
     else {
-      std::cerr << "gen: " << yl << " < " << yr << " : " << ((yl < yr) ? "true" : "false") << std::endl;
+//      std::cerr << "gen: " << yl << " < " << yr << " : " << ((yl < yr) ? "true" : "false") << std::endl;
       return yl < yr; // general case:
     }
     std::cerr << "ERROR: unexpected fallthrough in comparison!" << std::endl;
