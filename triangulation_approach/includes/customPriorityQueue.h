@@ -2,6 +2,9 @@
 #include <queue>
 #include <stdio.h>
 
+#ifndef __CUSTOMPQ_H_
+#define __CUSTOMPQ_H_
+
 class custom_priority_queue : public std::priority_queue<std::pair<double, Triangle*>, std::vector<std::pair<double,Triangle*>>, std::greater<std::pair<double, Triangle*>>>{
 
 public:
@@ -38,3 +41,5 @@ public:
 		}
 	}
 };
+
+#endif

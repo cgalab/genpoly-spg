@@ -21,10 +21,14 @@ int Triangulation::getActualNumberOfVertices(){
 }
 
 Vertex* Triangulation::getVertex(int i){ 	
+	int n;
+
+	n = vertices.size();
+
 	if(i < 0){
-		return vertices[N + i];
-	}else if(i >= N){
-		return vertices[i - N];
+		return vertices[n + i];
+	}else if(i >= n){
+		return vertices[i - n];
 	}else{
 		return vertices[i];
 	}

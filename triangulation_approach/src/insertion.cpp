@@ -15,7 +15,7 @@ Insertion::Insertion(Triangulation* t, int index){
 void Insertion::execute(){
 	Triangle *t0, *t1;
 	double x, y;
-	Vertex *newV, *other0, *other1;
+	Vertex *other0, *other1;
 	TEdge *fromV0ToOther0, *fromV0ToOther1, *fromV1ToOther0, *fromV1ToOther1;
 	TEdge *fromV0ToNew, *fromV1ToNew;
 	TEdge *fromNewToOther0, *fromNewToOther1;
@@ -55,8 +55,35 @@ void Insertion::execute(){
 	new Triangle(fromV1ToNew, fromV1ToOther1, fromNewToOther1, v1, newV, other1);
 }
 
+void Insertion::translate(RandomGenerator* generator){
+	int index;
+	bool overroll, simple;
+	double alpha, stddev, r, dx, dy;
+	Translation* trans;
 
-// Destructors
-Insertion::~Insertion(){
+	index = (*T).getActualNumberOfVertices(); // don't know why not -1 here?!
 
+	alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
+	stddev = (*newV).getDirectedEdgeLength(alpha);
+
+	r = (*generator).getTranslationUniform(stddev / 2, stddev / 4);
+
+	dx = r * cos(alpha);
+	dy = r * sin(alpha);
+
+	trans = new Translation(T, index, dx, dy);
+
+	overroll = (*trans).checkOverroll();
+
+	if(!overroll){
+		simple = (*trans).checkSimplicityOfTranslation();
+
+		if(simple){
+			(*trans).checkSplit();
+
+			(*trans).execute();
+		}		
+	}
+
+	delete trans;
 }

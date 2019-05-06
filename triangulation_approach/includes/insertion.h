@@ -2,8 +2,8 @@
 #include "triangulation.h"
 #include "tedge.h"
 #include "triangle.h"
-
-
+#include "translation.h"
+#include "randomGenerator.h"
 
 #ifndef __INSERTION_H_
 #define __INSERTION_H_
@@ -16,6 +16,7 @@ private:
 
 	int i;
 	Vertex *v0, *v1;
+	Vertex *newV;
 	TEdge* e;
 
 public:
@@ -25,10 +26,7 @@ public:
 
 	// Others
 	void execute();
-
-	// Destructors
-	~Insertion();
-
+	void translate(RandomGenerator* generator);
 };
 
 #endif

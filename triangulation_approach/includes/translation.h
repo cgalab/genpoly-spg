@@ -6,6 +6,10 @@
 #include <list>
 #include <math.h>
 
+
+#ifndef __TRANSLATION_H_
+#define __TRANSLATION_H_
+
 class Translation{
 
 private:
@@ -54,3 +58,5 @@ public:
 
 	~Translation();
 };
+
+#endif

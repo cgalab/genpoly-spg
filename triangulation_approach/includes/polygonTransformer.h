@@ -13,4 +13,5 @@
 #include "translation.h"
 #include "insertion.h"
 
-int transformPolygon(Triangulation* T, int iterations, Timer t);
+int transformPolygonByMoves(Triangulation* T, int iterations, Timer t);
+void growPolygon(Triangulation* T, int toNr, Timer t);
