@@ -29,19 +29,30 @@ void decrementEdges(unsigned int index, std::set<Edge, setComp>& edgeS) {
 	}
 }
 
+// this function should be used to guarantee removal of an edge from the 'edgeS' set.
 void eraseEdgeFromSet (Edge e, std::set<Edge, setComp>& edgeS) {
   std::set<Edge, setComp>::iterator it;
 
-  std::cerr << "edge being erased: " << e << std::endl;
+//  std::cerr << "edge being erased: " << e << std::endl;
   it = edgeS.find(e);
 
   if (it != edgeS.end()) {
     assert(e == *it);
     edgeS.erase(it);
+  } else {
+    // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
+    // this is technically a crutch because there's a problem with the comparator function.
+    for (std::set<Edge, setComp>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) {
+      if (*it == e) {
+        edgeS.erase(it);
+        break;
+      }
+    }
   }
 }
 
 // function to remove edges connected to a single vertex from 'edgeS' set.
+// does not care whether it finds an edge or not, just attempts to remove it.
 void eraseVertexFromSet(Point *p1, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   unsigned int before, after;
   Point *p2, *p3;
@@ -61,9 +72,9 @@ void eraseVertexFromSet(Point *p1, std::set<Edge, setComp>& edgeS, std::vector<u
     e2 = Edge(p1, p2);
   }
 
-  std::cerr << "erasing vertexes: e1: " << e1 << ", e2: " << e2 << std::endl;
-  eraseEdgeFromSet(e1, edgeS);
-  eraseEdgeFromSet(e2, edgeS);
+//  std::cerr << "erasing vertexes: e1: " << e1 << ", e2: " << e2 << std::endl;
+  edgeS.erase(e1); // even if I get the wrong iterator for e1, it's an iterator to e2, so ok to be removed.
+  edgeS.erase(e2); // same should be fine with e2.
 }
 
 // swaps the order of points of the edge in the polygon,
@@ -88,40 +99,40 @@ void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon) {
 // swaps the points in the polygon so that the lex. order of the points is also the vertex order of the points.
 bool collSwap(Point *a, Point *b, Point *c, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   Point *lo, *mid, *hi;
-  Edge e1, e2;
-  bool be1=false, be2=false;
+  //Edge e1, e2;
+  //bool be1=false, be2=false;
 
   assert(*a < *b);
   assert(*a < *c);
-
+/*
   // create the incidental edges to the 3 points in the polygon.
-  if (((*b).v + points.size() +1) % points.size() == (*a).v) {
+  if (((*b).v + points.size() +1) % points.size() == (*a).v) { // make sure you create an edge to the right point.
     Point *temp = &points[polygon[((*b).v + points.size() -1) % points.size()]];
-    if (*temp < *b) {
+    if (*temp < *a) {  // if the point '*temp' is lower than '*a' then it could already be in 'edgeS'
       e1 = Edge(b, temp);
       be1 = true;
     }
   } else {
     Point *temp = &points[polygon[((*b).v + points.size() +1) % points.size()]];
-    if (*temp < *b) {
+    if (*temp < *a) {
       e1 = Edge(b, temp);
       be1 = true;
     }
   }
   if (((*c).v + points.size() +1) % points.size() == (*a).v) {
     Point *temp = &points[polygon[((*c).v + points.size() -1) % points.size()]];
-    if (*temp < *c) {
+    if (*temp < *a) {
       e2 = Edge(c, temp);
       be2 = true;
     }
   } else {
     Point *temp = &points[polygon[((*c).v + points.size() +1) % points.size()]];
-    if (*temp < *c) {
+    if (*temp < *a) {
       e2 = Edge(c, temp);
       be2 = true;
     }
   }
-
+*/
   // sort the points into lo/mid/hi lex order.
   if ((*a < *b) && (*a < *c)) {
     lo = a;
@@ -134,16 +145,11 @@ bool collSwap(Point *a, Point *b, Point *c, std::set<Edge, setComp>& edgeS, std:
     }
   }
 
-  std::cerr << "erasing because of 3PC: e1: ";
-  if (be1) std::cerr << e1;
-  else std::cerr << "no e1";
-  if (be2) std::cerr << e2;
-  else std::cerr << ", no e2";
-  std::cerr << std::endl;
+//  std::cerr << "erasing because of 3PC:";
   // treating the case when vertices are at indices [0,1,...,size()-1]
   if (((*lo).v == 0) && (((*mid).v + (*hi).v) == polygon.size())) {
-    if (be1) eraseEdgeFromSet(e1, edgeS);
-    if (be2) eraseEdgeFromSet(e2, edgeS);
+    eraseVertexFromSet(b, edgeS, polygon, points);
+    eraseVertexFromSet(c, edgeS, polygon, points);
     polSwap(lo, mid, polygon);
     if ((*lo).v == 1) polSwap(lo, hi, polygon);
     return true;
@@ -152,15 +158,15 @@ bool collSwap(Point *a, Point *b, Point *c, std::set<Edge, setComp>& edgeS, std:
   else if (((*mid).v == 0) && (((*lo).v + (*hi).v) == polygon.size())) {
     if ((*hi).v == 1) return false;
     else {
-      if (be1) eraseEdgeFromSet(e1, edgeS);
-      if (be2) eraseEdgeFromSet(e2, edgeS);
+      eraseVertexFromSet(b, edgeS, polygon, points);
+      eraseVertexFromSet(c, edgeS, polygon, points);
       polSwap(lo, hi, polygon);
     }
     return true;
   }
   else if (((*hi).v == 0) && (((*lo).v + (*mid).v) == polygon.size())) {
-    if (be1) eraseEdgeFromSet(e1, edgeS);
-    if (be2) eraseEdgeFromSet(e2, edgeS);
+    eraseVertexFromSet(b, edgeS, polygon, points);
+    eraseVertexFromSet(c, edgeS, polygon, points);
     polSwap(mid, hi, polygon);
     if ((*lo).v == 1) polSwap(lo, hi, polygon);
     return true;
@@ -168,33 +174,33 @@ bool collSwap(Point *a, Point *b, Point *c, std::set<Edge, setComp>& edgeS, std:
 
   //treating the case when vertices are at indices [0,...,size()-2,size()-1]
   if (((*lo).v == 0) && (((*mid).v + (*hi).v) == 2*polygon.size()-3)) {
-    if (be1) eraseEdgeFromSet(e1, edgeS);
-    if (be2) eraseEdgeFromSet(e2, edgeS);
+    eraseVertexFromSet(b, edgeS, polygon, points);
+    eraseVertexFromSet(c, edgeS, polygon, points);
     polSwap(lo, hi, polygon);
     if ((*lo).v == polygon.size()-1) polSwap(lo, mid, polygon);
     return true;
   }
   else if (((*mid).v == 0) && (((*lo).v + (*hi).v) == 2*polygon.size()-3)) {
-    if (be1) eraseEdgeFromSet(e1, edgeS);
-    if (be2) eraseEdgeFromSet(e2, edgeS);
+    eraseVertexFromSet(b, edgeS, polygon, points);
+    eraseVertexFromSet(c, edgeS, polygon, points);
     polSwap(mid, hi, polygon);
     if ((*lo).v == polygon.size()-1) polSwap(lo, mid, polygon);
     return true;
   }
   else if (((*hi).v == 0) && ((*lo).v+(*mid).v == 2*polygon.size()-3)) {
     if (((*lo).v == polygon.size()-2) && ((*mid).v == polygon.size()-1)) {
-      return false;
+      return false; // no erasing of edges as no change in order was made.
     }
     if ((*lo).v == polygon.size()-1) {
-      if (be1) eraseEdgeFromSet(e1, edgeS);
-      if (be2) eraseEdgeFromSet(e2, edgeS);
+      eraseVertexFromSet(b, edgeS, polygon, points);
+      eraseVertexFromSet(c, edgeS, polygon, points);
       polSwap(lo, mid, polygon);
       return true;
     }
   }
   else {
-    if (be1) eraseEdgeFromSet(e1, edgeS);
-    if (be2) eraseEdgeFromSet(e2, edgeS);
+    eraseVertexFromSet(b, edgeS, polygon, points);
+    eraseVertexFromSet(c, edgeS, polygon, points);
     if ((*hi).v < (*mid).v) {polSwap(mid, hi, polygon);}
     if ((*mid).v < (*lo).v) {polSwap(lo, mid, polygon);}
     if ((*hi).v < (*mid).v) {polSwap(mid, hi, polygon);}
@@ -230,7 +236,7 @@ bool collSwap (Edge& e1, Edge& e2, std::set<Edge, setComp>& edgeS, std::vector<u
 
   if ((rd1 > 1) && (rd2 > 1)) return false;
   if ((rd1 < 0) && (rd2 < 0)) return false;
-  std::cerr << "erasing because of 4PC: e1: " << e1 << ", e2: " << e2 << std::endl;
+//  std::cerr << "erasing because of 4PC: e1: " << e1 << ", e2: " << e2 << std::endl;
   if ( d1 &&  d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 1)) {
     eraseVertexFromSet(e2.p1, edgeS, polygon, points);
     eraseVertexFromSet(e1.p2, edgeS, polygon, points);
@@ -388,15 +394,13 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge, setComp>& edgeS, std::vect
   enum intersect_t isval;
   std::set<Edge, setComp>::iterator it;
 
-  std::cerr << "edge being removed: " << e << std::endl;
+//  std::cerr << "edge to be removed: " << e << std::endl;
   it = edgeS.find(e);
-  if (it != edgeS.end()) {
-    std::cerr << "*it: " << *it << std::endl;
-    assert(e == *it);
-  }
 
   if (it != edgeS.end()) {
-    std::cerr << "edge found: " << *it << std::endl;
+//    std::cerr << "*it: " << *it << std::endl;
+    assert(e == *it);
+
     // get edges before and after
     if (it != edgeS.begin()) {
       before = *(std::prev(it));
@@ -407,7 +411,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge, setComp>& edgeS, std::vect
       af = true;
     }
 
-    std::cerr << "removing edge from set(): " << *it << std::endl;
+//    std::cerr << "removing edge from set(): " << *it << std::endl;
     edgeS.erase(it);
 
     if (bef && af) {
@@ -421,13 +425,22 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge, setComp>& edgeS, std::vect
         }
       }
       else if ((isval == IS_TRUE) || (isval == IS_3P_COLLINEAR)) {
-        std::cerr << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
+//        std::cerr << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
         eraseEdgeFromSet(before, edgeS);
         eraseEdgeFromSet(after, edgeS);
         flip(before, after, polygon, points);
         valid = E_SKIP;
       } else if (isval >= IS_TRUE) {
         std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+      }
+    }
+  } else {
+    // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
+    // this is technically a crutch because there's a problem with the comparator function.
+    for (std::set<Edge, setComp>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
+      if (*it1 == e) {
+        edgeS.erase(it1);
+        break;
       }
     }
   }
@@ -445,8 +458,8 @@ std::pair<enum edge_t, std::set<Edge, setComp>::iterator> processEdge(Edge& e, s
 
   retval = edgeS.insert(e);
 
-  std::cerr << "retval.first : " << *retval.first << std::endl;
-	std::cerr << "retval.second: " << retval.second << std::endl;
+//  std::cerr << "retval.first : " << *retval.first << std::endl;
+//	std::cerr << "retval.second: " << retval.second << std::endl;
   assert(*retval.first == e);
 
   //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
@@ -478,8 +491,8 @@ std::pair<enum edge_t, std::set<Edge, setComp>::iterator> processEdge(Edge& e, s
         }
       }
       else {
-        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
-        eraseEdgeFromSet(e, edgeS);
+//        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+        edgeS.erase(retval.first);
         eraseEdgeFromSet(before, edgeS);
         flip(e, before, polygon, points);
         valid = E_SKIP;
@@ -500,8 +513,8 @@ std::pair<enum edge_t, std::set<Edge, setComp>::iterator> processEdge(Edge& e, s
         }
       }
       else {
-        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
-        eraseEdgeFromSet(e, edgeS);
+//        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
+        edgeS.erase(retval.first);
         eraseEdgeFromSet(after, edgeS);
         //removeEdgeFromSet(e, edgeS, polygon, points);
         //removeEdgeFromSet(after, edgeS, polygon, points);
@@ -573,7 +586,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
           std::cerr << "max: " << max_so_far << ", counter: " << max_count << std::endl;
       }
 
-      std::cerr << std::endl << "index: " << index << std::endl;
+//      std::cerr << std::endl << "index: " << index << std::endl;
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];
@@ -602,7 +615,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
         e2 = Edge(p1, p3, index);
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop = true;}
-        std::cerr << "skipping p3: " << *p3 << ", processing: " << e1 << std::endl;
+//        std::cerr << std::endl << "removed: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true;continue;}
       } else if ((*p1 > *p2) && (*p1 < *p3) ) {
@@ -610,12 +623,12 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
         e2 = Edge(p1, p2, index);
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop = true;}
-        std::cerr << "skipping p2: " << *p2 << ", processing: " << e1 << std::endl;
+//        std::cerr << std::endl << "removed: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true; continue;}
       } else {
         // construct the edges
-        std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
+//        std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
   		  if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
   			  e1 = Edge (p1, p2, index);
   			  e2 = Edge (p1, p3, index);
@@ -642,11 +655,11 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
           } //else std::cerr << "false alarm." << std::endl;
         }
 
-  		  std::cerr << "processing e1: " << e1 << std::endl;
+//  		  std::cerr << std::endl << "processing e1: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true;continue;}
 
-  		  std::cerr << std::endl << "processing e2: " << e2 << std::endl;
+//  		  std::cerr << std::endl << "processing e2: " << e2 << std::endl;
   		  val2 = processEdge(e2, edgeS, polygon, points);
   		  if (val2.first == E_SKIP) {
           loop = true;
