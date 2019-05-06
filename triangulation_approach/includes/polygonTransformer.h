@@ -11,5 +11,6 @@
 #include "basicDefinitions.h"
 #include <math.h>
 #include "translation.h"
+#include "insertion.h"
 
 int transformPolygon(Triangulation* T, int iterations, Timer t);

@@ -4,6 +4,11 @@
 Triangulation::Triangulation(int n){ 
 	vertices.reserve(n);
 	N = n;
+
+	Rectangle0 = NULL;
+	Rectangle1 = NULL;
+	Rectangle2 = NULL;
+	Rectangle3 = NULL;
 }
 
 // Getter
@@ -42,6 +47,11 @@ void Triangulation::setRectangle(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3)
 	Rectangle1 = v1;
 	Rectangle2 = v2;
 	Rectangle3 = v3;
+
+	(*v0).setTriangulation(this);
+	(*v1).setTriangulation(this);
+	(*v2).setTriangulation(this);
+	(*v3).setTriangulation(this);
 }
 
 // Remover
@@ -52,9 +62,6 @@ void Triangulation::removeVertex(int index){
 void Triangulation::removeEdge(TEdge* e){
 	edges.erase((*e).getID());
 }
-
-
-
 
 // Printer
 
@@ -72,6 +79,12 @@ void Triangulation::print(const char* filename){
 	fprintf(f, "<graph id=\"Graph\" edgeDefault=\"undirected\">\n");
 
 	fprintf(f, "<nodes>\n");
+
+	(*Rectangle0).print(f);
+	(*Rectangle1).print(f);
+	(*Rectangle2).print(f);
+	(*Rectangle3).print(f);
+
 	for(auto const& i : vertices){
 		if(i != NULL) (*i).print(f);
 	}

@@ -59,6 +59,14 @@ Vertex* TEdge::getV2(){
 	return v2;
 }
 
+Triangle* TEdge::getT1(){
+	return t1;
+}
+
+Triangle* TEdge::getT2(){
+	return t2;
+}
+
 Triangle* TEdge::getTriangleNotContaining(Vertex* v){
 	if((*t1).contains(v)) return t2;
 	else return t1;

@@ -13,7 +13,7 @@ class Triangle;
 #include "tedge.h"
 #include "triangle.h"
 
-class Triangulation {
+class Triangulation{
 
 private:
 	std::vector<Vertex*> vertices;

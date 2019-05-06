@@ -16,7 +16,7 @@ class Vertex;
 
 enum class EdgeType {POLYGON, FRAME, TRIANGULATION};
 
-class TEdge {
+class TEdge{
 
 private:
 	Triangulation* T;
@@ -43,6 +43,8 @@ public:
 	EdgeType getEdgeType();
 	Vertex* getV1();
 	Vertex* getV2();
+	Triangle* getT1();
+	Triangle* getT2();
 	Triangle* getTriangleNotContaining(Vertex* v);
 	Triangle* getTriangleContaining(Vertex* v);
 	Triangle* getOtherTriangle(Triangle* t);

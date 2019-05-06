@@ -14,7 +14,7 @@ class Triangle;
 #include "tedge.h"
 #include "triangle.h"
 
-class Vertex {
+class Vertex{
 
 private:
 	Triangulation* T;

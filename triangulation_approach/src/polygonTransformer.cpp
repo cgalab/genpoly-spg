@@ -12,7 +12,12 @@ int transformPolygon(Triangulation* T, int iterations, Timer t){
 	std::string filename;
 	int performedTranslations = 0;
 	Vertex* v;
+	Insertion* in;
 
+	in = new Insertion(T, 2);
+	(*in).execute();
+
+	iterations = 0;
 	for(int i = 0; i < iterations; i++){
 		//filename = "output/triangulation" + std::to_string(i) + ".graphml";
 		//(*T).print(filename.c_str());
