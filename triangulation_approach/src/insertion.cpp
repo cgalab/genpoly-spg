@@ -57,33 +57,36 @@ void Insertion::execute(){
 
 void Insertion::translate(RandomGenerator* generator){
 	int index;
-	bool overroll, simple;
+	bool overroll, simple = false;
 	double alpha, stddev, r, dx, dy;
 	Translation* trans;
 
-	index = (*T).getActualNumberOfVertices(); // don't know why not -1 here?!
+	index = (*T).getActualNumberOfVertices() - 1;
 
-	alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
-	stddev = (*newV).getDirectedEdgeLength(alpha);
+	while(!simple){
+		alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
+		//stddev = (*newV).getDirectedEdgeLength(alpha);
+		stddev = (*newV).getMediumEdgeLength();
 
-	r = (*generator).getTranslationUniform(stddev / 2, stddev / 4);
+		r = (*generator).getTranslationUniform(stddev / 2, stddev / 4);
 
-	dx = r * cos(alpha);
-	dy = r * sin(alpha);
+		dx = r * cos(alpha);
+		dy = r * sin(alpha);
 
-	trans = new Translation(T, index, dx, dy);
+		trans = new Translation(T, index, dx, dy);
 
-	overroll = (*trans).checkOverroll();
+		overroll = (*trans).checkOverroll();
 
-	if(!overroll){
-		simple = (*trans).checkSimplicityOfTranslation();
+		if(!overroll){
+			simple = (*trans).checkSimplicityOfTranslation();
 
-		if(simple){
-			(*trans).checkSplit();
+			if(simple){
+				(*trans).checkSplit();
 
-			(*trans).execute();
-		}		
+				(*trans).execute();
+			}
+		}
+
+		delete trans;
 	}
-
-	delete trans;
 }

@@ -182,7 +182,7 @@ void Vertex::removeTriangle(Triangle* t){
 
 //Printer
 void Vertex::print(FILE* f){
-	double factor = 100.0 / (*T).getActualNumberOfVertices();
+	double factor = 100.0 / (double)(*T).getActualNumberOfVertices() * 100;
 	if(factor < 1)
 		factor = 1;
 

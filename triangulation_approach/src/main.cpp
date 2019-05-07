@@ -9,8 +9,8 @@
 
 int main(){
 	Triangulation* T;
-	int n = 15;
-	int translations = 100 * n;
+	int n = 10000;
+	int translations;
 	Timer t;
 	Vertex* v;
 	TEdge* e;
@@ -18,10 +18,14 @@ int main(){
 	int performed;
 
 	t.start();
-	if(n <= 10)
+	if(n <= 100){
 		T = generateRegularPolygon(n);
-	else
-		T = generateRegularPolygon(10);
+		translations = n * 100;
+	}
+	else{
+		T = generateRegularPolygon(100);
+		translations = 10000;
+	}
 	(*T).check();
 	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", (*T).getActualNumberOfVertices(), t.elapsedTime());
 
