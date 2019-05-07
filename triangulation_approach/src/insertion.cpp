@@ -65,8 +65,7 @@ void Insertion::translate(RandomGenerator* generator){
 
 	while(!simple){
 		alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
-		//stddev = (*newV).getDirectedEdgeLength(alpha);
-		stddev = (*newV).getMediumEdgeLength();
+		stddev = (*newV).getDirectedEdgeLength(alpha);
 
 		r = (*generator).getTranslationUniform(stddev / 2, stddev / 4);
 

@@ -182,9 +182,15 @@ void Vertex::removeTriangle(Triangle* t){
 
 //Printer
 void Vertex::print(FILE* f){
-	double factor = 100.0 / (double)(*T).getActualNumberOfVertices() * 100;
-	if(factor < 1)
-		factor = 1;
+	double factor = 1;
+	int n = (*T).getActualNumberOfVertices();
+
+	if(n < 100)
+		factor = 100.0 / (double)n;
+	else if(n < 5000)
+		factor = 10;
+	else
+		factor = 20;
 
 	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * factor, y * factor, id, id);
 }
