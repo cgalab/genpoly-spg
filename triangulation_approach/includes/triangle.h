@@ -48,7 +48,7 @@ public:
 	void enqueue();
 	bool isEnqueued();
 	double calculateCollapseTime(Vertex* moving, double dx, double dy);
-	bool isInside(Vertex* v);
+	double signedArea();
 	
 	// Destructor
 	~Triangle();	

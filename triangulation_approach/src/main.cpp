@@ -9,22 +9,23 @@
 
 int main(){
 	Triangulation* T;
-	int n = 45000;
+	int n = 500000;
 	int translations;
 	Timer t;
 	Vertex* v;
 	TEdge* e;
 	Triangle* dreieck;
 	int performed;
+	int initialSize = 100;
 
 	t.start();
-	if(n <= 100){
+	if(n <= initialSize){
 		T = generateRegularPolygon(n);
 		translations = n * 100;
 	}
 	else{
-		T = generateRegularPolygon(100);
-		translations = 10000;
+		T = generateRegularPolygon(initialSize);
+		translations = 100 * initialSize;
 	}
 	(*T).check();
 	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", (*T).getActualNumberOfVertices(), t.elapsedTime());

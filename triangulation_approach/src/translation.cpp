@@ -179,9 +179,10 @@ void Translation::execute(){
 	Triangle* t = NULL;
 	std::pair<double, Triangle*> e;
 	Translation* trans;
-	double middleX, middleY, transX, transY, oldArea, newArea;
+	double middleX, middleY, transX, transY, oldArea, newArea, area, min;
 	TEdge* edge;
 	Vertex* intersectionPoint;
+	std::list<Triangle*> triangles;
 
 	if(split){
 		oldArea = signedArea(prevV, nextV, oldV);
@@ -264,6 +265,20 @@ void Translation::execute(){
 		}
 
 		(*original).setPosition((*oldV).getX() + dx, (*oldV).getY() + dy);
+
+		// TODO: check after translation whether each triangle still exists
+
+		/*triangles = (*original).getTriangles();
+
+		min = 2 * std::numeric_limits<double>::min();
+		for(auto& i : triangles){
+			area = (*i).signedArea();
+
+			if(area <= min && area >= - min){
+				printf("numerical error!");
+				flip(i, true);
+			}
+		}*/
 	}
 }
 
@@ -285,6 +300,7 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 		(*T).addVertex(newV);
 		(*T).print("triangulation.graphml");
 		exit(1);
+		// TODO: try to print just the context
 	}
 
 	t1 =(*e).getOtherTriangle(t0);

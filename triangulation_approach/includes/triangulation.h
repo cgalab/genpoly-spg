@@ -53,6 +53,7 @@ public:
 
 	// Others
 	void check();
+	void stretch(double factor);
 };
 
 #endif

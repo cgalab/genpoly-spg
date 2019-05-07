@@ -164,3 +164,14 @@ void Triangulation::check(){
 		(*i).check();
 	}
 }
+
+void Triangulation::stretch(double factor){
+	(*Rectangle0).stretch(factor);
+	(*Rectangle1).stretch(factor);
+	(*Rectangle2).stretch(factor);
+	(*Rectangle3).stretch(factor);
+
+	for(auto const& i : vertices){
+		(*i).stretch(factor);
+	}
+}

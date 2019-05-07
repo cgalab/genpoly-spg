@@ -188,6 +188,24 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	return numerator / denominator;
 }
 
+double Triangle::signedArea(){
+	double area;
+	double ax, ay, bx, by, cx, cy;
+
+	ax = (*v0).getX();
+	ay = (*v0).getY();
+
+	bx = (*v1).getX();
+	by = (*v1).getY();
+
+	cx = (*v2).getX();
+	cy = (*v2).getY();
+
+	area = 0.5 * (- ay * bx + ax * by + ay * cx - by * cx - ax * cy + bx * cy);
+
+	return area;
+}
+
 // Destructor
 Triangle::~Triangle(){
 	(*v0).removeTriangle(this);

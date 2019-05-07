@@ -221,6 +221,11 @@ void Vertex::check(){
 	}
 }
 
+void Vertex::stretch(double factor){
+	x = factor * x;
+	y = factor * y;
+}
+
 // Destructor
 Vertex::~Vertex(){
 	TEdge *e0, *e1, *e2;

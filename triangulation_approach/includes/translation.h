@@ -5,6 +5,7 @@
 #include "customPriorityQueue.h"
 #include <list>
 #include <math.h>
+#include <limits>
 
 
 #ifndef __TRANSLATION_H_
