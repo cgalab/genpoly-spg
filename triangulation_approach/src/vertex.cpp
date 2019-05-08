@@ -199,6 +199,21 @@ void Vertex::print(){
 	printf("Vertex %d at (%f, %f)\n", id, x, y);
 }
 
+void Vertex::printEnvironment(int depth){
+	Vertex *v;
+
+	print();
+
+	for(auto const& i : edges){
+		(*i).print();
+
+		if(depth > 0){
+			v = (*i).getOtherVertex(this);
+			(*v).printEnvironment(depth - 1);
+		}
+	}
+}
+
 // Others
 void Vertex::check(){
 	int n = 0;

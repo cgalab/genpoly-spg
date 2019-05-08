@@ -72,6 +72,7 @@ public:
 	// Printer
 	void print(FILE* f);
 	void print();
+	void printEnvironment(int depth);
 
 	// Others
 	void check();

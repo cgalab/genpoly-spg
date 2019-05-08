@@ -1,7 +1,6 @@
 PP = g++
 # maybe add -Werror -Wall
-WFLAGS = -Wextra -O3 
-
+WFLAGS = -Wextra -O3
 
 SDIR = src
 ODIR = obj

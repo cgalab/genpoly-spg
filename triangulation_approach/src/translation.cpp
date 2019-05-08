@@ -179,7 +179,7 @@ void Translation::execute(){
 	Triangle* t = NULL;
 	std::pair<double, Triangle*> e;
 	Translation* trans;
-	double middleX, middleY, transX, transY, oldArea, newArea, area, min;
+	double middleX, middleY, transX, transY, oldArea, newArea, area;
 	TEdge* edge;
 	Vertex* intersectionPoint;
 	std::list<Triangle*> triangles;
@@ -268,17 +268,21 @@ void Translation::execute(){
 
 		// TODO: check after translation whether each triangle still exists
 
-		/*triangles = (*original).getTriangles();
+		triangles = (*original).getTriangles();
 
-		min = 2 * std::numeric_limits<double>::min();
 		for(auto& i : triangles){
 			area = (*i).signedArea();
 
-			if(area <= min && area >= - min){
-				printf("numerical error!");
-				flip(i, true);
+			if(area == 0){
+				printf("numerical error! \n");
+				edge = (*i).getLongestEdge();
+				if((*edge).getEdgeType() != EdgeType::POLYGON)
+					flip(i, true);
+				else
+					printf("longest edge is PE\n");
+				printf("corrected! \n");
 			}
-		}*/
+		}
 	}
 }
 
@@ -299,6 +303,7 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 		printf("index: %d of %d dx: %f dy: %f \n", index, (*T).getActualNumberOfVertices(), dx, dy);
 		(*T).addVertex(newV);
 		(*T).print("triangulation.graphml");
+		(*original).printEnvironment(1);
 		exit(1);
 		// TODO: try to print just the context
 	}

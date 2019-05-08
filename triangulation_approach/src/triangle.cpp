@@ -72,14 +72,41 @@ TEdge* Triangle::getLongestEdge(){
 	double l1 = (*e1).length();
 	double l2 = (*e2).length();
 
-	if(l0 >= l1 && l0 >= l2)
+	if(l0 > l1 && l0 > l2)
 		return e0;
-	else if(l1 >= l2)
+
+	if(l1 > l2 && l1 > l0)
 		return e1;
-	else
+
+	if(l2 > l1 && l2 > l0)
 		return e2;
 
-	return 0;
+	// two edges have the same length
+
+	printf("multiple edges with the same length\n");
+
+	if(l0 == l1){
+		if((*e0).getEdgeType() == EdgeType::POLYGON)
+			return e1;
+		else
+			return e0;
+	}
+
+	if(l0 == l2){
+		if((*e0).getEdgeType() == EdgeType::POLYGON)
+			return e2;
+		else
+			return e0;
+	}
+
+	if(l1 == l2){
+		if((*e1).getEdgeType() == EdgeType::POLYGON)
+			return e1;
+		else
+			return e2;
+	}
+
+	return NULL;
 }
 
 // assumption: - pi <= alpha <= pi

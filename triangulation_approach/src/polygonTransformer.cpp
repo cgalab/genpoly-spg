@@ -24,7 +24,7 @@ int transformPolygonByMoves(Triangulation* T, int iterations, Timer t){
 		alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
 		stddev = (*v).getDirectedEdgeLength(alpha);
 
-		r = (*generator).getTranslationUniform(stddev / 2, stddev / 4);
+		r = (*generator).getTranslationNormal(stddev / 2, stddev / 6);
 
 		dx = r * cos(alpha);
 		dy = r * sin(alpha);
@@ -73,7 +73,7 @@ void growPolygon(Triangulation* T, int toNr, Timer t){
 
 		delete in;
 
-		if(i % 10 == 0)
+		if(i % 10000 == 0)
 			printf("%f%% of %d insertions performed after %f seconds \n", (double)i / (double)n * 100, n, t.elapsedTime());
 	}
 }
