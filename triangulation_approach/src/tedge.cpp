@@ -22,6 +22,11 @@ TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp){
 	n++;
 
 	T = NULL;
+
+	if(V1 == V2 || V1 == NULL || V2 == NULL){
+		printf("error circle edge\n");
+		exit(1);
+	}
 }
 
 TEdge::TEdge(Vertex* V1, Vertex* V2){ 
@@ -40,6 +45,11 @@ TEdge::TEdge(Vertex* V1, Vertex* V2){
 	n++;
 
 	T = NULL;
+
+	if(V1 == V2 || V1 == NULL || V2 == NULL){
+		printf("error circle edge\n");
+		exit(1);
+	}
 }
 
 // Getter

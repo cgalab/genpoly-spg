@@ -9,20 +9,20 @@
 
 int main(){
 	Triangulation* T;
-	int n = 1000000;
+	int n = 10000;
 	int translations;
 	Timer t;
 	int performed;
-	int initialSize = 50;
+	int initialSize = 10000;
 
 	t.start();
 	if(n <= initialSize){
 		T = generateRegularPolygon(n);
-		translations = n * 10000000;
+		translations = n * 100000;
 	}
 	else{
 		T = generateRegularPolygon(initialSize);
-		translations = 10000000 * initialSize;
+		translations = 1000 * initialSize;
 	}
 	(*T).check();
 	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", (*T).getActualNumberOfVertices(), t.elapsedTime());
@@ -32,6 +32,8 @@ int main(){
 	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, translations, t.elapsedTime());
 
 	(*T).check();
+
+	//(*T).stretch(1000);
 
 	(*T).print("triangulation_init.graphml");
 	//printStats(p);

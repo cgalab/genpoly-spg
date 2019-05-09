@@ -43,7 +43,7 @@ Vertex::Vertex(double X, double Y, int ID){
 }
 
 Vertex* Vertex::getTranslated(double dx, double dy){
-	return new Vertex(x + dx, y + dy, id);
+	return new Vertex(x + dx, y + dy);
 }
 
 // Getter
@@ -126,7 +126,8 @@ double Vertex::getDirectedEdgeLength(double alpha){
 	}
 	
 	printf("was not able to find the right triangle\n");
-	exit(1);
+	//exit(1);
+	return 0.001;
 }
 
 TEdge* Vertex::getToPrev(){
@@ -181,16 +182,18 @@ void Vertex::removeTriangle(Triangle* t){
 }
 
 //Printer
-void Vertex::print(FILE* f){
-	double factor = 1;
+void Vertex::print(FILE* f, double factor){
 	int n = (*T).getActualNumberOfVertices();
 
-	if(n < 100)
-		factor = 100.0 / (double)n;
-	else if(n < 5000)
-		factor = 10;
-	else
-		factor = 20;
+	if(factor == 0){
+		if(n < 100)
+			factor = 100.0 / (double)n;
+		else if(n < 5000)
+			factor = 10;
+		else
+			factor = 20;
+	}
+	
 
 	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * factor, y * factor, id, id);
 }
@@ -199,24 +202,61 @@ void Vertex::print(){
 	printf("Vertex %d at (%f, %f)\n", id, x, y);
 }
 
-void Vertex::printEnvironment(int depth){
-	Vertex *v;
+void Vertex::printEnvironment(int depth, const char* filename){
+	FILE* f;
+	std::map<int, TEdge*> es;
+	std::map<int, Vertex*> vs;
+	TEdge* e;
+	Vertex* v;
 
-	print();
+	f = fopen(filename, "w");
 
-	for(auto const& i : edges){
-		(*i).print();
+	getEnvironment(es, vs, depth);
 
-		if(depth > 0){
+	fprintf(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+	fprintf(f, "<graphml>\n");
+	fprintf(f, "<graph id=\"Graph\" edgeDefault=\"undirected\">\n");
+
+	fprintf(f, "<nodes>\n");
+
+	for(auto const& i : vs){
+		v = i.second;
+		(*v).print(f, 0.1);
+	}
+	fprintf(f, "</nodes>\n");
+
+	fprintf(f, "<edges>\n");
+	for(auto const& i : es){
+		e = i.second;
+		(*e).print(f);
+	}
+	fprintf(f, "</edges>\n");
+
+	fprintf(f, "</graph>\n");
+	fprintf(f, "</graphml>\n");
+
+	fclose(f);
+}
+
+void Vertex::getEnvironment(std::map<int, TEdge*> &es, std::map<int, Vertex*> &vs, int depth){
+	Vertex* v;
+
+	vs.insert(std::pair<int, Vertex*>(id, this));
+
+	if(depth > 0){
+		for(auto const& i : edges){
+			es.insert(std::pair<int, TEdge*>((*i).getID(), i));
 			v = (*i).getOtherVertex(this);
-			(*v).printEnvironment(depth - 1);
+			(*v).getEnvironment(es, vs, depth - 1);
 		}
 	}
+	
 }
 
 // Others
-void Vertex::check(){
+bool Vertex::check(){
 	int n = 0;
+	bool ok = true;
 
 	if(!rectangleVertex){
 		for(auto const& i : edges){
@@ -226,14 +266,21 @@ void Vertex::check(){
 
 		if(n != 2){
 			printf("Vertex %d has %d polygon edges\n", id, n);
+			ok = false;
 		}
 
-		if(toPrev == NULL)
+		if(toPrev == NULL){
 			printf("Edge to previous vertex is missing for vertex %d \n", id);
+			ok = false;
+		}
 
-		if(toNext == NULL)
+		if(toNext == NULL){
 			printf("Edge to next vertex is missing for vertex %d \n", id);
+			ok = false;
+		}
 	}
+
+	return ok;
 }
 
 void Vertex::stretch(double factor){

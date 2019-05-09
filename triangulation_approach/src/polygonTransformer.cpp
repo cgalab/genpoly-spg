@@ -56,7 +56,8 @@ int transformPolygonByMoves(Triangulation* T, int iterations, Timer t){
 void growPolygon(Triangulation* T, int toNr, Timer t){
 	int n, index, actualN, i;
 	Insertion *in;
-	RandomGenerator* generator = new RandomGenerator(); 
+	RandomGenerator* generator = new RandomGenerator();
+	bool ok;
 
 	n = toNr - (*T).getActualNumberOfVertices();
 

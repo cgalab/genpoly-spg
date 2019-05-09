@@ -52,7 +52,7 @@ public:
 	void printPolygon(const char* filename);
 
 	// Others
-	void check();
+	bool check();
 	void stretch(double factor);
 };
 

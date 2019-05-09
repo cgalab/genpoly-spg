@@ -274,13 +274,13 @@ void Translation::execute(){
 			area = (*i).signedArea();
 
 			if(area == 0){
-				printf("numerical error! \n");
+				//printf("numerical error! \n");
 				edge = (*i).getLongestEdge();
 				if((*edge).getEdgeType() != EdgeType::POLYGON)
 					flip(i, true);
 				else
 					printf("longest edge is PE\n");
-				printf("corrected! \n");
+				//printf("corrected! \n");
 			}
 		}
 	}
@@ -300,12 +300,12 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	e = (*t0).getLongestEdge();
 	if((*e).getEdgeType() == EdgeType::POLYGON){
 		printf("attention: polygon edge gets deleted :O \n");
-		printf("index: %d of %d dx: %f dy: %f \n", index, (*T).getActualNumberOfVertices(), dx, dy);
+		printf("id: %d dx: %f dy: %f \n", (*original).getID(), dx, dy);
 		(*T).addVertex(newV);
 		(*T).print("triangulation.graphml");
-		(*original).printEnvironment(1);
+		(*original).printEnvironment(3, "env.graphml");
+		(*T).check();
 		exit(1);
-		// TODO: try to print just the context
 	}
 
 	t1 =(*e).getOtherTriangle(t0);

@@ -1,6 +1,7 @@
 #include <list>
 #include <vector>
 #include <stdio.h>
+#include <map>
 
 
 #ifndef __VERTEX_H_
@@ -33,6 +34,7 @@ private:
 	static int n;
 	int id; // the id is always assumed to be equal to the index in the vertex vector of the triangulation
 
+	void getEnvironment(std::map<int, TEdge*> &es, std::map<int, Vertex*> &vs, int depth);
 public:
 
 	// Constructors
@@ -70,12 +72,12 @@ public:
 	void removeTriangle(Triangle* t);
 	
 	// Printer
-	void print(FILE* f);
+	void print(FILE* f, double factor);
 	void print();
-	void printEnvironment(int depth);
+	void printEnvironment(int depth, const char* filename);
 
 	// Others
-	void check();
+	bool check();
 	void stretch(double factor);
 	
 	// Destructor

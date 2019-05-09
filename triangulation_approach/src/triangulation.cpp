@@ -84,13 +84,13 @@ void Triangulation::print(const char* filename){
 
 	fprintf(f, "<nodes>\n");
 
-	(*Rectangle0).print(f);
-	(*Rectangle1).print(f);
-	(*Rectangle2).print(f);
-	(*Rectangle3).print(f);
+	(*Rectangle0).print(f, 0);
+	(*Rectangle1).print(f, 0);
+	(*Rectangle2).print(f, 0);
+	(*Rectangle3).print(f, 0);
 
 	for(auto const& i : vertices){
-		if(i != NULL) (*i).print(f);
+		if(i != NULL) (*i).print(f, 0);
 	}
 	fprintf(f, "</nodes>\n");
 
@@ -119,7 +119,7 @@ void Triangulation::printPolygon(const char* filename){
 
 	fprintf(f, "<nodes>\n");
 	for(auto const& i : vertices){
-		if(i != NULL && !(*i).isRectangleVertex()) (*i).print(f);
+		if(i != NULL && !(*i).isRectangleVertex()) (*i).print(f, 0);
 	}
 	fprintf(f, "</nodes>\n");
 
@@ -137,10 +137,11 @@ void Triangulation::printPolygon(const char* filename){
 }
 
 // Others
-void Triangulation::check(){
+bool Triangulation::check(){
 	EdgeType type;
 	int n;
 	TEdge* e;
+	bool ok = true;
 
 	for(auto const& i : edges){
 		e = i.second;
@@ -151,18 +152,22 @@ void Triangulation::check(){
 			if(n != 1){
 				printf("Edge of type FRAME with %d triangles:\n \t", n);
 				(*e).print();
+				ok = false;
 			}
 		}else{
 			if(n != 2){
 				printf("Edge of type not FRAME with %d triangles:\n \t", n);
 				(*e).print();
+				ok = false;
 			}
 		}			
 	}
 
 	for(auto const& i : vertices){
-		(*i).check();
+		ok = ok && (*i).check();
 	}
+
+	return ok;
 }
 
 void Triangulation::stretch(double factor){
