@@ -9,7 +9,9 @@
 #include "point.h"
 #include "rand.h"
 
-void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+	if (randseed) mt.seed(randseed);
+
 	unsigned int i, j, k;
 	polygon.resize(points.size());
 

@@ -86,7 +86,7 @@ public:
   }
 };
 
-enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg);
+enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg, unsigned int randseed);
 void printEnum(enum intersect_t val);
 void test();
 

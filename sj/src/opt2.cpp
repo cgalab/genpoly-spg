@@ -11,7 +11,6 @@
 #include "basicFunctions.h"
 #include "point.h"
 #include "edge.h"
-#include "randomGenerator.h"
 
 // comparison function for sorting pairs by secondary value
 bool sortbysec(const std::pair<Point*,double> &a, const std::pair<Point*,double> &b) {
@@ -532,9 +531,9 @@ std::pair<enum edge_t, std::set<Edge, setComp>::iterator> processEdge(Edge& e, s
   return retval2;
 }
 
-enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
 	// initialise and create a random permutation for the polygon
-	createRandPol(polygon, points);
+	createRandPol(polygon, points, randseed);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'

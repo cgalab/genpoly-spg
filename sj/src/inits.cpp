@@ -86,7 +86,7 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 }
 
 enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg,
-	enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew, bool& area, double& areaMin, double& areaMax) {
+	enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew, bool& area, double& areaMin, double& areaMax, unsigned int& randseed) {
 	enum error returnValue = SUCCESS;
 	int comm;
 
@@ -100,10 +100,11 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 		{"writeNew", no_argument, NULL, 'w'},
 		{"areamin", optional_argument, NULL, 'n'},
 		{"areamax", optional_argument, NULL, 'x'},
+		{"randseed", optional_argument, NULL, 'r'},
 		{0, 0, 0, 0}
 	};
 
-	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:w?tn::x::", long_options, NULL)) != -1 ) {
+	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:r:w?tn::x::", long_options, NULL)) != -1 ) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -120,16 +121,19 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 			case 'c':
 				returnValue = ofInit(outFormat, optarg);
 				break;
-			case 'w':
-				writeNew = true;
-				break;
-			case 't':
-				returnValue = RUN_TESTS;
-				break;
 			case 'n':
 				area = true;
 				if (optarg) areaMin = atof(optarg);
 				else areaMin = 0;
+				break;
+			case 'r':
+				randseed = atoi(optarg);
+				break;
+			case 't':
+				returnValue = RUN_TESTS;
+				break;
+			case 'w':
+				writeNew = true;
 				break;
 			case 'x':
 				area = true;
@@ -160,6 +164,8 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 				std::cerr << " --areamax<arg>     |OR| -x<arg>" << std::endl;
 				std::cerr << " :: no space allowed between areamax and <arg> or x and <arg> as it's an optional argument" << std::endl;
 				std::cerr << " :: option to calculate and return the area of a returned simple polygon (optional: if it's below <arg>)" << std::endl << std::endl;
+				std::cerr << " --randseed <arg>   |OR| -r <arg>" << std::endl;
+				std::cerr << " :: <arg> is an unsigned integer." << std::endl << std::endl;
 				std::cerr << " -t" << std::endl;
 				std::cerr << " :: ignores all other arguments and runs the test-bed." << std::endl;
 				break;

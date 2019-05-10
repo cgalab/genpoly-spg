@@ -15,6 +15,6 @@ void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon);
 bool collSwap(Point *a, Point *b, Point *c, std::vector<unsigned int>& polygon);
 bool collSwap (Edge& e1, Edge& e2, std::vector<unsigned int>& polygon);
 enum edge_t edgeCheck(unsigned int& index, Edge& e1, std::list<Edge>& edges, std::vector<unsigned int>& polygon, std::vector<Point>& points);
-enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points);
+enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
 
 #endif

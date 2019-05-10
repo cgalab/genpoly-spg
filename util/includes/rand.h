@@ -1,10 +1,10 @@
-#include <random>
-
 #ifndef __RAND_H_
 #define __RAND_H_
 
+#include <random>
+
 std::random_device rd;  // global variables for random engine
-std::mt19937 mt(rd());
+std::mt19937 mt (rd());
 
 // Min and Max are inclusive elements
 #define UniformRandomI(C, Min, Max)                   \
