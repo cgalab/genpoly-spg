@@ -97,10 +97,10 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 		{"alg", required_argument, NULL, 'a'},
 		{"informat", required_argument, NULL, 'b'},
 		{"outformat", required_argument, NULL, 'c'},
-		{"writeNew", no_argument, NULL, 'w'},
 		{"areamin", optional_argument, NULL, 'n'},
 		{"areamax", optional_argument, NULL, 'x'},
 		{"randseed", optional_argument, NULL, 'r'},
+		{"writeNew", no_argument, NULL, 'w'},
 		{0, 0, 0, 0}
 	};
 
