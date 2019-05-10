@@ -112,6 +112,10 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
         fprintf(fout, "  %lf   %lf\n", points[polygon[i]].x, points[polygon[i]].y);
       fprintf(fout, "  %lf   %lf\n", points[polygon[0]].x, points[polygon[0]].y);
       break;
+    case OF_PURE:
+      for (unsigned int i = 0; i < points.size(); ++i)
+        fprintf(fout, "%lf %lf\n", points[i].x, points[i].y);
+      break;
     case OF_UNDEFINED:
         std::cerr << "output format undefined.  Use -? for help." << std::endl;
       break;

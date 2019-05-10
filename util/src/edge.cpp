@@ -149,8 +149,8 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		else if (same12) return IS_VERTEX12;
 		else if (same21) return IS_VERTEX21;
 		else if (same22) return IS_VERTEX22;
-		else if (abs(det_a)+abs(det_b)+abs(det_c)+abs(det_d) == 0)
-			return IS_4P_COLLINEAR;
+		else if ((abs(det_a)+abs(det_b)+abs(det_c)+abs(det_d) == 0) && col) return IS_4P_COLLINEAR;
+
 		else if (col) return IS_3P_COLLINEAR;
 		else return IS_FALSE;
 	}

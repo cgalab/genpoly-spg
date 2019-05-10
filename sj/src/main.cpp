@@ -90,9 +90,8 @@ int main(int argc, char *argv[]) {
         returnValue = getSP(polygon, points, alg, randseed);
       }
 
-
-
       if (returnValue == SUCCESS) {
+        checkAllIntersections(polygon, points);
         returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
       }
     }
