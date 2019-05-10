@@ -490,7 +490,7 @@ std::pair<enum edge_t, std::set<Edge, setComp>::iterator> processEdge(Edge& e, s
         }
       }
       else {
-//        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+        //std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
         edgeS.erase(retval.first);
         eraseEdgeFromSet(before, edgeS);
         flip(e, before, polygon, points);
@@ -512,7 +512,7 @@ std::pair<enum edge_t, std::set<Edge, setComp>::iterator> processEdge(Edge& e, s
         }
       }
       else {
-//        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
+        //std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
         edgeS.erase(retval.first);
         eraseEdgeFromSet(after, edgeS);
         //removeEdgeFromSet(e, edgeS, polygon, points);
@@ -604,6 +604,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
       if ((*p1 > *p2) && (*p1 > *p3)) {
         e1 = Edge(p1, p2, index);
         e2 = Edge(p1, p3, index);
+        //std::cerr << std::endl << "removing: " << e1 << ", and: " << e2 << std::endl;
         val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
         if (val1.first == E_SKIP) {loop = true;}
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
@@ -614,7 +615,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
         e2 = Edge(p1, p3, index);
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop = true;}
-//        std::cerr << std::endl << "removed: " << e2 << ", processing: " << e1 << std::endl;
+        //std::cerr << std::endl << "removed: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true;continue;}
       } else if ((*p1 > *p2) && (*p1 < *p3) ) {
@@ -622,12 +623,12 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
         e2 = Edge(p1, p2, index);
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop = true;}
-//        std::cerr << std::endl << "removed: " << e2 << ", processing: " << e1 << std::endl;
+        //std::cerr << std::endl << "removed: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true; continue;}
       } else {
         // construct the edges
-//        std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
+        //std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
   		  if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
   			  e1 = Edge (p1, p2, index);
   			  e2 = Edge (p1, p3, index);
@@ -654,11 +655,11 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
           } //else std::cerr << "false alarm." << std::endl;
         }
 
-//  		  std::cerr << std::endl << "processing e1: " << e1 << std::endl;
+  		  //std::cerr << std::endl << "processing e1: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true;continue;}
 
-//  		  std::cerr << std::endl << "processing e2: " << e2 << std::endl;
+  		  //std::cerr << std::endl << "processing e2: " << e2 << std::endl;
   		  val2 = processEdge(e2, edgeS, polygon, points);
   		  if (val2.first == E_SKIP) {
           loop = true;

@@ -47,7 +47,12 @@ public:
     Yval yl, yr;
     double s;
     // comparison always starts at lex. higher of the P1 points.
-    if (*lhs.p1 < *rhs.p1) s = (*rhs.p1).x;
+    if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return false;
+    if (*lhs.p1 == *rhs.p1) {
+      if (*lhs.p2 < *rhs.p2) s = (*lhs.p2).x;
+      else s = (*rhs.p2).x;
+    }
+    else if (*lhs.p1 < *rhs.p1) s = (*rhs.p1).x;
     else s = (*lhs.p1).x;
     //std::cerr << ", s: " << s << std::endl;
     yl = getYatX(lhs, s);
@@ -61,7 +66,6 @@ public:
       // 4P coll.
       if ((abs(det1) < EPSILON) && (abs(det2) < EPSILON)) {
 //        std::cerr << "4Pc: " << std::endl;
-        if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return false;
         if (*lhs.p1 == *rhs.p1) return *lhs.p2 < *rhs.p2;
 //        std::cerr << ((*lhs.p1 < *rhs.p1) ? "true" : "false") << std::endl;
         return *lhs.p1 < *rhs.p1;
@@ -81,7 +85,7 @@ public:
 //      std::cerr << "gen: " << yl << " < " << yr << " : " << ((yl < yr) ? "true" : "false") << std::endl;
       return yl < yr; // general case:
     }
-    std::cerr << "ERROR: unexpected fallthrough in comparison!" << std::endl;
+    std::cerr << "ERROR: unexpected fallthrough in comparison! lhs: " << lhs << ",rhs: " << rhs << std::endl;
     return false;
   }
 };

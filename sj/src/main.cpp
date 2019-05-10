@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
       }
 
       if (returnValue == SUCCESS) {
-        checkAllIntersections(polygon, points);
+        //checkAllIntersections(polygon, points);
         returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
       }
     }
