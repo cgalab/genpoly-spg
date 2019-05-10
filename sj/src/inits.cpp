@@ -100,7 +100,7 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 		{"outformat", required_argument, NULL, 'c'},
 		{"areamin", optional_argument, NULL, 'n'},
 		{"areamax", optional_argument, NULL, 'x'},
-		{"randseed", optional_argument, NULL, 'r'},
+		{"randseed", required_argument, NULL, 'r'},
 		{"writeNew", no_argument, NULL, 'w'},
 		{0, 0, 0, 0}
 	};
@@ -161,9 +161,11 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 				std::cerr << "    a new file is created with an increment number added to the end." << std::endl << std::endl;
 				std::cerr << " --areamin<arg>     |OR| -n<arg>" << std::endl;
 				std::cerr << " :: no space allowed between areamin and <arg> or n and <arg> as it's an optional argument" << std::endl;
+				std::cerr << " :: the polygon is recalculated until returned area is above given minimum area" << std::endl;
 				std::cerr << " :: option to calculate and return the area of a returned simple polygon (optional: if it's above <arg>)" << std::endl << std::endl;
 				std::cerr << " --areamax<arg>     |OR| -x<arg>" << std::endl;
 				std::cerr << " :: no space allowed between areamax and <arg> or x and <arg> as it's an optional argument" << std::endl;
+				std::cerr << " :: the polygon is recalculated until returned area is below given maximum area" << std::endl;
 				std::cerr << " :: option to calculate and return the area of a returned simple polygon (optional: if it's below <arg>)" << std::endl << std::endl;
 				std::cerr << " --randseed <arg>   |OR| -r <arg>" << std::endl;
 				std::cerr << " :: <arg> is an unsigned integer." << std::endl << std::endl;

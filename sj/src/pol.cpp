@@ -45,7 +45,7 @@ bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Poin
         std::cerr << "retval: ";
         printEnum(retval);
         std::cerr << ", ei: " << ei << ", ej: " << ej << std::endl;
-        
+
         ++count;
         ret = true;
       }
