@@ -40,7 +40,6 @@ public:
 	// Constructors
 	Vertex(double X, double Y);
 	Vertex(double X, double Y, bool RV);
-	Vertex(double X, double Y, int ID);
 	Vertex* getTranslated(double dx, double dy);
 
 	// Getters

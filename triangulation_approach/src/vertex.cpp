@@ -29,19 +29,6 @@ Vertex::Vertex(double X, double Y, bool RV){
 	T = NULL;
 }
 
-Vertex::Vertex(double X, double Y, int ID){
-	x = X;
-	y = Y;
-	rectangleVertex = false;
-
-	id = ID;
-
-	toPrev = NULL;
-	toNext = NULL;
-
-	T = NULL;
-}
-
 Vertex* Vertex::getTranslated(double dx, double dy){
 	return new Vertex(x + dx, y + dy);
 }

@@ -9,7 +9,7 @@
 
 int main(){
 	Triangulation* T;
-	int n = 10000;
+	int n = 5000;
 	int translations;
 	Timer t;
 	int performed;
@@ -18,7 +18,7 @@ int main(){
 	t.start();
 	if(n <= initialSize){
 		T = generateRegularPolygon(n);
-		translations = n * 100000;
+		translations = n * 1000;
 	}
 	else{
 		T = generateRegularPolygon(initialSize);

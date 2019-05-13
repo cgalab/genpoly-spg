@@ -264,7 +264,8 @@ void Translation::execute(){
 			flip(t, false);
 		}
 
-		(*original).setPosition((*oldV).getX() + dx, (*oldV).getY() + dy);
+		//(*original).setPosition((*oldV).getX() + dx, (*oldV).getY() + dy);
+		(*original).setPosition((*newV).getX(), (*newV).getY());
 
 		// TODO: check after translation whether each triangle still exists
 

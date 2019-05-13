@@ -1,7 +1,7 @@
 #include "tedge.h"
 
 // Constructors
-TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp){ 
+TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp){
 	v1 = V1;
 	v2 = V2;
 
@@ -23,7 +23,7 @@ TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp){
 
 	T = NULL;
 
-	if(V1 == V2 || V1 == NULL || V2 == NULL){
+	if((*V1).getID() == (*V2).getID() || V1 == NULL || V2 == NULL){
 		printf("error circle edge\n");
 		exit(1);
 	}
@@ -46,7 +46,7 @@ TEdge::TEdge(Vertex* V1, Vertex* V2){
 
 	T = NULL;
 
-	if(V1 == V2 || V1 == NULL || V2 == NULL){
+	if((*V1).getID() == (*V2).getID() || V1 == NULL || V2 == NULL){
 		printf("error circle edge\n");
 		exit(1);
 	}
@@ -93,7 +93,7 @@ Triangle* TEdge::getOtherTriangle(Triangle* t){
 }
 
 Vertex* TEdge::getOtherVertex(Vertex* v){
-	if(v == v1)
+	if((*v).getID() == (*v1).getID())
 		return v2;
 	else
 		return v1;
@@ -272,10 +272,10 @@ enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
 		bool col = false; // if true, check for collinearity
 
 		//quick check if the edges share a vertex
-		if((*e1).getV1() == (*e2).getV2()) same11 = true;
-		if((*e1).getV1() == (*e2).getV2()) same12 = true;
-		if((*e1).getV2() == (*e2).getV1()) same21 = true;
-		if((*e1).getV2() == (*e2).getV2()) same22 = true;
+		if((*(*e1).getV1()).getID() == (*(*e2).getV2()).getID()) same11 = true;
+		if((*(*e1).getV1()).getID() == (*(*e2).getV2()).getID()) same12 = true;
+		if((*(*e1).getV2()).getID() == (*(*e2).getV1()).getID()) same21 = true;
+		if((*(*e1).getV2()).getID() == (*(*e2).getV2()).getID()) same22 = true;
 
 		// is e1 and e2 the same edge? then return IS_TRUE
 		if (same11 && same22) return IS_SAME_EDGE;
