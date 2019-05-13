@@ -51,15 +51,15 @@ std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
 	std::vector<TEdge*> out(2);
 	int index = 0;
 
-	if(e0 != e){
+	if((*e0).getID() != (*e).getID()){
 		out[index] = e0;
 		index++;
 	}
-	if(e1 != e){
+	if((*e1).getID() != (*e).getID()){
 		out[index] = e1;
 		index++;
 	}
-	if(e2 != e){
+	if((*e2).getID() != (*e).getID()){
 		out[index] = e2;
 		index++;
 	}
@@ -192,12 +192,12 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	cx = (*moving).getX();
 	cy = (*moving).getY();
 
-	if(moving == v0){
+	if((*moving).getID() == (*v0).getID()){
 		ax = (*v1).getX();
 		ay = (*v1).getY();
 		bx = (*v2).getX();
 		by = (*v2).getY();
-	}else if(moving == v1){
+	}else if((*moving).getID() == (*v1).getID()){
 		ax = (*v0).getX();
 		ay = (*v0).getY();
 		bx = (*v2).getX();

@@ -14,15 +14,16 @@ int main(){
 	Timer t;
 	int performed;
 	int initialSize = 10000;
+	int factor = 1000;
 
 	t.start();
 	if(n <= initialSize){
 		T = generateRegularPolygon(n);
-		translations = n * 1000;
+		translations = n * factor;
 	}
 	else{
 		T = generateRegularPolygon(initialSize);
-		translations = 1000 * initialSize;
+		translations = factor * initialSize;
 	}
 	(*T).check();
 	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", (*T).getActualNumberOfVertices(), t.elapsedTime());
@@ -40,7 +41,7 @@ int main(){
 
 	(*T).printPolygon("polygon_int.graphml");
 
-	//growPolygon(T, n, t);
+	growPolygon(T, n, t);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n", n, t.elapsedTime());
 
 	(*T).check();

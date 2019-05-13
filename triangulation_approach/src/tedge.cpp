@@ -188,7 +188,7 @@ double TEdge::getAngle(Vertex* v){
 	double x0, y0, x1, y1, dx, dy;
 	double cosa, alpha;
 
-	if(v == v1){
+	if((*v).getID() == (*v1).getID()){
 		x0 = (*v1).getX();
 		y0 = (*v1).getY();
 		x1 = (*v2).getX();

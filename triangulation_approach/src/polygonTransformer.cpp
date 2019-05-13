@@ -70,7 +70,7 @@ void growPolygon(Triangulation* T, int toNr, Timer t){
 		in = new Insertion(T, index);
 
 		(*in).execute();		
-		//(*in).translate(generator);
+		(*in).translate(generator);
 
 		delete in;
 
