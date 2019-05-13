@@ -276,7 +276,7 @@ void Translation::execute(){
 
 			if(area == 0){
 				//printf("numerical error! \n");
-				edge = (*i).getLongestEdge();
+				edge = (*i).getLongestEdge(0.0001);
 				if((*edge).getEdgeType() != EdgeType::POLYGON)
 					flip(i, true);
 				else
@@ -298,7 +298,7 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	if(!singleFlip) (*original).setPosition((*oldV).getX() + dx * actualTime, (*oldV).getY() + dy * actualTime);
 
 
-	e = (*t0).getLongestEdge();
+	e = (*t0).getLongestEdge(0.0001);
 	if((*e).getEdgeType() == EdgeType::POLYGON){
 		printf("attention: polygon edge gets deleted :O \n");
 		printf("id: %d dx: %f dy: %f \n", (*original).getID(), dx, dy);

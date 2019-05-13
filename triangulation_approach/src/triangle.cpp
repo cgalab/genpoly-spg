@@ -67,46 +67,54 @@ std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
 	return out;
 }
 
-TEdge* Triangle::getLongestEdge(){
+TEdge* Triangle::getLongestEdge(int epsilon){
 	double l0 = (*e0).length();
 	double l1 = (*e1).length();
 	double l2 = (*e2).length();
+	double longest, second;
+	TEdge *longestE, *secondE;
 
-	if(l0 > l1 && l0 > l2)
-		return e0;
+	if(l0 >= l1 && l0 >= l2){
+		longest = l0;
+		longestE = e0;
 
-	if(l1 > l2 && l1 > l0)
-		return e1;
+		if(l1 >= l2){
+			second = l1;
+			secondE = e1;
+		}else{
+			second = l2;
+			secondE = e2;
+		}
+	}else if(l1 >= l2){
+		longest = l1;
+		longestE = e1;
 
-	if(l2 > l1 && l2 > l0)
-		return e2;
+		if(l0 >= l2){
+			second = l0;
+			secondE = e0;
+		}else{
+			second = l2;
+			secondE = e2;
+		}
+	}else{
+		longest = l2;
+		longestE = e2;
 
-	// two edges have the same length
-
-	printf("multiple edges with the same length\n");
-
-	if(l0 == l1){
-		if((*e0).getEdgeType() == EdgeType::POLYGON)
-			return e1;
-		else
-			return e0;
+		if(l0 >= l1){
+			second = l0;
+			secondE = e0;
+		}else{
+			second = l1;
+			secondE = e1;
+		}
 	}
 
-	if(l0 == l2){
-		if((*e0).getEdgeType() == EdgeType::POLYGON)
-			return e2;
-		else
-			return e0;
+	if((*longestE).getEdgeType() == EdgeType::POLYGON){
+		if(longest - epsilon <= second)
+			longestE = secondE;
 	}
 
-	if(l1 == l2){
-		if((*e1).getEdgeType() == EdgeType::POLYGON)
-			return e1;
-		else
-			return e2;
-	}
-
-	return NULL;
+	return longestE;
 }
 
 // assumption: - pi <= alpha <= pi

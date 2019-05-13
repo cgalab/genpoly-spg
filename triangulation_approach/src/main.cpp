@@ -9,11 +9,11 @@
 
 int main(){
 	Triangulation* T;
-	int n = 5000;
+	int n = 1000000;
 	int translations;
 	Timer t;
 	int performed;
-	int initialSize = 10000;
+	int initialSize = 100;
 	int factor = 1000;
 
 	t.start();

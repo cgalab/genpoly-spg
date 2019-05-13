@@ -37,7 +37,7 @@ public:
 	Vertex* getOtherVertex(TEdge* e);
 	TEdge* getEdgeNotContaining(Vertex* v);
 	std::vector<TEdge*> getOtherEdges(TEdge* e);
-	TEdge* getLongestEdge();
+	TEdge* getLongestEdge(int epsilon);
 	double getRange(Vertex* v, double alpha);
 
 	// Printer
