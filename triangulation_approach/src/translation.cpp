@@ -303,7 +303,6 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 		printf("attention: polygon edge gets deleted :O \n");
 		printf("id: %llu dx: %f dy: %f \n", (*original).getID(), dx, dy);
 		(*T).addVertex(newV);
-		(*T).print("triangulation.graphml");
 		(*original).printEnvironment(3, "env.graphml");
 		(*T).check();
 		exit(1);

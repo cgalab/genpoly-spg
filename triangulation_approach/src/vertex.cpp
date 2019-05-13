@@ -113,8 +113,8 @@ double Vertex::getDirectedEdgeLength(double alpha){
 	}
 	
 	printf("was not able to find the right triangle\n");
-	//exit(1);
-	return 0.001;
+	
+	return getMediumEdgeLength();
 }
 
 TEdge* Vertex::getToPrev(){
@@ -170,9 +170,10 @@ void Vertex::removeTriangle(Triangle* t){
 
 //Printer
 void Vertex::print(FILE* f, double factor){
-	int n = (*T).getActualNumberOfVertices();
+	int n; 
 
 	if(factor == 0){
+		n = (*T).getActualNumberOfVertices();
 		if(n < 100)
 			factor = 100.0 / (double)n;
 		else if(n < 5000)
