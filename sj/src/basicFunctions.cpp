@@ -1,7 +1,7 @@
 #include <vector>
 #include "opt2.h"
 
-enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg) {
+enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg, unsigned int randseed) {
   enum error returnValue;
   switch(alg) {
     case A_UNDEFINED:
@@ -11,7 +11,7 @@ enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       returnValue = ALGORITHM_IDLE;
       break;
     case A_2OPT:
-      returnValue = opt2(polygon, points);
+      returnValue = opt2(polygon, points, randseed);
       break;
     default:
       returnValue = UNEXPECTED_ERROR;

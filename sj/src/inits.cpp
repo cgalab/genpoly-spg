@@ -77,6 +77,7 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 	if (strcmp(optarg,"perm") == 0) *outFormat = OF_PERM;
 	else if (strcmp(optarg,"poly") == 0) *outFormat = OF_POLY;
 	else if (strcmp(optarg,"dat") == 0) *outFormat = OF_DAT;
+	else if (strcmp(optarg,"pure") == 0) *outFormat = OF_PURE;
 	else {
 		*outFormat = OF_UNDEFINED;
 		std::cerr << "Error:  --outformat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'perm', 'dat', or 'poly'." << std::endl;
@@ -86,7 +87,7 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 }
 
 enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg,
-	enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew, bool& area, double& areaMin, double& areaMax) {
+	enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew, bool& area, double& areaMin, double& areaMax, unsigned int& randseed) {
 	enum error returnValue = SUCCESS;
 	int comm;
 
@@ -97,13 +98,14 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 		{"alg", required_argument, NULL, 'a'},
 		{"informat", required_argument, NULL, 'b'},
 		{"outformat", required_argument, NULL, 'c'},
-		{"writeNew", no_argument, NULL, 'w'},
 		{"areamin", optional_argument, NULL, 'n'},
 		{"areamax", optional_argument, NULL, 'x'},
+		{"randseed", required_argument, NULL, 'r'},
+		{"writeNew", no_argument, NULL, 'w'},
 		{0, 0, 0, 0}
 	};
 
-	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:w?tn::x::", long_options, NULL)) != -1 ) {
+	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:r:w?tn::x::", long_options, NULL)) != -1 ) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -120,16 +122,19 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 			case 'c':
 				returnValue = ofInit(outFormat, optarg);
 				break;
-			case 'w':
-				writeNew = true;
-				break;
-			case 't':
-				returnValue = RUN_TESTS;
-				break;
 			case 'n':
 				area = true;
 				if (optarg) areaMin = atof(optarg);
 				else areaMin = 0;
+				break;
+			case 'r':
+				randseed = atoi(optarg);
+				break;
+			case 't':
+				returnValue = RUN_TESTS;
+				break;
+			case 'w':
+				writeNew = true;
 				break;
 			case 'x':
 				area = true;
@@ -156,10 +161,14 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 				std::cerr << "    a new file is created with an increment number added to the end." << std::endl << std::endl;
 				std::cerr << " --areamin<arg>     |OR| -n<arg>" << std::endl;
 				std::cerr << " :: no space allowed between areamin and <arg> or n and <arg> as it's an optional argument" << std::endl;
+				std::cerr << " :: the polygon is recalculated until returned area is above given minimum area" << std::endl;
 				std::cerr << " :: option to calculate and return the area of a returned simple polygon (optional: if it's above <arg>)" << std::endl << std::endl;
 				std::cerr << " --areamax<arg>     |OR| -x<arg>" << std::endl;
 				std::cerr << " :: no space allowed between areamax and <arg> or x and <arg> as it's an optional argument" << std::endl;
+				std::cerr << " :: the polygon is recalculated until returned area is below given maximum area" << std::endl;
 				std::cerr << " :: option to calculate and return the area of a returned simple polygon (optional: if it's below <arg>)" << std::endl << std::endl;
+				std::cerr << " --randseed <arg>   |OR| -r <arg>" << std::endl;
+				std::cerr << " :: <arg> is an unsigned integer." << std::endl << std::endl;
 				std::cerr << " -t" << std::endl;
 				std::cerr << " :: ignores all other arguments and runs the test-bed." << std::endl;
 				break;

@@ -34,9 +34,10 @@ int main(int argc, char *argv[]) {
   int runAreaLoopFor, areaLoopCounter;
   clock_t areaTimerStart, areaTimerEnd;
   double maxTime, areaTimerElapsed;
+  unsigned int randseed = 0;
 
   // parse command line arguments
-  returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat, writeNew, calcArea, areaMin, areaMax);
+  returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat, writeNew, calcArea, areaMin, areaMax, randseed);
 
   if (returnValue == SUCCESS) {
     runAreaLoopFor = 1000;
@@ -54,8 +55,7 @@ int main(int argc, char *argv[]) {
       std::vector<unsigned int> polygon;
 
       // get a simple polygon with a given method
-      returnValue = getSP(polygon, points, alg);
-
+      //returnValue = getSP(polygon, points, alg);
 
       if (calcArea)
       {
@@ -67,16 +67,20 @@ int main(int argc, char *argv[]) {
           ++areaLoopCounter;
 
           // get a simple polygon with a given method
-          returnValue = getSP(polygon, points, alg);
+          returnValue = getSP(polygon, points, alg, randseed);
 
           area = pol_calc_area(polygon, points);
           areaTimerEnd = clock();
           areaTimerElapsed = (areaTimerEnd - areaTimerStart) / CLOCKS_PER_SEC;
+
+          //std::cerr << "areaMin: " << areaMin << ", areaMax: " << areaMax << ", area: " << area << std::endl;
+          //std::cerr << "time elapsed: " << areaTimerElapsed << ", areaLoopCounter: " << areaLoopCounter << std::endl;
+
           if ((areaMin >= 0) && (area > 0) && (area > areaMin)) break;
-          if ((areaMax > 0) && (area > 0) && (area < areaMax)) break;
+          if ((areaMax > 0)  && (area > 0) && (area < areaMax)) break;
+          if (randseed) break;
         } while ((areaLoopCounter < runAreaLoopFor) && (areaTimerElapsed < maxTime));
-        //std::cerr << "areaMin: " << areaMin << ", areaMax: " << areaMax << ", area: " << area << std::endl;
-        //std::cerr << "time elapsed: " << areaTimerElapsed << ", areaLoopCounter: " << areaLoopCounter << std::endl;
+
 
         if(area < 0)
           returnValue = ERR_AREA_NEGATIVE;
@@ -87,12 +91,11 @@ int main(int argc, char *argv[]) {
       }
       else {
         // get a simple polygon with a given method
-        returnValue = getSP(polygon, points, alg);
+        returnValue = getSP(polygon, points, alg, randseed);
       }
 
-
-
       if (returnValue == SUCCESS) {
+        //checkAllIntersections(polygon, points);
         returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
       }
     }
