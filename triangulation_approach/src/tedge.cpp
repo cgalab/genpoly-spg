@@ -88,7 +88,7 @@ Triangle* TEdge::getTriangleContaining(Vertex* v){
 }
 
 Triangle* TEdge::getOtherTriangle(Triangle* t){
-	if(t == t1) return t2;
+	if((*t).getID() == (*t1).getID()) return t2;
 	else return t1;
 }
 
@@ -125,9 +125,9 @@ void TEdge::setTriangle(Triangle* t){
 // Remover
 void TEdge::removeTriangle(Triangle* t){
 
-	if(t1 == t)
+	if(t1 != NULL && (*t1).getID() == (*t).getID())
 	 	t1 = NULL;
-	else if(t2 == t) 
+	else if(t2 != NULL && (*t2).getID() == (*t).getID()) 
 		t2 = NULL;
 	else 
 		printf("Removed triangle was not adjacent to edge from vertex %d to vertex %d \n", (*v1).getID(), (*v2).getID());
