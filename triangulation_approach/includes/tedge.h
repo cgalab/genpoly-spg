@@ -29,8 +29,8 @@ private:
 
 	EdgeType type;
 
-	int id;
-	static int n;
+	unsigned long long id;
+	static unsigned long long n;
 
 public:
 	
@@ -39,7 +39,7 @@ public:
 	TEdge(Vertex* V1, Vertex* V2, EdgeType tp);
 
 	// Getter
-	int getID();
+	unsigned long long getID();
 	EdgeType getEdgeType();
 	Vertex* getV1();
 	Vertex* getV2();

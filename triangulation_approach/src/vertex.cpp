@@ -46,12 +46,12 @@ std::list<Triangle*> Vertex::getTriangles(){
 	return triangles;
 }
 
-int Vertex::getID(){
+unsigned long long Vertex::getID(){
 	return id;
 }
 
 TEdge* Vertex::getEdgeTo(Vertex* toV){
-	int toID = (*toV).getID();
+	unsigned long long toID = (*toV).getID();
 	Vertex* v;
 
 	for(auto const& i : edges){
@@ -182,11 +182,11 @@ void Vertex::print(FILE* f, double factor){
 	}
 	
 
-	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%d\" mainText=\"%d\"></node>\n", x * factor, y * factor, id, id);
+	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%llu\" mainText=\"%llu\"></node>\n", x * factor, y * factor, id, id);
 }
 
 void Vertex::print(){
-	printf("Vertex %d at (%f, %f)\n", id, x, y);
+	printf("Vertex %llu at (%f, %f)\n", id, x, y);
 }
 
 void Vertex::printEnvironment(int depth, const char* filename){
@@ -252,17 +252,17 @@ bool Vertex::check(){
 		}
 
 		if(n != 2){
-			printf("Vertex %d has %d polygon edges\n", id, n);
+			printf("Vertex %llu has %d polygon edges\n", id, n);
 			ok = false;
 		}
 
 		if(toPrev == NULL){
-			printf("Edge to previous vertex is missing for vertex %d \n", id);
+			printf("Edge to previous vertex is missing for vertex %llu \n", id);
 			ok = false;
 		}
 
 		if(toNext == NULL){
-			printf("Edge to next vertex is missing for vertex %d \n", id);
+			printf("Edge to next vertex is missing for vertex %llu \n", id);
 			ok = false;
 		}
 	}
@@ -299,4 +299,4 @@ Vertex::~Vertex(){
 }
 
 // static member variables
-int Vertex::n = 0;
+unsigned long long Vertex::n = 0;

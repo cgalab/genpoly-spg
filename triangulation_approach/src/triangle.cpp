@@ -25,7 +25,7 @@ Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vert
 }
 
 // Getter
-int Triangle::getID(){
+unsigned long long Triangle::getID(){
 	return id;
 }
 
@@ -43,7 +43,7 @@ TEdge* Triangle::getEdgeNotContaining(Vertex* v){
 	if(!(*e1).contains(v)) return e1;
 	if(!(*e2).contains(v)) return e2;
 
-	printf("error: all edges are containing the vertex %d \n", (*v).getID());
+	printf("error: all edges are containing the vertex %llu \n", (*v).getID());
 	return NULL;
 }
 
@@ -174,7 +174,7 @@ void Triangle::print(){
 
 // Others
 bool Triangle::contains(Vertex* v){
-	int id = (*v).getID();
+	unsigned long long id = (*v).getID();
 
 	if((*v0).getID() == id) return true;
 	if((*v1).getID() == id) return true;
@@ -253,4 +253,4 @@ Triangle::~Triangle(){
 }
 
 // static member variables
-int Triangle::n = 0;
+unsigned long long Triangle::n = 0;

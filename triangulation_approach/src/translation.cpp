@@ -301,7 +301,7 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	e = (*t0).getLongestEdge(0.0001);
 	if((*e).getEdgeType() == EdgeType::POLYGON){
 		printf("attention: polygon edge gets deleted :O \n");
-		printf("id: %d dx: %f dy: %f \n", (*original).getID(), dx, dy);
+		printf("id: %llu dx: %f dy: %f \n", (*original).getID(), dx, dy);
 		(*T).addVertex(newV);
 		(*T).print("triangulation.graphml");
 		(*original).printEnvironment(3, "env.graphml");

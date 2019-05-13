@@ -24,8 +24,8 @@ private:
 
 	bool enqueued; // indicates whether the triangle is in the actual event queue
 
-	int id;
-	static int n;
+	unsigned long long id;
+	static unsigned long long n;
 
 public:
 	
@@ -33,7 +33,7 @@ public:
 	Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2);
 
 	// Getter
-	int getID();
+	unsigned long long getID();
 	Vertex* getOtherVertex(TEdge* e);
 	TEdge* getEdgeNotContaining(Vertex* v);
 	std::vector<TEdge*> getOtherEdges(TEdge* e);

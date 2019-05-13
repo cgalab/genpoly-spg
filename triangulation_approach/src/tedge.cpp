@@ -53,7 +53,7 @@ TEdge::TEdge(Vertex* V1, Vertex* V2){
 }
 
 // Getter
-int TEdge::getID(){
+unsigned long long TEdge::getID(){
 	return id;
 }
 
@@ -117,7 +117,7 @@ void TEdge::setTriangle(Triangle* t){
 	if(t1 == NULL) t1 = t;
 	else if(t2 == NULL) t2 = t;
 	else{
-		printf("The edge from vertex %d to vertex %d already has two triangles!\n", (*v1).getID(), (*v2).getID());
+		printf("The edge from vertex %llu to vertex %llu already has two triangles!\n", (*v1).getID(), (*v2).getID());
 		exit(1);
 	}
 }
@@ -130,7 +130,7 @@ void TEdge::removeTriangle(Triangle* t){
 	else if(t2 != NULL && (*t2).getID() == (*t).getID()) 
 		t2 = NULL;
 	else 
-		printf("Removed triangle was not adjacent to edge from vertex %d to vertex %d \n", (*v1).getID(), (*v2).getID());
+		printf("Removed triangle was not adjacent to edge from vertex %llu to vertex %llu \n", (*v1).getID(), (*v2).getID());
 }
 
 // Printer
@@ -141,7 +141,7 @@ void TEdge::print(FILE* f){
 
 	if(type == EdgeType::POLYGON) w = 5;
 	if(type == EdgeType::FRAME) w = 10;
-	fprintf(f, "<edge vertex1=\"%d\" vertex2=\"%d\" weight=\"%d\" useWeight=\"true\"></edge>\n", (*v1).getID(), (*v2).getID(), w);
+	fprintf(f, "<edge vertex1=\"%llu\" vertex2=\"%llu\" weight=\"%d\" useWeight=\"true\"></edge>\n", (*v1).getID(), (*v2).getID(), w);
 }
 
 void TEdge::print(){
@@ -151,7 +151,7 @@ void TEdge::print(){
 	else if(type == EdgeType::FRAME) tp = "FRAME";
 	else tp = "TRIANGULATION";
 
-	printf("Edge %d from point %d to point %d of type %s \n", id, (*v1).getID(), (*v2).getID(), tp.c_str());
+	printf("Edge %llu from vertex %llu to vertex %llu of type %s \n", id, (*v1).getID(), (*v2).getID(), tp.c_str());
 }
 
 // Others
@@ -226,7 +226,7 @@ TEdge::~TEdge(){
 }
 
 // Static member variables
-int TEdge::n = 0;
+unsigned long long TEdge::n = 0;
 
 // Other non-member stuff
 // from steinthors Edge class

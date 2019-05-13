@@ -31,8 +31,8 @@ private:
 
 	bool rectangleVertex; // determines whether the vertex is part of the rectangle surrounding the polygon
 
-	static int n;
-	int id; // the id is always assumed to be equal to the index in the vertex vector of the triangulation
+	static unsigned long long n;
+	unsigned long long id;
 
 	void getEnvironment(std::map<int, TEdge*> &es, std::map<int, Vertex*> &vs, int depth);
 public:
@@ -46,7 +46,7 @@ public:
 	double getX();
 	double getY();
 	std::list<Triangle*> getTriangles();
-	int getID();
+	unsigned long long getID();
 	TEdge* getEdgeTo(Vertex* v);
 	std::vector<TEdge*> getSurroundingEdges();
 	std::list<TEdge*> getPolygonEdges();
