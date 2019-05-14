@@ -25,6 +25,7 @@ public:
 	Insertion(Triangulation* t, int index);
 
 	// Others
+	bool lengthControll();
 	void execute();
 	void translate(RandomGenerator* generator);
 };

@@ -209,7 +209,7 @@ void Vertex::printEnvironment(int depth, const char* filename){
 
 	for(auto const& i : vs){
 		v = i.second;
-		(*v).print(f, 0.1);
+		(*v).print(f, 200);
 	}
 	fprintf(f, "</nodes>\n");
 

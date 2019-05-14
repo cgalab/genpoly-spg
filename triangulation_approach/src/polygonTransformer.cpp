@@ -58,10 +58,12 @@ void growPolygon(Triangulation* T, int toNr, Timer t){
 	Insertion *in;
 	RandomGenerator* generator = new RandomGenerator();
 	bool ok;
+	int div;
 
 	n = toNr - (*T).getActualNumberOfVertices();
+	div = 0.01 * n;
 
-	for(i = 0; i < n; i++){
+	for(i = 0; i < n;){
 		
 		actualN = (*T).getActualNumberOfVertices();
 
@@ -69,12 +71,20 @@ void growPolygon(Triangulation* T, int toNr, Timer t){
 
 		in = new Insertion(T, index);
 
+		ok = (*in).lengthControll();
+		if(!ok){
+			delete in;
+			continue;
+		}
+
 		(*in).execute();		
 		(*in).translate(generator);
 
 		delete in;
 
-		if(i % 10000 == 0)
+		i++;
+
+		if(i % div == 0)
 			printf("%f%% of %d insertions performed after %f seconds \n", (double)i / (double)n * 100, n, t.elapsedTime());
 	}
 }

@@ -12,6 +12,15 @@ Insertion::Insertion(Triangulation* t, int index){
 }
 
 // Others
+bool Insertion::lengthControll(){
+	double l = (*e).length();
+
+	if(l < 0.005)
+		return false;
+
+	return true;
+}
+
 void Insertion::execute(){
 	Triangle *t0, *t1;
 	double x, y;

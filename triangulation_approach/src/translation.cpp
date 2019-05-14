@@ -304,6 +304,7 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 		printf("id: %llu dx: %f dy: %f \n", (*original).getID(), dx, dy);
 		(*T).addVertex(newV);
 		(*original).printEnvironment(3, "env.graphml");
+		(*T).print("bug.graphml");
 		(*T).check();
 		exit(1);
 	}
