@@ -214,22 +214,29 @@ double TEdge::getAngle(Vertex* v){
 }
 
 bool TEdge::isBetween(Vertex* v){
-	double vx, vy, v1x, v2x, v1y, v2y;
+	double v1x, v2x, v1y, v2y, dx, dy, z;
 
-	vx = (*v).getX();
-	vy = (*v).getY();
 	v1x = (*v1).getX();
 	v1y = (*v1).getY();
 	v2x = (*v2).getX();
 	v2y = (*v2).getY();
 
-	if((vx <= v1x && vx >= v2x) || (vx >= v1x && vx <= v2x)){
-		if((vy <= v1y && vy >= v2y) || (vy >= v1y && vy <= v2y))
+	dx = fabs(v1x - v2x);
+	dy = fabs(v1y - v2y);
+
+	if(dx >= dy){
+		z = (*v).getX();
+
+		if((z >= v1x && z <= v2x) || (z <= v1x && z >= v2x))
 			return true;
-		else
-			return false;
-	}else
-		return false;
+	}else{
+		z = (*v).getY();
+
+		if((z >= v1y && z <= v2y) || (z <= v1y && z >= v2y))
+			return true;
+	}
+
+	return false;
 }
 
 // Destructor

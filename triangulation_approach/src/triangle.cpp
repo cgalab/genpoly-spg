@@ -156,12 +156,12 @@ TEdge* Triangle::getLongestEdgeAlt(){
 		return e2;
 
 	printf("was not able to detect a longest edge by comparison\n");
-	/*print();
+	print();
 	(*v0).print();
 	(*v1).print();
 	(*v2).print();
-	(*(*v0).getTriangulation()).print("strang.graphml");
-	exit(1);*/
+	//(*(*v0).getTriangulation()).print("strang.graphml");
+	//exit(1);
 	return getLongestEdge(0.0001);
 }
 
