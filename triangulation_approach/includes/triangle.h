@@ -34,10 +34,13 @@ public:
 
 	// Getter
 	unsigned long long getID();
+	Vertex* getVertex(int index);
+	TEdge* getEdge(int index);
 	Vertex* getOtherVertex(TEdge* e);
 	TEdge* getEdgeNotContaining(Vertex* v);
 	std::vector<TEdge*> getOtherEdges(TEdge* e);
 	TEdge* getLongestEdge(int epsilon);
+	TEdge* getLongestEdgeAlt();
 	double getRange(Vertex* v, double alpha);
 
 	// Printer

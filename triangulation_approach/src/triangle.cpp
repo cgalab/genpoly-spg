@@ -29,6 +29,28 @@ unsigned long long Triangle::getID(){
 	return id;
 }
 
+Vertex* Triangle::getVertex(int index){
+	if(index == 0)
+		return v0;
+	if(index == 1)
+		return v1;
+	if(index == 2)
+		return v2;
+
+	return NULL;	
+}
+
+TEdge* Triangle::getEdge(int index){
+	if(index == 0)
+		return e0;
+	if(index == 1)
+		return e1;
+	if(index == 2)
+		return e2;
+
+	return NULL;
+}
+
 Vertex* Triangle::getOtherVertex(TEdge* e){
 	if(!(*e).contains(v0)) 
 		return v0;
@@ -115,6 +137,32 @@ TEdge* Triangle::getLongestEdge(int epsilon){
 	}
 
 	return longestE;
+}
+
+TEdge* Triangle::getLongestEdgeAlt(){
+	TEdge* e;
+	Vertex* v;
+
+	v = getOtherVertex(e0);
+	if((*e0).isBetween(v) && (*e0).getEdgeType() != EdgeType::POLYGON)
+		return e0;
+
+	v = getOtherVertex(e1);
+	if((*e1).isBetween(v) && (*e1).getEdgeType() != EdgeType::POLYGON)
+		return e1;
+
+	v = getOtherVertex(e2);
+	if((*e2).isBetween(v) && (*e2).getEdgeType() != EdgeType::POLYGON)
+		return e2;
+
+	printf("was not able to detect a longest edge by comparison\n");
+	/*print();
+	(*v0).print();
+	(*v1).print();
+	(*v2).print();
+	(*(*v0).getTriangulation()).print("strang.graphml");
+	exit(1);*/
+	return getLongestEdge(0.0001);
 }
 
 // assumption: - pi <= alpha <= pi

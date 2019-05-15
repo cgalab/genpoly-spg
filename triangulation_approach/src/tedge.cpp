@@ -213,6 +213,25 @@ double TEdge::getAngle(Vertex* v){
 	return alpha;
 }
 
+bool TEdge::isBetween(Vertex* v){
+	double vx, vy, v1x, v2x, v1y, v2y;
+
+	vx = (*v).getX();
+	vy = (*v).getY();
+	v1x = (*v1).getX();
+	v1y = (*v1).getY();
+	v2x = (*v2).getX();
+	v2y = (*v2).getY();
+
+	if((vx <= v1x && vx >= v2x) || (vx >= v1x && vx <= v2x)){
+		if((vy <= v1y && vy >= v2y) || (vy >= v1y && vy <= v2y))
+			return true;
+		else
+			return false;
+	}else
+		return false;
+}
+
 // Destructor
 // Attention: don't remove edges before there triangles are removed
 TEdge::~TEdge(){

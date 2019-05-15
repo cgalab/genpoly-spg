@@ -200,6 +200,7 @@ void Translation::execute(){
 				printf("index: %d dx: %f dy: %f \n", index, dx, dy);
 				(*T).addVertex(newV);
 				(*T).print("triangulation.graphml");
+				//(*original).printSurroundingTriangulation("env.graphml");
 				exit(1);
 			}
 
@@ -276,7 +277,7 @@ void Translation::execute(){
 
 			if(area == 0){
 				//printf("numerical error! \n");
-				edge = (*i).getLongestEdge(0.0001);
+				edge = (*i).getLongestEdgeAlt();
 				if((*edge).getEdgeType() != EdgeType::POLYGON)
 					flip(i, true);
 				else
@@ -298,7 +299,7 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	if(!singleFlip) (*original).setPosition((*oldV).getX() + dx * actualTime, (*oldV).getY() + dy * actualTime);
 
 
-	e = (*t0).getLongestEdge(0.0001);
+	e = (*t0).getLongestEdgeAlt();
 	if((*e).getEdgeType() == EdgeType::POLYGON){
 		printf("attention: polygon edge gets deleted :O \n");
 		printf("id: %llu dx: %f dy: %f \n", (*original).getID(), dx, dy);

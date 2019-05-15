@@ -112,7 +112,9 @@ double Vertex::getDirectedEdgeLength(double alpha){
 		}
 	}
 	
-	printf("was not able to find the right triangle\n");
+	printf("was not able to find the right triangle for vertex %llu \n", id);
+	/*printSurroundingTriangulation("env.graphml");
+	exit(1);*/
 	
 	return getMediumEdgeLength();
 }
@@ -131,6 +133,10 @@ Vertex* Vertex::getPrev(){
 
 Vertex* Vertex::getNext(){
 	return (*toNext).getOtherVertex(this);
+}
+
+Triangulation* Vertex::getTriangulation(){
+	return T;
 }
 
 // Setter
@@ -187,7 +193,7 @@ void Vertex::print(FILE* f, double factor){
 }
 
 void Vertex::print(){
-	printf("Vertex %llu at (%f, %f)\n", id, x, y);
+	printf("Vertex %llu at (%.15f, %.15f)\n", id, x, y);
 }
 
 void Vertex::printEnvironment(int depth, const char* filename){
@@ -239,6 +245,62 @@ void Vertex::getEnvironment(std::map<int, TEdge*> &es, std::map<int, Vertex*> &v
 		}
 	}
 	
+}
+
+void Vertex::printSurroundingTriangulation(const char* filename){
+	FILE* f;
+	std::map<int, TEdge*> es;
+	std::map<int, Vertex*> vs;
+	TEdge* e;
+	Vertex* v;
+
+	f = fopen(filename, "w");
+
+	vs.insert(std::pair<int, Vertex*>(id, this));
+
+	for(auto const& i : triangles){
+		e = (*i).getEdge(0);
+		es.insert(std::pair<int, TEdge*>((*e).getID(), e));
+
+		e = (*i).getEdge(1);
+		es.insert(std::pair<int, TEdge*>((*e).getID(), e));
+
+		e = (*i).getEdge(2);
+		es.insert(std::pair<int, TEdge*>((*e).getID(), e));
+
+		v = (*i).getVertex(0);
+		vs.insert(std::pair<int, Vertex*>((*v).getID(), v));
+
+		v = (*i).getVertex(1);
+		vs.insert(std::pair<int, Vertex*>((*v).getID(), v));
+
+		v = (*i).getVertex(2);
+		vs.insert(std::pair<int, Vertex*>((*v).getID(), v));
+	}
+
+	fprintf(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+	fprintf(f, "<graphml>\n");
+	fprintf(f, "<graph id=\"Graph\" edgeDefault=\"undirected\">\n");
+
+	fprintf(f, "<nodes>\n");
+
+	for(auto const& i : vs){
+		v = i.second;
+		(*v).print(f, 500);
+	}
+	fprintf(f, "</nodes>\n");
+
+	fprintf(f, "<edges>\n");
+	for(auto const& i : es){
+		e = i.second;
+		(*e).print(f);
+	}
+	fprintf(f, "</edges>\n");
+
+	fprintf(f, "</graph>\n");
+	fprintf(f, "</graphml>\n");
+
+	fclose(f);
 }
 
 // Others

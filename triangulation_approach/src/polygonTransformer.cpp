@@ -59,6 +59,7 @@ void growPolygon(Triangulation* T, int toNr, Timer t){
 	RandomGenerator* generator = new RandomGenerator();
 	bool ok;
 	int div;
+	int counter = 0;
 
 	n = toNr - (*T).getActualNumberOfVertices();
 	div = 0.01 * n;
@@ -74,8 +75,15 @@ void growPolygon(Triangulation* T, int toNr, Timer t){
 		ok = (*in).lengthControll();
 		if(!ok){
 			delete in;
+
+			counter++;
+			if(counter > 10000)
+				printf("%d tries to find a suitable edge to insert in\n", counter);
+			
 			continue;
 		}
+
+		counter = 0;
 
 		(*in).execute();		
 		(*in).translate(generator);

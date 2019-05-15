@@ -67,6 +67,7 @@ public:
 	bool contains(Vertex* v);
 	int nrAssignedTriangles();
 	double getAngle(Vertex* v);
+	bool isBetween(Vertex* v);
 
 	// Destructor
 	~TEdge();

@@ -57,6 +57,7 @@ public:
 	TEdge* getToNext();
 	Vertex* getPrev();
 	Vertex* getNext();
+	Triangulation* getTriangulation();
 
 	// Setters
 	void setTriangulation(Triangulation* t);
@@ -74,6 +75,7 @@ public:
 	void print(FILE* f, double factor);
 	void print();
 	void printEnvironment(int depth, const char* filename);
+	void printSurroundingTriangulation(const char* filename);
 
 	// Others
 	bool check();
