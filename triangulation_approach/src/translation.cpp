@@ -190,7 +190,8 @@ void Translation::execute(){
 
 		// vertex stays on the same side of the edge between the neigboring vertices
 		if(signbit(oldArea) == signbit(newArea)){
-				
+			
+			// TODO: maybe the intersection point computation causes parts of the trouble	
 			// compute the intersection point to split the translation
 			intersectionPoint = getIntersectionPoint(prevV, oldV, nextV, newV);
 			if(intersectionPoint == NULL)
@@ -241,6 +242,7 @@ void Translation::execute(){
 			if(edge != NULL){
 				t = (*edge).getTriangleContaining(original);
 				flip(t, true);
+				//printf("did a security flip\n");
 			}				
 
 			// get translation from middle to end
@@ -268,8 +270,8 @@ void Translation::execute(){
 		//(*original).setPosition((*oldV).getX() + dx, (*oldV).getY() + dy);
 		(*original).setPosition((*newV).getX(), (*newV).getY());
 
-		// TODO: check after translation whether each triangle still exists
-
+		// check after translation whether any of the still existing triangles has the area 0
+		// this is not good enough to avoid all security flips for splited translations!
 		triangles = (*original).getTriangles();
 
 		for(auto& i : triangles){
@@ -294,6 +296,7 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	Vertex *vn0, *vn1; // non joint vertices
 	TEdge *e, *e1, *e2;
 	double t;
+	double x, y;
 
 	// move vertex to event time
 	if(!singleFlip) (*original).setPosition((*oldV).getX() + dx * actualTime, (*oldV).getY() + dy * actualTime);
@@ -339,9 +342,16 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	t1 = new Triangle(e, e1, e2, vn0, vn1, vj1);
 
 	// add new triangles to queue if necessary
+	// TODO: think about potential to calculate the collapse time relative to the original position of the point
+	// maybe it's possible to reset the position of original to the original position temporarely
 	if(!singleFlip){
+		// reset coordinates temporarely to original position
+		x = (*original).getX();
+		y = (*original).getY();
+		(*original).setPosition((*oldV).getX(), (*oldV).getY());
+
 		t = (*t0).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
-		t = t + actualTime;
+		//t = t + actualTime;
 
 		if(t >= actualTime && t <= 1){
 			(*t0).enqueue();
@@ -349,12 +359,14 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 		}
 
 		t = (*t1).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
-		t = t + actualTime;
+		//t = t + actualTime;
 
 		if(t >= actualTime && t <= 1){
 			(*t1).enqueue();
 			Q.push(std::make_pair(t, t1));
 		}
+
+		(*original).setPosition(x, y);
 	}
 }
 

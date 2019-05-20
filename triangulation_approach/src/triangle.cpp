@@ -139,6 +139,7 @@ TEdge* Triangle::getLongestEdge(int epsilon){
 	return longestE;
 }
 
+// seems to work right and the problem of getting a PE here is caused by an error in the triangulation
 TEdge* Triangle::getLongestEdgeAlt(){
 	TEdge* e;
 	Vertex* v;
@@ -162,6 +163,8 @@ TEdge* Triangle::getLongestEdgeAlt(){
 	(*v2).print();
 	//(*(*v0).getTriangulation()).print("strang.graphml");
 	//exit(1);
+
+	// questionable whether this is really helpful
 	return getLongestEdge(0.0001);
 }
 

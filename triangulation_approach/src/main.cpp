@@ -9,11 +9,11 @@
 
 int main(){
 	Triangulation* T;
-	int n = 1000000;
+	int n = 10000;
 	int translations;
 	Timer t;
 	int performed;
-	int initialSize = 100;
+	int initialSize = 10000;
 	int factor = 1000;
 
 	t.start();
@@ -36,14 +36,14 @@ int main(){
 
 	//(*T).stretch(1000);
 
-	(*T).print("triangulation_init.graphml");
+	/*(*T).print("triangulation_init.graphml");
 	//printStats(p);
 
 	(*T).printPolygon("polygon_int.graphml");
 
 	growPolygon(T, n, t);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n", n, t.elapsedTime());
-
+	*/
 	(*T).check();
 	
 	(*T).print("triangulation.graphml");
