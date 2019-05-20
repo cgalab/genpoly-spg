@@ -82,8 +82,11 @@ int main(int argc, char *argv[]) {
         } while ((areaLoopCounter < runAreaLoopFor) && (areaTimerElapsed < maxTime));
 
 
-        if(area < 0)
-          returnValue = ERR_AREA_NEGATIVE;
+        if(area < 0) {
+          doFlip(0, polygon.size()-1, polygon, points);
+          area = pol_calc_area(polygon, points);
+          std::cout << std::setprecision(15) << area << std::endl;
+        }
         else if (((areaMin >= 0) && (area > areaMin)) || ((areaMax > 0) && (area < areaMax)))
           std::cout << std::setprecision(15) << area << std::endl;
         else

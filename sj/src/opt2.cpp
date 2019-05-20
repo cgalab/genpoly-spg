@@ -565,7 +565,6 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 
   do {
     loop = false;
-    comp.lower_idx = 0;
     max_so_far = 0;
     old_index = 0;
     max_count = 0;
@@ -589,7 +588,6 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];
-  		comp.t = (*p1).x; // the x index used as the comparison.
 
   		// get the 2 points it is connected to in 'polygon', treating the edge case when the point 'p1' is on the ends
   		before = ((*p1).v + points.size() -1) % points.size();

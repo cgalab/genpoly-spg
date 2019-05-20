@@ -182,6 +182,7 @@ public:
 	}
 };
 
+void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points, unsigned int randseed);
 double reldist(const Point& pa, const Point& pb, const Point& p);
 double reldist(const Edge& e, const Point& p);

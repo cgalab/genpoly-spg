@@ -23,6 +23,8 @@ double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& poi
   return Area;
 }
 
+// really slow version to check whether a polygon has an intersection.
+// Better to use a form of the line-sweep to check.
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   std::cerr << "checking intersections..." << std::endl;
   unsigned int count = 0;
