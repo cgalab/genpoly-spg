@@ -6,6 +6,7 @@
 #include <list>
 #include <math.h>
 #include <limits>
+#include <string>
 
 
 #ifndef __TRANSLATION_H_
@@ -40,7 +41,7 @@ private:
 
 	double signedArea(Vertex* v0, Vertex* v1, Vertex* v2);
 
-	bool insideQuadrilateral(Vertex* v, Vertex* q0, Vertex* q1, Vertex* q2, Vertex* q3);
+	bool insideQuadrilateral(Vertex* v);
 
 	bool checkEdge(Vertex* fromV, TEdge* newE);
 

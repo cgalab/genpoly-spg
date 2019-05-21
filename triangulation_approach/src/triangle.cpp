@@ -10,6 +10,9 @@ Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vert
 	v1 = V1;
 	v2 = V2;
 
+	id = n;
+	n++;
+
 	(*e0).setTriangle(this);
 	(*e1).setTriangle(this);
 	(*e2).setTriangle(this);
@@ -18,8 +21,64 @@ Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vert
 	(*v1).addTriangle(this);
 	(*v2).addTriangle(this);
 
+	enqueued = false;
+}
+
+Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2, std::string context, bool &ok){
+	Triangle* t;
+	bool cont;
+
+	e0 = E0;
+	e1 = E1;
+	e2 = E2;
+
+	v0 = V0;
+	v1 = V1;
+	v2 = V2;
+
 	id = n;
 	n++;
+
+	t = (*e0).setTriangle(this, context, ok);
+	if(t != NULL){
+		cont = (*t).contains(V0);
+		cont = cont && (*t).contains(V1);
+		cont = cont && (*t).contains(V2);
+		if(cont){
+			printf("0An equal triangle already exists, context: %s\n", context.c_str());
+			printf("vertex IDs: %llu %llu %llu \n", (*V0).getID(), (*V1).getID(), (*V2).getID());
+			//exit(1);
+			ok = false;
+		}
+	}
+	t = (*e1).setTriangle(this, context, ok);
+	if(t != NULL){
+		cont = (*t).contains(V0);
+		cont = cont && (*t).contains(V1);
+		cont = cont && (*t).contains(V2);
+		if(cont){
+			printf("1An equal triangle already exists, context: %s\n", context.c_str());
+			printf("vertex IDs: %llu %llu %llu \n", (*V0).getID(), (*V1).getID(), (*V2).getID());
+			//exit(1);
+			ok = false;
+		}
+	}
+	t = (*e2).setTriangle(this, context, ok);
+	if(t != NULL){
+		cont = (*t).contains(V0);
+		cont = cont && (*t).contains(V1);
+		cont = cont && (*t).contains(V2);
+		if(cont){
+			printf("2An equal triangle already exists, context: %s\n", context.c_str());
+			printf("vertex IDs: %llu %llu %llu \n", (*V0).getID(), (*V1).getID(), (*V2).getID());
+			//exit(1);
+			ok = false;
+		}
+	}
+
+	(*v0).addTriangle(this);
+	(*v1).addTriangle(this);
+	(*v2).addTriangle(this);
 
 	enqueued = false;
 }
@@ -145,18 +204,19 @@ TEdge* Triangle::getLongestEdgeAlt(){
 	Vertex* v;
 
 	v = getOtherVertex(e0);
-	if((*e0).isBetween(v) && (*e0).getEdgeType() != EdgeType::POLYGON)
+	if((*e0).isBetween(v) && (*e0).getEdgeType() == EdgeType::TRIANGULATION)
 		return e0;
 
 	v = getOtherVertex(e1);
-	if((*e1).isBetween(v) && (*e1).getEdgeType() != EdgeType::POLYGON)
+	if((*e1).isBetween(v) && (*e1).getEdgeType() == EdgeType::TRIANGULATION)
 		return e1;
 
 	v = getOtherVertex(e2);
-	if((*e2).isBetween(v) && (*e2).getEdgeType() != EdgeType::POLYGON)
+	if((*e2).isBetween(v) && (*e2).getEdgeType() == EdgeType::TRIANGULATION)
 		return e2;
 
 	printf("was not able to detect a longest edge by comparison\n");
+	printf("triangle area: %.16f \n", signedArea());
 	print();
 	(*v0).print();
 	(*v1).print();
@@ -217,7 +277,7 @@ double Triangle::getRange(Vertex* v, double alpha){
 
 // Printer
 void Triangle::print(){
-	printf("Triangle:\n");
+	printf("Triangle %llu:\n", id);
 	(*e0).print();
 	(*e1).print();
 	(*e2).print();

@@ -29,6 +29,7 @@ void initialTriangulationPseudoStar(Triangulation* T, int n){
 	Vertex *center, *v0, *v1;
 	TEdge *e0, *e1, *e2, *start;
 	Triangle *t;
+	bool ok = true;
 
 	// move vertex 0 to the origin
 	center = (*T).getVertex(0);
@@ -44,7 +45,7 @@ void initialTriangulationPseudoStar(Triangulation* T, int n){
 	(*T).addEdge(e1);
 	(*T).addEdge(start);
 
-	t = new Triangle(e0, e1, start, v0, v1, center);
+	t = new Triangle(e0, e1, start, v0, v1, center, "initialGeneratorStart", ok);
 
 	for(i = 3; i < n; i++){
 		v0 = v1;
@@ -57,14 +58,14 @@ void initialTriangulationPseudoStar(Triangulation* T, int n){
 		(*T).addEdge(e0);
 		(*T).addEdge(e1);
 
-		t = new Triangle(e0, e1, e2, v0, v1, center);
+		t = new Triangle(e0, e1, e2, v0, v1, center, "initialGenerator1", ok);
 	}
 
 	v0 = (*T).getVertex(1);
 	(*e1).setEdgeType(EdgeType::POLYGON);
 	e2 = new TEdge(v0, v1);
 	(*T).addEdge(e2);
-	t = new Triangle(e1, e2, start, v0, v1, center);
+	t = new Triangle(e1, e2, start, v0, v1, center, "initialGeneratorEnd", ok);
 }
 
 // boxPolygon startindex 0
@@ -117,6 +118,7 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 	Vertex* v0 = NULL, *v1 = NULL, *v2 = NULL;
 	TEdge* e0 = NULL, *e1 = NULL, *e2 = NULL;
 	Triangle* t;
+	bool ok;
 
 	// the inital triangulation contains n-2 triangles
 	v0 = (*T).getVertex(0);
@@ -124,6 +126,7 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 	e0 = new TEdge(v1, v0, EdgeType::POLYGON);
 	(*T).addEdge(e0);
 	for(i = 0; i < n - 2; i++){
+		ok = true;
 		if(i % 2 == 0){
 			// v0 stays as it is and v1 becomes v2
 			v2 = v1;
@@ -137,7 +140,7 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 			(*T).addEdge(e0);
 			(*T).addEdge(e1);
 
-			t = new Triangle(e0, e1, e2, v0, v1, v2);		
+			t = new Triangle(e0, e1, e2, v0, v1, v2, "initialGeneratorZigZag1", ok);
 		}else{
 			// v1 becomes v0 and v2 stays as it is
 			v0 = v1;
@@ -151,7 +154,7 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 			(*T).addEdge(e0);
 			(*T).addEdge(e1);
 
-			t = new Triangle(e0, e1, e2, v0, v1, v2);
+			t = new Triangle(e0, e1, e2, v0, v1, v2, "initialGeneratorZigZag2", ok);
 		}
 
 		//(*t).print();

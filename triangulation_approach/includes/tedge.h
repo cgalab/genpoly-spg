@@ -54,6 +54,7 @@ public:
 	void setTriangulation(Triangulation* t);
 	void setEdgeType(EdgeType tp);
 	void setTriangle(Triangle* t);
+	Triangle* setTriangle(Triangle* t, std::string context, bool &ok);
 
 	// Remover
 	void removeTriangle(Triangle* t);

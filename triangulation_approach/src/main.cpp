@@ -6,15 +6,14 @@
 #include "timer.h"
 #include "statistics.h"
 
-
 int main(){
 	Triangulation* T;
-	int n = 10000;
+	int n = 1000000;
 	int translations;
 	Timer t;
 	int performed;
-	int initialSize = 10000;
-	int factor = 1000;
+	int initialSize = 6;
+	int factor = 100000;
 
 	t.start();
 	if(n <= initialSize){
@@ -36,18 +35,18 @@ int main(){
 
 	//(*T).stretch(1000);
 
-	/*(*T).print("triangulation_init.graphml");
+	(*T).print("triangulation_init.graphml");
 	//printStats(p);
 
 	(*T).printPolygon("polygon_int.graphml");
 
-	growPolygon(T, n, t);
+	/*growPolygon(T, n, t);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n", n, t.elapsedTime());
-	*/
-	(*T).check();
 	
-	(*T).print("triangulation.graphml");
+	(*T).check();*/
+	
+	//(*T).print("triangulation.graphml");
 	//printStats(p);
 
-	(*T).printPolygon("polygon.graphml");
+	//(*T).printPolygon("polygon.graphml");
 }

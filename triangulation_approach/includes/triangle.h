@@ -1,6 +1,7 @@
 #include <list>
 #include <stdio.h>
 #include <vector>
+#include <string>
 
 #ifndef __TRIANGLE_H_
 #define __TRIANGLE_H_
@@ -31,6 +32,7 @@ public:
 	
 	// Constructors
 	Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2);
+	Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2, std::string context, bool &ok);
 
 	// Getter
 	unsigned long long getID();

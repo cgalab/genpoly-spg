@@ -28,6 +28,7 @@ void Insertion::execute(){
 	TEdge *fromV0ToOther0, *fromV0ToOther1, *fromV1ToOther0, *fromV1ToOther1;
 	TEdge *fromV0ToNew, *fromV1ToNew;
 	TEdge *fromNewToOther0, *fromNewToOther1;
+	bool ok = true, sameT = false;
 
 	x = (*v0).getX() + ((*v1).getX() - (*v0).getX()) / 2;
 	y = (*v0).getY() + ((*v1).getY() - (*v0).getY()) / 2;
@@ -40,6 +41,8 @@ void Insertion::execute(){
 
 	other0 = (*t0).getOtherVertex(e);
 	other1 = (*t1).getOtherVertex(e);
+
+	sameT = ((*t0).getID() == (*t1).getID());
 
 	delete e;
 
@@ -58,10 +61,25 @@ void Insertion::execute(){
 	(*T).addEdge(fromNewToOther0);
 	(*T).addEdge(fromNewToOther1);
 
-	new Triangle(fromV0ToNew, fromV0ToOther0, fromNewToOther0, v0, newV, other0);
-	new Triangle(fromV0ToNew, fromV0ToOther1, fromNewToOther1, v0, newV, other1);
-	new Triangle(fromV1ToNew, fromV1ToOther0, fromNewToOther0, v1, newV, other0);
-	new Triangle(fromV1ToNew, fromV1ToOther1, fromNewToOther1, v1, newV, other1);
+	new Triangle(fromV0ToNew, fromV0ToOther0, fromNewToOther0, v0, newV, other0, "insertion1", ok);
+	new Triangle(fromV0ToNew, fromV0ToOther1, fromNewToOther1, v0, newV, other1, "insertion2", ok);
+	new Triangle(fromV1ToNew, fromV1ToOther0, fromNewToOther0, v1, newV, other0, "insertion3", ok);
+	new Triangle(fromV1ToNew, fromV1ToOther1, fromNewToOther1, v1, newV, other1, "insertion4", ok);
+
+	if(!ok){
+		printf("v0:\n");
+		(*v0).print();
+		printf("v1:\n");
+		(*v1).print();
+		printf("other0:\n");
+		(*other0).print();
+		printf("other1:\n");
+		(*other1).print();
+		printf("newV: \n");
+		(*newV).print();
+		printf("triangles had the same ID: %d \n", sameT);
+		exit(1);
+	}
 }
 
 void Insertion::translate(RandomGenerator* generator){

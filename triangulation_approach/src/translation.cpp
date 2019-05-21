@@ -61,20 +61,53 @@ double Translation::signedArea(Vertex* v0, Vertex* v1, Vertex* v2){
 	return area;
 }
 
-bool Translation::insideQuadrilateral(Vertex* v, Vertex* q0, Vertex* q1, Vertex* q2, Vertex* q3){
-	double a0, a1, a2, a3;
-	bool inside;
+// https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+bool Translation::insideQuadrilateral(Vertex* v){
+	Vertex* dummyVertex;
+	TEdge* dummyEdge;
+	double maxX, x;
+	int count = 0;
+	intersect_t intersection;
 
-	a0 = signedArea(q0, q1, v);
-	a1 = signedArea(q1, q2, v);
-	a2 = signedArea(q2, q3, v);
-	a3 = signedArea(q3, q0, v);
+	// find maximum x value
+	maxX = (*oldV).getX();
+	x = (*newV).getX();
+	if(x > maxX)
+		maxX = x;
+	x = (*prevV).getX();
+	if(x > maxX)
+		maxX = x;
+	x = (*nextV).getX();
+	if(x > maxX)
+		maxX = x;
 
-	inside = (signbit(a0) == signbit(a1));
-	inside = inside && (signbit(a0) == signbit(a2));
-	inside = inside && (signbit(a0) == signbit(a3));
+	if((*v).getX() > maxX)
+		return false;
+	maxX = maxX + 10;
 
-	return inside;
+	dummyVertex = new Vertex(maxX, (*v).getY());
+	dummyEdge = new TEdge(v, dummyVertex);
+
+	intersection = checkIntersection(dummyEdge, prevOldE);
+	if(intersection != intersect_t::IS_FALSE)
+		count++;
+	intersection = checkIntersection(dummyEdge, nextOldE);
+	if(intersection != intersect_t::IS_FALSE)
+		count++;
+	intersection = checkIntersection(dummyEdge, prevNewE);
+	if(intersection != intersect_t::IS_FALSE)
+		count++;
+	intersection = checkIntersection(dummyEdge, nextNewE);
+	if(intersection != intersect_t::IS_FALSE)
+		count++;
+
+	delete dummyEdge;
+	delete dummyVertex;
+
+	if(count % 2 == 1)
+		return true;
+	else
+		return false;
 }
 
 bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
@@ -151,28 +184,29 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 // public member functions
 
 bool Translation::checkOverroll(){
-	bool simple;
+	bool overroll;
 	Vertex* randomV;
 
 	// check whether the quadrilateral of the chosen Vertex P, its translated version P' and the two neighbors M and N is simple
 	// otherwise there can not be any overroll
-	simple = !(checkIntersection(prevOldE, nextNewE) || checkIntersection(nextOldE, prevNewE));
+	overroll = !(checkIntersection(prevOldE, nextNewE) || checkIntersection(nextOldE, prevNewE));
 
-	if(!simple) return false;
+	if(!overroll)
+		return false;
 
 	// check for the next vertex whether its inside the quadrilateral
 	randomV = (*T).getVertex(index - 2);
 
-	simple = insideQuadrilateral(randomV, oldV, nextV, newV, prevV);
+	overroll = insideQuadrilateral(randomV);
 
 	// check also for a second vertex to increase the chance the reject non-simple translation
 	randomV = (*T).getVertex(index + 2);
 
-	simple = simple || insideQuadrilateral(randomV, oldV, nextV, newV, prevV);
+	overroll = overroll || insideQuadrilateral(randomV);
 
 	//if(simple) printf("Potential overroll detected! \n");
 
-	return simple;
+	return overroll;
 }
 
 void Translation::execute(){
@@ -185,7 +219,7 @@ void Translation::execute(){
 	std::list<Triangle*> triangles;
 
 	if(split){
-		oldArea = signedArea(prevV, nextV, oldV);
+		/*oldArea = signedArea(prevV, nextV, oldV);
 		newArea = signedArea(prevV, nextV, newV);
 
 		// vertex stays on the same side of the edge between the neigboring vertices
@@ -253,7 +287,7 @@ void Translation::execute(){
 			(*trans).execute();
 
 			delete trans;
-		}
+		}*/
 
 	}else{
 		generateInitialQueue();
@@ -306,9 +340,13 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	if((*e).getEdgeType() == EdgeType::POLYGON){
 		printf("attention: polygon edge gets deleted :O \n");
 		printf("id: %llu dx: %f dy: %f \n", (*original).getID(), dx, dy);
+
+		(*T).addVertex(oldV);
 		(*T).addVertex(newV);
+		(*T).addEdge(transPath);
 		(*original).printEnvironment(3, "env.graphml");
 		(*T).print("bug.graphml");
+
 		(*T).check();
 		exit(1);
 	}
@@ -342,8 +380,6 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	t1 = new Triangle(e, e1, e2, vn0, vn1, vj1);
 
 	// add new triangles to queue if necessary
-	// TODO: think about potential to calculate the collapse time relative to the original position of the point
-	// maybe it's possible to reset the position of original to the original position temporarely
 	if(!singleFlip){
 		// reset coordinates temporarely to original position
 		x = (*original).getX();

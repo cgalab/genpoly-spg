@@ -120,6 +120,42 @@ void TEdge::setTriangle(Triangle* t){
 		printf("The edge from vertex %llu to vertex %llu already has two triangles!\n", (*v1).getID(), (*v2).getID());
 		exit(1);
 	}
+
+	// absolutely important to compare by pointer here, because t is still in construction
+	if(t1 == t2){
+		printf("The edge from vertex %llu to vertex %llu has already registered the same triangle! \n", (*v1).getID(), (*v2).getID());
+		exit(1);
+	}	
+}
+
+Triangle* TEdge::setTriangle(Triangle* t, std::string context, bool &ok){
+	if(t1 == NULL){
+		t1 = t;
+		return t2;
+	}else if(t2 == NULL){
+		t2 = t;
+		return t1;
+	}else{
+		printf("The edge from vertex %llu to vertex %llu already has two triangles!\n", (*v1).getID(), (*v2).getID());
+		printf("context: %s \n", context.c_str());
+		ok = false;
+	}
+	return NULL;
+
+	// absolutely important to compare by pointer here, because t is still in construction
+	if(t1 == t2){
+		printf("The edge from vertex %llu to vertex %llu has already registered the same triangle! \n", (*v1).getID(), (*v2).getID());
+		printf("context: %s \n", context.c_str());
+		print();
+		printf("existing t1\n");
+		(*t1).print();
+		printf("existing t2\n");
+		(*t2).print();
+		printf("new t\n");
+		(*t).print();
+		printf("end\n");
+		ok = false;
+	}	
 }
 
 // Remover

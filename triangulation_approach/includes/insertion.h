@@ -4,6 +4,7 @@
 #include "triangle.h"
 #include "translation.h"
 #include "randomGenerator.h"
+#include <string>
 
 #ifndef __INSERTION_H_
 #define __INSERTION_H_
