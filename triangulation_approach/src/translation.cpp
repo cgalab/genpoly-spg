@@ -113,69 +113,98 @@ bool Translation::insideQuadrilateral(Vertex* v){
 bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 	std::vector<TEdge*> surEdges;
 	enum intersect_t iType = intersect_t::IS_FALSE;
+	enum intersect_t iType0, iType1;
+	TEdge* intersectedE = NULL;
 	EdgeType eType;
 	Triangle* nextT = NULL;
-	surEdges = (*fromV).getSurroundingEdges();
-	Triangle* nexT;
+	int count = 0;
 
-	// start with the edge to the previous vertex
+	surEdges = (*fromV).getSurroundingEdges();
+
+	// iterate over all edges of the surrounding polygon
 	for(auto& i : surEdges){
 		iType = checkIntersection(newE, i);
 
 		// new edge hits vertex of surrounding polygon
-		if(iType > intersect_t::IS_FALSE && iType <= intersect_t::IS_VERTEX22) return false;
-		// intersection with edge of surrounding polygon
-		else if(iType == intersect_t::IS_TRUE){
-			eType = (*i).getEdgeType();
+		if((iType > intersect_t::IS_FALSE && iType <= intersect_t::IS_VERTEX22) || iType == intersect_t::IS_SAME_EDGE)
+			return false;
 
-			// intersected edge is polygon edge
-			if(eType == EdgeType::POLYGON){
-				//printf("edge hit polygon edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
-				return false;
-			// intersected edge is frame edge
-			}else if(eType == EdgeType::FRAME){
-				//printf("edge hit frame edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
-				return false;
-			// intersected edge is just a triangulation edge
-			}else{
-				//printf("edge hit triangulation edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
-				nextT = (*i).getTriangleNotContaining(fromV);
-				surEdges = (*nextT).getOtherEdges(i);
-				break;
-			}
-		}
+		// count intersections to detect numerical errors
+		if(iType > intersect_t::IS_FALSE){
+			count++;
+			intersectedE = i;
+		}	
 	}
 
-	// iterate over the adjacent triangles it there was an intersection with a triangulation edge
-	while(!(iType == intersect_t::IS_FALSE)){
+	// no intersection -> the new vertex stays in the surrounding polygon
+	if(count == 0){
+		return true;
+	// multiple intersections -> numerical error
+	}else if(count > 1){
+		//printf("numerical problem: new edge intersects multiple edges of the surrounding polygon -> translation rejected \n");
+		return false;
+	}
 
-		for(auto& i : surEdges){
+	// one real intersection with an edge of the surrounding polygon
+	eType = (*intersectedE).getEdgeType();
 
-			iType = checkIntersection(newE, i);
+	// intersected edge is polygon edge
+	if(eType == EdgeType::POLYGON){
+		return false;
+	// intersected edge is frame edge
+	}else if(eType == EdgeType::FRAME){
+		return false;
+	// intersected edge is just a triangulation edge
+	}else{
+		nextT = (*intersectedE).getTriangleNotContaining(fromV);
+		surEdges = (*nextT).getOtherEdges(intersectedE);
+	}
+	
+	// iterate over the adjacent triangles if there was an intersection with a triangulation edge
+	// here surEdges always have the length 2
+	while(true){
+		iType0 = checkIntersection(newE, surEdges[0]);
+		iType1 = checkIntersection(newE, surEdges[1]);
 
-			// new edge hits vertex of surrounding polygon
-			if(iType > intersect_t::IS_FALSE && iType <= intersect_t::IS_VERTEX22) return false;
-			// intersection with edge of surrounding polygon
-			else if(iType == intersect_t::IS_TRUE){
-				eType = (*i).getEdgeType();
+		// the new edge doesn't interesect any further edges
+		if(iType0 == intersect_t::IS_FALSE && iType1 == intersect_t::IS_FALSE)
+			return true;
 
-				// intersected edge is polygon edge
-				if(eType == EdgeType::POLYGON){
-					//printf("edge hit polygon edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
-					return false;
-				// intersected edge is frame edge
-				}else if(eType == EdgeType::FRAME){
-					//printf("edge hit frame edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
-					return false;
-				// intersected edge is just a triangulation edge
-				}else{
-					//printf("edge hit triangulation edge from vertex %d to vertex %d \n", (*(*i).getV1()).getID(), (*(*i).getV2()).getID());
-					nextT = (*i).getOtherTriangle(nextT);
-					surEdges = (*nextT).getOtherEdges(i);
-					break;
-				}
-			}
+		// new edge hits vertex of surrounding polygon
+		if((iType0 > intersect_t::IS_FALSE && iType0 <= intersect_t::IS_VERTEX22) || iType0 == intersect_t::IS_SAME_EDGE) 
+			return false;
+		if((iType1 > intersect_t::IS_FALSE && iType1 <= intersect_t::IS_VERTEX22) || iType1 == intersect_t::IS_SAME_EDGE) 
+			return false;
+
+		// check for numerical problems
+		if(iType0 > intersect_t::IS_FALSE && iType1 > intersect_t::IS_FALSE){
+			//printf("numerical problem: new edge intersects all edges of a triangle -> translation rejected \n");
+			return false;
 		}
+
+		// chose the intersected edge
+		if(iType0 > intersect_t::IS_FALSE){
+			iType = iType0;
+			intersectedE = surEdges[0];
+		}else{
+			iType = iType1;
+			intersectedE = surEdges[1];
+		}
+
+		// intersection with edge of surrounding polygon
+		eType = (*intersectedE).getEdgeType();
+
+		// intersected edge is polygon edge
+		if(eType == EdgeType::POLYGON){
+			return false;
+		// intersected edge is frame edge
+		}else if(eType == EdgeType::FRAME){
+			return false;
+		// intersected edge is just a triangulation edge
+		}else{
+			nextT = (*intersectedE).getOtherTriangle(nextT);
+			surEdges = (*nextT).getOtherEdges(intersectedE);
+		}	
 	}
 
 	return true;

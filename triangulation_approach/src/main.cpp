@@ -12,8 +12,8 @@ int main(){
 	int translations;
 	Timer t;
 	int performed;
-	int initialSize = 6;
-	int factor = 100000;
+	int initialSize = 100;
+	int factor = 1000;
 
 	t.start();
 	if(n <= initialSize){
@@ -40,10 +40,10 @@ int main(){
 
 	(*T).printPolygon("polygon_int.graphml");
 
-	/*growPolygon(T, n, t);
+	growPolygon(T, n, t);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n", n, t.elapsedTime());
 	
-	(*T).check();*/
+	(*T).check();
 	
 	//(*T).print("triangulation.graphml");
 	//printStats(p);
