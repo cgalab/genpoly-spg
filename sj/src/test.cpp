@@ -4,6 +4,7 @@
 #include <iomanip>      // std::setprecision
 #include "edge.h"
 #include "point.h"
+#include "opt2.h"
 //#include "bst.h"
 #include "basicFunctions.h" //for setComp (Edge set test)
 
@@ -357,32 +358,27 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
     std::cerr << "max: " << max << std::endl;
   } else std::cerr << "Det test disabled." << std::endl;
 
+  std::cerr << "=== Verification test ===" << std::endl;
 
-/*
-  // need to check if ebst class is working properly
-    std::cerr << "=== Edge Binary Search Tree class tests ===" << std::endl;
+  std::vector<Point> points;
+  p1.set(1,1);
+  points.push_back(p1);
+  p2.set(1,2);
+  points.push_back(p2);
+  p3.set(2,1);
+  points.push_back(p3);
+  p4.set(2,2);
+  points.push_back(p4);
 
-  ebst tree;
-  std::pair<BSTNode*, enum bst_t> retval;
+  std::vector<unsigned int> polygon;
+  for(int i = 0; i < 4; ++i)
+    polygon.push_back(i);
 
-  p1.set(0,0);
-  p2.set(3,3);
-  e1.l_idx = 0;
-  p3.set(1,0);
-  p4.set(1,3);
-  e2.l_idx = 1;
-  std::cout << tree << std::endl;
+  bool btest = verify_simple_polygon(polygon, points);
+  std::cerr << "is simple: should be true : " << ((btest) ? "true" : "false") << std::endl;
 
-  retval = tree.insert(e1);
-  std::cout << "e1 enum: ";
-  printEnum(retval.second);
-  std::cout << std::endl;
-  std::cout << tree << std::endl;
-
-  retval = tree.insert(e2);
-  std::cout << "e2 enum: ";
-  printEnum(retval.second);
-  std::cout << std::endl;
-  std::cout << tree << std::endl;
-*/
+  polygon[1] = 2;
+  polygon[2] = 1;
+  btest = verify_simple_polygon(polygon, points);
+  std::cerr << "is simple: should be false: " << ((btest) ? "true" : "false") << std::endl;
 }

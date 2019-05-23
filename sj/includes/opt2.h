@@ -8,6 +8,7 @@
 #ifndef __2OPT_H_
 #define __2OPT_H_
 
+bool verify_simple_polygon(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool sortbysec(const std::pair<Point,double> &a, const std::pair<Point,double> &b);
 bool sortbyint(const int i, const int j);
 void polSwap(Edge e, std::vector<unsigned int>& polygon);

@@ -51,6 +51,9 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	if(strcmp(optarg,"2opt") == 0) {
 		*alg = A_2OPT;
 	}
+	else if(strcmp(optarg,"curve") == 0) {
+		*alg = A_CURVE;
+	}
 	else {
 		*alg = A_UNDEFINED;
 		std::cerr << "Error:  --alg input incorrect.  Use -? for help. Input: '" << optarg << "', should be '2opt'." << std::endl;

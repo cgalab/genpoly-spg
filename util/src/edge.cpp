@@ -203,6 +203,7 @@ void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Po
 	}
 }
 
+// flip a polygon from index: i1 to index: i2.
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	//std::cout << "inside doFlip" << std::endl;
 	//std::cout << "flipping: i1: " << i1 << ", i2: " << i2 << std::endl;
