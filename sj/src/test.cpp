@@ -386,6 +386,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   for(int i = 0; i < 4; ++i)
     polygon.push_back(i);
 
+/*
   bool btest = verify_simple_polygon(polygon, points);
   std::cerr << "is simple: should be true : " << ((btest) ? "true" : "false") << std::endl;
 
@@ -393,4 +394,5 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   polygon[2] = 1;
   btest = verify_simple_polygon(polygon, points);
   std::cerr << "is simple: should be false: " << ((btest) ? "true" : "false") << std::endl;
+*/
 }
