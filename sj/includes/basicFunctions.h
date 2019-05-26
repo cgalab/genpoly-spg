@@ -7,8 +7,6 @@
 #ifndef __BASICFUNCTIONS_H_
 #define __BASICFUNCTIONS_H_
 
-
-
 class lexComp {
 public:
     const std::vector<Point>& value_vector;
