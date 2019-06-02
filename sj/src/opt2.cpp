@@ -351,14 +351,22 @@ bool collSwap (Edge& e1, Edge& e2, std::set<Edge, setComp>& edgeS, std::vector<u
     polSwap(e2.p1, e1.p1, polygon);
     return true;
   }
-  if (!d1 && d2 && (rd1 < 0) && (rd2 == 1)) {
+  if (!d1 &&  d2 && (rd1 < 0) && (rd2 == 1)) {
     eraseVertexFromSet(e1.p1, edgeS, polygon, points);
     eraseVertexFromSet(e2.p1, edgeS, polygon, points);
     polSwap(e2.p1, e1.p1, polygon);
     polSwap(e2.p1, e2.p2, polygon);
     return true;
   }
-  std::cerr << "ERROR in 4P collSwap!" << std::endl;
+  if ( d1 && !d2 && (rd1 < 0) && (rd2 == 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    polSwap(e1.p1, e2.p1, polygon);
+    polSwap(e2.p1, e2.p2, polygon);
+    return true;
+  }
+
+  std::cerr << "ERROR in 4P collSwap: fallthrough!" << std::endl;
   std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
   std::cerr << "edge collswap: rd1: " << rd1 << ", rd2: " << rd2 << std::endl;
   std::cerr << "d1: " << ((d1) ? "true" : "false") << ", d2: " << ((d2) ? "true" : "false") << std::endl;
