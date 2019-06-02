@@ -1,7 +1,33 @@
 #include <vector>
 #include <iostream> // for endl
-#include "point.h"
+#include <algorithm>    // for std::sort
+#include <assert.h> // for assert
 #include <math.h>
+#include "point.h" // for Point class
+
+
+// Input:
+// lex:     vector for unsigned integers referencing indexes in point set 'points'
+// points:  vector of 'Point'
+// Method:
+//  Function fills 'lex' with the lexicographgically sorted indexes of 'points'
+//  and adds the lexicographical index of each point into '.l' property
+// Assumptions: given lex vector is the same size as points vector.
+void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points) {
+
+  assert(lex.size() == points.size());
+
+  for(unsigned int i = 0; i < points.size(); ++i)
+		lex[i] = i;
+	// sort 'lex' based on lexicographical order of 'points'
+	std::sort(lex.begin(), lex.end(), lexComp(points));
+  // save the lex index into each point in 'points'
+  unsigned int counter = 0;
+  for (std::vector<unsigned int>::iterator it = lex.begin(); it != lex.end(); ++it) {
+    points[(*it)].l = counter;
+    ++counter;
+  }
+}
 
 // simple function to display points in a Point vector.
 void pdisplay (const std::vector<Point>& p) {
