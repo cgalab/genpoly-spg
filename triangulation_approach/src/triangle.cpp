@@ -331,9 +331,6 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	numerator = bx * ay - ax * by - cx * (ay - by) - cy * (bx - ax);
 	denominator = dx * (ay - by) + dy * (bx - ax);
 
-	if(id == 1108852)
-		printf("num: %.16f den: %.16f \n", numerator, denominator);
-
 	return numerator / denominator;
 }
 

@@ -41,7 +41,7 @@ int transformPolygonByMoves(Triangulation* T, int iterations, Timer t){
 				(*trans).checkSplit();
 
 				ex = (*trans).execute();
-				if(ex != Executed::FALSE)
+				if(ex != Executed::REJECTED)
 					performedTranslations++;
 			}
 		}

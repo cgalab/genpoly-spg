@@ -18,11 +18,15 @@ bool EventQueue::insert(double time, Triangle* t){
 
 		if(time < time1){
 			// check for numerical stability
-			if(time + epsilon >= time1)
+			if(time + epsilon >= time1){
+				printf("Eventqueue: prevented numerical stability\n");
 				return false;
+			}
 
-			if(time - epsilon <= prevTime)
+			if(time - epsilon <= prevTime){
+				printf("Eventqueue: prevented numerical stability\n");
 				return false;
+			}
 
 			// insert new element
 			e0 = (struct element*)malloc(sizeof(struct element));
@@ -51,8 +55,10 @@ bool EventQueue::insert(double time, Triangle* t){
 	// insert at the end
 	if(e1 == NULL){
 		// check for numerical stability
-		if(time - epsilon <= prevTime)
+		if(time - epsilon <= prevTime){
+			printf("Eventqueue: prevented numerical stability\n");
 			return false;
+		}
 
 		// insert new element
 		e0 = (struct element*)malloc(sizeof(struct element));
@@ -129,3 +135,5 @@ void EventQueue::print(){
 		e = e -> next;
 	}
 }
+
+// TODO: implement destructor which deletes the remaining elements if the execution is aborted

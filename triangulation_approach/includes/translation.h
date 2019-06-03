@@ -13,7 +13,7 @@
 #ifndef __TRANSLATION_H_
 #define __TRANSLATION_H_
 
-enum class Executed {TRUE, FALSE, PARTIAL};
+enum class Executed {FULL, REJECTED, PARTIAL};
 
 class Translation{
 

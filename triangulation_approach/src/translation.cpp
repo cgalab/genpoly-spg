@@ -252,9 +252,10 @@ enum Executed Translation::execute(){
 	TEdge* edge;
 	Vertex* intersectionPoint;
 	std::list<Triangle*> triangles;
+	enum Executed ex;
 
 	if(split){
-		/*oldArea = signedArea(prevV, nextV, oldV);
+		oldArea = signedArea(prevV, nextV, oldV);
 		newArea = signedArea(prevV, nextV, newV);
 
 		// vertex stays on the same side of the edge between the neigboring vertices
@@ -279,18 +280,26 @@ enum Executed Translation::execute(){
 			transY = (*intersectionPoint).getY() - (*oldV).getY();
 
 			trans = new Translation(T, index, transX, transY);
-			(*trans).execute();
+			ex = (*trans).execute();
 
 			delete trans;
+
+			if(ex != Executed::FULL)
+				return ex;
 
 			// second part of the translation
 			transX = (*newV).getX() - (*original).getX();
 			transY = (*newV).getY() - (*original).getY();
 
 			trans = new Translation(T, index, transX, transY);
-			(*trans).execute();
+			ex = (*trans).execute();
 
 			delete trans;
+
+			if(ex == Executed::FULL)
+				return ex;
+			else
+				return Executed::PARTIAL;
 		// vertex changes side
 		}else{
 			// get translation to end position for first translation which is the middle between the neighboring vertices
@@ -301,9 +310,12 @@ enum Executed Translation::execute(){
 			transY = middleY - (*oldV).getY();
 
 			trans = new Translation(T, index, transX, transY);
-			(*trans).execute();
+			ex = (*trans).execute();
 
 			delete trans;
+
+			if(ex != Executed::FULL)
+				return ex;
 
 			// for numerical reasons its possible that the triangle of the old vertex and the neighboring vertices doesn't vanish at the time when the vertex arrives between its neighbors
 			// therefore this must be checked and corrected before starting the second translation
@@ -319,14 +331,19 @@ enum Executed Translation::execute(){
 			transY = (*newV).getY() - (*original).getY();
 
 			trans = new Translation(T, index, transX, transY);
-			(*trans).execute();
+			ex = (*trans).execute();
 
 			delete trans;
-		}*/
+
+			if(ex == Executed::FULL)
+				return ex;
+			else
+				return Executed::PARTIAL;
+		}
 
 	}else{
 		if(!generateInitialQueue())
-			return Executed::FALSE;
+			return Executed::REJECTED;
 
 		while(Q.size() > 0){
 			e = Q.pop();
@@ -357,6 +374,8 @@ enum Executed Translation::execute(){
 				//printf("corrected! \n");
 			}
 		}
+
+		return Executed::FULL;
 	}
 }
 
@@ -400,7 +419,7 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 	vn0 = (*t0).getOtherVertex(e);
 	vn1 = (*t1).getOtherVertex(e);
 
-	if(index == 161010){
+	/*if(index == 161010){
 		printf("debug info:\n");
 		printf("dx: %f dy: %f \n", dx, dy);
 		printf("original position: x = %f, y = %f, area = %f \n", (*oldV).getX(), (*oldV).getY(), signedArea(vn0, vj1, oldV));
@@ -427,7 +446,7 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 		(*original).setPosition((*oldV).getX(), (*oldV).getY());
 
 		printf("collapse time t0: %.16f t1: %.16f \n", (*t0).calculateCollapseTime(original, dx, dy), (*t1).calculateCollapseTime(original, dx, dy));
-	}
+	}*/
 
 	delete e;
 
@@ -460,16 +479,14 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 		y = (*original).getY();
 		(*original).setPosition((*oldV).getX(), (*oldV).getY());
 
-		t = (*t0).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
-		//t = t + actualTime;
+		t = (*t0).calculateCollapseTime(original, dx, dy); // again between 0 and 1
 
 		if(t >= actualTime && t <= 1){
 			(*t0).enqueue();
 			stable = stable && Q.insert(t, t0);
 		}
 
-		t = (*t1).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
-		//t = t + actualTime;
+		t = (*t1).calculateCollapseTime(original, dx, dy); // again between 0 and 1
 
 		if(t >= actualTime && t <= 1){
 			(*t1).enqueue();
