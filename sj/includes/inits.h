@@ -16,6 +16,6 @@ enum error argInit(int argc, char *argv[],
                    enum in_format_t *inFormat, enum out_format_t *outFormat,
                    bool& writeNew,
                    bool& area, double& areaMin, double& areaMax,
-                   unsigned int& randseed);
+                   unsigned int& randseed, bool& checkSimple);
 
 #endif

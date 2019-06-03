@@ -38,6 +38,7 @@ double reldist(const Edge& e, const Point& p) {
 	return reldist(*e.p1, *e.p2, p);
 }
 
+// calculates the determinant of the vertices of 'e' and the point p
 double det(const Edge e, const Point p) {
 	const Point& pa = *e.p1;
 	const Point& pb = *e.p2;
@@ -134,10 +135,10 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		dp_4 = reldist(e2, *e1.p2);
 
 		//std::cerr.precision(17);
-		//std::cerr << "det_a: " << det_a << ", dp1: " << dp_1 << std::endl;
-		//std::cerr << "det_b: " << det_b << ", dp2: " << dp_2 << std::endl;
-		//std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << std::endl;
-		//std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << std::endl;
+		//std::cerr << "det_a: " << det_a << ", dp1: " << dp_1 << ", same11: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << std::endl;
+		//std::cerr << "det_b: " << det_b << ", dp2: " << dp_2 << ", same12: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << std::endl;
+		//std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << ", same21: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << std::endl;
+		//std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << ", same22: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << std::endl;
 
 				 if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) ) col = true;
 		else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) ) col = true;
@@ -145,11 +146,11 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		else if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) ) col = true;
 
 		// 2opt function only cares about collinearity when it's 4 point and the points intercept in some way.
-		if (same11) return IS_VERTEX11;
+		if ((abs(det_a)+abs(det_b)+abs(det_c)+abs(det_d) == 0) && col) return IS_4P_COLLINEAR;
+		else if (same11) return IS_VERTEX11;
 		else if (same12) return IS_VERTEX12;
 		else if (same21) return IS_VERTEX21;
 		else if (same22) return IS_VERTEX22;
-		else if ((abs(det_a)+abs(det_b)+abs(det_c)+abs(det_d) == 0) && col) return IS_4P_COLLINEAR;
 
 		else if (col) return IS_3P_COLLINEAR;
 		else return IS_FALSE;
@@ -203,6 +204,7 @@ void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Po
 	}
 }
 
+// flip a polygon from index: i1 to index: i2.
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	//std::cout << "inside doFlip" << std::endl;
 	//std::cout << "flipping: i1: " << i1 << ", i2: " << i2 << std::endl;

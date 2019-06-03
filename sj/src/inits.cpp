@@ -31,11 +31,13 @@ enum error inFileInit(char *inFile, char *optarg) {
 
 enum error outFileInit(char *outFile, char *optarg) {
 	enum error returnValue = SUCCESS;
+	/*
 	if(optarg[0] == 0) {
 		std::cerr << "Error: no input entered for outFile. Use -? for help." << std::endl;
 		returnValue = NO_OUT_FILE;
 	}
-	else if (optarg[0] == '-') {
+	else */
+	if (optarg[0] == '-') {
 		std::cerr << "Error: another command set as input <string> for --outfile. Use -? for help." << std::endl;
 		returnValue = READ_ERROR_OFILE;
 	}
@@ -50,6 +52,9 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	enum error returnValue = SUCCESS;
 	if(strcmp(optarg,"2opt") == 0) {
 		*alg = A_2OPT;
+	}
+	else if(strcmp(optarg,"curve") == 0) {
+		*alg = A_CURVE;
 	}
 	else {
 		*alg = A_UNDEFINED;
@@ -87,7 +92,8 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 }
 
 enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg,
-	enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew, bool& area, double& areaMin, double& areaMax, unsigned int& randseed) {
+	enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew, bool& area,
+	double& areaMin, double& areaMax, unsigned int& randseed, bool& checkSimple) {
 	enum error returnValue = SUCCESS;
 	int comm;
 
@@ -101,11 +107,12 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 		{"areamin", optional_argument, NULL, 'n'},
 		{"areamax", optional_argument, NULL, 'x'},
 		{"randseed", required_argument, NULL, 'r'},
-		{"writeNew", no_argument, NULL, 'w'},
+		{"writenew", no_argument, NULL, 'w'},
+		{"simplecalc", no_argument, NULL, 's'},
 		{0, 0, 0, 0}
 	};
 
-	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:r:w?tn::x::", long_options, NULL)) != -1 ) {
+	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:r:w?stn::x::", long_options, NULL)) != -1 ) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -129,6 +136,9 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 				break;
 			case 'r':
 				randseed = atoi(optarg);
+				break;
+			case 's':
+				checkSimple = true;
 				break;
 			case 't':
 				returnValue = RUN_TESTS;
@@ -169,6 +179,8 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 				std::cerr << " :: option to calculate and return the area of a returned simple polygon (optional: if it's below <arg>)" << std::endl << std::endl;
 				std::cerr << " --randseed <arg>   |OR| -r <arg>" << std::endl;
 				std::cerr << " :: <arg> is an unsigned integer." << std::endl << std::endl;
+				std::cerr << " --simplecalc       |OR| -s " << std::endl;
+				std::cerr << " :: uses a slow check to verify simplicity and count intersections (if any)" << std::endl << std::endl;
 				std::cerr << " -t" << std::endl;
 				std::cerr << " :: ignores all other arguments and runs the test-bed." << std::endl;
 				break;

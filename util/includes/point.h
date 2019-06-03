@@ -1,9 +1,9 @@
+#ifndef __POINT_H_
+#define __POINT_H_
+
 #include <iostream> // for endl
 #include <vector>
 #include "basicDefinitions.h"
-
-#ifndef __POINT_H_
-#define __POINT_H_
 
 class Point {
 public:
@@ -59,6 +59,22 @@ public:
   }
 };
 
+class lexComp {
+public:
+    const std::vector<Point>& value_vector;
+
+    lexComp(const std::vector<Point>& val_vec):
+      value_vector(val_vec) {}
+
+    bool operator()(int i, int j)
+    {
+      if (value_vector[i].x < value_vector[j].x) return true;
+      else if ((value_vector[i].x == value_vector[j].x) && (value_vector[i].y < value_vector[j].y)) return true;
+      else return false;
+    }
+};
+
+void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points);
 void pdisplay (const std::vector< Point >& vy);
 double getXmin(const std::vector<Point>& p);
 double getXmax(const std::vector<Point>& p);

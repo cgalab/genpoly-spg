@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
   enum out_format_t outFormat = OF_UNDEFINED;
   bool writeNew = false;
   bool calcArea = false;
+  bool checkSimple = false;
   double areaMin = -1, areaMax = -1;
   int runAreaLoopFor, areaLoopCounter;
   clock_t areaTimerStart, areaTimerEnd;
@@ -37,7 +38,7 @@ int main(int argc, char *argv[]) {
   unsigned int randseed = 0;
 
   // parse command line arguments
-  returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat, writeNew, calcArea, areaMin, areaMax, randseed);
+  returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat, writeNew, calcArea, areaMin, areaMax, randseed, checkSimple);
 
   if (returnValue == SUCCESS) {
     runAreaLoopFor = 1000;
@@ -98,8 +99,8 @@ int main(int argc, char *argv[]) {
       }
 
       if (returnValue == SUCCESS) {
-        //checkAllIntersections(polygon, points);
-        returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
+        if (checkSimple) checkAllIntersections(polygon, points);
+        if (outFile[0] != 0) returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
       }
     }
   }

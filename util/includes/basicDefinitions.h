@@ -30,7 +30,8 @@ enum error {
 enum alg_t {
   A_UNDEFINED,
   A_IDLE,
-  A_2OPT
+  A_2OPT,
+  A_CURVE
 };
 
 // the output format of the result.

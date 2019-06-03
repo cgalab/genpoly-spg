@@ -103,35 +103,7 @@ bool collSwap(Point *a, Point *b, Point *c, std::set<Edge, setComp>& edgeS, std:
 
   assert(*a < *b);
   assert(*a < *c);
-/*
-  // create the incidental edges to the 3 points in the polygon.
-  if (((*b).v + points.size() +1) % points.size() == (*a).v) { // make sure you create an edge to the right point.
-    Point *temp = &points[polygon[((*b).v + points.size() -1) % points.size()]];
-    if (*temp < *a) {  // if the point '*temp' is lower than '*a' then it could already be in 'edgeS'
-      e1 = Edge(b, temp);
-      be1 = true;
-    }
-  } else {
-    Point *temp = &points[polygon[((*b).v + points.size() +1) % points.size()]];
-    if (*temp < *a) {
-      e1 = Edge(b, temp);
-      be1 = true;
-    }
-  }
-  if (((*c).v + points.size() +1) % points.size() == (*a).v) {
-    Point *temp = &points[polygon[((*c).v + points.size() -1) % points.size()]];
-    if (*temp < *a) {
-      e2 = Edge(c, temp);
-      be2 = true;
-    }
-  } else {
-    Point *temp = &points[polygon[((*c).v + points.size() +1) % points.size()]];
-    if (*temp < *a) {
-      e2 = Edge(c, temp);
-      be2 = true;
-    }
-  }
-*/
+
   // sort the points into lo/mid/hi lex order.
   if ((*a < *b) && (*a < *c)) {
     lo = a;
@@ -379,8 +351,24 @@ bool collSwap (Edge& e1, Edge& e2, std::set<Edge, setComp>& edgeS, std::vector<u
     polSwap(e2.p1, e1.p1, polygon);
     return true;
   }
-  std::cerr << "ERROR in 4P collSwap!" << std::endl;
-  std::cerr << "edge collswap: rd1: " << rd1 << ", dp2: " << rd2 << std::endl;
+  if (!d1 &&  d2 && (rd1 < 0) && (rd2 == 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    polSwap(e2.p1, e1.p1, polygon);
+    polSwap(e2.p1, e2.p2, polygon);
+    return true;
+  }
+  if ( d1 && !d2 && (rd1 < 0) && (rd2 == 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    polSwap(e1.p1, e2.p1, polygon);
+    polSwap(e2.p1, e2.p2, polygon);
+    return true;
+  }
+
+  std::cerr << "ERROR in 4P collSwap: fallthrough!" << std::endl;
+  std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+  std::cerr << "edge collswap: rd1: " << rd1 << ", rd2: " << rd2 << std::endl;
   std::cerr << "d1: " << ((d1) ? "true" : "false") << ", d2: " << ((d2) ? "true" : "false") << std::endl;
   return true;
 }
@@ -565,6 +553,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 
   do {
     loop = false;
+    comp.lower_idx = 0;
     max_so_far = 0;
     old_index = 0;
     max_count = 0;
@@ -588,6 +577,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];
+  		comp.t = (*p1).x; // the x index used as the comparison.
 
   		// get the 2 points it is connected to in 'polygon', treating the edge case when the point 'p1' is on the ends
   		before = ((*p1).v + points.size() -1) % points.size();
