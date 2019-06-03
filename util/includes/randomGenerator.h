@@ -13,6 +13,8 @@ class RandomGenerator{
 	public:
 		RandomGenerator(){
 			generator.seed(rd());
+			// seed 246547 prduces error after 16% of insertion!
+			//generator.seed(246547);
 		}
 
 		int getRandomIndex(int n){ return std::uniform_int_distribution<int> {0, n - 1} (generator); }

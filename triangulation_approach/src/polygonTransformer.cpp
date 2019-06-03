@@ -12,6 +12,7 @@ int transformPolygonByMoves(Triangulation* T, int iterations, Timer t){
 	std::string filename;
 	int performedTranslations = 0;
 	Vertex* v;
+	enum Executed ex;
 
 	for(int i = 0; i < iterations; i++){
 		//filename = "output/triangulation" + std::to_string(i) + ".graphml";
@@ -39,8 +40,9 @@ int transformPolygonByMoves(Triangulation* T, int iterations, Timer t){
 			if(simple){
 				(*trans).checkSplit();
 
-				(*trans).execute();
-				performedTranslations++;
+				ex = (*trans).execute();
+				if(ex != Executed::FALSE)
+					performedTranslations++;
 			}
 		}
 

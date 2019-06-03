@@ -7,10 +7,13 @@
 #include <math.h>
 #include <limits>
 #include <string>
+#include "eventQueue.h"
 
 
 #ifndef __TRANSLATION_H_
 #define __TRANSLATION_H_
+
+enum class Executed {TRUE, FALSE, PARTIAL};
 
 class Translation{
 
@@ -35,9 +38,9 @@ private:
 
 	double actualTime;
 	bool split;
-	custom_priority_queue Q;
+	EventQueue Q;
 
-	void generateInitialQueue();
+	bool generateInitialQueue();
 
 	double signedArea(Vertex* v0, Vertex* v1, Vertex* v2);
 
@@ -50,9 +53,9 @@ public:
 
 	bool checkOverroll();
 
-	void execute();
+	enum Executed execute();
 
-	void flip(Triangle* t0, bool singleFlip);
+	bool flip(Triangle* t0, bool singleFlip);
 
 	bool checkSimplicityOfTranslation();
 

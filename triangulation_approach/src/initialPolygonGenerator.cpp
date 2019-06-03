@@ -176,6 +176,7 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 	Vertex *v0, *v1;
 	Triangle *t;
 	double a = 5 * r; // lenght of a side
+	bool ok = false;
 
 	// generate the rectangle
 	/*
@@ -213,7 +214,7 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 		next = new TEdge(v1, rv0);
 		(*T).addEdge(next);
 
-		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv0);
+		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv0, "box polygon 1", ok);
 
 		v0 = v1;
 		prev = next;
@@ -222,7 +223,7 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 	// second quadrant
 	next = new TEdge(v0, rv1);
 	(*T).addEdge(next);
-	t = new Triangle(prev, next, re0, v0, rv0, rv1);
+	t = new Triangle(prev, next, re0, v0, rv0, rv1, "box polygon 2", ok);
 	prev = next;
 
 	for(; i <= limit1; i++){
@@ -230,7 +231,7 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 		next = new TEdge(v1, rv1);
 		(*T).addEdge(next);
 
-		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv1);
+		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv1, "box polygon 3", ok);
 
 		v0 = v1;
 		prev = next;
@@ -239,7 +240,7 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 	// third quadrant
 	next = new TEdge(v0, rv2);
 	(*T).addEdge(next);
-	t = new Triangle(prev, next, re1, v0, rv1, rv2);
+	t = new Triangle(prev, next, re1, v0, rv1, rv2, "box polygon 4", ok);
 	prev = next;
 
 	for(; i <= limit2; i++){
@@ -247,7 +248,7 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 		next = new TEdge(v1, rv2);
 		(*T).addEdge(next);
 
-		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv2);
+		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv2, "box polygon 5", ok);
 
 		v0 = v1;
 		prev = next;
@@ -256,7 +257,7 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 	// fourth quadrant
 	next = new TEdge(v0, rv3);
 	(*T).addEdge(next);
-	t = new Triangle(prev, next, re2, v0, rv2, rv3);
+	t = new Triangle(prev, next, re2, v0, rv2, rv3, "box polygon 6", ok);
 	prev = next;
 
 	for(; i < n; i++){
@@ -264,7 +265,7 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 		next = new TEdge(v1, rv3);
 		(*T).addEdge(next);
 
-		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv3);
+		t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv3, "box polygon 7", ok);
 
 		v0 = v1;
 		prev = next;
@@ -275,6 +276,6 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 	next = new TEdge(v1, rv3);
 	(*T).addEdge(next);
 
-	t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv3);
-	t = new Triangle(next, start, re3, v1, rv0, rv3);
+	t = new Triangle(prev, (*v0).getEdgeTo(v1), next, v0, v1, rv3, "box polygon 8", ok);
+	t = new Triangle(next, start, re3, v1, rv0, rv3, "box polygon 9", ok);
 }

@@ -1,7 +1,9 @@
 #include "translation.h"
 
 // Constructors
-Translation::Translation(Triangulation* Tr, int i, double dX, double dY){
+Translation::Translation(Triangulation* Tr, int i, double dX, double dY) : Q(EventQueue(0.00001))
+
+{
 	T = Tr;
 	index = i;
 	actualTime = 0;
@@ -27,20 +29,24 @@ Translation::Translation(Triangulation* Tr, int i, double dX, double dY){
 	nextNewE = new TEdge(newV, nextV);
 }
 
-void Translation::generateInitialQueue(){
+bool Translation::generateInitialQueue(){
 	double t;
 	std::list<Triangle*> triangles = (*original).getTriangles();
+	bool ok = true;
+
 
 	for(auto& i : triangles){
 		t = (*i).calculateCollapseTime(original, dx, dy);
 
 		if(t >= 0 && t <= 1){
-			(*i).enqueue();
-			Q.push(std::make_pair(t, i));
+			(*i).enqueue();		
+
+			if(!Q.insert(t, i))
+				return false;
 		}
 	}
 
-	//Q.check();
+	return true;
 }
 
 double Translation::signedArea(Vertex* v0, Vertex* v1, Vertex* v2){
@@ -238,7 +244,7 @@ bool Translation::checkOverroll(){
 	return overroll;
 }
 
-void Translation::execute(){
+enum Executed Translation::execute(){
 	Triangle* t = NULL;
 	std::pair<double, Triangle*> e;
 	Translation* trans;
@@ -319,15 +325,16 @@ void Translation::execute(){
 		}*/
 
 	}else{
-		generateInitialQueue();
+		if(!generateInitialQueue())
+			return Executed::FALSE;
 
-		while(!Q.empty()){
-			e = Q.top();
-			Q.pop();
+		while(Q.size() > 0){
+			e = Q.pop();
 			actualTime = e.first;
 			t = e.second;
 
-			flip(t, false);
+			if(!flip(t, false))
+				return Executed::PARTIAL;
 		}
 
 		//(*original).setPosition((*oldV).getX() + dx, (*oldV).getY() + dy);
@@ -353,13 +360,15 @@ void Translation::execute(){
 	}
 }
 
-void Translation::flip(Triangle* t0, bool singleFlip){
+bool Translation::flip(Triangle* t0, bool singleFlip){
 	Triangle *t1;
 	Vertex *vj0, *vj1; // joint vertices
 	Vertex *vn0, *vn1; // non joint vertices
 	TEdge *e, *e1, *e2;
 	double t;
 	double x, y;
+	bool ok = true;
+	bool stable = true;
 
 	// move vertex to event time
 	if(!singleFlip) (*original).setPosition((*oldV).getX() + dx * actualTime, (*oldV).getY() + dy * actualTime);
@@ -384,10 +393,41 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	if((*t1).isEnqueued())
 		Q.remove(t1);
 
+	
+
 	vj0 = (*e).getV1();
 	vj1 = (*e).getV2();
 	vn0 = (*t0).getOtherVertex(e);
 	vn1 = (*t1).getOtherVertex(e);
+
+	if(index == 161010){
+		printf("debug info:\n");
+		printf("dx: %f dy: %f \n", dx, dy);
+		printf("original position: x = %f, y = %f, area = %f \n", (*oldV).getX(), (*oldV).getY(), signedArea(vn0, vj1, oldV));
+		printf("target position: x = %f, y = %f, area = %f \n", (*newV).getX(), (*newV).getY(), signedArea(vn0, vj1, newV));
+		printf("actual area: %.16f \n", signedArea(vn0, vj1, original));
+		printf("areas of t1:\n");
+		printf("start: %.16f now: %.16f end: %.16f \n", signedArea(vn1, vj1, oldV), signedArea(vn1, vj1, original), signedArea(vn1, vj1, newV));
+		(*t0).print();
+		(*t1).print();
+		printf("vj0:\n");
+		(*vj0).print();
+		printf("vj1:\n");
+		(*vj1).print();
+		printf("vn0:\n");
+		(*vn0).print();
+		printf("vn1:\n");
+		(*vn1).print();
+
+		printf("original vertex:\n");
+		(*original).print();
+		printf("longest edge:\n");
+		(*e).print();
+
+		(*original).setPosition((*oldV).getX(), (*oldV).getY());
+
+		printf("collapse time t0: %.16f t1: %.16f \n", (*t0).calculateCollapseTime(original, dx, dy), (*t1).calculateCollapseTime(original, dx, dy));
+	}
 
 	delete e;
 
@@ -398,7 +438,7 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	e1 = (*vj0).getEdgeTo(vn0);
 	e2 = (*vj0).getEdgeTo(vn1);
 
-	t0 = new Triangle(e, e1, e2, vn0, vn1, vj0);
+	t0 = new Triangle(e, e1, e2, vn0, vn1, vj0, "Flip1", ok);
 
 	// new triangle vn0, vn1, vj1
 	(*T).addEdge(e);
@@ -406,7 +446,12 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 	e1 = (*vj1).getEdgeTo(vn0);
 	e2 = (*vj1).getEdgeTo(vn1);
 
-	t1 = new Triangle(e, e1, e2, vn0, vn1, vj1);
+	t1 = new Triangle(e, e1, e2, vn0, vn1, vj1, "Flip2", ok);
+
+	if(!ok){
+		printf("index: %d \n", index);
+		exit(1);
+	}
 
 	// add new triangles to queue if necessary
 	if(!singleFlip){
@@ -420,7 +465,7 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 
 		if(t >= actualTime && t <= 1){
 			(*t0).enqueue();
-			Q.push(std::make_pair(t, t0));
+			stable = stable && Q.insert(t, t0);
 		}
 
 		t = (*t1).calculateCollapseTime(original, dx, dy); // again between 0 and 1 but 0 is now the acutal time
@@ -428,11 +473,13 @@ void Translation::flip(Triangle* t0, bool singleFlip){
 
 		if(t >= actualTime && t <= 1){
 			(*t1).enqueue();
-			Q.push(std::make_pair(t, t1));
+			stable = stable && Q.insert(t, t1);
 		}
 
 		(*original).setPosition(x, y);
 	}
+	
+	return stable;
 }
 
 bool Translation::checkSimplicityOfTranslation(){
@@ -451,6 +498,7 @@ bool Translation::checkSimplicityOfTranslation(){
 }
 
 void Translation::checkSplit(){
+	// TODO: what happens if checkEdge runs in the case that the edge intersects all edges of a triangle?
 	split = !checkEdge(original, transPath);
 }
 	
