@@ -1,17 +1,8 @@
 #include "triangle.h"
 
 // Constructors
-Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2){ 
-	e0 = E0;
-	e1 = E1;
-	e2 = E2;
-
-	v0 = V0;
-	v1 = V1;
-	v2 = V2;
-
-	id = n;
-	n++;
+Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2) :
+e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) { 
 
 	(*e0).setTriangle(this);
 	(*e1).setTriangle(this);
@@ -21,23 +12,13 @@ Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vert
 	(*v1).addTriangle(this);
 	(*v2).addTriangle(this);
 
-	enqueued = false;
+	n++;
 }
 
-Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2, std::string context, bool &ok){
+Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2, std::string context, bool &ok) :
+e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) { 
 	Triangle* t;
 	bool cont;
-
-	e0 = E0;
-	e1 = E1;
-	e2 = E2;
-
-	v0 = V0;
-	v1 = V1;
-	v2 = V2;
-
-	id = n;
-	n++;
 
 	t = (*e0).setTriangle(this, context, ok);
 	if(t != NULL){
@@ -80,7 +61,7 @@ Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vert
 	(*v1).addTriangle(this);
 	(*v2).addTriangle(this);
 
-	enqueued = false;
+	n++;
 }
 
 // Getter

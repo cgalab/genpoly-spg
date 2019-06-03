@@ -1,11 +1,6 @@
 #include "eventQueue.h"
 
-EventQueue::EventQueue(double eps){
-	first = NULL;
-	n = 0;
-
-	epsilon = eps;
-}
+EventQueue::EventQueue(double eps) : first(NULL), n(0), epsilon(eps) {}
 
 bool EventQueue::insert(double time, Triangle* t){
 	struct element* e0;

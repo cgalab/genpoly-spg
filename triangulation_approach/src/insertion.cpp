@@ -2,10 +2,7 @@
 
 // Constructors
 
-Insertion::Insertion(Triangulation* t, int index){
-	T = t;
-
-	i = index;
+Insertion::Insertion(Triangulation* t, int index) : T(t), i(index) {
 	v0 = (*T).getVertex(i);
 	v1 = (*v0).getNext();
 	e = (*v0).getToNext();

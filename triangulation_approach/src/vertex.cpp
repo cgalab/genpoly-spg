@@ -1,32 +1,12 @@
 #include "vertex.h"
 
 // Constructors
-Vertex::Vertex(double X, double Y){ 
-	x = X,
-	y = Y;
-	rectangleVertex = false;
-
-	id = n;
+Vertex::Vertex(double X, double Y) : x(X), y(Y), rectangleVertex(false), id(n), toPrev(NULL), toNext(NULL), T(NULL) {
 	n++;
-
-	toPrev = NULL;
-	toNext = NULL;
-
-	T = NULL;
 }
 
-Vertex::Vertex(double X, double Y, bool RV){ 
-	x = X,
-	y = Y;
-	rectangleVertex = RV;
-
-	id = n;
+Vertex::Vertex(double X, double Y, bool RV) : x(X), y(Y), rectangleVertex(RV), id(n), toPrev(NULL), toNext(NULL), T(NULL) {
 	n++;
-
-	toPrev = NULL;
-	toNext = NULL;
-
-	T = NULL;
 }
 
 Vertex* Vertex::getTranslated(double dx, double dy){

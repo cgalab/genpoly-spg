@@ -1,14 +1,8 @@
 #include "triangulation.h"
 
 // Constructors
-Triangulation::Triangulation(int n){ 
-	vertices.reserve(n);
-	N = n;
-
-	Rectangle0 = NULL;
-	Rectangle1 = NULL;
-	Rectangle2 = NULL;
-	Rectangle3 = NULL;
+Triangulation::Triangulation(int n) : N(n), Rectangle0(NULL), Rectangle1(NULL), Rectangle2(NULL), Rectangle3(NULL) { 
+	vertices.reserve(N);
 }
 
 // Getter

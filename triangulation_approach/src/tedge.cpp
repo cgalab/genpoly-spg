@@ -1,52 +1,32 @@
 #include "tedge.h"
 
 // Constructors
-TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp){
-	v1 = V1;
-	v2 = V2;
-
-	t1 = NULL;
-	t2 = NULL;
-
-	type = tp;
-
-	if(tp == EdgeType::POLYGON){
-		(*V1).setToNext(this);
-		(*V2).setToPrev(this);
+TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp) : T(NULL), v1(V1), v2(V2), t1(NULL), t2(NULL), type(tp), id(n) {
+	
+	if(type == EdgeType::POLYGON){
+		(*v1).setToNext(this);
+		(*v2).setToPrev(this);
 	}
 
-	(*V1).addEdge(this);
-	(*V2).addEdge(this);
+	(*v1).addEdge(this);
+	(*v2).addEdge(this);
 
-	id = n;
 	n++;
 
-	T = NULL;
-
-	if((*V1).getID() == (*V2).getID() || V1 == NULL || V2 == NULL){
+	if(v1 == NULL || v2 == NULL || (*v1).getID() == (*v2).getID()){
 		printf("error circle edge\n");
 		exit(1);
 	}
 }
 
-TEdge::TEdge(Vertex* V1, Vertex* V2){ 
-	v1 = V1;
-	v2 = V2;
+TEdge::TEdge(Vertex* V1, Vertex* V2) : T(NULL), v1(V1), v2(V2), t1(NULL), t2(NULL), type(EdgeType::TRIANGULATION), id(n) { 
+	
+	(*v1).addEdge(this);
+	(*v2).addEdge(this);
 
-	t1 = NULL;
-	t2 = NULL;
-
-	type = EdgeType::TRIANGULATION;
-
-	(*V1).addEdge(this);
-	(*V2).addEdge(this);
-
-	id = n;
 	n++;
 
-	T = NULL;
-
-	if((*V1).getID() == (*V2).getID() || V1 == NULL || V2 == NULL){
+	if(v1 == NULL || v2 == NULL || (*v1).getID() == (*v2).getID()){
 		printf("error circle edge\n");
 		exit(1);
 	}

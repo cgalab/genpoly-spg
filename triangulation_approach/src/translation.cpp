@@ -1,17 +1,10 @@
 #include "translation.h"
 
 // Constructors
-Translation::Translation(Triangulation* Tr, int i, double dX, double dY) : Q(EventQueue(0.00001))
+Translation::Translation(Triangulation* Tr, int i, double dX, double dY) : 
+Q(EventQueue(0.00001)), dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false)
 
 {
-	T = Tr;
-	index = i;
-	actualTime = 0;
-	split = false;
-
-	dx = dX;
-	dy = dY;
-
 	original = (*T).getVertex(index);
 	
 	prevV = (*original).getPrev();
