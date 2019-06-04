@@ -135,6 +135,13 @@ void pdisplay (const std::vector<Point>& p) {
   }
 }
 
+// simple function to display points in a Point vector.
+void pdisplay (const std::vector<unsigned int> ind, const std::vector<Point>& p) {
+  for (unsigned int i = 0; i < p.size(); i++) {
+    std::cout << p[ind[i]] << std::endl;
+  }
+}
+
 double getXmin(const std::vector<Point>& p) {
   double xmin = INFINITY;
   for (unsigned int i = 0; i < p.size(); i++) {
