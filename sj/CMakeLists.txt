@@ -8,6 +8,7 @@ add_executable(spg
                     src/opt2.cpp
                     src/pol.cpp
                     src/test.cpp
+					src/curve.cpp
                     )
 
 target_include_directories(spg PUBLIC
