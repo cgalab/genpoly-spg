@@ -13,6 +13,9 @@ int transformPolygonByMoves(Triangulation* T, int iterations, Timer t){
 	int performedTranslations = 0;
 	Vertex* v;
 	enum Executed ex;
+	int div;
+
+	div = 0.01 * iterations;
 
 	for(int i = 0; i < iterations; i++){
 		//filename = "output/triangulation" + std::to_string(i) + ".graphml";
@@ -48,7 +51,7 @@ int transformPolygonByMoves(Triangulation* T, int iterations, Timer t){
 
 		delete trans;
 
-		if(i % 1000 == 0)
+		if(i % div == 0)
 			printf("%f%% of %d translations performed after %f seconds \n", (double)i / (double)iterations * 100, iterations, t.elapsedTime());
 	}
 

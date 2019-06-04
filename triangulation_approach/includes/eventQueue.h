@@ -3,18 +3,18 @@
 #ifndef __EVENTQUEUE_H_
 #define __EVENTQUEUE_H_
 
-struct element{
+struct Element{
 	double collapseTime;
 	Triangle* triangle;
 
-	struct element* next;
+	struct Element* next;
 };
 
 class EventQueue{
 
 private:
 
-	struct element* first;
+	struct Element* first;
 	int n;
 	double epsilon;
 
@@ -26,6 +26,7 @@ public:
 	std::pair<double, Triangle*> pop();
 	int size();
 	void print();
+	~EventQueue();
 };
 
 #endif

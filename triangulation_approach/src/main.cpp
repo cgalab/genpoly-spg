@@ -44,39 +44,15 @@ int main(){
 	growPolygon(T, n, t);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n", n, t.elapsedTime());
 	
-	//(*T).check();
+	(*T).check();
+
+	performed = transformPolygonByMoves(T, 1000000, t);
+	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, translations, t.elapsedTime());
+
+	(*T).check();
 	
 	//(*T).print("triangulation.graphml");
 	//printStats(p);
 
 	//(*T).printPolygon("polygon.graphml");
 }
-
-/*int main(){
-	EventQueue Q(0.01);
-	Triangle* t = NULL;
-	int i = 1;
-
-	printf("1. insertion t = 0.21, result %d \n", Q.insert(0.21, t));
-	Q.print();
-	printf("2. insertion t = 0.24, result %d \n", Q.insert(0.24, t));
-	Q.print();
-	printf("3. insertion t = 0.21001, result %d \n", Q.insert(0.21001, t));
-	Q.print();
-	printf("4. insertion t = 0.23999, result %d \n", Q.insert(0.23999, t));
-	Q.print();
-	printf("5. insertion t = 0.11, result %d \n", Q.insert(0.11, t));
-	Q.print();
-	printf("6. insertion t = 0.81, result %d \n", Q.insert(0.81, t));
-	Q.print();
-
-	while(Q.size() > 0){
-		printf("%d. pop: time = %f size after: %d \n", i, Q.pop().first, Q.size());
-		printf("size after: %d \n", Q.size());
-		Q.print();
-
-		i++;
-	}
-	
-
-}*/

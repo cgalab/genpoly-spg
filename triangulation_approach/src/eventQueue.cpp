@@ -3,8 +3,8 @@
 EventQueue::EventQueue(double eps) : first(NULL), n(0), epsilon(eps) {}
 
 bool EventQueue::insert(double time, Triangle* t){
-	struct element* e0;
-	struct element* e1, *prev = NULL;
+	struct Element* e0;
+	struct Element* e1, *prev = NULL;
 	double time1, prevTime = -100;
 
 	e1 = first;
@@ -24,7 +24,7 @@ bool EventQueue::insert(double time, Triangle* t){
 			}
 
 			// insert new element
-			e0 = (struct element*)malloc(sizeof(struct element));
+			e0 = (struct Element*)malloc(sizeof(struct Element));
 
 			e0 -> collapseTime = time;
 			e0 -> triangle = t;
@@ -56,7 +56,7 @@ bool EventQueue::insert(double time, Triangle* t){
 		}
 
 		// insert new element
-		e0 = (struct element*)malloc(sizeof(struct element));
+		e0 = (struct Element*)malloc(sizeof(struct Element));
 
 		e0 -> collapseTime = time;
 		e0 -> triangle = t;
@@ -80,7 +80,7 @@ int EventQueue::size(){
 }
 
 std::pair<double, Triangle*> EventQueue::pop(){
-	struct element* e;
+	struct Element* e;
 	std::pair<double, Triangle*> out;
 
 	e = first;
@@ -97,7 +97,7 @@ std::pair<double, Triangle*> EventQueue::pop(){
 
 void EventQueue::remove(Triangle* t){
 	unsigned long long id = (*t).getID();
-	struct element *e, *prev = NULL;
+	struct Element *e, *prev = NULL;
 
 	e = first;
 	while(e != NULL){
@@ -119,7 +119,7 @@ void EventQueue::remove(Triangle* t){
 }
 
 void EventQueue::print(){
-	struct element* e;
+	struct Element* e;
 	int i = 0;
 
 	e = first;
@@ -131,4 +131,15 @@ void EventQueue::print(){
 	}
 }
 
-// TODO: implement destructor which deletes the remaining elements if the execution is aborted
+EventQueue::~EventQueue(){
+	struct Element *prev, *e;
+
+	e = first;
+
+	while(e != NULL){
+		prev = e;
+		e = prev -> next;
+
+		free(prev);
+	}
+}
