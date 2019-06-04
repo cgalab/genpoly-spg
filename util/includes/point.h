@@ -75,7 +75,9 @@ public:
 };
 
 void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points);
+void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points);
 void pdisplay (const std::vector< Point >& vy);
+void pdisplay (const std::vector<unsigned int>& ind, const std::vector<Point>& p);
 double getXmin(const std::vector<Point>& p);
 double getXmax(const std::vector<Point>& p);
 double getYmin(const std::vector<Point>& p);
