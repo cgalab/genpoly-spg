@@ -3,6 +3,13 @@
 #include <string>
 #include "basicDefinitions.h"
 
+#ifndef __INTERSECTTYPE_
+#define __INTERSECTTYPE_
+
+enum class IntersectionType {NONE, EDGE, VERTEX};
+
+#endif
+
 #ifndef __TEDGE_H_
 #define __TEDGE_H_
 
@@ -15,6 +22,7 @@ class Vertex;
 #include "vertex.h"
 
 enum class EdgeType {POLYGON, FRAME, TRIANGULATION};
+
 
 class TEdge{
 
@@ -76,8 +84,10 @@ public:
 
 #endif
 
-enum intersect_t checkIntersection(TEdge* e1, TEdge* e2);
+enum IntersectionType checkIntersection(TEdge* e1, TEdge* e2);
+enum IntersectionType checkIntersection_new(TEdge* e0, TEdge* e1, const double epsilon);
 double det(TEdge* e, Vertex* p);
 double reldist(TEdge* e, Vertex* p);
 Vertex* getIntersectionPoint(Vertex* s0, Vertex* e0, Vertex* s1, Vertex* e1);
+double signedArea(Vertex* v0, Vertex* v1, Vertex* v2);
 double crossProduct2D(double x0, double y0, double x1, double y1);

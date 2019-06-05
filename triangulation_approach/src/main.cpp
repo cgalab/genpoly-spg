@@ -42,7 +42,7 @@ int main(){
 	(*T).printPolygon("polygon_int.graphml");
 
 	growPolygon(T, n, t);
-	printf("Grew initial polygon to %d vertices afters %f seconds \n", n, t.elapsedTime());
+	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", n, t.elapsedTime());
 	
 	(*T).check();
 
@@ -54,5 +54,5 @@ int main(){
 	//(*T).print("triangulation.graphml");
 	//printStats(p);
 
-	//(*T).printPolygon("polygon.graphml");
+	(*T).printPolygon("polygon.graphml");
 }

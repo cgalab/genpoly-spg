@@ -298,7 +298,7 @@ double det(TEdge* e, Vertex* p){
 	return (px * (pay - pby) - py * (pax - pbx) + (pax * pby - pbx * pay));
 }
 
-enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
+enum IntersectionType checkIntersection(TEdge* e1, TEdge* e2){
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;
 	bool same11 = false, same12 = false, same21 = false, same22 = false;
@@ -320,7 +320,7 @@ enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
 		if((*(*e1).getV2()).getID() == (*(*e2).getV2()).getID()) same22 = true;
 
 		// is e1 and e2 the same edge? then return IS_TRUE
-		if (same11 && same22) return IS_SAME_EDGE;
+		if(same11 && same22) return IntersectionType::VERTEX;
 
 		// some determinant was 0, need to check if it's inside an edge or outside.
 		dp_1 = reldist(e1, (*e2).getV1());
@@ -342,20 +342,66 @@ enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
 		else if((det_d == 0) && (dp_4 > 0) && (dp_4 < 1))
 			col = true;
 
-		if(col) return IS_4P_COLLINEAR;
-		else if(same11) return IS_VERTEX11;
-		else if(same12) return IS_VERTEX12;
-		else if(same21) return IS_VERTEX21;
-		else if(same22) return IS_VERTEX22;
-		else return IS_FALSE;
+		if(col)
+			return IntersectionType::VERTEX;
+		else if(same11)
+			return IntersectionType::VERTEX;
+		else if(same12)
+			return IntersectionType::VERTEX;
+		else if(same21)
+			return IntersectionType::VERTEX;
+		else if(same22)
+			return IntersectionType::VERTEX;
+		else
+			return IntersectionType::NONE;
 
 	}else{
 		// none of the determinants were 0, so just need to check the sign for intersection.
 		if((signbit(det_a) ^ signbit(det_b)) && (signbit(det_c) ^ signbit(det_d)))
- 			return IS_TRUE;
+ 			return IntersectionType::EDGE;
 		else 
-			return IS_FALSE;
+			return IntersectionType::NONE;
 	}
+}
+
+enum IntersectionType checkIntersection_new(TEdge* e0, TEdge* e1, const double epsilon){
+	Vertex *v00, *v01, *v10, *v11;
+	double area00, area01, area10, area11;
+	double l0, l1;
+
+	v00 = (*e0).getV1();
+	v01 = (*e0).getV2();
+	v10 = (*e1).getV1();
+	v11 = (*e1).getV2();
+
+	l0 = (*e0).length();
+	l1 = (*e1).length();
+
+	// triangle areas containing edge e0
+	area00 = signedArea(v00, v01, v10);
+	area01 = signedArea(v00, v01, v11);
+	// triangle areas containing edge e1
+	area10 = signedArea(v10, v11, v00);
+	area11 = signedArea(v10, v11, v01);
+
+	//printf("areas: %.16f %.16f %.16f %.16f \n", area00, area01, area10, area11);
+
+	if(fabs(area00) <= epsilon)
+		return IntersectionType::VERTEX;
+
+	if(fabs(area01) <= epsilon)
+		return IntersectionType::VERTEX;
+
+	if(fabs(area10) <= epsilon)
+		return IntersectionType::VERTEX;
+
+	if(fabs(area11) <= epsilon)
+		return IntersectionType::VERTEX;
+
+	if((signbit(area00) != signbit(area01)) && (signbit(area10) != signbit(area11)))
+		return IntersectionType::EDGE;
+
+	return IntersectionType::NONE;
 }
 
 // From: "Intersection of two lines in three-space" by Ronald Goldman
@@ -364,7 +410,7 @@ enum intersect_t checkIntersection(TEdge* e1, TEdge* e2){
 Vertex* getIntersectionPoint(Vertex* s0, Vertex* e0, Vertex* s1, Vertex* e1){
 	double s0x, s0y, e0x, e0y, s1x, s1y, e1x, e1y;
 	double d0x, d0y, d1x, d1y; // compenents of the displacement vectors
-	double t, s; // intersection time
+	double t, s; // intersection times
 	double crossD;
 
 	s0x = (*s0).getX();
@@ -393,6 +439,24 @@ Vertex* getIntersectionPoint(Vertex* s0, Vertex* e0, Vertex* s1, Vertex* e1){
 	if(0 <= t && t <= 1 && 0 <= s && s <= 1) return new Vertex(s0x + t * d0x, s0y + t * d0y);
 
 	return NULL;
+}
+
+double signedArea(Vertex* v0, Vertex* v1, Vertex* v2){
+	double area;
+	double ax, ay, bx, by, cx, cy;
+
+	ax = (*v0).getX();
+	ay = (*v0).getY();
+
+	bx = (*v1).getX();
+	by = (*v1).getY();
+
+	cx = (*v2).getX();
+	cy = (*v2).getY();
+
+	area = 0.5 * (- ay * bx + ax * by + ay * cx - by * cx - ax * cy + bx * cy);
+
+	return area;
 }
 
 double crossProduct2D(double x0, double y0, double x1, double y1){

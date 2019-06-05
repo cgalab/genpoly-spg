@@ -66,7 +66,7 @@ bool Translation::insideQuadrilateral(Vertex* v){
 	TEdge* dummyEdge;
 	double maxX, x;
 	int count = 0;
-	intersect_t intersection;
+	IntersectionType intersection;
 
 	// find maximum x value
 	maxX = (*oldV).getX();
@@ -88,16 +88,16 @@ bool Translation::insideQuadrilateral(Vertex* v){
 	dummyEdge = new TEdge(v, dummyVertex);
 
 	intersection = checkIntersection(dummyEdge, prevOldE);
-	if(intersection != intersect_t::IS_FALSE)
+	if(intersection != IntersectionType::NONE)
 		count++;
 	intersection = checkIntersection(dummyEdge, nextOldE);
-	if(intersection != intersect_t::IS_FALSE)
+	if(intersection != IntersectionType::NONE)
 		count++;
 	intersection = checkIntersection(dummyEdge, prevNewE);
-	if(intersection != intersect_t::IS_FALSE)
+	if(intersection != IntersectionType::NONE)
 		count++;
 	intersection = checkIntersection(dummyEdge, nextNewE);
-	if(intersection != intersect_t::IS_FALSE)
+	if(intersection != IntersectionType::NONE)
 		count++;
 
 	delete dummyEdge;
@@ -109,10 +109,11 @@ bool Translation::insideQuadrilateral(Vertex* v){
 		return false;
 }
 
+// ATTENTION: high epsilon in checkSimplicity leads to splits which are no splits
 bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 	std::vector<TEdge*> surEdges;
-	enum intersect_t iType = intersect_t::IS_FALSE;
-	enum intersect_t iType0, iType1;
+	enum IntersectionType iType = IntersectionType::NONE;
+	enum IntersectionType iType0, iType1;
 	TEdge* intersectedE = NULL;
 	EdgeType eType;
 	Triangle* nextT = NULL;
@@ -125,11 +126,11 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 		iType = checkIntersection(newE, i);
 
 		// new edge hits vertex of surrounding polygon
-		if((iType > intersect_t::IS_FALSE && iType <= intersect_t::IS_VERTEX22) || iType == intersect_t::IS_SAME_EDGE)
+		if(iType == IntersectionType::VERTEX)
 			return false;
 
 		// count intersections to detect numerical errors
-		if(iType > intersect_t::IS_FALSE){
+		if(iType == IntersectionType::EDGE){
 			count++;
 			intersectedE = i;
 		}	
@@ -140,7 +141,7 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 		return true;
 	// multiple intersections -> numerical error
 	}else if(count > 1){
-		//printf("numerical problem: new edge intersects multiple edges of the surrounding polygon -> translation rejected \n");
+		printf("numerical problem: new edge intersects multiple edges of the surrounding polygon -> translation rejected \n");
 		return false;
 	}
 
@@ -166,23 +167,23 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 		iType1 = checkIntersection(newE, surEdges[1]);
 
 		// the new edge doesn't interesect any further edges
-		if(iType0 == intersect_t::IS_FALSE && iType1 == intersect_t::IS_FALSE)
+		if(iType0 == IntersectionType::NONE && iType1 == IntersectionType::NONE)
 			return true;
 
 		// new edge hits vertex of surrounding polygon
-		if((iType0 > intersect_t::IS_FALSE && iType0 <= intersect_t::IS_VERTEX22) || iType0 == intersect_t::IS_SAME_EDGE) 
+		if(iType0 == IntersectionType::VERTEX) 
 			return false;
-		if((iType1 > intersect_t::IS_FALSE && iType1 <= intersect_t::IS_VERTEX22) || iType1 == intersect_t::IS_SAME_EDGE) 
+		if(iType1 == IntersectionType::VERTEX) 
 			return false;
 
 		// check for numerical problems
-		if(iType0 > intersect_t::IS_FALSE && iType1 > intersect_t::IS_FALSE){
-			//printf("numerical problem: new edge intersects all edges of a triangle -> translation rejected \n");
+		if(iType0 != IntersectionType::NONE && iType1 != IntersectionType::NONE){
+			printf("numerical problem: new edge intersects all edges of a triangle -> translation rejected \n");
 			return false;
 		}
 
 		// chose the intersected edge
-		if(iType0 > intersect_t::IS_FALSE){
+		if(iType0 != IntersectionType::NONE){
 			iType = iType0;
 			intersectedE = surEdges[0];
 		}else{
@@ -217,7 +218,7 @@ bool Translation::checkOverroll(){
 
 	// check whether the quadrilateral of the chosen Vertex P, its translated version P' and the two neighbors M and N is simple
 	// otherwise there can not be any overroll
-	overroll = !(checkIntersection(prevOldE, nextNewE) || checkIntersection(nextOldE, prevNewE));
+	overroll = !(checkIntersection(prevOldE, nextNewE) != IntersectionType::NONE || checkIntersection(nextOldE, prevNewE) != IntersectionType::NONE);
 
 	if(!overroll)
 		return false;

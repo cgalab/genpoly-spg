@@ -125,7 +125,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points) 
   // 'upper' and 'lower' both have the same start and end points, to return a CCW c.h.,
   // first add 'lower' to 'ch' then 'upper' minus the ends
   ch.insert(ch.end(), lower.begin(), lower.end());
-  ch.insert(ch.end(), std::next(upper.begin()), std::prev(lower.end()))
+  ch.insert(ch.end(), std::next(upper.begin()), std::prev(lower.end()));
 }
 
 // simple function to display points in a Point vector.

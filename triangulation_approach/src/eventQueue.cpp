@@ -14,12 +14,12 @@ bool EventQueue::insert(double time, Triangle* t){
 		if(time < time1){
 			// check for numerical stability
 			if(time + epsilon >= time1){
-				printf("Eventqueue: prevented numerical stability\n");
+				//printf("Eventqueue: prevented numerical stability\n");
 				return false;
 			}
 
 			if(time - epsilon <= prevTime){
-				printf("Eventqueue: prevented numerical stability\n");
+				//printf("Eventqueue: prevented numerical stability\n");
 				return false;
 			}
 
@@ -51,7 +51,7 @@ bool EventQueue::insert(double time, Triangle* t){
 	if(e1 == NULL){
 		// check for numerical stability
 		if(time - epsilon <= prevTime){
-			printf("Eventqueue: prevented numerical stability\n");
+			//printf("Eventqueue: prevented numerical stability\n");
 			return false;
 		}
 
