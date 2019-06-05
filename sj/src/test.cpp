@@ -34,13 +34,13 @@ void test() {
 /*
 test:  bool checkIntersection(const Edge e1, const Edge e2)
 */
-  Point p1 = Point(0,0,1,1);
+  Point p1 = Point(0,0,0,0);
   p1.l = 1;
-  Point p2 = Point(0,0,2,2);
+  Point p2 = Point(0,0,1,1);
   p2.l = 2;
-  Point p3 = Point(0,0,3,3);
+  Point p3 = Point(0,0,2,2);
   p3.l = 3;
-  Point p4 = Point(0,0,4,4);
+  Point p4 = Point(0,0,3,3);
   p4.l = 4;
 
   std::cerr << "=== Point comparison tests ===" << std::endl;
@@ -385,7 +385,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "=== Verification test ===" << std::endl;
 
   std::vector<Point> points;
-  p1.set(1,1);
+  p1.set(10,10);
   points.push_back(p1);
   p2.set(1,2);
   points.push_back(p2);
@@ -394,9 +394,15 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(2,2);
   points.push_back(p4);
 
-  std::vector<unsigned int> polygon;
-  for(int i = 0; i < 4; ++i)
-    polygon.push_back(i);
+  //std::vector<unsigned int> polygon;
+  //for(int i = 0; i < 4; ++i)
+  //  polygon.push_back(i);
+
+  std::vector<unsigned int> ch;
+
+  get_convex_hull(ch, points);
+  std::cerr << "ch: " << std::endl;
+  pdisplay(ch, points);
 
 /*
   bool btest = verify_simple_polygon(polygon, points);

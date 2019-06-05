@@ -52,6 +52,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points) 
     // go through the lower points and check if the new point has a higher angle than the next point in lower.
     double x_i = points[lex[i]].x;
     double y_i = points[lex[i]].y;
+    //std::cerr << "i: " << i << ", p: " << points[lex[i]] << std::endl;
 
     // upper loop
     unsigned int j = 0;
@@ -60,6 +61,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points) 
       double x_j = x_i - points[upper[j]].x;
       double y_j = y_i - points[upper[j]].y;
       double a_j;
+      //std::cerr << "j: " << j << ", p: " << points[upper[j]] << std::endl;
 
       if (x_j > 0) a_j = y_j/x_j;
       else if (x_j == 0) a_j = 1 + signbit(y_j)*(-2);
@@ -83,6 +85,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points) 
       else {
         // upper[j+1] doesn't exist, i is automatically the next j+1
         upper.push_back(lex[i]);
+        break;
       }
       ++j;
     }
@@ -117,28 +120,38 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points) 
       else {
         // lower[j+1] doesn't exist, i is automatically the next j+1
         lower.push_back(lex[i]);
+        break;
       }
       ++j;
     }
   }
+  // add the last lex. point if it's missing.
+  if (points[lex[lex.size()-1]] != points[upper[upper.size()-1]])
+    upper.push_back(lex[lex.size()-1]);
+  if (points[lex[lex.size()-1]] != points[lower[lower.size()-1]])
+    lower.push_back(lex[lex.size()-1]);
 
-  // 'upper' and 'lower' both have the same start and end points, to return a CCW c.h.,
-  // first add 'lower' to 'ch' then 'upper' minus the ends
+  std::cerr << "upper: " << std::endl;
+  pdisplay(upper, points);
+  std::cerr << "lower: " << std::endl;
+  pdisplay(lower, points);
+  // 'upper' and 'lower' both have the same start point, to return a CCW c.h.,
+  // first add 'lower' to 'ch' then 'upper' minus the start
   ch.insert(ch.end(), lower.begin(), lower.end());
-  ch.insert(ch.end(), std::next(upper.begin()), std::prev(lower.end()));
+  ch.insert(ch.end(), std::next(upper.rbegin()), std::prev(upper.rend()));
 }
 
 // simple function to display points in a Point vector.
 void pdisplay (const std::vector<Point>& p) {
   for (unsigned int i = 0; i < p.size(); i++) {
-    std::cout << p[i] << std::endl;
+    std::cerr << p[i] << std::endl;
   }
 }
 
 // simple function to display points in a Point vector.
-void pdisplay (const std::vector<unsigned int> ind, const std::vector<Point>& p) {
-  for (unsigned int i = 0; i < p.size(); i++) {
-    std::cout << p[ind[i]] << std::endl;
+void pdisplay (const std::vector<unsigned int>& ind, const std::vector<Point>& p) {
+  for (unsigned int i = 0; i < ind.size(); i++) {
+    std::cerr << p[ind[i]] << std::endl;
   }
 }
 
