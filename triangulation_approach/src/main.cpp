@@ -3,56 +3,41 @@
 #include <stdio.h>
 #include "triangulation.h"
 #include "polygonTransformer.h"
-#include "timer.h"
 #include "statistics.h"
-#include "eventQueue.h"
+#include "settings.h"
 
 int main(){
+	Settings settings;
 	Triangulation* T;
-	int n = 1000000;
-	int translations;
-	Timer t;
-	int performed;
-	int initialSize = 100;
-	int factor = 1000;
+	int translations, performed;
 
-	t.start();
-	if(n <= initialSize){
-		T = generateRegularPolygon(n);
-		translations = n * factor;
-	}
-	else{
-		T = generateRegularPolygon(initialSize);
-		translations = factor * initialSize;
-	}
-	(*T).check();
-	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", (*T).getActualNumberOfVertices(), t.elapsedTime());
+	readSettings(settings);
 
-
-	performed = transformPolygonByMoves(T, translations, t);
-	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, translations, t.elapsedTime());
+	T = generateRegularPolygon(settings);
 
 	(*T).check();
+	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", settings.getInitialSize(), settings.elapsedTime());
 
-	//(*T).stretch(1000);
+
+	performed = transformPolygonByMoves(settings, T, settings.getInitialTN());
+	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, settings.getInitialTN(), settings.elapsedTime());
+
+	(*T).check();
 
 	(*T).print("triangulation_init.graphml");
-	//printStats(p);
-
 	(*T).printPolygon("polygon_int.graphml");
 
-	growPolygon(T, n, t);
-	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", n, t.elapsedTime());
+	growPolygon(settings, T);
+	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", settings.getTargetSize(), settings.elapsedTime());
 	
 	(*T).check();
 
-	performed = transformPolygonByMoves(T, 1000000, t);
-	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, translations, t.elapsedTime());
+	performed = transformPolygonByMoves(settings, T, 1000000);
+	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, 1000000, settings.elapsedTime());
 
 	(*T).check();
 	
 	//(*T).print("triangulation.graphml");
-	//printStats(p);
 
 	(*T).printPolygon("polygon.graphml");
 }

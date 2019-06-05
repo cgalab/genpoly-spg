@@ -109,7 +109,6 @@ bool Translation::insideQuadrilateral(Vertex* v){
 		return false;
 }
 
-// ATTENTION: high epsilon in checkSimplicity leads to splits which are no splits
 bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 	std::vector<TEdge*> surEdges;
 	enum IntersectionType iType = IntersectionType::NONE;

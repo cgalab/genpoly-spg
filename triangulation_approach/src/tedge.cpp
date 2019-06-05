@@ -314,13 +314,18 @@ enum IntersectionType checkIntersection(TEdge* e1, TEdge* e2){
 		bool col = false; // if true, check for collinearity
 
 		//quick check if the edges share a vertex
-		if((*(*e1).getV1()).getID() == (*(*e2).getV2()).getID()) same11 = true;
-		if((*(*e1).getV1()).getID() == (*(*e2).getV2()).getID()) same12 = true;
-		if((*(*e1).getV2()).getID() == (*(*e2).getV1()).getID()) same21 = true;
-		if((*(*e1).getV2()).getID() == (*(*e2).getV2()).getID()) same22 = true;
+		if((*(*e1).getV1()).getID() == (*(*e2).getV2()).getID())
+			same11 = true;
+		if((*(*e1).getV1()).getID() == (*(*e2).getV2()).getID())
+			same12 = true;
+		if((*(*e1).getV2()).getID() == (*(*e2).getV1()).getID())
+			same21 = true;
+		if((*(*e1).getV2()).getID() == (*(*e2).getV2()).getID())
+			same22 = true;
 
 		// is e1 and e2 the same edge? then return IS_TRUE
-		if(same11 && same22) return IntersectionType::VERTEX;
+		if(same11 && same22)
+			return IntersectionType::VERTEX;
 
 		// some determinant was 0, need to check if it's inside an edge or outside.
 		dp_1 = reldist(e1, (*e2).getV1());

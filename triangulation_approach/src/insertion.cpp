@@ -79,16 +79,17 @@ void Insertion::execute(){
 	}
 }
 
-void Insertion::translate(RandomGenerator* generator){
+void Insertion::translate(Settings &settings, RandomGenerator* generator){
 	int index;
 	bool overroll, simple = false;
 	double alpha, stddev, r, dx, dy;
 	Translation* trans;
 	int count = 0;
+	int max = settings.getInsertionTries();
 
 	index = (*T).getActualNumberOfVertices() - 1;
 
-	while(!simple && count < 100){
+	while(!simple && count < max){
 		alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
 		stddev = (*newV).getDirectedEdgeLength(alpha);
 
@@ -115,4 +116,7 @@ void Insertion::translate(RandomGenerator* generator){
 
 		count++;
 	}
+
+	if(settings.getFBMode() == FeedbackMode::VERBOSE && count == max)
+		printf("translation after insertion was impossible!\n");
 }

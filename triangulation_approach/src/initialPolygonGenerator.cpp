@@ -1,10 +1,11 @@
 #include "initialPolygonGenerator.h"
 
-Triangulation* generateRegularPolygon(int n){
+Triangulation* generateRegularPolygon(Settings &settings){
 	double r, alpha;
 	int i;
 	Vertex* v;
-	Triangulation* T = new Triangulation(n);
+	int n = settings.getInitialSize();
+	Triangulation* T = new Triangulation(settings.getTargetSize());
 	
 	alpha = 2 * M_PI / n;
 	r = 100; //n * 10 / (2 * M_PI); // maybe a good choice for the radius = n * sigma / (2 * pi)
@@ -16,7 +17,7 @@ Triangulation* generateRegularPolygon(int n){
 
 	initialTriangulationZigZag(T, n);
 
-	boxPolygon(T, r, n, 0);
+	boxPolygon(settings, T, 0);
 
 	return T; 
 	
@@ -167,7 +168,7 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 	}
 }
 
-void boxPolygon(Triangulation* T, double r, int n, int startIndex){
+void boxPolygon(Settings &settings, Triangulation* T, int startIndex){
 	// vertices and edges of the rectangle
 	Vertex *rv0, *rv1, *rv2, *rv3;
 	TEdge *re0, *re1, *re2, *re3;
@@ -175,8 +176,9 @@ void boxPolygon(Triangulation* T, double r, int n, int startIndex){
 	TEdge *start, *prev, *next;
 	Vertex *v0, *v1;
 	Triangle *t;
-	double a = 5 * r; // lenght of a side
+	double a = settings.getBoxSize(); // lenght of a side
 	bool ok = false;
+	int n = settings.getInitialSize();
 
 	// generate the rectangle
 	/*

@@ -5,12 +5,13 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
+#include "settings.h"
 
 enum class RPShapes {RPS_FLAT, RPS_QUADRATIC};
 
 //Polygon* generateRectangularPolygon(int n, enum RPShapes type);
-Triangulation* generateRegularPolygon(int n);
+Triangulation* generateRegularPolygon(Settings &settings);
 void initialTriangulationPseudoStar(Triangulation* T, int n);
 void initialTriangulationStar(Triangulation* T, int n);
 void initialTriangulationZigZag(Triangulation* T, int n);
-void boxPolygon(Triangulation* T, double r, int n, int startIndex);
+void boxPolygon(Settings &settings, Triangulation* T, int startIndex);

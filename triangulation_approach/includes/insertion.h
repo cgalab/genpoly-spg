@@ -5,6 +5,7 @@
 #include "translation.h"
 #include "randomGenerator.h"
 #include <string>
+#include "settings.h"
 
 #ifndef __INSERTION_H_
 #define __INSERTION_H_
@@ -28,7 +29,7 @@ public:
 	// Others
 	bool lengthControll();
 	void execute();
-	void translate(RandomGenerator* generator);
+	void translate(Settings & settings, RandomGenerator* generator);
 };
 
 #endif

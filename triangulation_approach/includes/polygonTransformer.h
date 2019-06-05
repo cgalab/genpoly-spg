@@ -12,6 +12,7 @@
 #include <math.h>
 #include "translation.h"
 #include "insertion.h"
+#include "settings.h"
 
-int transformPolygonByMoves(Triangulation* T, int iterations, Timer t);
-void growPolygon(Triangulation* T, int toNr, Timer t);
+int transformPolygonByMoves(Settings &settings, Triangulation* T, int iterations);
+void growPolygon(Settings &settings, Triangulation* T);
