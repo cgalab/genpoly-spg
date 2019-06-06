@@ -29,11 +29,11 @@ class TEdge{
 private:
 	Triangulation* T;
 
+	Vertex* v0;
 	Vertex* v1;
-	Vertex* v2;
 
+	Triangle* t0;
 	Triangle* t1;
-	Triangle* t2;
 
 	EdgeType type;
 
@@ -43,16 +43,16 @@ private:
 public:
 	
 	// Constructors
-	TEdge(Vertex* V1, Vertex* V2);
-	TEdge(Vertex* V1, Vertex* V2, EdgeType tp);
+	TEdge(Vertex* V0, Vertex* V1);
+	TEdge(Vertex* V0, Vertex* V1, EdgeType tp);
 
 	// Getter
 	unsigned long long getID();
 	EdgeType getEdgeType();
+	Vertex* getV0();
 	Vertex* getV1();
-	Vertex* getV2();
+	Triangle* getT0();
 	Triangle* getT1();
-	Triangle* getT2();
 	Triangle* getTriangleNotContaining(Vertex* v);
 	Triangle* getTriangleContaining(Vertex* v);
 	Triangle* getOtherTriangle(Triangle* t);
@@ -84,7 +84,7 @@ public:
 
 #endif
 
-enum IntersectionType checkIntersection(TEdge* e1, TEdge* e2);
+enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1);
 enum IntersectionType checkIntersection_new(TEdge* e0, TEdge* e1, const double epsilon);
 double det(TEdge* e, Vertex* p);
 double reldist(TEdge* e, Vertex* p);

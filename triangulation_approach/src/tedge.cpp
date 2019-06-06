@@ -1,32 +1,34 @@
 #include "tedge.h"
 
 // Constructors
-TEdge::TEdge(Vertex* V1, Vertex* V2, EdgeType tp) : T(NULL), v1(V1), v2(V2), t1(NULL), t2(NULL), type(tp), id(n) {
+TEdge::TEdge(Vertex* V0, Vertex* V1, EdgeType tp) : T(NULL), v0(V0), v1(V1), 
+t0(NULL), t1(NULL), type(tp), id(n) {
 	
 	if(type == EdgeType::POLYGON){
-		(*v1).setToNext(this);
-		(*v2).setToPrev(this);
+		(*v0).setToNext(this);
+		(*v1).setToPrev(this);
 	}
 
+	(*v0).addEdge(this);
 	(*v1).addEdge(this);
-	(*v2).addEdge(this);
 
 	n++;
 
-	if(v1 == NULL || v2 == NULL || (*v1).getID() == (*v2).getID()){
+	if(v0 == NULL || v1 == NULL || (*v0).getID() == (*v1).getID()){
 		printf("error circle edge\n");
 		exit(1);
 	}
 }
 
-TEdge::TEdge(Vertex* V1, Vertex* V2) : T(NULL), v1(V1), v2(V2), t1(NULL), t2(NULL), type(EdgeType::TRIANGULATION), id(n) { 
+TEdge::TEdge(Vertex* V0, Vertex* V1) : T(NULL), v0(V0), v1(V1),
+t0(NULL), t1(NULL), type(EdgeType::TRIANGULATION), id(n) { 
 	
+	(*v0).addEdge(this);
 	(*v1).addEdge(this);
-	(*v2).addEdge(this);
 
 	n++;
 
-	if(v1 == NULL || v2 == NULL || (*v1).getID() == (*v2).getID()){
+	if(v0 == NULL || v1 == NULL || (*v0).getID() == (*v1).getID()){
 		printf("error circle edge\n");
 		exit(1);
 	}
@@ -41,42 +43,42 @@ EdgeType TEdge::getEdgeType(){
 	return type;
 }
 
+Vertex* TEdge::getV0(){
+	return v0;
+}
+
 Vertex* TEdge::getV1(){
 	return v1;
 }
 
-Vertex* TEdge::getV2(){
-	return v2;
+Triangle* TEdge::getT0(){
+	return t0;
 }
 
 Triangle* TEdge::getT1(){
 	return t1;
 }
 
-Triangle* TEdge::getT2(){
-	return t2;
-}
-
 Triangle* TEdge::getTriangleNotContaining(Vertex* v){
-	if((*t1).contains(v)) return t2;
-	else return t1;
+	if((*t0).contains(v)) return t1;
+	else return t0;
 }
 
 Triangle* TEdge::getTriangleContaining(Vertex* v){
-	if((*t1).contains(v)) return t1;
-	else return t2;
-}
-
-Triangle* TEdge::getOtherTriangle(Triangle* t){
-	if((*t).getID() == (*t1).getID()) return t2;
+	if((*t0).contains(v)) return t0;
 	else return t1;
 }
 
+Triangle* TEdge::getOtherTriangle(Triangle* t){
+	if((*t).getID() == (*t0).getID()) return t1;
+	else return t0;
+}
+
 Vertex* TEdge::getOtherVertex(Vertex* v){
-	if((*v).getID() == (*v1).getID())
-		return v2;
-	else
+	if((*v).getID() == (*v0).getID())
 		return v1;
+	else
+		return v0;
 }
 
 // Setter
@@ -88,49 +90,49 @@ void TEdge::setEdgeType(EdgeType tp){
 	type = tp;
 
 	if(tp == EdgeType::POLYGON){
-		(*v1).setToNext(this);
-		(*v2).setToPrev(this);
+		(*v0).setToNext(this);
+		(*v1).setToPrev(this);
 	}
 }
 
 void TEdge::setTriangle(Triangle* t){
-	if(t1 == NULL) t1 = t;
-	else if(t2 == NULL) t2 = t;
+	if(t0 == NULL) t0 = t;
+	else if(t1 == NULL) t1 = t;
 	else{
-		printf("The edge from vertex %llu to vertex %llu already has two triangles!\n", (*v1).getID(), (*v2).getID());
+		printf("The edge from vertex %llu to vertex %llu already has two triangles!\n", (*v0).getID(), (*v1).getID());
 		exit(1);
 	}
 
 	// absolutely important to compare by pointer here, because t is still in construction
-	if(t1 == t2){
-		printf("The edge from vertex %llu to vertex %llu has already registered the same triangle! \n", (*v1).getID(), (*v2).getID());
+	if(t0 == t1){
+		printf("The edge from vertex %llu to vertex %llu has already registered the same triangle! \n", (*v0).getID(), (*v1).getID());
 		exit(1);
 	}	
 }
 
 Triangle* TEdge::setTriangle(Triangle* t, std::string context, bool &ok){
-	if(t1 == NULL){
-		t1 = t;
-		return t2;
-	}else if(t2 == NULL){
-		t2 = t;
+	if(t0 == NULL){
+		t0 = t;
 		return t1;
+	}else if(t1 == NULL){
+		t1 = t;
+		return t0;
 	}else{
-		printf("The edge from vertex %llu to vertex %llu already has two triangles!\n", (*v1).getID(), (*v2).getID());
+		printf("The edge from vertex %llu to vertex %llu already has two triangles!\n", (*v0).getID(), (*v1).getID());
 		printf("context: %s \n", context.c_str());
 		ok = false;
 	}
 	return NULL;
 
 	// absolutely important to compare by pointer here, because t is still in construction
-	if(t1 == t2){
-		printf("The edge from vertex %llu to vertex %llu has already registered the same triangle! \n", (*v1).getID(), (*v2).getID());
+	if(t0 == t1){
+		printf("The edge from vertex %llu to vertex %llu has already registered the same triangle! \n", (*v0).getID(), (*v1).getID());
 		printf("context: %s \n", context.c_str());
 		print();
+		printf("existing t0\n");
+		(*t0).print();
 		printf("existing t1\n");
 		(*t1).print();
-		printf("existing t2\n");
-		(*t2).print();
 		printf("new t\n");
 		(*t).print();
 		printf("end\n");
@@ -141,23 +143,23 @@ Triangle* TEdge::setTriangle(Triangle* t, std::string context, bool &ok){
 // Remover
 void TEdge::removeTriangle(Triangle* t){
 
-	if(t1 != NULL && (*t1).getID() == (*t).getID())
-	 	t1 = NULL;
-	else if(t2 != NULL && (*t2).getID() == (*t).getID()) 
-		t2 = NULL;
+	if(t0 != NULL && (*t0).getID() == (*t).getID())
+	 	t0 = NULL;
+	else if(t1 != NULL && (*t1).getID() == (*t).getID()) 
+		t1 = NULL;
 	else 
-		printf("Removed triangle was not adjacent to edge from vertex %llu to vertex %llu \n", (*v1).getID(), (*v2).getID());
+		printf("Removed triangle was not adjacent to edge from vertex %llu to vertex %llu \n", (*v0).getID(), (*v1).getID());
 }
 
 // Printer
 void TEdge::print(FILE* f){
 	int w = 0;
+	if(t0 != NULL) w++;
 	if(t1 != NULL) w++;
-	if(t2 != NULL) w++;
 
 	if(type == EdgeType::POLYGON) w = 5;
 	if(type == EdgeType::FRAME) w = 10;
-	fprintf(f, "<edge vertex1=\"%llu\" vertex2=\"%llu\" weight=\"%d\" useWeight=\"true\"></edge>\n", (*v1).getID(), (*v2).getID(), w);
+	fprintf(f, "<edge vertex1=\"%llu\" vertex2=\"%llu\" weight=\"%d\" useWeight=\"true\"></edge>\n", (*v0).getID(), (*v1).getID(), w);
 }
 
 void TEdge::print(){
@@ -167,33 +169,33 @@ void TEdge::print(){
 	else if(type == EdgeType::FRAME) tp = "FRAME";
 	else tp = "TRIANGULATION";
 
-	printf("Edge %llu from vertex %llu to vertex %llu of type %s \n", id, (*v1).getID(), (*v2).getID(), tp.c_str());
+	printf("Edge %llu from vertex %llu to vertex %llu of type %s \n", id, (*v0).getID(), (*v1).getID(), tp.c_str());
 }
 
 // Others
 double TEdge::length(){
-	double x1, x2, y1, y2;
+	double x0, x1, y0, y1;
+
+	x0 = (*v0).getX();
+	y0 = (*v0).getY();
 
 	x1 = (*v1).getX();
 	y1 = (*v1).getY();
 
-	x2 = (*v2).getX();
-	y2 = (*v2).getY();
-
-	return sqrt(pow((x1 - x2), 2) + pow((y1 - y2), 2));	
+	return sqrt(pow((x0 - x1), 2) + pow((y0 - y1), 2));	
 }
 
 bool TEdge::contains(Vertex* v){
+	if((*v).getID() == (*v0).getID()) return true;
 	if((*v).getID() == (*v1).getID()) return true;
-	if((*v).getID() == (*v2).getID()) return true;
 	return false;
 }
 
 int TEdge::nrAssignedTriangles(){
 	int n = 0;
 
+	if(t0 != NULL) n++;
 	if(t1 != NULL) n++;
-	if(t2 != NULL) n++;
 
 	return n;
 }
@@ -204,16 +206,16 @@ double TEdge::getAngle(Vertex* v){
 	double x0, y0, x1, y1, dx, dy;
 	double cosa, alpha;
 
-	if((*v).getID() == (*v1).getID()){
-		x0 = (*v1).getX();
-		y0 = (*v1).getY();
-		x1 = (*v2).getX();
-		y1 = (*v2).getY();
-	}else{
-		x0 = (*v2).getX();
-		y0 = (*v2).getY();
+	if((*v).getID() == (*v0).getID()){
+		x0 = (*v0).getX();
+		y0 = (*v0).getY();
 		x1 = (*v1).getX();
 		y1 = (*v1).getY();
+	}else{
+		x0 = (*v1).getX();
+		y0 = (*v1).getY();
+		x1 = (*v0).getX();
+		y1 = (*v0).getY();
 	}
 
 	dx = x1 - x0;
@@ -230,25 +232,25 @@ double TEdge::getAngle(Vertex* v){
 }
 
 bool TEdge::isBetween(Vertex* v){
-	double v1x, v2x, v1y, v2y, dx, dy, z;
+	double v0x, v1x, v0y, v1y, dx, dy, z;
 
+	v0x = (*v0).getX();
+	v0y = (*v0).getY();
 	v1x = (*v1).getX();
 	v1y = (*v1).getY();
-	v2x = (*v2).getX();
-	v2y = (*v2).getY();
 
-	dx = fabs(v1x - v2x);
-	dy = fabs(v1y - v2y);
+	dx = fabs(v0x - v1x);
+	dy = fabs(v0y - v1y);
 
 	if(dx >= dy){
 		z = (*v).getX();
 
-		if((z >= v1x && z <= v2x) || (z <= v1x && z >= v2x))
+		if((z >= v0x && z <= v1x) || (z <= v0x && z >= v1x))
 			return true;
 	}else{
 		z = (*v).getY();
 
-		if((z >= v1y && z <= v2y) || (z <= v1y && z >= v2y))
+		if((z >= v0y && z <= v1y) || (z <= v0y && z >= v1y))
 			return true;
 	}
 
@@ -258,13 +260,13 @@ bool TEdge::isBetween(Vertex* v){
 // Destructor
 // Attention: don't remove edges before there triangles are removed
 TEdge::~TEdge(){
+	(*v0).removeEdge(this);
 	(*v1).removeEdge(this);
-	(*v2).removeEdge(this);
 
 	if(T != NULL) (*T).removeEdge(this);
 
+	if(t0 != NULL) delete t0;
 	if(t1 != NULL) delete t1;
-	if(t2 != NULL) delete t2;
 }
 
 // Static member variables
@@ -273,8 +275,8 @@ unsigned long long TEdge::n = 0;
 // Other non-member stuff
 // from steinthors Edge class
 double reldist(TEdge* e, Vertex* p){
-	Vertex* pa = (*e).getV1();
-	Vertex* pb = (*e).getV2();
+	Vertex* pa = (*e).getV0();
+	Vertex* pb = (*e).getV1();
 	double px = (*p).getX();
 	double py = (*p).getY();
 	double pax = (*pa).getX();
@@ -286,8 +288,8 @@ double reldist(TEdge* e, Vertex* p){
 }
 
 double det(TEdge* e, Vertex* p){
-	Vertex* pa = (*e).getV1();
-	Vertex* pb = (*e).getV2();
+	Vertex* pa = (*e).getV0();
+	Vertex* pb = (*e).getV1();
 	double px = (*p).getX();
 	double py = (*p).getY();
 	double pax = (*pa).getX();
@@ -298,40 +300,41 @@ double det(TEdge* e, Vertex* p){
 	return (px * (pay - pby) - py * (pax - pbx) + (pax * pby - pbx * pay));
 }
 
-enum IntersectionType checkIntersection(TEdge* e1, TEdge* e2){
+enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1){
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;
-	bool same11 = false, same12 = false, same21 = false, same22 = false;
+	bool same00 = false, same01 = false, same10 = false, same11 = false;
 
-	// determinant between edge 1 and a point in edge 2
-	det_a = det(e1, (*e2).getV1());
-	det_b = det(e1, (*e2).getV2());
-	// determinant between edge 2 and a point in edge 1
-	det_c = det(e2, (*e1).getV1());
-	det_d = det(e2, (*e1).getV2());
+	// determinant between edge 0 and a point in edge 1
+	det_a = det(e0, (*e1).getV0());
+	det_b = det(e0, (*e1).getV1());
+	// determinant between edge 1 and a point in edge 0
+	det_c = det(e1, (*e0).getV0());
+	det_d = det(e1, (*e0).getV1());
 
 	if(det_a * det_b * det_c * det_d == 0){
 		bool col = false; // if true, check for collinearity
 
 		//quick check if the edges share a vertex
-		if((*(*e1).getV1()).getID() == (*(*e2).getV2()).getID())
+		if((*(*e0).getV0()).getID() == (*(*e1).getV0()).getID())
+			same00 = true;
+		if((*(*e0).getV0()).getID() == (*(*e1).getV1()).getID())
+			same01 = true;
+		if((*(*e0).getV1()).getID() == (*(*e1).getV0()).getID())
+			same10 = true;
+		if((*(*e0).getV1()).getID() == (*(*e1).getV1()).getID())
 			same11 = true;
-		if((*(*e1).getV1()).getID() == (*(*e2).getV2()).getID())
-			same12 = true;
-		if((*(*e1).getV2()).getID() == (*(*e2).getV1()).getID())
-			same21 = true;
-		if((*(*e1).getV2()).getID() == (*(*e2).getV2()).getID())
-			same22 = true;
 
+		// TODO: this makes no sense if the vertices in the edges are unordered
 		// is e1 and e2 the same edge? then return IS_TRUE
-		if(same11 && same22)
+		if(same00 && same11)
 			return IntersectionType::VERTEX;
 
 		// some determinant was 0, need to check if it's inside an edge or outside.
-		dp_1 = reldist(e1, (*e2).getV1());
-		dp_2 = reldist(e1, (*e2).getV2());
-		dp_3 = reldist(e2, (*e1).getV1());
-		dp_4 = reldist(e2, (*e1).getV2());
+		dp_1 = reldist(e0, (*e1).getV0());
+		dp_2 = reldist(e0, (*e1).getV1());
+		dp_3 = reldist(e1, (*e0).getV0());
+		dp_4 = reldist(e1, (*e0).getV1());
 
 		//std::cout << "dp1: " << dp_1 << std::endl;
 		//std::cout << "dp2: " << dp_2 << std::endl;
@@ -349,13 +352,13 @@ enum IntersectionType checkIntersection(TEdge* e1, TEdge* e2){
 
 		if(col)
 			return IntersectionType::VERTEX;
+		else if(same00)
+			return IntersectionType::VERTEX;
+		else if(same01)
+			return IntersectionType::VERTEX;
+		else if(same10)
+			return IntersectionType::VERTEX;
 		else if(same11)
-			return IntersectionType::VERTEX;
-		else if(same12)
-			return IntersectionType::VERTEX;
-		else if(same21)
-			return IntersectionType::VERTEX;
-		else if(same22)
 			return IntersectionType::VERTEX;
 		else
 			return IntersectionType::NONE;
@@ -374,10 +377,10 @@ enum IntersectionType checkIntersection_new(TEdge* e0, TEdge* e1, const double e
 	double area00, area01, area10, area11;
 	double l0, l1;
 
-	v00 = (*e0).getV1();
-	v01 = (*e0).getV2();
-	v10 = (*e1).getV1();
-	v11 = (*e1).getV2();
+	v00 = (*e0).getV0();
+	v01 = (*e0).getV1();
+	v10 = (*e1).getV0();
+	v11 = (*e1).getV1();
 
 	l0 = (*e0).length();
 	l1 = (*e1).length();

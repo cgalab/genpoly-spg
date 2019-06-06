@@ -156,7 +156,7 @@ bool Triangulation::check(){
 			}
 		}
 
-		if((*e).getV1() == (*e).getV2()){
+		if((*e).getV0() == (*e).getV1()){
 			printf("Edge %llu has two identical vertices with id %llu \n", (*e).getID(), (*(*e).getV1()).getID());
 			ok = false;
 		}		

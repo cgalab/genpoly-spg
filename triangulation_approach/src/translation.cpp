@@ -407,8 +407,8 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 
 	
 
-	vj0 = (*e).getV1();
-	vj1 = (*e).getV2();
+	vj0 = (*e).getV0();
+	vj1 = (*e).getV1();
 	vn0 = (*t0).getOtherVertex(e);
 	vn1 = (*t1).getOtherVertex(e);
 

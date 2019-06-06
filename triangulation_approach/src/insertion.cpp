@@ -33,8 +33,8 @@ void Insertion::execute(){
 	newV = new Vertex(x, y);
 	(*T).addVertex(newV);
 
-	t0 = (*e).getT1();
-	t1 = (*e).getT2();
+	t0 = (*e).getT0();
+	t1 = (*e).getT1();
 
 	other0 = (*t0).getOtherVertex(e);
 	other1 = (*t1).getOtherVertex(e);

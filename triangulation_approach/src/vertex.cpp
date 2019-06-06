@@ -35,9 +35,9 @@ TEdge* Vertex::getEdgeTo(Vertex* toV){
 	Vertex* v;
 
 	for(auto const& i : edges){
-		v = (*i).getV1();
+		v = (*i).getV0();
 		if(toID == (*v).getID()) return i;
-		v = (*i).getV2();
+		v = (*i).getV1();
 		if(toID == (*v).getID()) return i;
 	}
 	//printf("no connection from vertex %d to vertex %d found\n", id, toID);
