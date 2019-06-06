@@ -79,7 +79,7 @@ void Insertion::execute(){
 	}
 }
 
-void Insertion::translate(Settings &settings, RandomGenerator* generator){
+void Insertion::translate(Settings &settings, RandomGenerator &generator){
 	int index;
 	bool overroll, simple = false;
 	double alpha, stddev, r, dx, dy;
@@ -90,10 +90,10 @@ void Insertion::translate(Settings &settings, RandomGenerator* generator){
 	index = (*T).getActualNumberOfVertices() - 1;
 
 	while(!simple && count < max){
-		alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
+		alpha = generator.getTranslationUniform(- M_PI, M_PI);
 		stddev = (*newV).getDirectedEdgeLength(alpha);
 
-		r = (*generator).getTranslationNormal(stddev / 2, stddev / 6);
+		r = generator.getTranslationNormal(stddev / 2, stddev / 6);
 
 		dx = r * cos(alpha);
 		dy = r * sin(alpha);

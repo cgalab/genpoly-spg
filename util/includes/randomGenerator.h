@@ -1,6 +1,4 @@
 #include <random>
-#include "point.h"
-//#include "vertex.h"
 
 #ifndef __RANDOMGENERATOR_H_
 #define __RANDOMGENERATOR_H_
@@ -12,23 +10,15 @@ class RandomGenerator{
 
 	public:
 		RandomGenerator(){
-			generator.seed(rd());
-			// seed 246547 prduces error after 16% of insertion!
-			//generator.seed(246547);
+			unsigned int seed = rd();
+
+			printf("seed: %d \n", seed);
+
+			generator.seed(seed);
 		}
 
-		int getRandomIndex(int n){ return std::uniform_int_distribution<int> {0, n - 1} (generator); }
-		
-		Point* translatePointNormal(Point* v, double mean, double stddev){
-			double x = (*v).x;
-			double y = (*v).y;
-			unsigned int i = (*v).i;
-			double dx, dy;
-			
-			dx = std::normal_distribution<double> {mean, stddev} (generator);	
-			dy = std::normal_distribution<double> {mean, stddev} (generator);				
-			
-			return new Point(x + dx, y + dy, i);
+		int getRandomIndex(int n){ 
+			return std::uniform_int_distribution<int> {0, n - 1} (generator);
 		}
 
 		double getTranslationNormal(double mean, double stddev){
@@ -48,30 +38,8 @@ class RandomGenerator{
 		}
 
 		double getTranslationUniform(double min, double max){
-			double trans;
-			double limit = 0.001;
-
-			trans = std::uniform_real_distribution<double> {min, max} (generator);	
-
-			if(trans < limit && trans > - limit){
-				if(trans > 0)
-					trans = limit;
-				else
-					trans = - limit;
-			}
-
-			return trans;
+			return std::uniform_real_distribution<double> {min, max} (generator);	
 		}
-/*
-		Vertex* translateVertexNormal(Vertex* v, double mean, double stddev){
-			double dx, dy;
-			
-			dx = std::normal_distribution<double> {mean, stddev} (generator);	
-			dy = std::normal_distribution<double> {mean, stddev} (generator);				
-			
-			return (*v).getTranslated(dx, dy);
-		}
-*/
 };
 
 #endif

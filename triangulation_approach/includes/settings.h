@@ -1,4 +1,5 @@
 #include "timer.h"
+#include "randomGenerator.h"
 
 #ifndef __SETTINGS_H_
 #define __SETTINGS_H_
@@ -46,10 +47,6 @@ public:
 	void setInitialTN(int factor);
 	void setTargetSize(int n);
 	void setInsertionTries(int n);
-
-
-
-
 };
 
 #endif

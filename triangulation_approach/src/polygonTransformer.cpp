@@ -2,9 +2,8 @@
 #include <string>
 #include <math.h>
 
-int transformPolygonByMoves(Settings &settings, Triangulation* T, int iterations){
+int transformPolygonByMoves(Settings &settings, RandomGenerator &generator, Triangulation* T, int iterations){
 	int index = 0;
-	RandomGenerator* generator = new RandomGenerator(); // could maybe be an object instead of a pointer
 	double dx = 0, dy = 0, stddev, alpha, r; // radius of the initial polygon was 30
 	bool simple, overroll;
 	Translation* trans;
@@ -18,14 +17,14 @@ int transformPolygonByMoves(Settings &settings, Triangulation* T, int iterations
 
 	for(int i = 0; i < iterations; i++){
 
-		index = (*generator).getRandomIndex(n);
+		index = generator.getRandomIndex(n);
 
 		v = (*T).getVertex(index);
 
-		alpha = (*generator).getTranslationUniform(- M_PI, M_PI);
+		alpha = generator.getTranslationUniform(- M_PI, M_PI);
 		stddev = (*v).getDirectedEdgeLength(alpha);
 
-		r = (*generator).getTranslationNormal(stddev / 2, stddev / 6);
+		r = generator.getTranslationNormal(stddev / 2, stddev / 6);
 
 		dx = r * cos(alpha);
 		dy = r * sin(alpha);
@@ -55,10 +54,9 @@ int transformPolygonByMoves(Settings &settings, Triangulation* T, int iterations
 	return performedTranslations;
 }
 
-void growPolygon(Settings &settings, Triangulation* T){
+void growPolygon(Settings &settings, RandomGenerator &generator, Triangulation* T){
 	int n, index, actualN, i;
 	Insertion *in;
-	RandomGenerator* generator = new RandomGenerator();
 	bool ok;
 	int div;
 	int counter = 0;
@@ -70,7 +68,7 @@ void growPolygon(Settings &settings, Triangulation* T){
 		
 		actualN = (*T).getActualNumberOfVertices();
 
-		index = (*generator).getRandomIndex(actualN);
+		index = generator.getRandomIndex(actualN);
 
 		in = new Insertion(T, index);
 

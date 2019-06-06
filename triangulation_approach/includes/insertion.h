@@ -29,7 +29,7 @@ public:
 	// Others
 	bool lengthControll();
 	void execute();
-	void translate(Settings & settings, RandomGenerator* generator);
+	void translate(Settings &settings, RandomGenerator &generator);
 };
 
 #endif
