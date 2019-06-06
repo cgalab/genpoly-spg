@@ -73,14 +73,14 @@ void Settings::setInsertionTries(int n){
 
 // static stuff
 void readSettings(Settings &settings){
-	int n = 1000000;
+	int n = 10000;
 	int initialN = 100;
 	int initTrans;
 	int factor = 1000;
 
 	settings.setInitialSize(initialN);
 	settings.setTargetSize(n);
-	settings.setFBMode(FeedbackMode::EXECUTION);
+	settings.setFBMode(FeedbackMode::LACONIC);
 
 	if(n > initialN)
 		initTrans = factor * initialN;

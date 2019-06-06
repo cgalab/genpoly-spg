@@ -29,7 +29,7 @@ int transformPolygonByMoves(Settings &settings, RandomGenerator &generator, Tria
 		dx = r * cos(alpha);
 		dy = r * sin(alpha);
 
-		trans = new Translation(T, index, dx, dy);
+		trans = new Translation(T, settings, index, dx, dy);
 
 		overroll = (*trans).checkOverroll();
 

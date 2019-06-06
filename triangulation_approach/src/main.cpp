@@ -35,11 +35,13 @@ int main(){
 	(*T).check();
 
 	performed = transformPolygonByMoves(settings, generator, T, 1000000);
-	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, 1000000, settings.elapsedTime());
+	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed, 1000000, settings.elapsedTime());
 
 	(*T).check();
 	
 	//(*T).print("triangulation.graphml");
 
 	(*T).printPolygon("polygon.graphml");
+
+	exit(0);
 }

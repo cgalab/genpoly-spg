@@ -8,6 +8,7 @@
 #include <limits>
 #include <string>
 #include "eventQueue.h"
+#include "settings.h"
 
 
 #ifndef __TRANSLATION_H_
@@ -40,6 +41,8 @@ private:
 	bool split;
 	EventQueue Q;
 
+	Settings settings;
+
 	bool generateInitialQueue();
 
 	double signedArea(Vertex* v0, Vertex* v1, Vertex* v2);
@@ -49,7 +52,7 @@ private:
 	bool checkEdge(Vertex* fromV, TEdge* newE);
 
 public:
-	Translation(Triangulation* Tr, int i, double dX, double dY);
+	Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY);
 
 	bool checkOverroll();
 

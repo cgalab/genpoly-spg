@@ -12,7 +12,7 @@ class RandomGenerator{
 		RandomGenerator(){
 			unsigned int seed = rd();
 
-			printf("seed: %d \n", seed);
+			printf("seed: %u \n", seed);
 
 			generator.seed(seed);
 		}

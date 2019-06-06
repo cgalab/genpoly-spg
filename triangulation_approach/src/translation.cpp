@@ -1,8 +1,8 @@
 #include "translation.h"
 
 // Constructors
-Translation::Translation(Triangulation* Tr, int i, double dX, double dY) : 
-Q(EventQueue(0.00001)), dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false)
+Translation::Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY) : 
+Q(EventQueue(0.00001)), dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false), settings(set)
 
 {
 	original = (*T).getVertex(index);
@@ -140,7 +140,8 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 		return true;
 	// multiple intersections -> numerical error
 	}else if(count > 1){
-		printf("numerical problem: new edge intersects multiple edges of the surrounding polygon -> translation rejected \n");
+		if(settings.getFBMode() == FeedbackMode::VERBOSE)
+			printf("CheckEdge: new edge intersects multiple edges of the surrounding polygon -> translation rejected due to numerical problem\n");
 		return false;
 	}
 
@@ -177,7 +178,8 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 
 		// check for numerical problems
 		if(iType0 != IntersectionType::NONE && iType1 != IntersectionType::NONE){
-			printf("numerical problem: new edge intersects all edges of a triangle -> translation rejected \n");
+			if(settings.getFBMode() == FeedbackMode::VERBOSE)
+				printf("CheckEdge: new edge intersects multiple edges of the surrounding polygon -> translation rejected due to numerical problem\n");
 			return false;
 		}
 
@@ -264,7 +266,6 @@ enum Executed Translation::execute(){
 				printf("index: %d dx: %f dy: %f \n", index, dx, dy);
 				(*T).addVertex(newV);
 				(*T).print("triangulation.graphml");
-				//(*original).printSurroundingTriangulation("env.graphml");
 				exit(1);
 			}
 
@@ -272,7 +273,7 @@ enum Executed Translation::execute(){
 			transX = (*intersectionPoint).getX() - (*oldV).getX();
 			transY = (*intersectionPoint).getY() - (*oldV).getY();
 
-			trans = new Translation(T, index, transX, transY);
+			trans = new Translation(T, settings, index, transX, transY);
 			ex = (*trans).execute();
 
 			delete trans;
@@ -284,7 +285,7 @@ enum Executed Translation::execute(){
 			transX = (*newV).getX() - (*original).getX();
 			transY = (*newV).getY() - (*original).getY();
 
-			trans = new Translation(T, index, transX, transY);
+			trans = new Translation(T, settings, index, transX, transY);
 			ex = (*trans).execute();
 
 			delete trans;
@@ -302,7 +303,7 @@ enum Executed Translation::execute(){
 			transX = middleX - (*oldV).getX();
 			transY = middleY - (*oldV).getY();
 
-			trans = new Translation(T, index, transX, transY);
+			trans = new Translation(T, settings, index, transX, transY);
 			ex = (*trans).execute();
 
 			delete trans;
@@ -323,7 +324,7 @@ enum Executed Translation::execute(){
 			transX = (*newV).getX() - (*original).getX();
 			transY = (*newV).getY() - (*original).getY();
 
-			trans = new Translation(T, index, transX, transY);
+			trans = new Translation(T, settings, index, transX, transY);
 			ex = (*trans).execute();
 
 			delete trans;
@@ -358,13 +359,19 @@ enum Executed Translation::execute(){
 			area = (*i).signedArea();
 
 			if(area == 0){
-				//printf("numerical error! \n");
+				if(settings.getFBMode() == FeedbackMode::VERBOSE)
+					printf("Translation: Triangle area = 0 after translation...");
+
 				edge = (*i).getLongestEdgeAlt();
 				if((*edge).getEdgeType() != EdgeType::POLYGON)
 					flip(i, true);
-				else
-					printf("longest edge is PE\n");
-				//printf("corrected! \n");
+				else{
+					printf("\nTriangle area = 0 after translation: PE can not be fliped\n");
+					exit(2);
+				}
+
+				if(settings.getFBMode() == FeedbackMode::VERBOSE)
+					printf("corrected! \n");
 			}
 		}
 
@@ -388,7 +395,7 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 
 	e = (*t0).getLongestEdgeAlt();
 	if((*e).getEdgeType() == EdgeType::POLYGON){
-		printf("attention: polygon edge gets deleted :O \n");
+		printf("Flip: polygon edge gets deleted\n");
 		printf("id: %llu dx: %f dy: %f \n", (*original).getID(), dx, dy);
 
 		(*T).addVertex(oldV);
@@ -398,7 +405,7 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 		(*T).print("bug.graphml");
 
 		(*T).check();
-		exit(1);
+		exit(3);
 	}
 
 	t1 =(*e).getOtherTriangle(t0);
@@ -459,11 +466,6 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 	e2 = (*vj1).getEdgeTo(vn1);
 
 	t1 = new Triangle(e, e1, e2, vn0, vn1, vj1, "Flip2", ok);
-
-	if(!ok){
-		printf("index: %d \n", index);
-		exit(1);
-	}
 
 	// add new triangles to queue if necessary
 	if(!singleFlip){
