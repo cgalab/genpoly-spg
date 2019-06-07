@@ -31,7 +31,8 @@ enum alg_t {
   A_UNDEFINED,
   A_IDLE,
   A_2OPT,
-  A_CURVE
+  A_CURVE,
+  A_HOLE
 };
 
 // the output format of the result.

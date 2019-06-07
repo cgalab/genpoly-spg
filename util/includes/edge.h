@@ -182,6 +182,13 @@ public:
 	}
 };
 
+class C_Edge: public Edge {
+public:
+  unsigned int sc;  // index into a vector of s_curves
+  unsigned int par;  // index into a vector of std::pair<uint, uint> of curve ends.
+  bool upper;       // whether the edge is an upper curve end or lower curve end.
+};
+
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points, unsigned int randseed);
 double reldist(const Point& pa, const Point& pb, const Point& p);

@@ -4,6 +4,7 @@
 #include "basicDefinitions.h"
 #include "point.h"
 #include "edge.h"
+#include "curve.h"
 
 
 enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
@@ -18,25 +19,42 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
   return UNEXPECTED_ERROR;
 }
-/*
+
 // function that accepts a simple polygon and returns a array of a polygon with its holes.
 // Input: 'polygon'     : a vector with vertices of 'points' set that is a simple polygon
 //        'points'      : a vector of <Point> objects
 // Output: 'pol_array'  : an array of polygons, the first index is the outermost simple polygon, the rest are simple holes inside that polygon
-enum error holes(std::vector<unsigned int>& polygon, std::vector<Point>& points,std::vector<std::vector<unsigned int>>& pol_array) {
+enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  std::vector<s_curve> sc;
+  Point *m, *l, *r;
+  bool isll, isrl;
 
   //start with creating a vector for the lexicographically sorted indexes of 'points'
   std::vector<unsigned int> lex (points.size());
   fill_lex(lex, points); // fill 'lex' with the indexes
 
-  std::cerr << "first point: " << points[lex[0]] << ", pol: " << polygon.size() << std::endl;
+  std::cerr << "first point: " << points[lex[0]] << ", pol: " << polygon.size() << ", sph: " << sph.size() << std::endl;
 
   // go through all the points in lex. order
-  for (unsigned int i = 0; i < lex.size(), ++i) {
-    // for point i:  insert it into a set.
+  for (unsigned int i = 0; i < lex.size(); ++i) {
+    m = &points[lex[i]];
+    l = &points[(points.size() + (*m).v - 1) % points.size()];
+    r = &points[(points.size() + (*m).v + 1) % points.size()];
 
+    // check for '>o', '-o-', 'o<' condition
+    (l < m) ? isll = true : isll = false;
+    (r < m) ? isrl = true : isrl = false;
+
+    if (isll && isrl) { // '>o'
+
+    }
+    else if (!isll && !isrl) { // 'o<'
+
+    }
+    else { // '-o-'
+
+    }
   }
 
   return UNEXPECTED_ERROR;
 }
-*/

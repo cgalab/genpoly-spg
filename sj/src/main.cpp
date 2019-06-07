@@ -14,6 +14,8 @@
 #include "point.h"
 #include "edge.h"
 #include "pol.h"
+#include "opt2.h"
+#include "curve.h"
 
 int main(int argc, char *argv[]) {
 
@@ -56,46 +58,56 @@ int main(int argc, char *argv[]) {
       std::vector<unsigned int> polygon;
 
       // get a simple polygon with a given method
-      //returnValue = getSP(polygon, points, alg);
-
-      if (calcArea)
-      {
-        double area = 0;
-        areaLoopCounter = 0;
-        areaTimerStart = clock();
-        do
+      if (alg == A_2OPT) {
+        if (calcArea)
         {
-          ++areaLoopCounter;
+          double area = 0;
+          areaLoopCounter = 0;
+          areaTimerStart = clock();
+          do
+          {
+            ++areaLoopCounter;
 
-          // get a simple polygon with a given method
-          returnValue = getSP(polygon, points, alg, randseed);
+            // get a simple polygon with a given method
+            returnValue = opt2(polygon, points, randseed);
 
-          area = pol_calc_area(polygon, points);
-          areaTimerEnd = clock();
-          areaTimerElapsed = (areaTimerEnd - areaTimerStart) / CLOCKS_PER_SEC;
+            area = pol_calc_area(polygon, points);
+            areaTimerEnd = clock();
+            areaTimerElapsed = (areaTimerEnd - areaTimerStart) / CLOCKS_PER_SEC;
 
-          //std::cerr << "areaMin: " << areaMin << ", areaMax: " << areaMax << ", area: " << area << std::endl;
-          //std::cerr << "time elapsed: " << areaTimerElapsed << ", areaLoopCounter: " << areaLoopCounter << std::endl;
+            //std::cerr << "areaMin: " << areaMin << ", areaMax: " << areaMax << ", area: " << area << std::endl;
+            //std::cerr << "time elapsed: " << areaTimerElapsed << ", areaLoopCounter: " << areaLoopCounter << std::endl;
 
-          if ((areaMin >= 0) && (area > 0) && (area > areaMin)) break;
-          if ((areaMax > 0)  && (area > 0) && (area < areaMax)) break;
-          if (randseed) break;
-        } while ((areaLoopCounter < runAreaLoopFor) && (areaTimerElapsed < maxTime));
+            if ((areaMin >= 0) && (area > 0) && (area > areaMin)) break;
+            if ((areaMax > 0)  && (area > 0) && (area < areaMax)) break;
+            if (randseed) break;
+          } while ((areaLoopCounter < runAreaLoopFor) && (areaTimerElapsed < maxTime));
 
 
-        if(area < 0) {
-          doFlip(0, polygon.size()-1, polygon, points);
-          area = pol_calc_area(polygon, points);
-          std::cout << std::setprecision(15) << area << std::endl;
+          if(area < 0) {
+            doFlip(0, polygon.size()-1, polygon, points);
+            area = pol_calc_area(polygon, points);
+            std::cout << std::setprecision(15) << area << std::endl;
+          }
+          else if (((areaMin >= 0) && (area > areaMin)) || ((areaMax > 0) && (area < areaMax)))
+            std::cout << std::setprecision(15) << area << std::endl;
+          else
+            returnValue = ERR_AREA_NOT_BETTER;
         }
-        else if (((areaMin >= 0) && (area > areaMin)) || ((areaMax > 0) && (area < areaMax)))
-          std::cout << std::setprecision(15) << area << std::endl;
-        else
-          returnValue = ERR_AREA_NOT_BETTER;
+        else {
+          // get a simple polygon with a given method
+          returnValue = opt2(polygon, points, randseed);
+        }
       }
-      else {
-        // get a simple polygon with a given method
-        returnValue = getSP(polygon, points, alg, randseed);
+      else if (alg == A_HOLE) {
+        // a vector of polygons, [0] is the simple polygon, subsequent polygons are holes in it.
+        std::vector<std::vector<unsigned int>> sph;
+
+        // get a simple polygon to work with.
+        returnValue = opt2(polygon, points, randseed);
+        if (returnValue == SUCCESS) {
+           returnValue = holes(sph, polygon, points);
+        }
       }
 
       if (returnValue == SUCCESS) {
