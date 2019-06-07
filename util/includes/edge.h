@@ -1,11 +1,11 @@
+#ifndef __EDGE_H_
+#define __EDGE_H_
+
 #include <iostream> // for endl
 #include <vector>
 #include <iomanip>      // std::setprecision
 #include "basicDefinitions.h"
 #include "point.h"
-
-#ifndef __EDGE_H_
-#define __EDGE_H_
 
 // class for when an edge is vertical on the x axis
 class Yval {
