@@ -1,7 +1,7 @@
-#include "point.h"
-
 #ifndef __INITS_H_
 #define __INITS_H_
+
+#include "point.h"
 
 //int initArgs(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg, enum out_format_t *outFormat, enum in_format_t *inFormat);
 int algInit(enum alg_t *alg, char * optarg);
