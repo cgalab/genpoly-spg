@@ -38,9 +38,11 @@ int main(int argc, char *argv[]) {
   clock_t areaTimerStart, areaTimerEnd;
   double maxTime, areaTimerElapsed;
   unsigned int randseed = 0;
+  unsigned int nr_holes = 0;
 
   // parse command line arguments
-  returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat, writeNew, calcArea, areaMin, areaMax, randseed, checkSimple);
+  returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat,
+                        writeNew, calcArea, areaMin, areaMax, randseed, checkSimple, nr_holes);
 
   if (returnValue == SUCCESS) {
     runAreaLoopFor = 1000;
@@ -100,6 +102,7 @@ int main(int argc, char *argv[]) {
         }
       }
       else if (alg == A_HOLE) {
+        if (nr_holes == 0) nr_holes = 1;
         // a vector of polygons, [0] is the simple polygon, subsequent polygons are holes in it.
         std::vector<std::vector<unsigned int>> sph;
 

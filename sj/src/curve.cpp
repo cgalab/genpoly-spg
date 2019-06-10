@@ -28,33 +28,37 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
   std::vector<s_curve> sc;
   Point *m, *l, *r;
   bool isll, isrl;
+  unsigned int count_open=0, count_cont=0, count_close=0;
 
   //start with creating a vector for the lexicographically sorted indexes of 'points'
   std::vector<unsigned int> lex (points.size());
   fill_lex(lex, points); // fill 'lex' with the indexes
 
-  std::cerr << "first point: " << points[lex[0]] << ", pol: " << polygon.size() << ", sph: " << sph.size() << std::endl;
+  std::cerr << "sph: " << sph.size() << std::endl;
 
   // go through all the points in lex. order
   for (unsigned int i = 0; i < lex.size(); ++i) {
     m = &points[lex[i]];
-    l = &points[(points.size() + (*m).v - 1) % points.size()];
-    r = &points[(points.size() + (*m).v + 1) % points.size()];
+    l = &points[polygon[(points.size() + (*m).v - 1) % points.size()]];
+    r = &points[polygon[(points.size() + (*m).v + 1) % points.size()]];
+    //std::cerr << "m: " << *m << ", l: " << *l << ", r: " << *r << std::endl;
 
     // check for '>o', '-o-', 'o<' condition
-    (l < m) ? isll = true : isll = false;
-    (r < m) ? isrl = true : isrl = false;
+    (*l < *m) ? isll = true : isll = false;
+    (*r < *m) ? isrl = true : isrl = false;
 
     if (isll && isrl) { // '>o'
-
+      ++count_open;
     }
-    else if (!isll && !isrl) { // 'o<'
-
+    else if (isll ^ isrl) { // 'o<'
+      ++count_cont;
     }
     else { // '-o-'
-
+      ++count_close;
     }
   }
 
-  return UNEXPECTED_ERROR;
+  std::cerr << "opened: " << count_open << ", continued: " << count_cont << ", closed: " << count_close << std::endl;
+
+  return SUCCESS;
 }
