@@ -66,6 +66,11 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
 
     if (isll && isrl) { // '>o'
       ++count_close;
+
+      // find 'e1' and 'e2' in 'edgeS'
+      // continue the old curve ends to 'm'
+      // create a new pair of 'points' indexes with the open ends of the old s_curves
+      // push the pair to the s_curve with lower 'lsp'
     }
     else if (isll ^ isrl) { // '-o-'
       ++count_cont;
