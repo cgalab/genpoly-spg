@@ -527,16 +527,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 	// original input index of points in 'i' and polygon index in 'v'
 	// Now it can be sorted lexicographically
 	std::vector<unsigned int> lex (points.size());
-	for(unsigned int i = 0; i < points.size(); ++i)
-		lex[i] = points[i].i;
-
-	// lex contains a vector of 'points' indexes sorted lexicographically
-	std::sort(lex.begin(), lex.end(), lexComp(points));
-  unsigned int counter = 0;
-  for (std::vector<unsigned int>::iterator it = lex.begin(); it != lex.end(); ++it) {
-    points[(*it)].l = counter;
-    ++counter;
-  }
+	fill_lex(lex, points); // fill 'lex' with the indexes
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
 	unsigned int index=0, before, after;
