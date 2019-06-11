@@ -271,10 +271,25 @@ public:
   unsigned int par;  // index into a vector of std::pair<uint, uint> of curve ends.
   bool lower;       // whether the edge is an upper curve end or lower curve end.
 
+  C_Edge() {p1=NULL; p2=NULL;l_idx=0; sc=0; par=0;}
   C_Edge(Point *P1, Point *P2) {
 		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
 		else {p1=P2; p2=P1;}
     l_idx=0;
+	}
+
+  friend bool operator==(const C_Edge lhs, const C_Edge rhs) {
+		if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
+		else return false;
+	}
+
+  // to print out an edge, gives the format:
+  // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
+	friend std::ostream& operator<<(std::ostream& os, const C_Edge& e) {
+		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
+    << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [" << e.sc << "," << e.par << "]";
+		return os;
 	}
 };
 

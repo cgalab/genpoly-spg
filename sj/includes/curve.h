@@ -16,7 +16,13 @@ public:
   // a vector of all curves that have the same lex. start. point.
   // this is defined as a pair of indexes into 'points' that represent the 'ends' of the curve.
   // end.first is the upper end and end.second is the lower end based on 'y' value.
-  std::vector< std::pair<unsigned int, unsigned int> > end;
+  std::vector< std::pair<unsigned int, unsigned int> > ends;
+
+  friend std::ostream& operator<<(std::ostream& os, const s_curve& c) {
+		os << "lsp: " << c.lsp << ", rin: " << ((c.rin) ? "true": "false") << "\n";
+    for (unsigned int i = 0; i < c.ends.size();++i) os << "upper: " << c.ends[i].first << ", lower: " << c.ends[i].second << "\n";
+		return os;
+	}
 };
 
 enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
