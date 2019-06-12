@@ -1,12 +1,12 @@
+#ifndef __2OPT_H_
+#define __2OPT_H_
+
 #include <vector>
 #include <utility> // for std::pair
 #include <list>
 #include "basicDefinitions.h"
 #include "point.h"
 #include "edge.h"
-
-#ifndef __2OPT_H_
-#define __2OPT_H_
 
 bool sortbysec(const std::pair<Point,double> &a, const std::pair<Point,double> &b);
 bool sortbyint(const int i, const int j);

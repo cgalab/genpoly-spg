@@ -20,8 +20,8 @@ bool sortbysec(const std::pair<Point*,double> &a, const std::pair<Point*,double>
 bool sortbyint(const int i, const int j) {return (i<j);}
 
 // function to remove edges from 'edgeS' up to and including value of 'index'
-void decrementEdges(unsigned int index, std::set<Edge, setComp>& edgeS) {
-	std::set<Edge, setComp>::iterator it = edgeS.begin();
+void decrementEdges(unsigned int index, std::set<Edge>& edgeS) {
+	std::set<Edge>::iterator it = edgeS.begin();
 	while (it != edgeS.end()) {
 		if ((*it).l_idx >= index) it = edgeS.erase(it);
 		else ++it;
@@ -29,8 +29,8 @@ void decrementEdges(unsigned int index, std::set<Edge, setComp>& edgeS) {
 }
 
 // this function should be used to guarantee removal of an edge from the 'edgeS' set.
-void eraseEdgeFromSet (Edge e, std::set<Edge, setComp>& edgeS) {
-  std::set<Edge, setComp>::iterator it;
+void eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS) {
+  std::set<Edge>::iterator it;
 
 //  std::cerr << "edge being erased: " << e << std::endl;
   it = edgeS.find(e);
@@ -41,7 +41,7 @@ void eraseEdgeFromSet (Edge e, std::set<Edge, setComp>& edgeS) {
   } else {
     // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
     // this is technically a crutch because there's a problem with the comparator function.
-    for (std::set<Edge, setComp>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) {
+    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) {
       if (*it == e) {
         edgeS.erase(it);
         break;
@@ -52,7 +52,7 @@ void eraseEdgeFromSet (Edge e, std::set<Edge, setComp>& edgeS) {
 
 // function to remove edges connected to a single vertex from 'edgeS' set.
 // does not care whether it finds an edge or not, just attempts to remove it.
-void eraseVertexFromSet(Point *p1, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   unsigned int before, after;
   Point *p2, *p3;
   Edge e1, e2;
@@ -96,7 +96,7 @@ void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon) {
 // function that takes 3 points: a, b, and c that are already assumed collinear
 // a is assumed to be the lowest point lexicographically as well as the middle point in polygon of the 3 points.
 // swaps the points in the polygon so that the lex. order of the points is also the vertex order of the points.
-bool collSwap(Point *a, Point *b, Point *c, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+bool collSwap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   Point *lo, *mid, *hi;
   //Edge e1, e2;
   //bool be1=false, be2=false;
@@ -183,7 +183,7 @@ bool collSwap(Point *a, Point *b, Point *c, std::set<Edge, setComp>& edgeS, std:
 }
 
 // Function that takes 2 edges, e1 and e2 that both intersect and are collinear
-bool collSwap (Edge& e1, Edge& e2, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+bool collSwap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   bool d1, d2;
   double rd1 = reldist(e1, *e2.p1);
   double rd2 = reldist(e1, *e2.p2);
@@ -374,12 +374,12 @@ bool collSwap (Edge& e1, Edge& e2, std::set<Edge, setComp>& edgeS, std::vector<u
 }
 
 // function to purely remove edge 'e' from 'edgeS' if it's in there and check the 'before' and 'after' edges for intersection.
-enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum edge_t valid = E_VALID;
   Edge before, after;
   bool bef=false, af=false;
   enum intersect_t isval;
-  std::set<Edge, setComp>::iterator it;
+  std::set<Edge>::iterator it;
 
 //  std::cerr << "edge to be removed: " << e << std::endl;
   it = edgeS.find(e);
@@ -424,7 +424,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge, setComp>& edgeS, std::vect
   } else {
     // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
     // this is technically a crutch because there's a problem with the comparator function.
-    for (std::set<Edge, setComp>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
+    for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
       if (*it1 == e) {
         edgeS.erase(it1);
         break;
@@ -434,13 +434,13 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge, setComp>& edgeS, std::vect
   return valid;
 }
 
-std::pair<enum edge_t, std::set<Edge, setComp>::iterator> processEdge(Edge& e, std::set<Edge, setComp>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum edge_t valid = E_VALID;
   enum intersect_t isval;
   bool bef = false, af = false;
   Edge before, after;
-  std::pair<std::set<Edge, setComp>::iterator,bool> retval;
-  std::pair<enum edge_t, std::set<Edge, setComp>::iterator> retval2;
+  std::pair<std::set<Edge>::iterator,bool> retval;
+  std::pair<enum edge_t, std::set<Edge>::iterator> retval2;
   //std::set<Edge, setComp>::key_compare mycomp = edgeS.key_comp();
 
   retval = edgeS.insert(e);
@@ -527,33 +527,25 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 	// original input index of points in 'i' and polygon index in 'v'
 	// Now it can be sorted lexicographically
 	std::vector<unsigned int> lex (points.size());
-	for(unsigned int i = 0; i < points.size(); ++i)
-		lex[i] = points[i].i;
-
-	// lex contains a vector of 'points' indexes sorted lexicographically
-	std::sort(lex.begin(), lex.end(), lexComp(points));
-  unsigned int counter = 0;
-  for (std::vector<unsigned int>::iterator it = lex.begin(); it != lex.end(); ++it) {
-    points[(*it)].l = counter;
-    ++counter;
-  }
+	fill_lex(lex, points); // fill 'lex' with the indexes
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
 	unsigned int index=0, before, after;
   unsigned int max_so_far, max_count, old_index;
 	//double d_idx;
-  compObject comp;
-	std::pair<enum edge_t, std::set<Edge, setComp>::iterator> val1, val2;
+  //compObject comp;
+	//std::pair<enum edge_t, std::set<Edge, setComp>::iterator> val1, val2;
+  std::pair<enum edge_t, std::set<Edge>::iterator> val1, val2;
   double val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
   bool loop;
-	std::set<Edge, setComp> edgeS(comp); // a set of edges.
+	//std::set<Edge, setComp> edgeS(comp); // a set of edges.
+  std::set<Edge> edgeS; // a set of edges.
 
 
   do {
     loop = false;
-    comp.lower_idx = 0;
     max_so_far = 0;
     old_index = 0;
     max_count = 0;
@@ -577,7 +569,6 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];
-  		comp.t = (*p1).x; // the x index used as the comparison.
 
   		// get the 2 points it is connected to in 'polygon', treating the edge case when the point 'p1' is on the ends
   		before = ((*p1).v + points.size() -1) % points.size();

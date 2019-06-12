@@ -56,6 +56,9 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	else if(strcmp(optarg,"curve") == 0) {
 		*alg = A_CURVE;
 	}
+	else if(strcmp(optarg,"hole") == 0) {
+		*alg = A_HOLE;
+	}
 	else {
 		*alg = A_UNDEFINED;
 		std::cerr << "Error:  --alg input incorrect.  Use -? for help. Input: '" << optarg << "', should be '2opt'." << std::endl;
@@ -91,9 +94,11 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 	return returnValue;
 }
 
-enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg,
-	enum in_format_t *inFormat, enum out_format_t *outFormat, bool& writeNew, bool& area,
-	double& areaMin, double& areaMax, unsigned int& randseed, bool& checkSimple) {
+enum error argInit(	int argc, char *argv[],
+										char *inFile, char *outFile, enum alg_t *alg,
+										enum in_format_t *inFormat, enum out_format_t *outFormat,
+										bool& writeNew, bool& area,	double& areaMin, double& areaMax,
+										unsigned int& randseed, bool& checkSimple, unsigned int& holes) {
 	enum error returnValue = SUCCESS;
 	int comm;
 
@@ -112,7 +117,7 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 		{0, 0, 0, 0}
 	};
 
-	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:r:w?stn::x::", long_options, NULL)) != -1 ) {
+	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:h:r:w?stn::x::", long_options, NULL)) != -1 ) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -128,6 +133,9 @@ enum error argInit(int argc, char *argv[], char *inFile, char *outFile, enum alg
 				break;
 			case 'c':
 				returnValue = ofInit(outFormat, optarg);
+				break;
+			case 'h':
+				holes = atoi(optarg);
 				break;
 			case 'n':
 				area = true;

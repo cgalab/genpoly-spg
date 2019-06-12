@@ -1,11 +1,11 @@
+#ifndef __EDGE_H_
+#define __EDGE_H_
+
 #include <iostream> // for endl
 #include <vector>
 #include <iomanip>      // std::setprecision
 #include "basicDefinitions.h"
 #include "point.h"
-
-#ifndef __EDGE_H_
-#define __EDGE_H_
 
 // class for when an edge is vertical on the x axis
 class Yval {
@@ -154,6 +154,36 @@ public:
     if ((*p1).l < (*p2).l) return (*p1).l;
     else return (*p2).l;
   }
+  Yval getYatX(const double x) const {
+  	Yval y;
+  	// calculate the y-axis order of the 2 edges at idx
+  	// use Yval in case of x1-x2 = 0
+  	Point P1 = *p1;
+  	Point P2 = *p2;
+
+  	//assert((x <= P2.x) && (P1.x <= x));
+
+  	if ((P2.x - P1.x) == 0) {
+  		y.set(P1.y, P2.y);
+  		y.setX(P1.x);
+  	}
+  	else {
+  		double slope = (P2.y-P1.y) / (P2.x-P1.x);
+  		double bias = P1.y - slope*P1.x;
+  		double val = slope * x + bias;
+  		if (abs(val) < EPSILON) y.set(0);
+  		else y.set(val);
+  		y.setX(x);
+  	}
+  	return y;
+  }
+
+  double det(const Point p) const {
+  	const Point& pa = *p1;
+  	const Point& pb = *p2;
+  	double ans = (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
+  	return (abs(ans) < EPSILON) ? 0 : ans;
+  }
 
   // check for if p1 is a 'left' vertex compared to p2
   bool checkPolLoHi() {
@@ -169,6 +199,59 @@ public:
       return (*p1).v < (*p2).v;
   }
 
+  bool operator < (const Edge& e) const {
+    // compares 2 edges at x-coordinate 't'
+    // have to catch 5 cases, general case, t is in same beginning point, same end point, 3P collinear and 4P collinear
+    // all 4 specific cases happen when y value is the same for lhs and rhs.
+    // *Problem 1: if the comparison was true at p1, it might be false at p2 if there is
+    //            an intersection between the first comparison at p1 and at p2 when the edge will be removed.
+    // possible solution: always compare at higher p1 value(?)
+//    std::cerr << "lhs: " << lhs << " < rhs: " << rhs << std::endl;
+    Yval yl, yr;
+    double s;
+    // comparison always starts at lex. higher of the P1 points.
+    if ((*p1 == *e.p1) && (*p2 == *e.p2)) return false;
+    if (*p1 == *e.p1) {
+      if (*p2 < *e.p2) s = (*p2).x;
+      else s = (*e.p2).x;
+    }
+    else if (*p1 < *e.p1) s = (*e.p1).x;
+    else s = (*p1).x;
+    //std::cerr << ", s: " << s << std::endl;
+    yl = (*this).getYatX(s);
+    yr = e.getYatX(s);
+
+    if (yl == yr) {
+      double det1, det2;
+      det1 = (*this).det(*e.p1);
+      det2 = (*this).det(*e.p2);
+
+      // 4P coll.
+      if ((abs(det1) < EPSILON) && (abs(det2) < EPSILON)) {
+//        std::cerr << "4Pc: " << std::endl;
+        if (*p1 == *e.p1) return *p2 < *e.p2;
+//        std::cerr << ((*lhs.p1 < *rhs.p1) ? "true" : "false") << std::endl;
+        return *p1 < *e.p1;
+      }
+      // 3P coll. pick the lower of the p2s
+      else {
+//        std::cerr << "3Pc: ";
+        if (*p2 < *e.p2) s = (*p2).x;
+        else s = (*e.p2).x;
+        yl = (*this).getYatX(s);
+        yr = e.getYatX(s);
+//        std::cerr << ((yl < yr) ? "true" : "false") << std::endl;
+        return yl < yr;
+      }
+    }
+    else {
+//      std::cerr << "gen: " << yl << " < " << yr << " : " << ((yl < yr) ? "true" : "false") << std::endl;
+      return yl < yr; // general case:
+    }
+    std::cerr << "ERROR: unexpected fallthrough in comparison! this: " << *this << ", e: " << e << std::endl;
+    return false;
+  }
+
 	friend bool operator==(const Edge lhs, const Edge rhs) {
 		if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
 		else return false;
@@ -178,6 +261,34 @@ public:
   // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
 	friend std::ostream& operator<<(std::ostream& os, const Edge& e) {
 		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "]";
+		return os;
+	}
+};
+
+class C_Edge: public Edge {
+public:
+  unsigned int sc;  // index into a vector of s_curves
+  unsigned int par;  // index into a vector of std::pair<uint, uint> of curve ends.
+  bool lower;       // whether the edge is an upper curve end or lower curve end.
+
+  C_Edge() {p1=NULL; p2=NULL;l_idx=0; sc=0; par=0;}
+  C_Edge(Point *P1, Point *P2) {
+		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
+		else {p1=P2; p2=P1;}
+    l_idx=0;
+	}
+
+  friend bool operator==(const C_Edge lhs, const C_Edge rhs) {
+		if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
+		else return false;
+	}
+
+  // to print out an edge, gives the format:
+  // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
+	friend std::ostream& operator<<(std::ostream& os, const C_Edge& e) {
+		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
+    << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [" << e.sc << "," << e.par << "]";
 		return os;
 	}
 };

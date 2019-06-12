@@ -14,6 +14,7 @@ struct compObject{
   unsigned int lower_idx;
 };
 
+/*
 // comparison class for the set of edges in 'opt2.cpp'
 struct setComp {
 private:
@@ -74,6 +75,8 @@ public:
     return false;
   }
 };
+*/
+
 
 enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg, unsigned int randseed);
 void printEnum(enum intersect_t val);
