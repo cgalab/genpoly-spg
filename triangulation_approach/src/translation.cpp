@@ -117,8 +117,43 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 	EdgeType eType;
 	Triangle* nextT = NULL;
 	int count = 0;
+	bool lowerX = false, higherX = false, lowerY = false, higherY = false;
+	Vertex *v;
 
 	surEdges = (*fromV).getSurroundingEdges();
+
+	// search for triangulation errors by checking whether the fromV is wrathly inside of its Surrounding Polygon
+	for(auto& i : surEdges){
+		v = (*i).getV0();
+
+		if((*v).getX() > (*fromV).getX())
+			higherX = true;
+		else
+			lowerX = true;
+
+		if((*v).getY() > (*fromV).getY())
+			higherY = true;
+		else
+			lowerY = true;
+
+		v = (*i).getV1();
+
+		if((*v).getX() > (*fromV).getX())
+			higherX = true;
+		else
+			lowerX = true;
+
+		if((*v).getY() > (*fromV).getY())
+			higherY = true;
+		else
+			lowerY = true;
+	}
+
+	if(!(lowerX && lowerY && higherX && higherY)){
+		printf("Triangulation error: fromV is outside of its surrounding polygon\n");
+		exit(6);
+	}
+
 
 	// iterate over all edges of the surrounding polygon
 	for(auto& i : surEdges){
@@ -179,7 +214,7 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 		// check for numerical problems
 		if(iType0 != IntersectionType::NONE && iType1 != IntersectionType::NONE){
 			if(settings.getFBMode() == FeedbackMode::VERBOSE)
-				printf("CheckEdge: new edge intersects multiple edges of the surrounding polygon -> translation rejected due to numerical problem\n");
+				printf("CheckEdge: new edge intersects multiple edges of the actual triangle -> translation rejected due to numerical problem\n");
 			return false;
 		}
 
@@ -366,8 +401,26 @@ enum Executed Translation::execute(){
 				if((*edge).getEdgeType() != EdgeType::POLYGON)
 					flip(i, true);
 				else{
-					printf("\nTriangle area = 0 after translation: PE can not be fliped\n");
-					exit(2);
+					/*printf("\nTriangle area = 0 after translation: PE can not be fliped\n");
+					printf("index: %d id: %llu dx: %f dy: %f\n", index, (*original).getID(), dx, dy);
+					(*i).print();
+					(*(*i).getVertex(0)).print();
+					(*(*i).getVertex(1)).print();
+					(*(*i).getVertex(2)).print();
+					printf("oldv\n");
+					(*oldV).print();
+					printf("newV\n");
+					(*newV).print();
+					exit(2);*/
+
+					trans = new Translation(T, settings, index, - dx * 0.1, - dy * 0.1);
+					ex = (*trans).execute();
+					delete trans;
+
+					if(ex == Executed::REJECTED){
+						printf("\nTriangle area = 0 after translation: PE can not be fliped\n");
+						exit(2);
+					}
 				}
 
 				if(settings.getFBMode() == FeedbackMode::VERBOSE)
@@ -396,7 +449,7 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 	e = (*t0).getLongestEdgeAlt();
 	if((*e).getEdgeType() == EdgeType::POLYGON){
 		printf("Flip: polygon edge gets deleted\n");
-		printf("id: %llu dx: %f dy: %f \n", (*original).getID(), dx, dy);
+		printf("id: %llu index: %d dx: %f dy: %f \n", (*original).getID(), index, dx, dy);
 
 		(*T).addVertex(oldV);
 		(*T).addVertex(newV);

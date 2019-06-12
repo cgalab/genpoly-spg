@@ -1,9 +1,54 @@
 #!/bin/bash
 # my script
 
-for i in {1..10}
+make all
+
+code0=0
+code1=0
+code2=0
+code3=0
+code4=0
+code5=0
+code6=0
+
+for i in {1..1000}
 do
+	echo try nr. $i
+
 	./app
 
-	echo $?
+	rv=$?
+
+	echo Exit code: $rv
+
+	if [ $rv -eq 0 ]
+	then
+		code0=$((code0+1))
+	elif [ $rv -eq 1 ]
+	then
+		code1=$((code1+1))
+	elif [ $rv -eq 2 ]
+	then
+		code2=$((code2+1))
+	elif [ $rv -eq 3 ]
+	then
+		code3=$((code3+1))
+	elif [ $rv -eq 4 ]
+	then
+		code4=$((code4+1))
+	elif [ $rv -eq 5 ]
+	then
+		code5=$((code5+1))
+	elif [ $rv -eq 6 ]
+	then
+		code6=$((code6+1))
+	fi
 done
+
+echo Exit code 0: $code0
+echo Exit code 1: $code1
+echo Exit code 2: $code2
+echo Exit code 3: $code3
+echo Exit code 4: $code4
+echo Exit code 5: $code5
+echo Exit code 6: $code6
