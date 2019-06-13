@@ -18,8 +18,10 @@ public:
   // end.first is the upper end and end.second is the lower end based on 'y' value.
   std::vector< std::pair<C_Edge, C_Edge> > ends;
 
+  s_curve() {lsp=0;rin=true;}
+
   friend std::ostream& operator<<(std::ostream& os, const s_curve& c) {
-		os << "lsp: " << c.lsp << ", rin: " << ((c.rin) ? "true": "false") << "\n";
+		os << "lsp: " << c.lsp << ", rin: " << (c.rin ? "true" : "false") << "\n";
     for (unsigned int i = 0; i < c.ends.size();++i) os << "upper: " << c.ends[i].first << ", lower: " << c.ends[i].second << "\n";
 		return os;
 	}
