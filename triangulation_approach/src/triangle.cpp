@@ -28,7 +28,7 @@ e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) {
 		if(cont){
 			printf("0An equal triangle already exists, context: %s\n", context.c_str());
 			printf("vertex IDs: %llu %llu %llu \n", (*V0).getID(), (*V1).getID(), (*V2).getID());
-			//exit(1);
+			exit(5);
 			ok = false;
 		}
 	}
@@ -40,7 +40,7 @@ e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) {
 		if(cont){
 			printf("1An equal triangle already exists, context: %s\n", context.c_str());
 			printf("vertex IDs: %llu %llu %llu \n", (*V0).getID(), (*V1).getID(), (*V2).getID());
-			//exit(1);
+			exit(5);
 			ok = false;
 		}
 	}
@@ -52,7 +52,7 @@ e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) {
 		if(cont){
 			printf("2An equal triangle already exists, context: %s\n", context.c_str());
 			printf("vertex IDs: %llu %llu %llu \n", (*V0).getID(), (*V1).getID(), (*V2).getID());
-			//exit(1);
+			exit(5);
 			ok = false;
 		}
 	}

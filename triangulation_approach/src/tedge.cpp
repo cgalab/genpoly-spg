@@ -310,7 +310,7 @@ enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1){
 	det_c = det(e1, (*e0).getV0());
 	det_d = det(e1, (*e0).getV1());
 
-	if(det_a * det_b * det_c * det_d == 0){
+	if(fabs(det_a * det_b * det_c * det_d) < 0.00000000000000000001){
 		bool col = false; // if true, check for collinearity
 
 		//quick check if the edges share a vertex
@@ -359,7 +359,7 @@ enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1){
 		else if(same11)
 			return IntersectionType::VERTEX;
 		else
-			return IntersectionType::NONE;
+			return IntersectionType::VERTEX;
 
 	}else{
 		// none of the determinants were 0, so just need to check the sign for intersection.

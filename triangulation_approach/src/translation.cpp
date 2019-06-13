@@ -297,11 +297,12 @@ enum Executed Translation::execute(){
 			if(intersectionPoint == NULL)
 				intersectionPoint = getIntersectionPoint(nextV, oldV, prevV, newV);
 			if(intersectionPoint == NULL){
-				printf("something went wrong computing the intersection point to split the translation \n");
+				/*printf("something went wrong computing the intersection point to split the translation \n");
 				printf("index: %d dx: %f dy: %f \n", index, dx, dy);
 				(*T).addVertex(newV);
 				(*T).print("triangulation.graphml");
-				exit(1);
+				exit(1);*/
+				return Executed::REJECTED;
 			}
 
 			// first part of the translation
