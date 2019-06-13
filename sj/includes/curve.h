@@ -14,9 +14,9 @@ public:
   bool rin;
 
   // a vector of all curves that have the same lex. start. point.
-  // this is defined as a pair of indexes into 'points' that represent the 'ends' of the curve.
+  // this is defined as a pair of 'C_Edge's that represent the 'ends' of the curve.
   // end.first is the upper end and end.second is the lower end based on 'y' value.
-  std::vector< std::pair<unsigned int, unsigned int> > ends;
+  std::vector< std::pair<C_Edge, C_Edge> > ends;
 
   friend std::ostream& operator<<(std::ostream& os, const s_curve& c) {
 		os << "lsp: " << c.lsp << ", rin: " << ((c.rin) ? "true": "false") << "\n";

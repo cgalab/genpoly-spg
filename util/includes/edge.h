@@ -275,7 +275,7 @@ public:
   C_Edge(Point *P1, Point *P2) {
 		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
 		else {p1=P2; p2=P1;}
-    l_idx=0;
+    l_idx=0;sc=0;par=0;
 	}
 
   friend bool operator==(const C_Edge lhs, const C_Edge rhs) {
