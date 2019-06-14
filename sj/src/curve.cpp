@@ -18,9 +18,26 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
   std::cerr << "first point: " << points[lex[0]] << ", pol: " << polygon.size() << std::endl;
 
-
   return UNEXPECTED_ERROR;
 }
+
+// Found a better way to find holes based on this theorem:
+// Theorem of inner curves:  Every point on the convex hull is either connected to its incidental c.h. point directly,
+// or via an inner curve that ends in the incidental c.h. point.
+// This means we can traverse the c.h. points and find hole candidates from the start of all inner curves.
+enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  std::vector<s_curve> sc;
+
+  // start with getting all c.h. points.
+  std::vector<unsigned int> ch;
+  get_convex_hull(ch, points);
+
+  std::cerr << "c.h. points: " << ch.size() << ", inner points: " << points.size()-ch.size() << ", sph: " << sph.size() << ", p: " << polygon.size() << std::endl;
+  pdisplay(ch, points);
+
+  return SUCCESS;
+}
+
 
 // function that accepts a simple polygon and returns a array of a polygon with its holes.
 // Input: 'polygon'     : a vector with vertices of 'points' set that is a simple polygon
