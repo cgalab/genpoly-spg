@@ -11,7 +11,7 @@ class RandomGenerator{
 	public:
 		RandomGenerator(){
 			unsigned int seed = rd();
-			//seed = 3083175447;
+			//seed = 2187281837;
 
 			printf("seed: %u \n", seed);
 

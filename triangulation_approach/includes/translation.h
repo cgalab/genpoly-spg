@@ -40,6 +40,7 @@ private:
 	double actualTime;
 	bool split;
 	EventQueue Q;
+	const double epsilon = 0.00001;
 
 	Settings settings;
 

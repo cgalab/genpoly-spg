@@ -11,7 +11,7 @@ code4=0
 code5=0
 code6=0
 
-for i in {1..1000}
+for i in {1..50}
 do
 	echo try nr. $i
 

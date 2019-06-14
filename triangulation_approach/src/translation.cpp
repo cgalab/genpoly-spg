@@ -2,7 +2,7 @@
 
 // Constructors
 Translation::Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY) : 
-Q(EventQueue(0.00001)), dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false), settings(set)
+Q(EventQueue(epsilon)), dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false), settings(set)
 
 {
 	original = (*T).getVertex(index);
@@ -30,6 +30,12 @@ bool Translation::generateInitialQueue(){
 
 	for(auto& i : triangles){
 		t = (*i).calculateCollapseTime(original, dx, dy);
+
+		if(t <= epsilon && t >= - epsilon)
+			return false;
+
+		if(t >= 1 - epsilon && t <= 1 + epsilon)
+			return false;
 
 		if(t >= 0 && t <= 1){
 			(*i).enqueue();		
@@ -151,6 +157,7 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 
 	if(!(lowerX && lowerY && higherX && higherY)){
 		printf("Triangulation error: fromV is outside of its surrounding polygon\n");
+		(*fromV).printEnvironment(2, "env.graphml");
 		exit(6);
 	}
 
@@ -530,12 +537,24 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 
 		t = (*t0).calculateCollapseTime(original, dx, dy); // again between 0 and 1
 
+		if(t <= actualTime + epsilon && t >= actualTime - epsilon)
+			stable = false;
+
+		if(t <= 1 + epsilon && t >= 1 - epsilon)
+			stable = false;
+
 		if(t >= actualTime && t <= 1){
 			(*t0).enqueue();
 			stable = stable && Q.insert(t, t0);
 		}
 
 		t = (*t1).calculateCollapseTime(original, dx, dy); // again between 0 and 1
+
+		if(t <= actualTime + epsilon && t >= actualTime - epsilon)
+			stable = false;
+
+		if(t <= 1 + epsilon && t >= 1 - epsilon)
+			stable = false;
 
 		if(t >= actualTime && t <= 1){
 			(*t1).enqueue();
