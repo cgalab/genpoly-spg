@@ -18,9 +18,26 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
   std::cerr << "first point: " << points[lex[0]] << ", pol: " << polygon.size() << std::endl;
 
-
   return UNEXPECTED_ERROR;
 }
+
+// Found a better way to find holes based on this theorem:
+// Theorem of inner curves:  Every point on the convex hull is either connected to its incidental c.h. point directly,
+// or via an inner curve that ends in the incidental c.h. point.
+// This means we can traverse the c.h. points and find hole candidates from the start of all inner curves.
+enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  std::vector<s_curve> sc;
+
+  // start with getting all c.h. points.
+  std::vector<unsigned int> ch;
+  get_convex_hull(ch, points);
+
+  std::cerr << "c.h. points: " << ch.size() << ", inner points: " << points.size()-ch.size() << ", sph: " << sph.size() << ", p: " << polygon.size() << std::endl;
+  pdisplay(ch, points);
+
+  return SUCCESS;
+}
+
 
 // function that accepts a simple polygon and returns a array of a polygon with its holes.
 // Input: 'polygon'     : a vector with vertices of 'points' set that is a simple polygon
@@ -149,17 +166,13 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
         e2.sc = (*retval1.first).sc;
         e2.par = (*retval1.first).par;
         e2.lower = (*retval1.first).lower;
-        //update s_curve.ends with new endpoint.
-//        std::cerr << "in here" << std::endl;
-//        std::cerr << "s_curve index: " << e2.sc << ", pair index: " << e2.par << std::endl;
-//        std::cerr << "current upper end: " << sc[e2.sc].ends[e2.par].first << std::endl;
+        //update s_curve.ends with new edge.
         if (e2.lower) sc[e2.sc].ends[e2.par].second = e2;
         else          sc[e2.sc].ends[e2.par].first  = e2;
         // remove e1, add e2 into 'edgeS'
         edgeS.erase(retval1.first);
         retval2 = edgeS.insert(e2);
         assert(*retval2.first == e2);
-
       }
       else {
         // find 'e2' in 'edgeS'
@@ -212,10 +225,12 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
           after = *(std::next(retval2.first));
           // if curve has other curves on both sides,
           // check upper/lower orientation of adjacent s_curves
-          if (before.lower == after.lower) {
-            if (before.lower == false) nu_c.rin = !sc[before.sc].rin;
-            else if (after.lower == true) nu_c.rin = !sc[after.sc].rin;
+          if (before.lower == after.lower) { // 2 inner curves inside an outer curve
+            if (before.lower == false) nu_c.rin = !sc[before.sc].rin; // the inner upper curve
+            else nu_c.rin = sc[before.sc].rin; // the inner lower curve
           }
+          else if (before.sc == after.sc) nu_c.rin = !sc[before.sc].rin; // one inner curve encapsulated by an outer curve
+          else nu_c.rin = sc[before.sc].rin; // between 2 incidental inner curves
         }
         else nu_c.rin = true;
 
@@ -239,8 +254,10 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
           // check upper/lower orientation of adjacent s_curves
           if (before.lower == after.lower) {
             if (before.lower == false) nu_c.rin = !sc[before.sc].rin;
-            else if (after.lower == true) nu_c.rin = !sc[after.sc].rin;
+            else nu_c.rin = sc[before.sc].rin;
           }
+          else if (before.sc == after.sc) nu_c.rin = !sc[before.sc].rin;
+          else nu_c.rin = sc[before.sc].rin;
         }
         else assert(nu_c.rin == true);
 
@@ -261,11 +278,12 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
   std::cerr << "opened: " << count_open << ", continued: " << count_cont << ", closed: " << count_close << std::endl;
   unsigned int valid_curves = 0;
   for (unsigned int i = 0; i < sc.size(); ++i) {
-    if (sc[i].rin == true) {
-      // found a valid curve
+    if (sc[i].rin == false) {
       ++valid_curves;
+      std::cerr << sc[i] << std::endl;
     }
   }
+
   std::cerr << "valid curves to make holes out of: " << valid_curves << std::endl;
 
 
