@@ -31,7 +31,6 @@ void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points) {
 
 // function that fills the vector 'ch' with indexes of 'points' set that are the points on the convex get_convex_hull
 // input: 'ch' - vector of indexes <unsigned int> into 'points' that are the points on the convex hull
-//        'lex' - all points in 'points' set in lexicographical order
 //        'points' - a vector of <Point> points.
 void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points) {
 
