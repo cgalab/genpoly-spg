@@ -265,6 +265,34 @@ public:
 	}
 };
 
+class I_Edge: public Edge {
+private:
+protected:
+public:
+  // l2ch : "left point is the direction towards the convex hull"
+  bool l2ch;
+
+  I_Edge() {p1=NULL; p2=NULL;l_idx=0; l2ch=false;}
+  I_Edge(Point *P1, Point *P2) {
+		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
+		else {p1=P2; p2=P1;}
+    l_idx=0;l2ch=false;
+	}
+  I_Edge(Point *P1, Point *P2, bool b) {
+		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
+		else {p1=P2; p2=P1;}
+    l_idx=0;l2ch=b;
+	}
+
+  // the '*' is to see better which direction the c.h. is.
+  friend std::ostream& operator<<(std::ostream& os, const I_Edge& e) {
+    os << (e.l2ch ? "*" : "") << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
+    << "," << (*e.p1).v << "," << (*e.p1).l << "] , " << (e.l2ch ? "" : "*") << "(" << (*e.p2).x << "," << (*e.p2).y
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "]";
+    return os;
+  }
+};
+
 class C_Edge: public Edge {
 public:
   unsigned int sc;  // index into a vector of s_curves

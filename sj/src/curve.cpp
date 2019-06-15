@@ -27,7 +27,7 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 // or via an inner curve that ends in the incidental c.h. point.
 // This means we can traverse the c.h. points and find hole candidates from the start of all inner curves.
 enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
-  std::vector< std::pair<Edge,Edge> > ends;
+  std::vector< std::pair<I_Edge,I_Edge> > ends;
   Point prev, p, next;
   bool is_left, inner;
   unsigned int diff;
@@ -72,17 +72,20 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsig
       }
 
       // create the edges
-      Edge e1, e2;
+      I_Edge e1, e2;
       if (is_left ^ inner) {
-        e1 = Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v - 1) % polygon.size()]]);
-        e2 = Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v + 1) % polygon.size()]]);
+        e1 = I_Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v - 1) % polygon.size()]]);
+        e2 = I_Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v + 1) % polygon.size()]]);
       }
       else {
-        e1 = Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v + 1) % polygon.size()]]);
-        e2 = Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v - 1) % polygon.size()]]);
+        e1 = I_Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v + 1) % polygon.size()]]);
+        e2 = I_Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v - 1) % polygon.size()]]);
       }
+      // set the l2ch boolean of the edges
+      if (*e1.p1 == prev) e1.l2ch = true;
+      if (*e2.p1 == p) e2.l2ch = true;
 //      std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
-      std::pair<Edge, Edge> par (e1, e2);
+      std::pair<I_Edge, I_Edge> par (e1, e2);
       ends.push_back(par);
 
     }
