@@ -8,6 +8,7 @@
 #include "point.h"
 #include "edge.h"
 #include "curve.h"
+#include "pol.h"
 
 
 enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
@@ -34,7 +35,10 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsig
 
   // start with getting all c.h. points.
   std::vector<unsigned int> ch;
-  get_convex_hull(ch, points);
+  get_convex_hull(ch, points, true);
+
+  double area = pol_calc_area(ch, points);
+	std::cerr << "Area: " << area << std::endl;
 
   std::cerr << "c.h. points: " << ch.size() << ", inner points: " << points.size()-ch.size() << ", sph: " << sph.size() << ", p: " << polygon.size() << std::endl;
 
