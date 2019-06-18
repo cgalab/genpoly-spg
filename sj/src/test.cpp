@@ -7,6 +7,7 @@
 #include "opt2.h"
 //#include "bst.h"
 #include "basicFunctions.h" //for setComp (Edge set test)
+#include "pol.h"
 
 
 /*

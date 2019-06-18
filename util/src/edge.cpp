@@ -7,27 +7,6 @@
 #include "basicDefinitions.h"
 #include "edge.h"
 #include "point.h"
-#include "rand.h"
-
-void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
-	if (randseed) mt.seed(randseed);
-
-	unsigned int i, j, k;
-	polygon.resize(points.size());
-
-	for(unsigned int j = 0; j < polygon.size();++j) {
-		polygon[j] = points[j].i;
-	}
-
-	for (i = polygon.size()-1; i > 0; --i) {
-		UniformRandomI(j, 0, i);
-		k = polygon[i];
-		polygon[i] = polygon[j];
-		polygon[j] = k;
-		points[polygon[i]].v = i;
-	}
-	points[polygon[i]].v = i;
-}
 
 // returns relative distance of a point to an edge.
 double reldist(const Point& pa, const Point& pb, const Point& p) {
@@ -229,7 +208,7 @@ void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon
 		}
 	}
 	else { // if i1 is higher than i2 we flip the outer polygonal chain
-		i2 += points.size();
+		i2 += polygon.size();
 		//std::cout << "new i2: " << i2 << std::endl;
 
 		while(i1 < i2) {
@@ -238,12 +217,12 @@ void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon
 			//std::cout << "mod of i2: " << (i2 % points.size()) << std::endl;
 			//std::cout << "p[i1]: " << polygon[(i1 % points.size())] << ", p[i2]: " << polygon[(i2 % points.size())] << std::endl;
 			//std::cout << "p[p[i1]]: " << points[polygon[(i1 % points.size())]].v << ", p[p[i2]]: " << points[polygon[(i2 % points.size())]].v << std::endl;
-			t = polygon[(i1 % points.size())];
-			polygon[(i1 % points.size())] = polygon[(i2 % points.size())];
-			polygon[(i2 % points.size())] = t;
+			t = polygon[(i1 % polygon.size())];
+			polygon[(i1 % polygon.size())] = polygon[(i2 % polygon.size())];
+			polygon[(i2 % polygon.size())] = t;
 			//std::cout << "p[i1]:" << polygon[(i1 % points.size())] << ", p[i2]:" << polygon[(i2 % points.size())] << std::endl;
-			points[polygon[(i1 % points.size())]].v = i1 % points.size();
-			points[polygon[(i2 % points.size())]].v = i2 % points.size();
+			points[polygon[(i1 % polygon.size())]].v = i1 % polygon.size();
+			points[polygon[(i2 % polygon.size())]].v = i2 % polygon.size();
 			//std::cout << "p[p[i1]].v:" << points[polygon[(i1 % points.size())]].v << ", p[p[i2]].v:" << points[polygon[(i2 % points.size())]].v << std::endl;
 			++i1;
 			--i2;

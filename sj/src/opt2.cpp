@@ -29,7 +29,7 @@ void decrementEdges(unsigned int index, std::set<Edge>& edgeS) {
 }
 
 // this function should be used to guarantee removal of an edge from the 'edgeS' set.
-void eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS) {
+bool eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS) {
   std::set<Edge>::iterator it;
 
 //  std::cerr << "edge being erased: " << e << std::endl;
@@ -38,16 +38,18 @@ void eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS) {
   if (it != edgeS.end()) {
     assert(e == *it);
     edgeS.erase(it);
+    return true;
   } else {
     // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
     // this is technically a crutch because there's a problem with the comparator function.
     for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) {
       if (*it == e) {
         edgeS.erase(it);
-        break;
+        return true;
       }
     }
   }
+  return false;
 }
 
 // function to remove edges connected to a single vertex from 'edgeS' set.
@@ -96,7 +98,7 @@ void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon) {
 // function that takes 3 points: a, b, and c that are already assumed collinear
 // a is assumed to be the lowest point lexicographically as well as the middle point in polygon of the 3 points.
 // swaps the points in the polygon so that the lex. order of the points is also the vertex order of the points.
-bool collSwap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+bool collSwap (Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   Point *lo, *mid, *hi;
   //Edge e1, e2;
   //bool be1=false, be2=false;
@@ -203,7 +205,6 @@ bool collSwap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned i
   else {
     d2 = ((int)(*e2.p1).v - (int)(*e2.p2).v) < 0; // false means edge order in poly is : [...p2p1...]
   }
-
 
   if ((rd1 > 1) && (rd2 > 1)) return false;
   if ((rd1 < 0) && (rd2 < 0)) return false;
@@ -521,7 +522,9 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
 
 enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
 	// initialise and create a random permutation for the polygon
-	createRandPol(polygon, points, randseed);
+	//createRandPol(polygon, points, randseed);
+  createCHRandPol(polygon, points, randseed);
+  pdisplay(polygon, points);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'

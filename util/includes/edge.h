@@ -107,6 +107,10 @@ public:
     l_idx=idx;
   }
 
+  bool isNull() {
+    return ((p1 == NULL) || (p2 == NULL));
+  }
+
 	void set(Point* v1, Point* v2) {
     if ((*v1) < (*v2)) {p1=v1; p2=v2;}
 		else {p1=v2; p2=v1;}
@@ -199,6 +203,17 @@ public:
       return (*p1).v < (*p2).v;
   }
 
+  // check if the edge crosses an value on the x-axis 'x'
+  // An edge already has p1 and p2 in lex. order.
+  enum intersect_t checkCrossing(double x) {
+    if ((*p1).x == x) return IS_VERTEX11;
+    if ((*p2).x == x) return IS_VERTEX22;
+    if ((*p1).x < x) {
+      if (x < (*p2).x) return IS_TRUE;
+    }
+    else return IS_FALSE;
+  }
+
   bool operator < (const Edge& e) const {
     // compares 2 edges at x-coordinate 't'
     // have to catch 5 cases, general case, t is in same beginning point, same end point, 3P collinear and 4P collinear
@@ -263,6 +278,34 @@ public:
 		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "]";
 		return os;
 	}
+};
+
+class I_Edge: public Edge {
+private:
+protected:
+public:
+  // l2ch : "left point is the direction towards the convex hull"
+  bool l2ch;
+
+  I_Edge() {p1=NULL; p2=NULL;l_idx=0; l2ch=false;}
+  I_Edge(Point *P1, Point *P2) {
+		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
+		else {p1=P2; p2=P1;}
+    l_idx=0;l2ch=false;
+	}
+  I_Edge(Point *P1, Point *P2, bool b) {
+		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
+		else {p1=P2; p2=P1;}
+    l_idx=0;l2ch=b;
+	}
+
+  // the '*' is to see better which direction the c.h. is.
+  friend std::ostream& operator<<(std::ostream& os, const I_Edge& e) {
+    os << (e.l2ch ? "*" : "") << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
+    << "," << (*e.p1).v << "," << (*e.p1).l << "] , " << (e.l2ch ? "" : "*") << "(" << (*e.p2).x << "," << (*e.p2).y
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "]";
+    return os;
+  }
 };
 
 class C_Edge: public Edge {
