@@ -107,6 +107,10 @@ public:
     l_idx=idx;
   }
 
+  bool isNull() {
+    return ((p1 == NULL) || (p2 == NULL));
+  }
+
 	void set(Point* v1, Point* v2) {
     if ((*v1) < (*v2)) {p1=v1; p2=v2;}
 		else {p1=v2; p2=v1;}
@@ -197,6 +201,17 @@ public:
     }
     else
       return (*p1).v < (*p2).v;
+  }
+
+  // check if the edge crosses an value on the x-axis 'x'
+  // An edge already has p1 and p2 in lex. order.
+  enum intersect_t checkCrossing(double x) {
+    if ((*p1).x == x) return IS_VERTEX11;
+    if ((*p2).x == x) return IS_VERTEX22;
+    if ((*p1).x < x) {
+      if (x < (*p2).x) return IS_TRUE;
+    }
+    else return IS_FALSE;
   }
 
   bool operator < (const Edge& e) const {
