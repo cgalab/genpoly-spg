@@ -123,44 +123,10 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 	EdgeType eType;
 	Triangle* nextT = NULL;
 	int count = 0;
-	bool lowerX = false, higherX = false, lowerY = false, higherY = false;
-	Vertex *v;
+
+	(*fromV).checkSurroundingPolygonFast();
 
 	surEdges = (*fromV).getSurroundingEdges();
-
-	// search for triangulation errors by checking whether the fromV is wrathly inside of its Surrounding Polygon
-	for(auto& i : surEdges){
-		v = (*i).getV0();
-
-		if((*v).getX() > (*fromV).getX())
-			higherX = true;
-		else
-			lowerX = true;
-
-		if((*v).getY() > (*fromV).getY())
-			higherY = true;
-		else
-			lowerY = true;
-
-		v = (*i).getV1();
-
-		if((*v).getX() > (*fromV).getX())
-			higherX = true;
-		else
-			lowerX = true;
-
-		if((*v).getY() > (*fromV).getY())
-			higherY = true;
-		else
-			lowerY = true;
-	}
-
-	if(!(lowerX && lowerY && higherX && higherY)){
-		printf("Triangulation error: fromV is outside of its surrounding polygon\n");
-		(*fromV).printEnvironment(2, "env.graphml");
-		exit(6);
-	}
-
 
 	// iterate over all edges of the surrounding polygon
 	for(auto& i : surEdges){
@@ -480,35 +446,6 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 	vn0 = (*t0).getOtherVertex(e);
 	vn1 = (*t1).getOtherVertex(e);
 
-	/*if(index == 161010){
-		printf("debug info:\n");
-		printf("dx: %f dy: %f \n", dx, dy);
-		printf("original position: x = %f, y = %f, area = %f \n", (*oldV).getX(), (*oldV).getY(), signedArea(vn0, vj1, oldV));
-		printf("target position: x = %f, y = %f, area = %f \n", (*newV).getX(), (*newV).getY(), signedArea(vn0, vj1, newV));
-		printf("actual area: %.16f \n", signedArea(vn0, vj1, original));
-		printf("areas of t1:\n");
-		printf("start: %.16f now: %.16f end: %.16f \n", signedArea(vn1, vj1, oldV), signedArea(vn1, vj1, original), signedArea(vn1, vj1, newV));
-		(*t0).print();
-		(*t1).print();
-		printf("vj0:\n");
-		(*vj0).print();
-		printf("vj1:\n");
-		(*vj1).print();
-		printf("vn0:\n");
-		(*vn0).print();
-		printf("vn1:\n");
-		(*vn1).print();
-
-		printf("original vertex:\n");
-		(*original).print();
-		printf("longest edge:\n");
-		(*e).print();
-
-		(*original).setPosition((*oldV).getX(), (*oldV).getY());
-
-		printf("collapse time t0: %.16f t1: %.16f \n", (*t0).calculateCollapseTime(original, dx, dy), (*t1).calculateCollapseTime(original, dx, dy));
-	}*/
-
 	delete e;
 
 	// new triangle vn0, vn1, vj0
@@ -588,6 +525,8 @@ void Translation::checkSplit(){
 }
 	
 Translation::~Translation(){
+	(*original).checkSurroundingPolygonAdvanced();
+
 	delete transPath;
 	delete oldV;
 	delete newV;

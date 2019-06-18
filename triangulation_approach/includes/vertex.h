@@ -80,6 +80,8 @@ public:
 	// Others
 	bool check();
 	void stretch(double factor);
+	void checkSurroundingPolygonFast();
+	void checkSurroundingPolygonAdvanced();
 	
 	// Destructor
 	~Vertex();

@@ -219,7 +219,7 @@ double TEdge::getAngle(Vertex* v){
 	dx = x1 - x0;
 	dy = y1 - y0;
 
-	cosa = dx / sqrt(pow((x1 - x0), 2) + pow((y1 - y0), 2));
+	cosa = dx / sqrt(pow((dx), 2) + pow((dy), 2));
 
 	alpha = acos(cosa);
 
