@@ -146,7 +146,10 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
   // make sure of the ordering
 	if (enforceCCWOrder) {
     double area = pol_calc_area(ch, points);
+    //std::cerr << "area: " << area << std::endl;
     if (area < 0) doFlip(0, ch.size()-1, ch, points);
+    //area = pol_calc_area(ch, points);
+    //std::cerr << "area: " << area << std::endl;
   }
 }
 
@@ -199,6 +202,8 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 	// start with getting all c.h. points.
 	std::vector<unsigned int> ch;
 	get_convex_hull(ch, points, true);
+  std::cerr << "ch: " << std::endl;
+  pdisplay(ch, points);
   // get all inner points.
   std::vector<unsigned int> ip;
 	get_inner_points(ip, ch, points);
@@ -211,14 +216,19 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 		UniformRandomI(randpos, 0, ch.size()+ip.size()-1);
     if (randpos < ch.size()) {
       polygon[i] = ch[ch.size()-1]; // using always the last point make sure the c.h. is orderly distributed in the polygon.
+      points[polygon[i]].v = i;
       ch.pop_back();
     }
     else {
       randpos = randpos - ch.size();
       polygon[i] = ip[randpos];
+      points[polygon[i]].v = i;
       ip.pop_back();
     }
 	} while (i != 0) ;
+
+  std::cerr << "polygon: " << std::endl;
+  pdisplay(polygon, points);
 }
 
 // really slow version to check whether a polygon has an intersection.

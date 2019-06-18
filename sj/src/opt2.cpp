@@ -11,6 +11,7 @@
 #include "basicFunctions.h"
 #include "point.h"
 #include "edge.h"
+#include "pol.h"
 
 // comparison function for sorting pairs by secondary value
 bool sortbysec(const std::pair<Point*,double> &a, const std::pair<Point*,double> &b) {
@@ -524,7 +525,6 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 	// initialise and create a random permutation for the polygon
 	//createRandPol(polygon, points, randseed);
   createCHRandPol(polygon, points, randseed);
-  pdisplay(polygon, points);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'
