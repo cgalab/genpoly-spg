@@ -177,21 +177,25 @@ void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& 
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
 	if (randseed) mt.seed(randseed);
 
-	unsigned int i, j, k;
+	unsigned int randpos, k;
 	polygon.resize(points.size());
 
 	for(unsigned int i = 0; i < polygon.size();++i) {
 		polygon[i] = points[i].i;
 	}
 
-	for (i = polygon.size()-1; i > 0; --i) {
-		UniformRandomI(j, 0, i);
+  unsigned int i = polygon.size();
+	do {
+    --i;
+		UniformRandomI(randpos, 0, i);
 		k = polygon[i];
-		polygon[i] = polygon[j];
-		polygon[j] = k;
+		polygon[i] = polygon[randpos];
+		polygon[randpos] = k;
 		points[polygon[i]].v = i;
-	}
-	points[polygon[i]].v = i;
+	} while (i!= 0);
+
+  //std::cerr << "polygon: " << std::endl;
+  //pdisplay(polygon, points);
 }
 
 // function to create a random polygon where the convex hull points are in relative CCW order.
@@ -202,8 +206,8 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 	// start with getting all c.h. points.
 	std::vector<unsigned int> ch;
 	get_convex_hull(ch, points, true);
-  std::cerr << "ch: " << std::endl;
-  pdisplay(ch, points);
+  //std::cerr << "ch: " << std::endl;
+  //pdisplay(ch, points);
   // get all inner points.
   std::vector<unsigned int> ip;
 	get_inner_points(ip, ch, points);
@@ -227,8 +231,8 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
     }
 	} while (i != 0) ;
 
-  std::cerr << "polygon: " << std::endl;
-  pdisplay(polygon, points);
+  //std::cerr << "polygon: " << std::endl;
+  //pdisplay(polygon, points);
 }
 
 // really slow version to check whether a polygon has an intersection.

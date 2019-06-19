@@ -523,8 +523,8 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
 
 enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
 	// initialise and create a random permutation for the polygon
-	//createRandPol(polygon, points, randseed);
-  createCHRandPol(polygon, points, randseed);
+	createRandPol(polygon, points, randseed);
+  //createCHRandPol(polygon, points, randseed);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'
