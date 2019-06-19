@@ -17,7 +17,7 @@ double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& poi
   {
     p = points[polygon[index]];
 
-    Area += p.x * prev.y - p.y * prev.x;
+    Area += p.y * prev.x - p.x * prev.y;
     prev = p;
   }
 
