@@ -209,7 +209,7 @@ bool collSwap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned i
 
   if ((rd1 > 1) && (rd2 > 1)) return false;
   if ((rd1 < 0) && (rd2 < 0)) return false;
-//  std::cerr << "erasing because of 4PC: e1: " << e1 << ", e2: " << e2 << std::endl;
+  //std::cerr << "erasing because of 4PC: e1: " << e1 << ", e2: " << e2 << std::endl;
   if ( d1 &&  d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 1)) {
     eraseVertexFromSet(e2.p1, edgeS, polygon, points);
     eraseVertexFromSet(e1.p2, edgeS, polygon, points);
@@ -446,9 +446,14 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
   //std::set<Edge, setComp>::key_compare mycomp = edgeS.key_comp();
 
   retval = edgeS.insert(e);
-
-//  std::cerr << "retval.first : " << *retval.first << std::endl;
-//	std::cerr << "retval.second: " << retval.second << std::endl;
+/*
+  if (*retval.first != e) {
+    std::cerr << "retval.first : " << *retval.first << std::endl;
+	   std::cerr << "retval.second: " << retval.second << std::endl;
+     std::cout << "edges in 'edgeS':" << std::endl;
+     for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+   }
+*/
   assert(*retval.first == e);
 
   //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
@@ -473,14 +478,14 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {
-        //std::cerr << "4P collinearity between:" << e << " and " << before << std::endl;
+//        std::cerr << "4P collinearity between:" << e << " and bef: " << before << std::endl;
         if (collSwap(e, before, edgeS, polygon, points)) {
-          //std::cerr << "4P coll. after swap: " << e << " and " << before << std::endl;
+//          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
           valid = E_SKIP;
         }
       }
       else {
-        //std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+//        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
         edgeS.erase(retval.first);
         eraseEdgeFromSet(before, edgeS);
         flip(e, before, polygon, points);
@@ -491,13 +496,13 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
     if (af && (valid == E_VALID)) {
       isval = checkIntersection(e, after);
       if (isval < IS_TRUE) {
-        //std::cerr << "No intersection." << std::endl;
+//        std::cerr << "No intersection." << std::endl;
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {
-        //std::cerr << "4P collinearity between:" << e << " and " << after << std::endl;
+//        std::cerr << "4P collinearity between:" << e << " and aft: " << after << std::endl;
         if (collSwap(e, after, edgeS, polygon, points)) {
-          //std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
+//          std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
           valid = E_SKIP;
         }
       }
@@ -525,6 +530,8 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 	// initialise and create a random permutation for the polygon
 	//createRandPol(polygon, points, randseed);
   createCHRandPol(polygon, points, randseed);
+  //pdisplay(polygon, points);
+  //assert(1 == 0);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'
@@ -586,18 +593,18 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
       if ((*p1 > *p2) && (*p1 > *p3)) {
         e1 = Edge(p1, p2, index);
         e2 = Edge(p1, p3, index);
-        //std::cerr << std::endl << "removing: " << e1 << ", and: " << e2 << std::endl;
+//        std::cerr << std::endl << "removing: " << e1 << ", and: " << e2 << std::endl;
         val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
         if (val1.first == E_SKIP) {loop = true;}
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop = true;}
-        //std::cerr << "skipping index" << std::endl;
+//        std::cerr << "skipping index" << std::endl;
       } else if ((*p1 < *p2) && (*p1 > *p3)) {
-        e1 = Edge (p1, p2, index);
+        e1 = Edge(p1, p2, index);
         e2 = Edge(p1, p3, index);
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop = true;}
-        //std::cerr << std::endl << "removed: " << e2 << ", processing: " << e1 << std::endl;
+//        std::cerr << std::endl << "removed p3: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true;continue;}
       } else if ((*p1 > *p2) && (*p1 < *p3) ) {
@@ -605,7 +612,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
         e2 = Edge(p1, p2, index);
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop = true;}
-        //std::cerr << std::endl << "removed: " << e2 << ", processing: " << e1 << std::endl;
+//        std::cerr << std::endl << "removed p2: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true; continue;}
       } else {
@@ -621,6 +628,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   			  e2 = Edge (p1, p2, index);
           val3 = det(e1, *p2);
   		  }
+//        std::cerr << "processing e1: " << e1 << ", and e2: " << e2 << std::endl;
 
         if (val3 == 0) {
           // the 2 edges are collinear

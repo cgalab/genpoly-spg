@@ -272,6 +272,11 @@ public:
 		else return false;
 	}
 
+  friend bool operator!=(const Edge lhs, const Edge rhs) {
+		if ((*lhs.p1 != *rhs.p1) || (*lhs.p2 != *rhs.p2)) return true;
+		else return false;
+	}
+
   // to print out an edge, gives the format:
   // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
 	friend std::ostream& operator<<(std::ostream& os, const Edge& e) {

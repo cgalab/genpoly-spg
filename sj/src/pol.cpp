@@ -177,7 +177,7 @@ void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& 
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
 	if (randseed) mt.seed(randseed);
 
-	unsigned int randpos, k;
+	unsigned int randpos, temp;
 	polygon.resize(points.size());
 
 	for(unsigned int i = 0; i < polygon.size();++i) {
@@ -188,9 +188,9 @@ void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& point
 	do {
     --i;
 		UniformRandomI(randpos, 0, i);
-		k = polygon[i];
+		temp = polygon[i];
 		polygon[i] = polygon[randpos];
-		polygon[randpos] = k;
+		polygon[randpos] = temp;
 		points[polygon[i]].v = i;
 	} while (i!= 0);
 
@@ -226,6 +226,7 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
     else {
       randpos = randpos - ch.size();
       polygon[i] = ip[randpos];
+      ip[randpos] = ip[ip.size()-1];
       points[polygon[i]].v = i;
       ip.pop_back();
     }
