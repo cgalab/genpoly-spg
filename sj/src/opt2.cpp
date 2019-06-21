@@ -530,6 +530,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 	// initialise and create a random permutation for the polygon
 	//createRandPol(polygon, points, randseed);
   createCHRandPol(polygon, points, randseed);
+  // .
   //pdisplay(polygon, points);
   //assert(1 == 0);
 
