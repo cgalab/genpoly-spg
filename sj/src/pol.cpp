@@ -25,6 +25,20 @@ double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& poi
   return Area;
 }
 
+// function that checks if the points in 'points' given by indexes in 'polygon'
+// (can be a subset of 'points' of minimum size 3) is 2 dimensional.
+bool is_2D(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  assert(polygon.size() > 2);
+  Edge e = Edge (&points[polygon[0]], &points[polygon[1]]);
+  Point p;
+
+  for (unsigned int i = 2; i < polygon.size(); ++i) {
+    p = points[polygon[i]];
+    if (det(e,p) > 0) return true;
+  }
+  return false;
+}
+
 // function that fills the vector 'ch' with indexes of 'points' set that are the points on the convex get_convex_hull
 // input: 'ch' - vector of indexes <unsigned int> into 'points' that are the points on the convex hull
 //        'points' - a vector of <Point> points.
