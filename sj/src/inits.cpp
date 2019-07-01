@@ -114,6 +114,7 @@ enum error argInit(	int argc, char *argv[],
 		{"randseed", required_argument, NULL, 'r'},
 		{"writenew", no_argument, NULL, 'w'},
 		{"simplecalc", no_argument, NULL, 's'},
+		{"holes", no_argument, NULL, 'h'},
 		{"help", no_argument, NULL, '?'},
 		{0, 0, 0, 0}
 	};
@@ -182,6 +183,8 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << "                     'perm'   : each line as an index into the point set that was used." << std::endl;
 				std::cerr << "                     'poly'   : same as above for 'informat'" << std::endl;
 				std::cerr << "                     'dat'    : format that gnuplot understands and can plot." << std::endl << std::endl;
+				std::cerr << " -h, --holes <arg>" << std::endl;
+				std::cerr << "             <arg> is the number of holes desired." << std::endl << std::endl;
 				std::cerr << " -w, --writenew" << std::endl;
 				std::cerr << "             option to not overwrite the output file if it already exists," << std::endl;
 				std::cerr << "             a new file is created with an increment number added to the end." << std::endl << std::endl;
