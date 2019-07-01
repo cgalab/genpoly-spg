@@ -138,6 +138,7 @@ enum error argInit(	int argc, char *argv[],
 				break;
 			case 'h':
 				holes = atoi(optarg);
+				*alg = A_HOLE;
 				break;
 			case 'n':
 				area = true;
