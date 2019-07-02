@@ -42,9 +42,17 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsig
 
   std::cerr << "c.h. points: " << ch.size() << ", inner points: " << points.size()-ch.size() << ", sph: " << sph.size() << ", p: " << polygon.size() << std::endl;
 
+  //if there are less than 3 inner points
+  if (points.size()-ch.size() < 3) return TOO_FEW_INNER_POINTS_FOR_HOLE;
+  if (points.size()-ch.size() == 3) {
+    // get inner points
+    // append ch as the first vector of indexes to sph
+    // append the inner points vector of indexes to sph
+  }
+
   // check to see how many inner points there are, if there are less than
   // the number of holes we want, just create the max amount of holes.
-  
+
 
   // add the starting edges of all inner curves of the c.h. to 'ends' vector
   prev = points[ch[ch.size()-1]];
