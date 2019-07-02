@@ -167,6 +167,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
   }
 }
 
+// function to fill a vector of unsigned integers 'ip' with all points not on the convex hull of the point set 'points'
 void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& ch, std::vector<Point>& points) {
   assert(ip.size() == 0); assert(ch.size() > 0); assert(points.size() > 0);
 
