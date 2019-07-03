@@ -129,7 +129,6 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
 }
 
 enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, std::vector< std::vector<unsigned int> >& sph, std::vector<Point>& points) {
-  std::cerr << "in here" << std::endl;
   FILE *fout;
 
   if(writeNew) {
@@ -173,7 +172,7 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
         for (unsigned int i = 0; i < sph[j].size(); ++i)
           fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
         fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
-        fprintf(fout, "\n");
+        fprintf(fout, "\n\n");
         break;
       case OF_PURE:
         for (unsigned int i = 0; i < sph[j].size(); ++i)
