@@ -9,6 +9,7 @@
 #include "edge.h"
 #include "curve.h"
 #include "pol.h"
+#include "opt2.h"
 
 
 enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
@@ -27,18 +28,24 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 // Theorem of inner curves:  Every point on the convex hull is either connected to its incidental c.h. point directly,
 // or via an inner curve that ends in the incidental c.h. point.
 // This means we can traverse the c.h. points and find hole candidates from the start of all inner curves.
-enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes) {
+enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int randseed, unsigned int nr_holes) {
+  assert(sph.size() == 0);
+  std::vector<unsigned int> polygon;
   std::vector< std::pair<I_Edge,I_Edge> > ends;
   Point prev, p, next;
   bool is_left, inner;
   unsigned int diff;
+
+  // get a simple polygon to work with.
+  opt2(polygon, points, randseed);
+  poldisplay(polygon);
 
   // start with getting all c.h. points.
   std::vector<unsigned int> ch;
   get_convex_hull(ch, points, true);
 
   double area = pol_calc_area(ch, points);
-	std::cerr << "Area: " << area << ", holes: " << nr_holes << std::endl;
+	std::cerr << "Area: " << area << ", holes: " << nr_holes << ", randseed: " << randseed << std::endl;
 
   std::cerr << "c.h. points: " << ch.size() << ", inner points: " << points.size()-ch.size() << ", sph: " << sph.size() << ", p: " << polygon.size() << std::endl;
 
@@ -46,8 +53,13 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsig
   if (points.size()-ch.size() < 3) return TOO_FEW_INNER_POINTS_FOR_HOLE;
   if (points.size()-ch.size() == 3) {
     // get inner points
+    std::vector<unsigned int> ip;
+    get_inner_points(ip, ch, points);
     // append ch as the first vector of indexes to sph
+    sph.push_back(ch);
     // append the inner points vector of indexes to sph
+    sph.push_back(ip);
+    return SUCCESS;
   }
 
   // check to see how many inner points there are, if there are less than

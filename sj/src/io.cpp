@@ -127,3 +127,67 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
   fclose(fout);
   return SUCCESS;
 }
+
+enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, std::vector< std::vector<unsigned int> >& sph, std::vector<Point>& points) {
+  std::cerr << "in here" << std::endl;
+  FILE *fout;
+
+  if(writeNew) {
+    fout = fopen(outFile, "r");
+
+    if(fout != NULL) {
+      //fprintf(stderr, "outFile already exists, need to create a new file\n");
+
+      int counter = 0;
+      char tempOutFile[255];
+
+      do {
+        snprintf(tempOutFile, sizeof(tempOutFile), "%s%d", outFile, counter);
+        fout = fopen(tempOutFile, "r");
+        ++counter;
+      } while (fout != NULL);
+          strcpy(outFile, tempOutFile);
+    }
+  }
+
+  fout = fopen(outFile, "w");
+
+  for (unsigned int j = 0; j < sph.size(); ++j) {
+    switch(outFormat) {
+      case OF_PERM:
+        fprintf(fout, "#Polygon: %u\n", j+1);
+        for (unsigned int i = 0; i < sph[j].size(); ++i)
+          fprintf(fout, "%u\n", sph[j][i]);
+        fprintf(fout, "\n");
+        break;
+      case OF_POLY:
+        if (j == 0) fprintf(fout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
+        fprintf(fout, "%lu\n", sph[j].size());
+        for (unsigned int i = 0; i < sph[j].size(); ++i)
+          fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        fprintf(fout, "\n");
+        break;
+      case OF_DAT:
+        fprintf(fout, "# (index %u)\n", j);
+        fprintf(fout, "# X   Y\n");
+        for (unsigned int i = 0; i < sph[j].size(); ++i)
+          fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
+        fprintf(fout, "\n");
+        break;
+      case OF_PURE:
+        for (unsigned int i = 0; i < sph[j].size(); ++i)
+          fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        fprintf(fout, "\n");
+        break;
+      case OF_UNDEFINED:
+          std::cerr << "output format undefined.  Use -? for help." << std::endl;
+        break;
+      default:
+        std::cerr << "unknown error writing output" << std::endl;
+        break;
+    }
+  }
+  fclose(fout);
+  return SUCCESS;
+}

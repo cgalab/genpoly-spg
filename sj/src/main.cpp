@@ -56,8 +56,10 @@ int main(int argc, char *argv[]) {
     returnValue = readInFile(inFile, inFormat, &points);
     if(returnValue == SUCCESS) {
 
-      // a polygon is a list of indexes in 'points'
+      // 'polygon' is a list of indexes in 'points'
       std::vector<unsigned int> polygon;
+      // 'sph' is a vector of polygons, [0] is the simple polygon, subsequent polygons are holes in it.
+      std::vector<std::vector<unsigned int>> sph;
 
       // get a simple polygon with a given method
       if (alg == A_2OPT) {
@@ -102,20 +104,28 @@ int main(int argc, char *argv[]) {
         }
       }
       else if (alg == A_HOLE) {
-        if (nr_holes == 0) nr_holes = 1;
-        // a vector of polygons, [0] is the simple polygon, subsequent polygons are holes in it.
-        std::vector<std::vector<unsigned int>> sph;
-
-        // get a simple polygon to work with.
-        returnValue = opt2(polygon, points, randseed);
-        if (returnValue == SUCCESS) {
-           returnValue = holes2(sph, polygon, points, nr_holes);
-        }
+         returnValue = holes2(sph, points, randseed, nr_holes);
       }
 
       if (returnValue == SUCCESS) {
         if (checkSimple) checkAllIntersections(polygon, points);
-        if (outFile[0] != 0) returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
+        if (outFile[0] != 0) {
+          switch(alg) {
+            case A_2OPT:
+              returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
+              break;
+            case A_HOLE:
+              returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);
+              break;
+            case A_CURVE:
+            case A_IDLE:
+            case A_UNDEFINED:
+            default:
+              returnValue = UNEXPECTED_ERROR;
+              break;
+          }
+
+        }
       }
     }
   }
