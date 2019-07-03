@@ -17,12 +17,26 @@ double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& poi
   {
     p = points[polygon[index]];
 
-    Area += p.x * prev.y - p.y * prev.x;
+    Area += p.y * prev.x - p.x * prev.y;
     prev = p;
   }
 
   Area = Area / 2;
   return Area;
+}
+
+// function that checks if the points in 'points' given by indexes in 'polygon'
+// (can be a subset of 'points' of minimum size 3) is 2 dimensional.
+bool is_2D(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  assert(polygon.size() > 2);
+  Edge e = Edge (&points[polygon[0]], &points[polygon[1]]);
+  Point p;
+
+  for (unsigned int i = 2; i < polygon.size(); ++i) {
+    p = points[polygon[i]];
+    if (det(e,p) > 0) return true;
+  }
+  return false;
 }
 
 // function that fills the vector 'ch' with indexes of 'points' set that are the points on the convex get_convex_hull
@@ -146,10 +160,14 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
   // make sure of the ordering
 	if (enforceCCWOrder) {
     double area = pol_calc_area(ch, points);
+    //std::cerr << "area: " << area << std::endl;
     if (area < 0) doFlip(0, ch.size()-1, ch, points);
+    //area = pol_calc_area(ch, points);
+    //std::cerr << "area: " << area << std::endl;
   }
 }
 
+// function to fill a vector of unsigned integers 'ip' with all points not on the convex hull of the point set 'points'
 void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& ch, std::vector<Point>& points) {
   assert(ip.size() == 0); assert(ch.size() > 0); assert(points.size() > 0);
 
@@ -174,21 +192,25 @@ void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& 
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
 	if (randseed) mt.seed(randseed);
 
-	unsigned int i, j, k;
+	unsigned int randpos, temp;
 	polygon.resize(points.size());
 
 	for(unsigned int i = 0; i < polygon.size();++i) {
 		polygon[i] = points[i].i;
 	}
 
-	for (i = polygon.size()-1; i > 0; --i) {
-		UniformRandomI(j, 0, i);
-		k = polygon[i];
-		polygon[i] = polygon[j];
-		polygon[j] = k;
+  unsigned int i = polygon.size();
+	do {
+    --i;
+		UniformRandomI(randpos, 0, i);
+		temp = polygon[i];
+		polygon[i] = polygon[randpos];
+		polygon[randpos] = temp;
 		points[polygon[i]].v = i;
-	}
-	points[polygon[i]].v = i;
+	} while (i!= 0);
+
+  //std::cerr << "polygon: " << std::endl;
+  //pdisplay(polygon, points);
 }
 
 // function to create a random polygon where the convex hull points are in relative CCW order.
@@ -199,6 +221,8 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 	// start with getting all c.h. points.
 	std::vector<unsigned int> ch;
 	get_convex_hull(ch, points, true);
+  //std::cerr << "ch: " << std::endl;
+  //pdisplay(ch, points);
   // get all inner points.
   std::vector<unsigned int> ip;
 	get_inner_points(ip, ch, points);
@@ -211,14 +235,20 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 		UniformRandomI(randpos, 0, ch.size()+ip.size()-1);
     if (randpos < ch.size()) {
       polygon[i] = ch[ch.size()-1]; // using always the last point make sure the c.h. is orderly distributed in the polygon.
+      points[polygon[i]].v = i;
       ch.pop_back();
     }
     else {
       randpos = randpos - ch.size();
       polygon[i] = ip[randpos];
+      ip[randpos] = ip[ip.size()-1];
+      points[polygon[i]].v = i;
       ip.pop_back();
     }
 	} while (i != 0) ;
+
+  //std::cerr << "polygon: " << std::endl;
+  //pdisplay(polygon, points);
 }
 
 // really slow version to check whether a polygon has an intersection.

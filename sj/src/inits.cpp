@@ -114,6 +114,8 @@ enum error argInit(	int argc, char *argv[],
 		{"randseed", required_argument, NULL, 'r'},
 		{"writenew", no_argument, NULL, 'w'},
 		{"simplecalc", no_argument, NULL, 's'},
+		{"holes", no_argument, NULL, 'h'},
+		{"help", no_argument, NULL, '?'},
 		{0, 0, 0, 0}
 	};
 
@@ -136,6 +138,7 @@ enum error argInit(	int argc, char *argv[],
 				break;
 			case 'h':
 				holes = atoi(optarg);
+				*alg = A_HOLE;
 				break;
 			case 'n':
 				area = true;
@@ -162,35 +165,44 @@ enum error argInit(	int argc, char *argv[],
 			case '?':
 				returnValue = NO_ARGUMENTS;
 				std::cerr << "Command line arguments:" << std::endl;
-				std::cerr << " -?" << std::endl;
-				std::cerr << " :: ignores any other argument and just prints this helpful information." << std::endl << std::endl;
-				std::cerr << " --infile <string>  |OR| -i <string>" << std::endl;
-				std::cerr << " ::  <string> is the filename of a file containing a set of points." << std::endl << std::endl;
-				std::cerr << " --outfile <string> |OR| -o <string>" << std::endl;
-				std::cerr << " :: <string> is the filename of a file with the processed output of the program." << std::endl << std::endl;
-				std::cerr << " --alg <arg>        |OR| -a <arg>" << std::endl;
-				std::cerr << " :: <arg> can be '2opt' (without the '') ." << std::endl << std::endl;
-				std::cerr << " --informat <arg>   |OR| -b <arg>" << std::endl;
-				std::cerr << " :: <arg> can be 'points' OR 'poly' OR 'comp'." << std::endl << std::endl;
-				std::cerr << " --outformat <arg>  |OR| -c <arg>" << std::endl;
-				std::cerr << " :: <arg> can be 'perm' OR 'poly' OR 'dat'." << std::endl << std::endl;
-				std::cerr << " --writenew         |OR| -w" << std::endl;
-				std::cerr << " :: option to not overwrite the output file if it already exists," << std::endl;
-				std::cerr << "    a new file is created with an increment number added to the end." << std::endl << std::endl;
-				std::cerr << " --areamin<arg>     |OR| -n<arg>" << std::endl;
-				std::cerr << " :: no space allowed between areamin and <arg> or n and <arg> as it's an optional argument" << std::endl;
-				std::cerr << " :: the polygon is recalculated until returned area is above given minimum area" << std::endl;
-				std::cerr << " :: option to calculate and return the area of a returned simple polygon (optional: if it's above <arg>)" << std::endl << std::endl;
-				std::cerr << " --areamax<arg>     |OR| -x<arg>" << std::endl;
-				std::cerr << " :: no space allowed between areamax and <arg> or x and <arg> as it's an optional argument" << std::endl;
-				std::cerr << " :: the polygon is recalculated until returned area is below given maximum area" << std::endl;
-				std::cerr << " :: option to calculate and return the area of a returned simple polygon (optional: if it's below <arg>)" << std::endl << std::endl;
-				std::cerr << " --randseed <arg>   |OR| -r <arg>" << std::endl;
-				std::cerr << " :: <arg> is an unsigned integer." << std::endl << std::endl;
-				std::cerr << " --simplecalc       |OR| -s " << std::endl;
-				std::cerr << " :: uses a slow check to verify simplicity and count intersections (if any)" << std::endl << std::endl;
+				std::cerr << " -?, --help" << std::endl;
+				std::cerr << "             ignores any other argument and just prints this helpful information." << std::endl << std::endl;
+				std::cerr << " -i, --infile <string>" << std::endl;
+				std::cerr << "              <string> is the filename of a file containing a set of points." << std::endl << std::endl;
+				std::cerr << " -o. --outfile <string>" << std::endl;
+				std::cerr << "               <string> is the filename of a file with the processed output of the program." << std::endl << std::endl;
+				std::cerr << " -a, --alg <arg>" << std::endl;
+				std::cerr << "           <arg> can be '2opt' or 'hole' (without the '')." << std::endl << std::endl;
+				std::cerr << " -b, --informat <arg>" << std::endl;
+				std::cerr << "                <arg> can be:"  << std::endl;
+				std::cerr << "                     'points' : no header, each line: 'x y'" << std::endl;
+				std::cerr << "                     'poly'   : header with 'x_min x_max y_min y_max' in first line and number of points in 2nd" << std::endl;
+				std::cerr << "                                each subsequent line: 'x y'" << std::endl;
+				std::cerr << "                     'comp'   : header with comments, each subsequent line: 'enumeration x y'" << std::endl << std::endl;
+				std::cerr << " -c, --outformat <arg>" << std::endl;
+				std::cerr << "                 <arg> can be:" << std::endl;
+				std::cerr << "                     'perm'   : each line as an index into the point set that was used." << std::endl;
+				std::cerr << "                     'poly'   : same as above for 'informat'" << std::endl;
+				std::cerr << "                     'dat'    : format that gnuplot understands and can plot." << std::endl << std::endl;
+				std::cerr << " -h, --holes <arg>" << std::endl;
+				std::cerr << "             <arg> is the number of holes desired." << std::endl << std::endl;
+				std::cerr << " -w, --writenew" << std::endl;
+				std::cerr << "             option to not overwrite the output file if it already exists," << std::endl;
+				std::cerr << "             a new file is created with an increment number added to the end." << std::endl << std::endl;
+				std::cerr << " -n, --areamin<arg>" << std::endl;
+				std::cerr << "              no space allowed between areamin and <arg> or n and <arg> as it's an optional argument" << std::endl;
+				std::cerr << "              the polygon is recalculated until returned area is above given minimum area" << std::endl;
+				std::cerr << "              if no argument is given, will simply calculate the area and output to cout" << std::endl << std::endl;
+				std::cerr << " -x, --areamax<arg>" << std::endl;
+				std::cerr << "              no space allowed between areamax and <arg> or x and <arg> as it's an optional argument" << std::endl;
+				std::cerr << "              the polygon is recalculated until returned area is below given maximum area" << std::endl;
+				std::cerr << "              if no argument is given, will simply calculate the area and output to cout" << std::endl << std::endl;
+				std::cerr << " -r, --randseed <arg>" << std::endl;
+				std::cerr << "                <arg> is an unsigned integer above 0." << std::endl << std::endl;
+				std::cerr << " -s, --simplecalc" << std::endl;
+				std::cerr << "              uses a really slow check to verify simplicity and count intersections (if any)" << std::endl;
 				std::cerr << " -t" << std::endl;
-				std::cerr << " :: ignores all other arguments and runs the test-bed." << std::endl;
+				std::cerr << "   ignores all other arguments and runs the test-bed." << std::endl;
 				break;
 
 			default:

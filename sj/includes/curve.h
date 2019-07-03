@@ -28,7 +28,7 @@ public:
 };
 
 enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
-enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points);
-enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes);
+enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes);
 
 #endif

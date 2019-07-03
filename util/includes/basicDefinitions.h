@@ -23,7 +23,9 @@ enum error {
   ALGORITHM_IDLE = 11,
   RUN_TESTS = 12,
   ERR_AREA_NEGATIVE = 13,
-  ERR_AREA_NOT_BETTER = 14
+  ERR_AREA_NOT_BETTER = 14,
+  TOO_FEW_INNER_POINTS_FOR_HOLE = 15,
+  INNER_POINTS_COLLINEAR = 16
 };
 
 // the algorithms that should be selectable.

@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
         // get a simple polygon to work with.
         returnValue = opt2(polygon, points, randseed);
         if (returnValue == SUCCESS) {
-           returnValue = holes2(sph, polygon, points);
+           returnValue = holes2(sph, polygon, points, nr_holes);
         }
       }
 

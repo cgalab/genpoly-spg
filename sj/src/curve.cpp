@@ -27,7 +27,7 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 // Theorem of inner curves:  Every point on the convex hull is either connected to its incidental c.h. point directly,
 // or via an inner curve that ends in the incidental c.h. point.
 // This means we can traverse the c.h. points and find hole candidates from the start of all inner curves.
-enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes) {
   std::vector< std::pair<I_Edge,I_Edge> > ends;
   Point prev, p, next;
   bool is_left, inner;
@@ -38,12 +38,21 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsig
   get_convex_hull(ch, points, true);
 
   double area = pol_calc_area(ch, points);
-	std::cerr << "Area: " << area << std::endl;
+	std::cerr << "Area: " << area << ", holes: " << nr_holes << std::endl;
 
   std::cerr << "c.h. points: " << ch.size() << ", inner points: " << points.size()-ch.size() << ", sph: " << sph.size() << ", p: " << polygon.size() << std::endl;
 
+  //if there are less than 3 inner points
+  if (points.size()-ch.size() < 3) return TOO_FEW_INNER_POINTS_FOR_HOLE;
+  if (points.size()-ch.size() == 3) {
+    // get inner points
+    // append ch as the first vector of indexes to sph
+    // append the inner points vector of indexes to sph
+  }
+
   // check to see how many inner points there are, if there are less than
   // the number of holes we want, just create the max amount of holes.
+
 
   // add the starting edges of all inner curves of the c.h. to 'ends' vector
   prev = points[ch[ch.size()-1]];
@@ -109,7 +118,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsig
 // Input: 'polygon'     : a vector with vertices of 'points' set that is a simple polygon
 //        'points'      : a vector of <Point> objects
 // Output: 'pol_array'  : an array of polygons, the first index is the outermost simple polygon, the rest are simple holes inside that polygon
-enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes) {
   std::vector<s_curve> sc;
   std::set<C_Edge> edgeS;
   std::pair<std::set<C_Edge>::iterator, bool> retval1, retval2; // return values for the 'edgeS' set.
@@ -121,7 +130,7 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
   std::vector<unsigned int> lex (points.size());
   fill_lex(lex, points); // fill 'lex' with the indexes
 
-  std::cerr << "sph: " << sph.size() << std::endl;
+  std::cerr << "sph: " << sph.size() << ", holes: " << nr_holes << std::endl;
 
   // go through all the points in lex. order, except the last.  We don't need to process the last vertex.
   for (unsigned int i = 0; i < lex.size()-1; ++i) {
