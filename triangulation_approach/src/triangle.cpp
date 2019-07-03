@@ -185,15 +185,15 @@ TEdge* Triangle::getLongestEdgeAlt(){
 	Vertex* v;
 
 	v = getOtherVertex(e0);
-	if((*e0).isBetween(v) && (*e0).getEdgeType() == EdgeType::TRIANGULATION)
+	if((*e0).isBetween(v))
 		return e0;
 
 	v = getOtherVertex(e1);
-	if((*e1).isBetween(v) && (*e1).getEdgeType() == EdgeType::TRIANGULATION)
+	if((*e1).isBetween(v))
 		return e1;
 
 	v = getOtherVertex(e2);
-	if((*e2).isBetween(v) && (*e2).getEdgeType() == EdgeType::TRIANGULATION)
+	if((*e2).isBetween(v))
 		return e2;
 
 	printf("was not able to detect a longest edge by comparison\n");

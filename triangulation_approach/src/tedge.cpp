@@ -226,6 +226,10 @@ double TEdge::getAngle(Vertex* v){
 	if(dy < 0)
 		alpha = - alpha;
 
+	if(alpha == 0 && dx < 0)
+		alpha = M_PI;
+
+
 	return alpha;
 }
 
@@ -373,13 +377,16 @@ enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1){
 enum IntersectionType checkIntersection_new(TEdge* e0, TEdge* e1, const double epsilon){
 	Vertex *v00, *v01, *v10, *v11;
 	double area00, area01, area10, area11;
-	double l0, l1;
+	double x00, x01, x10, x11, y00, y01, y10, y11;
+	double l0, l1, d0x, d0y, d1x, d1y;
 
+	// get vertices
 	v00 = (*e0).getV0();
 	v01 = (*e0).getV1();
 	v10 = (*e1).getV0();
 	v11 = (*e1).getV1();
 
+	// compute edge lengths
 	l0 = (*e0).length();
 	l1 = (*e1).length();
 
@@ -390,19 +397,33 @@ enum IntersectionType checkIntersection_new(TEdge* e0, TEdge* e1, const double e
 	area10 = signedArea(v10, v11, v00);
 	area11 = signedArea(v10, v11, v01);
 
-	//printf("areas: %.16f %.16f %.16f %.16f \n", area00, area01, area10, area11);
+	// check whether v10 lays on e0
+	if(fabs(area00) / l0 <= epsilon){
+		// check whether v10 lays between the vertices of e0
+		if((*e0).isBetween(v10))
+			return IntersectionType::VERTEX;
+	}
 
-	if(fabs(area00) <= epsilon)
-		return IntersectionType::VERTEX;
+	// check whether v11 lays on e0
+	if(fabs(area01) / l0 <= epsilon){
+		// check whether v10 lays between the vertices of e0
+		if((*e0).isBetween(v11))
+			return IntersectionType::VERTEX;
+	}
 
-	if(fabs(area01) <= epsilon)
-		return IntersectionType::VERTEX;
+	// check whether v00 lays on e1
+	if(fabs(area10) / l1 <= epsilon){
+		// check whether v10 lays between the vertices of e0
+		if((*e1).isBetween(v00))
+			return IntersectionType::VERTEX;
+	}
 
-	if(fabs(area10) <= epsilon)
-		return IntersectionType::VERTEX;
-
-	if(fabs(area11) <= epsilon)
-		return IntersectionType::VERTEX;
+	// check whether v01 lays on e1
+	if(fabs(area11) / l1 <= epsilon){
+		// check whether v10 lays between the vertices of e0
+		if((*e1).isBetween(v01))
+			return IntersectionType::VERTEX;
+	}
 
 	if((signbit(area00) != signbit(area01)) && (signbit(area10) != signbit(area11)))
 		return IntersectionType::EDGE;

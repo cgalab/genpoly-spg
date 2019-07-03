@@ -1,8 +1,9 @@
 #include "settings.h"
 
 // Constructors
+// a boxsize of 1000 has precision around 10⁻¹³
 Settings::Settings() :
-feedback(FeedbackMode::EXECUTION), initialSize(100), radius(100), boxSize(500), 
+feedback(FeedbackMode::EXECUTION), initialSize(100), radius(100), boxSize(1000), 
 insertionTries(100), t(Timer()) {
 	
 	t.start();

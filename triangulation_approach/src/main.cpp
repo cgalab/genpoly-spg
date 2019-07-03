@@ -21,7 +21,7 @@ int main(){
 	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", settings.getInitialSize(), settings.elapsedTime());
 
 
-	performed = transformPolygonByMoves(settings, generator, T, settings.getInitialTN());
+	performed = transformPolygonByMoves(settings, generator, T, settings.getInitialTN(), false);
 	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, settings.getInitialTN(), settings.elapsedTime());
 
 	(*T).check();
@@ -31,13 +31,16 @@ int main(){
 
 	growPolygon(settings, generator, T);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", settings.getTargetSize(), settings.elapsedTime());
-	
+	(*T).renumberVertices();
+
 	(*T).check();
 
-	performed = transformPolygonByMoves(settings, generator, T, 1000000);
+	performed = transformPolygonByMoves(settings, generator, T, 1000000, false);
 	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed, 1000000, settings.elapsedTime());
-
+	printf("number of vertices: %d \n", (*T).getActualNumberOfVertices());
 	(*T).check();
+
+	Vertex::printStats();
 	
 	//(*T).print("triangulation.graphml");
 

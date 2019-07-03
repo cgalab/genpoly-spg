@@ -54,6 +54,7 @@ public:
 	// Others
 	bool check();
 	void stretch(double factor);
+	void renumberVertices();
 };
 
 #endif

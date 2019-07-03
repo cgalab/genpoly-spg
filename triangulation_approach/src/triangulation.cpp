@@ -179,3 +179,22 @@ void Triangulation::stretch(double factor){
 		(*i).stretch(factor);
 	}
 }
+
+void Triangulation::renumberVertices(){
+	Vertex *v, *start;
+	unsigned long long n = 1;
+
+	v = vertices[0];
+	start = v;
+	(*v).setID(0);
+
+	v = (*v).getNext();
+	while((*v).getID() != 0){
+		(*v).setID(n);
+
+		n++;
+		v = (*v).getNext();
+	}
+
+	printf("n: %llu \n", n);
+}

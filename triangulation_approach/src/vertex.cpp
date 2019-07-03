@@ -81,7 +81,7 @@ double Vertex::getMediumEdgeLength(){
 }
 
 double Vertex::getDirectedEdgeLength(double alpha){
-	double length;
+	double length, angle;
 	int count = 0;
 
 	for(auto const& i : triangles){
@@ -95,13 +95,15 @@ double Vertex::getDirectedEdgeLength(double alpha){
 	printf("id: %llu alpha: %.16f \n", id, alpha / M_PI * 180);
 
 	for(auto const& i : edges){
-		length = (*i).getAngle(this);
+		angle = (*i).getAngle(this);
 
 		(*i).print();
-		printf("edge alpha: %.16f \n", length / M_PI * 180);
+		(*(*i).getV0()).print();
+		(*(*i).getV1()).print();
+		printf("edge alpha: %.20f truely zero: %d \n", angle / M_PI * 180, alpha == 0);
 	}
 	
-	printf("was not able to find the triangle for vertex %llu in direction %f \n", id, alpha);
+	printf("was not able to find the triangle for vertex %llu in direction %f, truely zero: \n", id, alpha);
 	/*printSurroundingTriangulation("env.graphml");
 	exit(7);*/
 	
@@ -152,6 +154,10 @@ void Vertex::setToPrev(TEdge* e){
 
 void Vertex::setToNext(TEdge* e){
 	toNext = e;
+}
+
+void Vertex::setID(unsigned long long n){
+	id = n;
 }
 
 // Remover
@@ -275,7 +281,7 @@ void Vertex::printSurroundingTriangulation(const char* filename){
 
 	for(auto const& i : vs){
 		v = i.second;
-		(*v).print(f, 1000);
+		(*v).print(f, 3000);
 	}
 	fprintf(f, "</nodes>\n");
 
@@ -290,6 +296,10 @@ void Vertex::printSurroundingTriangulation(const char* filename){
 	fprintf(f, "</graphml>\n");
 
 	fclose(f);
+}
+
+void Vertex::printStats(){
+	printf("created: %llu deleted: %llu still existing: %llu \n", n, deleted, n - deleted);
 }
 
 // Others
@@ -347,18 +357,19 @@ void Vertex::checkSurroundingPolygonFast(){
 
 	if(!(lowerX && lowerY && higherX && higherY)){
 		printf("Triangulation error: fromV is outside of its surrounding polygon\n");
-		printEnvironment(2, "env.graphml");
+		printSurroundingTriangulation("env.graphml");
 		exit(6);
 	}
 }
 
 void Vertex::checkSurroundingPolygonAdvanced(){
 	std::vector<TEdge*> surEdges;
-	double maxX = x, vx;
+	double maxX = -1000, vx, maxY = -1000, vy;
 	Vertex* dummyVertex;
 	TEdge* dummyEdge;
-	int count = 0;
+	int countE = 0, countV = 0;
 	IntersectionType intersection;
+
 
 	surEdges = getSurroundingEdges();
 
@@ -375,7 +386,7 @@ void Vertex::checkSurroundingPolygonAdvanced(){
 
 	if(x > maxX){
 		printf("Triangulation error 0: fromV is outside of its surrounding polygon\n");
-		printEnvironment(2, "env.graphml");
+		printSurroundingTriangulation("env.graphml");
 		exit(6);
 	}
 
@@ -385,16 +396,70 @@ void Vertex::checkSurroundingPolygonAdvanced(){
 	dummyEdge = new TEdge(this, dummyVertex);
 
 	for(auto& i : surEdges){
-		intersection = checkIntersection(dummyEdge, i);
-		if(intersection != IntersectionType::NONE)
-			count++;
+		intersection = checkIntersection_new(dummyEdge, i, 0.000000001);
+		if(intersection == IntersectionType::EDGE)
+			countE++;
+		if(intersection == IntersectionType::VERTEX)
+			countV++;
 	}
 
-	if(count % 2 == 0){
+	delete dummyEdge;
+	delete dummyVertex;
+
+	if(countV != 0)
+		return;
+
+	if(countE % 2 != 0)
+		return;
+
+	// find max y value
+	for(auto& i : surEdges){
+		vy = (*(*i).getV0()).getY();
+		if(vy > maxY)
+			maxY = vy;
+
+		vy = (*(*i).getV1()).getY();
+		if(vy > maxY)
+			maxY = vy;
+	}
+
+	if(y > maxY){
+		printf("Triangulation error 0: fromV is outside of its surrounding polygon\n");
+		printSurroundingTriangulation("env.graphml");
+		exit(6);
+	}
+
+	maxY = maxY + 10;
+
+	dummyVertex = new Vertex(x, maxY);
+	dummyEdge = new TEdge(this, dummyVertex);
+
+	countE = 0;
+	countV = 0;
+
+	for(auto& i : surEdges){
+		intersection = checkIntersection_new(dummyEdge, i, 0.000000001);
+		if(intersection == IntersectionType::EDGE)
+			countE++;
+		if(intersection == IntersectionType::VERTEX)
+			countV++;
+	}
+
+	
+
+	if(countV != 0){
+		delete dummyEdge;
+		delete dummyVertex;
+
+		return;
+	}
+
+	if(countE % 2 == 0){
 		printf("Triangulation error 1: %llu is outside of its surrounding polygon\n", id);
+		printf("countE: %d countV: %d \n", countE, countV);
 		(*T).addVertex(dummyVertex);
 		(*T).addEdge(dummyEdge);
-		printEnvironment(2, "env.graphml");
+		printSurroundingTriangulation("env.graphml");
 		(*T).print("debug.graphml");
 		exit(6);
 	}
@@ -424,7 +489,10 @@ Vertex::~Vertex(){
 	}
 
 	if(T != NULL) (*T).removeVertex(id);
+
+	deleted++;
 }
 
 // static member variables
 unsigned long long Vertex::n = 0;
+unsigned long long Vertex::deleted = 0;

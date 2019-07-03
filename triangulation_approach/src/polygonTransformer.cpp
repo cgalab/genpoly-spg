@@ -2,7 +2,7 @@
 #include <string>
 #include <math.h>
 
-int transformPolygonByMoves(Settings &settings, RandomGenerator &generator, Triangulation* T, int iterations){
+int transformPolygonByMoves(Settings &settings, RandomGenerator &generator, Triangulation* T, int iterations, bool fixed){
 	int index = 0;
 	double dx = 0, dy = 0, stddev, alpha, r; // radius of the initial polygon was 30
 	bool simple, overroll;
@@ -17,7 +17,10 @@ int transformPolygonByMoves(Settings &settings, RandomGenerator &generator, Tria
 
 	for(int i = 0; i < iterations; i++){
 
-		index = generator.getRandomIndex(n);
+		if(fixed)
+			index = 123235;
+		else
+			index = generator.getRandomIndex(n);
 
 		v = (*T).getVertex(index);
 

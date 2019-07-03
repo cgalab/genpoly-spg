@@ -93,16 +93,16 @@ bool Translation::insideQuadrilateral(Vertex* v){
 	dummyVertex = new Vertex(maxX, (*v).getY());
 	dummyEdge = new TEdge(v, dummyVertex);
 
-	intersection = checkIntersection(dummyEdge, prevOldE);
+	intersection = checkIntersection_new(dummyEdge, prevOldE, 0.0000000000001);
 	if(intersection != IntersectionType::NONE)
 		count++;
-	intersection = checkIntersection(dummyEdge, nextOldE);
+	intersection = checkIntersection_new(dummyEdge, nextOldE, 0.0000000000001);
 	if(intersection != IntersectionType::NONE)
 		count++;
-	intersection = checkIntersection(dummyEdge, prevNewE);
+	intersection = checkIntersection_new(dummyEdge, prevNewE, 0.0000000000001);
 	if(intersection != IntersectionType::NONE)
 		count++;
-	intersection = checkIntersection(dummyEdge, nextNewE);
+	intersection = checkIntersection_new(dummyEdge, nextNewE, 0.0000000000001);
 	if(intersection != IntersectionType::NONE)
 		count++;
 
@@ -130,7 +130,7 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 
 	// iterate over all edges of the surrounding polygon
 	for(auto& i : surEdges){
-		iType = checkIntersection(newE, i);
+		iType = checkIntersection_new(newE, i, epsilonInt);
 
 		// new edge hits vertex of surrounding polygon
 		if(iType == IntersectionType::VERTEX)
@@ -171,8 +171,8 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 	// iterate over the adjacent triangles if there was an intersection with a triangulation edge
 	// here surEdges always have the length 2
 	while(true){
-		iType0 = checkIntersection(newE, surEdges[0]);
-		iType1 = checkIntersection(newE, surEdges[1]);
+		iType0 = checkIntersection_new(newE, surEdges[0], epsilonInt);
+		iType1 = checkIntersection_new(newE, surEdges[1], epsilonInt);
 
 		// the new edge doesn't interesect any further edges
 		if(iType0 == IntersectionType::NONE && iType1 == IntersectionType::NONE)
@@ -227,7 +227,7 @@ bool Translation::checkOverroll(){
 
 	// check whether the quadrilateral of the chosen Vertex P, its translated version P' and the two neighbors M and N is simple
 	// otherwise there can not be any overroll
-	overroll = !(checkIntersection(prevOldE, nextNewE) != IntersectionType::NONE || checkIntersection(nextOldE, prevNewE) != IntersectionType::NONE);
+	overroll = !(checkIntersection_new(prevOldE, nextNewE, epsilonInt) != IntersectionType::NONE || checkIntersection_new(nextOldE, prevNewE, epsilonInt) != IntersectionType::NONE);
 
 	if(!overroll)
 		return false;
@@ -285,6 +285,7 @@ enum Executed Translation::execute(){
 			trans = new Translation(T, settings, index, transX, transY);
 			ex = (*trans).execute();
 
+			delete intersectionPoint;
 			delete trans;
 
 			if(ex != Executed::FULL)
@@ -520,7 +521,6 @@ bool Translation::checkSimplicityOfTranslation(){
 }
 
 void Translation::checkSplit(){
-	// TODO: what happens if checkEdge runs in the case that the edge intersects all edges of a triangle?
 	split = !checkEdge(original, transPath);
 }
 	

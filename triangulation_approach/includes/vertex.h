@@ -32,6 +32,7 @@ private:
 	bool rectangleVertex; // determines whether the vertex is part of the rectangle surrounding the polygon
 
 	static unsigned long long n;
+	static unsigned long long deleted;
 	unsigned long long id;
 
 	void getEnvironment(std::map<int, TEdge*> &es, std::map<int, Vertex*> &vs, int depth);
@@ -66,6 +67,7 @@ public:
 	void addTriangle(Triangle* t);
 	void setToPrev(TEdge* e);
 	void setToNext(TEdge* e);
+	void setID(unsigned long long n);
 
 	// Remover
 	void removeEdge(TEdge* e);
@@ -76,6 +78,7 @@ public:
 	void print();
 	void printEnvironment(int depth, const char* filename);
 	void printSurroundingTriangulation(const char* filename);
+	static void printStats();
 
 	// Others
 	bool check();
