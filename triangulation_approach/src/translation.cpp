@@ -61,7 +61,7 @@ double Translation::signedArea(Vertex* v0, Vertex* v1, Vertex* v2){
 	cx = (*v2).getX();
 	cy = (*v2).getY();
 
-	area = 0.5 * (- ay * bx + ax * by + ay * cx - by * cx - ax * cy + bx * cy);
+	area = 0.5 * (ay * (cx - bx) + by * (ax - cx) + cy * (bx - ax));
 
 	return area;
 }
@@ -270,11 +270,6 @@ enum Executed Translation::execute(){
 			if(intersectionPoint == NULL)
 				intersectionPoint = getIntersectionPoint(nextV, oldV, prevV, newV);
 			if(intersectionPoint == NULL){
-				/*printf("something went wrong computing the intersection point to split the translation \n");
-				printf("index: %d dx: %f dy: %f \n", index, dx, dy);
-				(*T).addVertex(newV);
-				(*T).print("triangulation.graphml");
-				exit(1);*/
 				return Executed::REJECTED;
 			}
 

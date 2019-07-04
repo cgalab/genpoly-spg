@@ -64,6 +64,17 @@ e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) {
 	n++;
 }
 
+// Attention: this triangles are just for testing
+Triangle::Triangle(Vertex* V0, Vertex* V1, Vertex* V2) :
+e0(NULL), e1(NULL), e2(NULL), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) { 
+
+	(*v0).addTriangle(this);
+	(*v1).addTriangle(this);
+	(*v2).addTriangle(this);
+
+	n++;
+}
+
 // Getter
 unsigned long long Triangle::getID(){
 	return id;
@@ -259,9 +270,9 @@ double Triangle::getRange(Vertex* v, double alpha){
 // Printer
 void Triangle::print(){
 	printf("Triangle %llu:\n", id);
-	(*e0).print();
-	(*e1).print();
-	(*e2).print();
+	(*v0).print();
+	(*v1).print();
+	(*v2).print();
 }
 
 // Others
@@ -328,20 +339,25 @@ double Triangle::signedArea(){
 	cx = (*v2).getX();
 	cy = (*v2).getY();
 
-	area = 0.5 * (- ay * bx + ax * by + ay * cx - by * cx - ax * cy + bx * cy);
+	area = 0.5 * (ay * (cx - bx) + by * (ax - cx) + cy * (bx - ax));
 
 	return area;
 }
 
 // Destructor
 Triangle::~Triangle(){
+
 	(*v0).removeTriangle(this);
 	(*v1).removeTriangle(this);
 	(*v2).removeTriangle(this);
 	
-	(*e0).removeTriangle(this);
-	(*e1).removeTriangle(this);
-	(*e2).removeTriangle(this);
+	// some test triangles may not have assigned edges
+	if(e0 != NULL)
+		(*e0).removeTriangle(this);
+	if(e0 != NULL)
+		(*e1).removeTriangle(this);
+	if(e0 != NULL)
+		(*e2).removeTriangle(this);
 }
 
 // static member variables

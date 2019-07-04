@@ -362,6 +362,7 @@ void Vertex::checkSurroundingPolygonFast(){
 	}
 }
 
+/*
 void Vertex::checkSurroundingPolygonAdvanced(){
 	std::vector<TEdge*> surEdges;
 	double maxX = -1000, vx, maxY = -1000, vy;
@@ -457,6 +458,12 @@ void Vertex::checkSurroundingPolygonAdvanced(){
 	if(countE % 2 == 0){
 		printf("Triangulation error 1: %llu is outside of its surrounding polygon\n", id);
 		printf("countE: %d countV: %d \n", countE, countV);
+
+		for(auto& i : triangles){
+			(*i).print();
+			printf("area: %.20f\n", (*i).signedArea());
+		}
+
 		(*T).addVertex(dummyVertex);
 		(*T).addEdge(dummyEdge);
 		printSurroundingTriangulation("env.graphml");
@@ -466,6 +473,119 @@ void Vertex::checkSurroundingPolygonAdvanced(){
 
 	delete dummyEdge;
 	delete dummyVertex;
+}*/
+
+void Vertex::checkSurroundingPolygonAdvanced(){
+	std::priority_queue<std::pair<double, Vertex*>> Q;
+	std::pair<double, Vertex*> p;
+	double angle, area;
+	Vertex *first, *second, *start;
+	Triangle *t;
+
+	for(auto& i : edges){
+		angle = (*i).getAngle(this);
+
+		Q.push(std::make_pair(angle, (*i).getOtherVertex(this)));
+	}
+
+	p = Q.top();
+	start = p.second;
+	second = start;
+	Q.pop();
+
+	while(!Q.empty()){
+		first = second;
+		p = Q.top();
+		second = p.second;
+		Q.pop();
+
+		t = new Triangle(first, second, this);
+		area = (*t).signedArea();
+		delete t;
+
+		// for the first run we don't know whether the sign will be positive or negative
+		if(signbit(area) == 0){
+			if(signbit(area) != sign){
+				printf("Triangulation error: %llu is outside of its surrounding polygon\n", id);
+				print();
+
+				while(!Q.empty()){
+					Q.pop();
+				}
+
+				for(auto& i : edges){
+					angle = (*i).getAngle(this);
+
+					Q.push(std::make_pair(angle, (*i).getOtherVertex(this)));
+				}
+
+				p = Q.top();
+				start = p.second;
+				second = start;
+				Q.pop();
+
+				printf("at angle %.10f:\n", p.first / M_PI * 180);
+				(*p.second).print();
+
+				while(!Q.empty()){
+					p = Q.top();
+					Q.pop();
+
+					printf("at angle %.10f:\n", p.first / M_PI * 180);
+					(*p.second).print();
+
+					first = second;
+					second = p.second;
+
+					t = new Triangle(first, second, this);
+					area = (*t).signedArea();
+					delete t;
+
+					printf("area: %.30f \n", area);
+				}
+
+				first = second;
+				second = start;
+
+				t = new Triangle(first, second, this);
+				area = (*t).signedArea();
+				delete t;
+
+				printf("area: %.30f \n", area);
+
+				exit(6);
+			}
+		}
+
+	}
+
+	first = second;
+	second = start;
+
+	t = new Triangle(first, second, this);
+	area = (*t).signedArea();
+	delete t;
+
+	if(signbit(area) == 0){
+		printf("Triangulation error: %llu is outside of its surrounding polygon\n", id);
+		print();
+
+		for(auto& i : edges){
+			angle = (*i).getAngle(this);
+
+			Q.push(std::make_pair(angle, (*i).getOtherVertex(this)));
+		}
+
+		while(!Q.empty()){
+			p = Q.top();
+			Q.pop();
+
+			printf("at angle %.10f:\n", p.first / M_PI * 180);
+			(*p.second).print();
+		}
+
+		exit(6);
+	}
 }
 
 // Destructor

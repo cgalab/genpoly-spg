@@ -481,7 +481,7 @@ double signedArea(Vertex* v0, Vertex* v1, Vertex* v2){
 	cx = (*v2).getX();
 	cy = (*v2).getY();
 
-	area = 0.5 * (- ay * bx + ax * by + ay * cx - by * cx - ax * cy + bx * cy);
+	area = 0.5 * (ay * (cx - bx) + by * (ax - cx) + cy * (bx - ax));
 
 	return area;
 }

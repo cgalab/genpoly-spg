@@ -33,6 +33,7 @@ public:
 	// Constructors
 	Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2);
 	Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2, std::string context, bool &ok);
+	Triangle(Vertex* V0, Vertex* V1, Vertex* V2);
 
 	// Getter
 	unsigned long long getID();

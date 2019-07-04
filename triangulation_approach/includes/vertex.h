@@ -2,6 +2,7 @@
 #include <vector>
 #include <stdio.h>
 #include <map>
+#include <queue>
 
 
 #ifndef __VERTEX_H_
