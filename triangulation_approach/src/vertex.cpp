@@ -475,6 +475,12 @@ void Vertex::checkSurroundingPolygonAdvanced(){
 	delete dummyVertex;
 }*/
 
+// i got it:
+// the calculation of the event time is that inaccurate that we get problems
+// if there is an edge very close to the triangle of the actual event
+// so it may appear that by shifting the vertex to the actual time we already
+// move it across this edge by accident => the vertex doesn't stay inside its
+// surrouding polygon 
 void Vertex::checkSurroundingPolygonAdvanced(){
 	std::priority_queue<std::pair<double, Vertex*>> Q;
 	std::pair<double, Vertex*> p;
