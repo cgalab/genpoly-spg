@@ -3,5 +3,6 @@
 
 enum error readInFile(char *inFile,in_format_t inFormat,std::vector<Point> *points);
 enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, std::vector< std::vector<unsigned int> >& sph, std::vector<Point>& points);
 
 #endif

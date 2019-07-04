@@ -9,6 +9,7 @@
 #include "edge.h"
 #include "curve.h"
 #include "pol.h"
+#include "opt2.h"
 
 
 enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
@@ -23,94 +24,136 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   return UNEXPECTED_ERROR;
 }
 
+// function that returns the length of the inner polygonal chain given by the pair of I_Edges
+unsigned int get_ipc_length(std::pair<I_Edge, I_Edge> par) {
+  unsigned int start, end;
+  if (par.first.l2ch) start = (*par.first.p2).v;
+  else start = (*par.first.p1).v;
+  if (par.second.l2ch) end = (*par.second.p2).v;
+  else end = (*par.second.p1).v;
+
+  return abs((int)start - (int)end);
+}
+
 // Found a better way to find holes based on this theorem:
 // Theorem of inner curves:  Every point on the convex hull is either connected to its incidental c.h. point directly,
 // or via an inner curve that ends in the incidental c.h. point.
 // This means we can traverse the c.h. points and find hole candidates from the start of all inner curves.
-enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes) {
-  std::vector< std::pair<I_Edge,I_Edge> > ends;
-  Point prev, p, next;
-  bool is_left, inner;
-  unsigned int diff;
+enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int randseed, unsigned int nr_holes) {
+  assert(sph.size() == 0);
 
   // start with getting all c.h. points.
   std::vector<unsigned int> ch;
   get_convex_hull(ch, points, true);
 
   double area = pol_calc_area(ch, points);
-	std::cerr << "Area: " << area << ", holes: " << nr_holes << std::endl;
+  unsigned int nr_inner = points.size()-ch.size();
+	std::cerr << "Area: " << area << ", holes: " << nr_holes << ", randseed: " << randseed << std::endl;
 
-  std::cerr << "c.h. points: " << ch.size() << ", inner points: " << points.size()-ch.size() << ", sph: " << sph.size() << ", p: " << polygon.size() << std::endl;
+  std::cerr << "c.h. points: " << ch.size() << ", inner points: " << nr_inner << ", sph: " << sph.size() << std::endl;
 
   //if there are less than 3 inner points
   if (points.size()-ch.size() < 3) return TOO_FEW_INNER_POINTS_FOR_HOLE;
   if (points.size()-ch.size() == 3) {
     // get inner points
+    std::vector<unsigned int> ip;
+    get_inner_points(ip, ch, points);
     // append ch as the first vector of indexes to sph
+    sph.push_back(ch);
     // append the inner points vector of indexes to sph
+    sph.push_back(ip);
+    return SUCCESS;
   }
+  if (points.size()-ch.size() > 3) {
+    std::vector<unsigned int> polygon;
+    std::vector< std::pair<I_Edge,I_Edge> > ends;
+    Point prev, p, next;
+    bool is_left, inner, strict;
+    unsigned int diff, total_holes = 0;
 
-  // check to see how many inner points there are, if there are less than
-  // the number of holes we want, just create the max amount of holes.
+    // if true, any result that has 1 or more holes will be returned
+    // else try and return exactly 'nr_holes' holes
+    if ((unsigned int)(nr_inner/3) < nr_holes) strict = false;
+    else strict = true;
 
+    do {
+      // get a simple polygon to work with.
+      opt2(polygon, points, randseed);
+      ++randseed;
 
-  // add the starting edges of all inner curves of the c.h. to 'ends' vector
-  prev = points[ch[ch.size()-1]];
-  for (unsigned int i = 0; i < ch.size(); ++i) {
-    prev = points[ch[(ch.size() + i - 1) % ch.size()]];
-    p = points[ch[i]];
-    next = points[ch[(ch.size() + i + 1) % ch.size()]];
+      // add the starting edges of all inner curves of the c.h. to 'ends' vector
+      for (unsigned int i = 0; i < ch.size(); ++i) {
+        prev = points[ch[(ch.size() + i - 1) % ch.size()]];
+        p = points[ch[i]];
+        next = points[ch[(ch.size() + i + 1) % ch.size()]];
 
-    // get the difference in index distance between 'prev' and 'p'
-    diff = get_cyclic_difference(p.v, prev.v, polygon.size());
-//    std::cerr << "diff: " << diff << std::endl;
-    //diff = 1 means the 2 c.h. points are connected by an edge.
-    if (diff > 1) {
-//      std::cerr << "prev: " << prev << std::endl;
-//      std::cerr << "p: " << p << std::endl;
-//      std::cerr << "next: " << next << std::endl;
+        // get the difference in index distance between 'prev' and 'p'
+        diff = get_cyclic_difference(p.v, prev.v, polygon.size());
+  //    std::cerr << "diff: " << diff << std::endl;
+        //diff = 1 means the 2 c.h. points are connected by an edge.
+        if (diff > 1) {
+  //      std::cerr << "prev: " << prev << std::endl;
+  //      std::cerr << "p: " << p << std::endl;
+  //      std::cerr << "next: " << next << std::endl;
 
-      // 'p' and 'prev' create a 'inner' polygonal chain and an 'outer' polygonal chain.
-      // if 'next' is inside the 'inner' p. chain, then the inner curve defined by the 2 c.h. points is the 'outer' p. chain
-      if (p.v > prev.v) {
-        is_left = true;
-        // check if 'next' is either lower than 'p' and higher than 'next'
-        if ((next.v < p.v) && (next.v > prev.v)) inner = false; //do not use the inner boundary between 'p' and 'prev'
-        else inner = true;
+          // 'p' and 'prev' create a 'inner' polygonal chain and an 'outer' polygonal chain.
+          // if 'next' is inside the 'inner' p. chain, then the inner curve defined by the 2 c.h. points is the 'outer' p. chain
+          if (p.v > prev.v) {
+            is_left = true;
+            // check if 'next' is either lower than 'p' and higher than 'next'
+            if ((next.v < p.v) && (next.v > prev.v)) inner = false; //do not use the inner boundary between 'p' and 'prev'
+            else inner = true;
+          }
+          else {
+            is_left = false;
+            if ((next.v > p.v) && (next.v < prev.v)) inner = false; //do not use the inner boundary between 'p' and 'prev'
+            else inner = true;
+          }
+
+          // create the edges
+          I_Edge e1, e2;
+          if (is_left ^ inner) {
+            e1 = I_Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v - 1) % polygon.size()]]);
+            e2 = I_Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v + 1) % polygon.size()]]);
+          }
+          else {
+            e1 = I_Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v + 1) % polygon.size()]]);
+            e2 = I_Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v - 1) % polygon.size()]]);
+          }
+          // set the l2ch boolean of the edges
+          if (*e1.p1 == prev) e1.l2ch = true;
+          if (*e2.p1 == p) e2.l2ch = true;
+    //      std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+          std::pair<I_Edge, I_Edge> par (e1, e2);
+          ends.push_back(par);
+        }
+      }
+      std::cerr << "ends: " << std::endl;
+      // now I have to go through the ends and make sure that there are enough points in each inner polygonal chain to create desired # of holes
+      for (unsigned int i=0; i < ends.size(); ++i) {
+        std::cerr << "e1: " << ends[i].first << ", e2: " << ends[i].second << std::endl;
+        // get length of inner polygonal chain
+        unsigned int diff = get_ipc_length(ends[i]);
+        total_holes = total_holes + (int)(diff/3);
+      }
+
+      std::cerr << "total holes: " << total_holes << std::endl;
+      if (strict) {
+        if (total_holes < nr_holes) continue;
       }
       else {
-        is_left = false;
-        if ((next.v > p.v) && (next.v < prev.v)) inner = false; //do not use the inner boundary between 'p' and 'prev'
-        else inner = true;
+        if (total_holes == 0) continue;
       }
 
-      // create the edges
-      I_Edge e1, e2;
-      if (is_left ^ inner) {
-        e1 = I_Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v - 1) % polygon.size()]]);
-        e2 = I_Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v + 1) % polygon.size()]]);
-      }
-      else {
-        e1 = I_Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v + 1) % polygon.size()]]);
-        e2 = I_Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v - 1) % polygon.size()]]);
-      }
-      // set the l2ch boolean of the edges
-      if (*e1.p1 == prev) e1.l2ch = true;
-      if (*e2.p1 == p) e2.l2ch = true;
-//      std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
-      std::pair<I_Edge, I_Edge> par (e1, e2);
-      ends.push_back(par);
+      // we can work with the current number of possible holes found in the pairs of I_Edges
+      // first check if the chain is 2 dimensional
+      // then just make the inner chain as a hole as a first attempt
 
-    }
+    } while ((strict && total_holes < nr_holes) || total_holes == 0);
 
-
+    return SUCCESS;
   }
-  std::cerr << "ends: " << std::endl;
-  for (unsigned int i=0; i < ends.size(); ++i) std::cerr << "e1: " << ends[i].first << ", e2: " << ends[i].second << std::endl;
-
-
-
-  return SUCCESS;
+  return UNEXPECTED_ERROR;
 }
 
 

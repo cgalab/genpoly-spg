@@ -289,7 +289,7 @@ class I_Edge: public Edge {
 private:
 protected:
 public:
-  // l2ch : "left point is the direction towards the convex hull"
+  // l2ch : "left point (p1) is the direction towards the convex hull"
   bool l2ch;
 
   I_Edge() {p1=NULL; p2=NULL;l_idx=0; l2ch=false;}
