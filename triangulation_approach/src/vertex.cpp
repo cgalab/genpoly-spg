@@ -505,56 +505,55 @@ void Vertex::checkSurroundingPolygonAdvanced(){
 
 		// for the first run we don't know whether the sign will be positive or negative
 		if(signbit(area) == 0){
-			if(signbit(area) != sign){
-				printf("Triangulation error: %llu is outside of its surrounding polygon\n", id);
-				print();
 
-				while(!Q.empty()){
-					Q.pop();
-				}
+			printf("Triangulation error: %llu is outside of its surrounding polygon\n", id);
+			print();
 
-				for(auto& i : edges){
-					angle = (*i).getAngle(this);
+			while(!Q.empty()){
+				Q.pop();
+			}
 
-					Q.push(std::make_pair(angle, (*i).getOtherVertex(this)));
-				}
+			for(auto& i : edges){
+				angle = (*i).getAngle(this);
 
+				Q.push(std::make_pair(angle, (*i).getOtherVertex(this)));
+			}
+
+			p = Q.top();
+			start = p.second;
+			second = start;
+			Q.pop();
+
+			printf("at angle %.10f:\n", p.first / M_PI * 180);
+			(*p.second).print();
+
+			while(!Q.empty()){
 				p = Q.top();
-				start = p.second;
-				second = start;
 				Q.pop();
 
 				printf("at angle %.10f:\n", p.first / M_PI * 180);
 				(*p.second).print();
 
-				while(!Q.empty()){
-					p = Q.top();
-					Q.pop();
-
-					printf("at angle %.10f:\n", p.first / M_PI * 180);
-					(*p.second).print();
-
-					first = second;
-					second = p.second;
-
-					t = new Triangle(first, second, this);
-					area = (*t).signedArea();
-					delete t;
-
-					printf("area: %.30f \n", area);
-				}
-
 				first = second;
-				second = start;
+				second = p.second;
 
 				t = new Triangle(first, second, this);
 				area = (*t).signedArea();
 				delete t;
 
 				printf("area: %.30f \n", area);
-
-				exit(6);
 			}
+
+			first = second;
+			second = start;
+
+			t = new Triangle(first, second, this);
+			area = (*t).signedArea();
+			delete t;
+
+			printf("area: %.30f \n", area);
+
+			exit(6);
 		}
 
 	}
