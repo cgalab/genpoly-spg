@@ -86,7 +86,6 @@ void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points);
 void fill_lex(std::vector<unsigned int>& lex, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void pdisplay (const std::vector< Point >& vy);
 void pdisplay (const std::vector<unsigned int>& ind, const std::vector<Point>& p);
-unsigned int get_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle);
 double getXmin(const std::vector<Point>& p);
 double getXmax(const std::vector<Point>& p);
 double getYmin(const std::vector<Point>& p);

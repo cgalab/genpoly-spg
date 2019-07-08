@@ -39,6 +39,93 @@ bool is_2D(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   return false;
 }
 
+// function to safely get the proper direction of ascension in polygon
+// returns true if going from 'p2' to 'p1' is ascending the polygon.
+bool is_r_ascend(I_Edge e) {
+  if ((*e.p1).v == 0) {
+    if ((*e.p2).v == 1) return true;
+    else return false;
+  }
+  if ((*e.p2).v == 0) {
+    if ((*e.p1).v == 1) return false;
+    else return true;
+  }
+  if ((*e.p1).v < (*e.p2).v) return true;
+  return false;
+}
+
+// function that checks if the chain defined by the 2 edges in 'par' of
+// the polygon in 'polygon' of the points in 'points' is 2 dimensional.
+bool is_2D(std::pair<I_Edge,I_Edge> par, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  assert(polygon.size() > 2);
+  unsigned int lower=0, upper=0;
+
+  // have to be careful in regards to moving from n-1 to 0 or 0 to n-1
+  // also have to design it so that I'm always ascending through the polygonal chain.
+  // if p1 is towards the ch point, and ascension is to p2,
+  // then p2 should form an edge with its other incidental point, and the rest
+  // of the points up to inner point of the other edge in 'par' should be checked for dimensionality
+  // 'lower' is an inner point, and 'upper' should be allowed to be a ch point
+  // or allowed to be an inner point that isn't checked.
+  assert(is_r_ascend(par.first) ^ is_r_ascend(par.second)); // this should always be opposites
+
+  if (par.first.l2ch) {
+    if (par.second.l2ch) {
+      if (is_r_ascend(par.first)) {
+        lower = (*par.first.p2).v;
+        upper = (*par.second.p1).v;
+      }
+      else {
+        lower = (*par.second.p2).v;
+        upper = (*par.first.p1).v;
+      }
+    }
+    else {
+      if (is_r_ascend(par.first)) {
+        lower = (*par.first.p2).v;
+        upper = (*par.second.p2).v;
+      }
+      else {
+        lower = (*par.second.p1).v;
+        upper = (*par.first.p1).v;
+      }
+    }
+  }
+  else {
+    if (par.second.l2ch) {
+      if (is_r_ascend(par.first)) {
+        lower = (*par.first.p1).v;
+        upper = (*par.second.p1).v;
+      }
+      else {
+        lower = (*par.second.p2).v;
+        upper = (*par.first.p2).v;
+      }
+    }
+    else {
+      if (is_r_ascend(par.first)) {
+        lower = (*par.first.p1).v;
+        upper = (*par.second.p2).v;
+      }
+      else {
+        lower = (*par.second.p1).v;
+        upper = (*par.first.p2).v;
+      }
+    }
+  }
+
+  Edge e = Edge (&points[polygon[lower]], &points[polygon[(lower + 1) % polygon.size()]]);
+  Point p;
+  unsigned int i = lower+2;
+
+  while (i != upper) {
+    p = points[polygon[i]];
+    if (det(e,p) > 0) return true;
+    i = (i+1)%polygon.size();
+  }
+  return false;
+}
+
 // function that fills the vector 'ch' with indexes of 'points' set that are the points on the convex get_convex_hull
 // input: 'ch' - vector of indexes <unsigned int> into 'points' that are the points on the convex hull
 //        'points' - a vector of <Point> points.
@@ -249,6 +336,78 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 
   //std::cerr << "polygon: " << std::endl;
   //pdisplay(polygon, points);
+}
+
+
+// function to get the lower index distance from one index to another in a cyclic index, such as a polygon
+unsigned int get_lowest_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle) {
+  int diff1, diff2;
+
+  if (a < b) {
+    diff1 = b-a;
+    diff2 = a+cycle-b;
+  }
+  else {
+    diff1 = a-b;
+    diff2 = b+cycle-a;
+  }
+  if (diff1 < diff2) return diff1;
+  else return diff2;
+}
+
+// function to return the pairs of edges that are the beginning of a polygonal chain
+// that ends in incidental convex hull points.
+void get_inner_chains_to_ch(std::vector< std::pair<I_Edge,I_Edge> >& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  Point prev, p, next;
+  unsigned int diff;
+  bool is_left, inner;
+
+  for (unsigned int i = 0; i < ch.size(); ++i) {
+    prev = points[ch[(ch.size() + i - 1) % ch.size()]];
+    p = points[ch[i]];
+    next = points[ch[(ch.size() + i + 1) % ch.size()]];
+
+    // get the difference in index distance between 'prev' and 'p'
+    diff = get_lowest_cyclic_difference(p.v, prev.v, polygon.size());
+//    std::cerr << "diff: " << diff << std::endl;
+    //diff = 1 means the 2 c.h. points are connected by an edge.
+    if (diff > 1) {
+//      std::cerr << "prev: " << prev << std::endl;
+//      std::cerr << "p: " << p << std::endl;
+//      std::cerr << "next: " << next << std::endl;
+
+      // 'p' and 'prev' create a 'inner' polygonal chain and an 'outer' polygonal chain.
+      // if 'next' is inside the 'inner' p. chain, then the inner curve defined by the 2 c.h. points is the 'outer' p. chain
+      if (p.v > prev.v) {
+        is_left = true;
+        // check if 'next' is either lower than 'p' and higher than 'next'
+        if ((next.v < p.v) && (next.v > prev.v)) inner = false; //do not use the inner boundary between 'p' and 'prev'
+        else inner = true;
+      }
+      else {
+        is_left = false;
+        if ((next.v > p.v) && (next.v < prev.v)) inner = false; //do not use the inner boundary between 'p' and 'prev'
+        else inner = true;
+      }
+
+      // create the edges
+      I_Edge e1, e2;
+      if (is_left ^ inner) {
+        e1 = I_Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v - 1) % polygon.size()]]);
+        e2 = I_Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v + 1) % polygon.size()]]);
+      }
+      else {
+        e1 = I_Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v + 1) % polygon.size()]]);
+        e2 = I_Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v - 1) % polygon.size()]]);
+      }
+      // set the l2ch boolean of the edges
+      if (*e1.p1 == prev) e1.l2ch = true;
+      if (*e2.p1 == p) e2.l2ch = true;
+//      std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+      std::pair<I_Edge, I_Edge> par (e1, e2);
+      ends.push_back(par);
+    }
+  }
 }
 
 // really slow version to check whether a polygon has an intersection.
