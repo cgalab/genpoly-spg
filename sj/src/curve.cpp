@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <utility> // for std::pair
 #include <math.h>  // for signbit
+#include <iterator>     // std::next
 #include "basicDefinitions.h"
 #include "point.h"
 #include "edge.h"
@@ -24,17 +25,6 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   return UNEXPECTED_ERROR;
 }
 
-// function that returns the length of the inner polygonal chain given by the pair of I_Edges
-unsigned int get_ipc_length(std::pair<I_Edge, I_Edge> par) {
-  unsigned int start, end;
-  if (par.first.l2ch) start = (*par.first.p2).v;
-  else start = (*par.first.p1).v;
-  if (par.second.l2ch) end = (*par.second.p2).v;
-  else end = (*par.second.p1).v;
-
-  return abs((int)start - (int)end);
-}
-
 // Found a better way to find holes based on this theorem:
 // Theorem of inner curves:  Every point on the convex hull is either connected to its incidental c.h. point directly,
 // or via an inner curve that ends in the incidental c.h. point.
@@ -47,6 +37,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
   get_convex_hull(ch, points, true);
 
   double area = pol_calc_area(ch, points);
+
   unsigned int nr_inner = points.size()-ch.size();
 	std::cerr << "Area: " << area << ", holes: " << nr_holes << ", randseed: " << randseed << std::endl;
 
@@ -91,8 +82,12 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
         // get length of inner polygonal chain
         if (is_2D(ends[i], polygon, points)) {
           std::cerr << "is 2D" << std::endl;
-          unsigned int diff = get_ipc_length(ends[i]);
+          unsigned int diff = get_chain_length(ends[i], polygon.size());
           total_holes = total_holes + (int)(diff/3);
+        }
+        else {
+          std::cerr << "not 2D" << std::endl;
+          ends.erase(std::next(ends.begin(),i));
         }
       }
 
@@ -110,12 +105,32 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
         }
       }
 
-      // we can work with the current number of possible holes found in the pairs of I_Edges
-      // first check if the chain is 2 dimensional
-      //for (unsigned int i=0; i < ends.size(); ++i) {
+      // we can work with the current number of possible holes found in
+      // the pairs of I_Edges in 'ends' as they have been validated.
+      // first test: make the inner chains in 'ends' as holes as a first attempt
 
-      //}
-      // then just make the inner chain as a hole as a first attempt
+      // what about:
+      // 1) add the whole polygon into sph[1]
+      // 2) for nr_holes: pick a random end, remove the hole from sph[1] and append it to sph
+      // after the first hole, I might have to quicksearch for the indexes to remove in sph[1]
+
+      sph.push_back(polygon);
+
+
+
+
+
+
+      // future thoughts:
+      // * if I always start with creating holes from the ends, what about creating
+      //   more than one hole from an inner pol. chain?
+      // * if I know how many holes I can theoretically pick from each unique primal edge pair,
+      //   I can randomly pick between all holes the primal pairs can generate
+      // * Let's say a primal pair has enough points to theoretically generate 5 holes
+      //
+
+
+
 
 
     } while ((strict && total_holes < nr_holes) || total_holes == 0);
