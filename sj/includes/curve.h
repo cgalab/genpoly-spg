@@ -3,6 +3,24 @@
 
 //#include <vector>
 
+class Ends {
+public:
+  // a pair of I edges that define the beginning and end of an inner polygonal chain
+  // between 2 incidental points on the convex hull, which could be used to form holes
+  std::pair<I_Edge, I_Edge> par;
+
+  // the theoretical upper limit of holes based on floor(points/3).
+  unsigned int nr_holes;
+
+  Ends(std::pair<I_Edge, I_Edge> P) {par = P;nr_holes = 0;}
+  Ends(std::pair<I_Edge, I_Edge> P, unsigned int H) {par = P;nr_holes = H;}
+
+  friend std::ostream& operator<<(std::ostream& os, std::pair<I_Edge, I_Edge> p) {
+    os << "e1: " << p.first << ", e2: " << p.second << ", holes: " << p.nr_holes << std::endl;
+  }
+};
+
+
 class s_curve {
 public:
   // index into 'points' vector, which is the lexicographical starting point
