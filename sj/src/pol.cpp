@@ -41,87 +41,111 @@ bool is_2D(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 
 // function to safely get the proper direction of ascension in polygon
 // returns true if going from 'p2' to 'p1' is ascending the polygon.
-bool is_r_ascend(I_Edge e) {
-  if ((*e.p1).v == 0) {
-    if ((*e.p2).v == 1) return true;
-    else return false;
+bool is_ascending(I_Edge e) {
+  if (e.l2ch) {
+    if ((*e.p1).v == 0) {
+      if ((*e.p2).v == 1) return true;
+      else return false;
+    }
+    if ((*e.p2).v == 0) {
+      if ((*e.p1).v == 1) return false;
+      else return true;
+    }
+    if ((*e.p1).v < (*e.p2).v) return true;
+    return false;
   }
-  if ((*e.p2).v == 0) {
-    if ((*e.p1).v == 1) return false;
-    else return true;
+  else {
+    if ((*e.p1).v == 0) {
+      if ((*e.p2).v == 1) return false;
+      else return true;
+    }
+    if ((*e.p2).v == 0) {
+      if ((*e.p1).v == 1) return true;
+      else return false;
+    }
+    if ((*e.p1).v < (*e.p2).v) return false;
+    return true;
   }
-  if ((*e.p1).v < (*e.p2).v) return true;
-  return false;
+  // should never reach the end
+  assert(false);
+}
+
+// function to get the lower index distance from one index to another in a cyclic index, such as a polygon
+unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle) {
+  unsigned int diff1, diff2;
+
+  if (a < b) {
+    diff1 = b-a;
+    diff2 = a+cycle-b;
+  }
+  else {
+    diff1 = a-b;
+    diff2 = b+cycle-a;
+  }
+  if (diff1 < diff2) return diff1;
+  else return diff2;
+}
+
+// function to get a length of a chain in a cyclic index, such as a polygon
+// given a certain 'lower' index and a 'higher' index and a 'cycle' which is the polygon size.
+// INPUTS:
+//    'par'       : pair of 'I_Edge's which define an inner polygonal chain
+//    'ascending' : boolean that defines to ascend through the polygonal index
+//                  from 'par.first' to 'par.second' or not
+// OUTPUT: length of the inner chain
+unsigned int get_chain_length(std::pair<I_Edge,I_Edge> par, unsigned int cycle) {
+  unsigned int a, b, l;
+
+  // 'a' is 'par.first' ch point 'v' value, 'b' is 'par.second' ch point 'v' value
+  a = (par.first.l2ch ? (*par.first.p1).v : (*par.first.p2).v);
+  b = (par.second.l2ch ? (*par.second.p1).v : (*par.second.p2).v);
+
+  if (is_ascending(par.first)) { // ascending from a to b
+    // there's a cycle reset inside the chain
+    // -1 because we assume a and b are on the convex hull, so one points needs to be deducted.
+    if (b < a) l = b + cycle -a -1;
+    else l = b -a -1;
+  }
+  else { // descending from a to b
+    if (a < b) l = a + cycle -b -1; // there's a cycle reset inside the chain
+    else l = a -b -1;
+  }
+  return l;
 }
 
 // function that checks if the chain defined by the 2 edges in 'par' of
 // the polygon in 'polygon' of the points in 'points' is 2 dimensional.
 bool is_2D(std::pair<I_Edge,I_Edge> par, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   assert(polygon.size() > 2);
-  unsigned int lower=0, upper=0;
 
-  // have to be careful in regards to moving from n-1 to 0 or 0 to n-1
-  // also have to design it so that I'm always ascending through the polygonal chain.
-  // if p1 is towards the ch point, and ascension is to p2,
-  // then p2 should form an edge with its other incidental point, and the rest
-  // of the points up to inner point of the other edge in 'par' should be checked for dimensionality
-  // 'lower' is an inner point, and 'upper' should be allowed to be a ch point
-  // or allowed to be an inner point that isn't checked.
-  assert(is_r_ascend(par.first) ^ is_r_ascend(par.second)); // this should always be opposites
-
-  if (par.first.l2ch) {
-    if (par.second.l2ch) {
-      if (is_r_ascend(par.first)) {
-        lower = (*par.first.p2).v;
-        upper = (*par.second.p1).v;
-      }
-      else {
-        lower = (*par.second.p2).v;
-        upper = (*par.first.p1).v;
-      }
-    }
-    else {
-      if (is_r_ascend(par.first)) {
-        lower = (*par.first.p2).v;
-        upper = (*par.second.p2).v;
-      }
-      else {
-        lower = (*par.second.p1).v;
-        upper = (*par.first.p1).v;
-      }
-    }
-  }
-  else {
-    if (par.second.l2ch) {
-      if (is_r_ascend(par.first)) {
-        lower = (*par.first.p1).v;
-        upper = (*par.second.p1).v;
-      }
-      else {
-        lower = (*par.second.p2).v;
-        upper = (*par.first.p2).v;
-      }
-    }
-    else {
-      if (is_r_ascend(par.first)) {
-        lower = (*par.first.p1).v;
-        upper = (*par.second.p2).v;
-      }
-      else {
-        lower = (*par.second.p1).v;
-        upper = (*par.first.p2).v;
-      }
-    }
-  }
-
-  Edge e = Edge (&points[polygon[lower]], &points[polygon[(lower + 1) % polygon.size()]]);
+  unsigned int a, b, l;
+  bool ascending;
+  int it;
+  Edge e;
   Point p;
-  unsigned int i = lower+2;
 
-  while (i != upper) {
+  // 'a' is 'par.first' ch point 'v' value, 'b' is 'par.second' ch point 'v' value
+  a = (par.first.l2ch ? (*par.first.p1).v : (*par.first.p2).v);
+  b = (par.second.l2ch ? (*par.second.p1).v : (*par.second.p2).v);
+
+  // get direction from 'a' to 'b' through the inner chain, whether it is ascending through the index or descending
+  ascending = is_ascending(par.first);
+  std::cerr << "a: " << a << ", b: " << b << ", ascending: " << (ascending ? "true" : "false") << std::endl;
+  // get length of the inner chain
+  l = get_chain_length(par, polygon.size());
+  std::cerr << "length: " << l << std::endl;
+  if (l < 3) return false;
+
+  if (ascending) it = 1;
+  else it = -1;
+
+  e = Edge (&points[polygon[(a + it) % polygon.size()]], &points[polygon[(a + 2*it) % polygon.size()]]);
+  unsigned int i = (a + 3*it)%polygon.size();
+
+  while (i != b) {
     p = points[polygon[i]];
     if (det(e,p) > 0) return true;
-    i = (i+1)%polygon.size();
+    i = (ascending ? (i+1)%polygon.size() : (i-1)%polygon.size());
   }
   return false;
 }
@@ -339,22 +363,6 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 }
 
 
-// function to get the lower index distance from one index to another in a cyclic index, such as a polygon
-unsigned int get_lowest_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle) {
-  int diff1, diff2;
-
-  if (a < b) {
-    diff1 = b-a;
-    diff2 = a+cycle-b;
-  }
-  else {
-    diff1 = a-b;
-    diff2 = b+cycle-a;
-  }
-  if (diff1 < diff2) return diff1;
-  else return diff2;
-}
-
 // function to return the pairs of edges that are the beginning of a polygonal chain
 // that ends in incidental convex hull points.
 void get_inner_chains_to_ch(std::vector< std::pair<I_Edge,I_Edge> >& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
@@ -368,7 +376,7 @@ void get_inner_chains_to_ch(std::vector< std::pair<I_Edge,I_Edge> >& ends, std::
     next = points[ch[(ch.size() + i + 1) % ch.size()]];
 
     // get the difference in index distance between 'prev' and 'p'
-    diff = get_lowest_cyclic_difference(p.v, prev.v, polygon.size());
+    diff = get_lower_cyclic_difference(p.v, prev.v, polygon.size());
 //    std::cerr << "diff: " << diff << std::endl;
     //diff = 1 means the 2 c.h. points are connected by an edge.
     if (diff > 1) {
