@@ -67,9 +67,9 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
   if (points.size()-ch.size() > 3) {
     std::vector<unsigned int> polygon;
     std::vector< std::pair<I_Edge,I_Edge> > ends;
-    Point prev, p, next;
-    bool is_left, inner, strict;
-    unsigned int diff, total_holes = 0;
+
+    bool strict;
+    unsigned int total_holes = 0;
 
     // if true, any result that has 1 or more holes will be returned
     // else try and return exactly 'nr_holes' holes
@@ -82,75 +82,45 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       ++randseed;
 
       // add the starting edges of all inner curves of the c.h. to 'ends' vector
-      for (unsigned int i = 0; i < ch.size(); ++i) {
-        prev = points[ch[(ch.size() + i - 1) % ch.size()]];
-        p = points[ch[i]];
-        next = points[ch[(ch.size() + i + 1) % ch.size()]];
+      get_inner_chains_to_ch(ends, ch, polygon, points);
 
-        // get the difference in index distance between 'prev' and 'p'
-        diff = get_cyclic_difference(p.v, prev.v, polygon.size());
-  //    std::cerr << "diff: " << diff << std::endl;
-        //diff = 1 means the 2 c.h. points are connected by an edge.
-        if (diff > 1) {
-  //      std::cerr << "prev: " << prev << std::endl;
-  //      std::cerr << "p: " << p << std::endl;
-  //      std::cerr << "next: " << next << std::endl;
-
-          // 'p' and 'prev' create a 'inner' polygonal chain and an 'outer' polygonal chain.
-          // if 'next' is inside the 'inner' p. chain, then the inner curve defined by the 2 c.h. points is the 'outer' p. chain
-          if (p.v > prev.v) {
-            is_left = true;
-            // check if 'next' is either lower than 'p' and higher than 'next'
-            if ((next.v < p.v) && (next.v > prev.v)) inner = false; //do not use the inner boundary between 'p' and 'prev'
-            else inner = true;
-          }
-          else {
-            is_left = false;
-            if ((next.v > p.v) && (next.v < prev.v)) inner = false; //do not use the inner boundary between 'p' and 'prev'
-            else inner = true;
-          }
-
-          // create the edges
-          I_Edge e1, e2;
-          if (is_left ^ inner) {
-            e1 = I_Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v - 1) % polygon.size()]]);
-            e2 = I_Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v + 1) % polygon.size()]]);
-          }
-          else {
-            e1 = I_Edge (&points[polygon[prev.v]], &points[polygon[(polygon.size() + prev.v + 1) % polygon.size()]]);
-            e2 = I_Edge (&points[polygon[p.v]], &points[polygon[(polygon.size() + p.v - 1) % polygon.size()]]);
-          }
-          // set the l2ch boolean of the edges
-          if (*e1.p1 == prev) e1.l2ch = true;
-          if (*e2.p1 == p) e2.l2ch = true;
-    //      std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
-          std::pair<I_Edge, I_Edge> par (e1, e2);
-          ends.push_back(par);
-        }
-      }
       std::cerr << "ends: " << std::endl;
       // now I have to go through the ends and make sure that there are enough points in each inner polygonal chain to create desired # of holes
       for (unsigned int i=0; i < ends.size(); ++i) {
         std::cerr << "e1: " << ends[i].first << ", e2: " << ends[i].second << std::endl;
         // get length of inner polygonal chain
-        unsigned int diff = get_ipc_length(ends[i]);
-        total_holes = total_holes + (int)(diff/3);
+        if (is_2D(ends[i], polygon, points)) {
+          std::cerr << "is 2D" << std::endl;
+          unsigned int diff = get_ipc_length(ends[i]);
+          total_holes = total_holes + (int)(diff/3);
+        }
       }
 
       std::cerr << "total holes: " << total_holes << std::endl;
       if (strict) {
-        if (total_holes < nr_holes) continue;
+        if (total_holes < nr_holes) {
+          ends.clear();
+          continue;
+        }
       }
       else {
-        if (total_holes == 0) continue;
+        if (total_holes == 0) {
+          ends.clear();
+          continue;
+        }
       }
 
       // we can work with the current number of possible holes found in the pairs of I_Edges
       // first check if the chain is 2 dimensional
+      //for (unsigned int i=0; i < ends.size(); ++i) {
+
+      //}
       // then just make the inner chain as a hole as a first attempt
+
 
     } while ((strict && total_holes < nr_holes) || total_holes == 0);
 
+    sph.push_back(polygon);
     return SUCCESS;
   }
   return UNEXPECTED_ERROR;
