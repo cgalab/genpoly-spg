@@ -141,14 +141,49 @@ bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& po
   else it = -1;
 
   e = Edge (&points[polygon[(a + it) % polygon.size()]], &points[polygon[(a + 2*it) % polygon.size()]]);
-  unsigned int i = (a + 3*it)%polygon.size();
+  unsigned int i = (a + 3*it + polygon.size())%polygon.size();
 
   while (i != b) {
     p = points[polygon[i]];
     if (det(e,p) > 0) return true;
-    i = (ascending ? (i+1)%polygon.size() : (i-1)%polygon.size());
+    i = (i + it + polygon.size())%polygon.size();
   }
   return false;
+}
+
+// function to fill the 'inner_polygon' vector with the inner polygonal chain of 'polygon' defined by 'ends'
+// This includes the points on the convex hull as they are a candidate to be used to create the hole.
+bool get_inner_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std::vector<unsigned int>& polygon) {
+  assert(polygon.size() > 2);
+
+  unsigned int a, b, l;
+  bool ascending;
+  int it;
+  Edge e;
+  Point p;
+
+  // 'a' is 'par.first' ch point 'v' value, 'b' is 'par.second' ch point 'v' value
+  a = (ends.par.first.l2ch ? (*ends.par.first.p1).v : (*ends.par.first.p2).v);
+  b = (ends.par.second.l2ch ? (*ends.par.second.p1).v : (*ends.par.second.p2).v);
+
+  // get direction from 'a' to 'b' through the inner chain, whether it is ascending through the index or descending
+  ascending = is_ascending(ends.par.first);
+//  std::cerr << "a: " << a << ", b: " << b << ", ascending: " << (ascending ? "true" : "false") << std::endl;
+
+  l = get_chain_length(ends, polygon.size());
+//  std::cerr << "length: " << l << std::endl;
+  if (l < 3) return false;
+
+  if (ascending) it = 1;
+  else it = -1;
+
+  unsigned int i = a;
+  b = (b + it + polygon.size())%polygon.size(); // c.h. point allowed to be a part of the inner polygon.
+  while (i != b) {
+    inner_polygon.push_back(polygon[i]);
+    i = (i+it+polygon.size())%polygon.size();
+  }
+  return true;
 }
 
 // function that fills the vector 'ch' with indexes of 'points' set that are the points on the convex get_convex_hull

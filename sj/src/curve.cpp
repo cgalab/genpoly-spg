@@ -115,9 +115,20 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       // 2) for nr_holes: pick a random end, remove the hole from sph[1] and append it to sph
       // after the first hole, I might have to quicksearch for the indexes to remove in sph[1]
 
-      sph.push_back(polygon);
+      sph.push_back(polygon); // need to find and remove the pol. chain that forms the hole, found here below.
 
+      for (unsigned int i=0; i < ends.size(); ++i) {
+        //create a vector of indexes that for the points of the inner pol. chain.
+        std::vector<unsigned int> inner_polygon;
+        get_inner_polygon(inner_polygon, ends[i], polygon);
+        std::vector<Point> inner_points;
+        //get_inner_points(inner_points, inner_polygon, points);
+//        std::cerr << "== inner polygon: " << i << "==" << std::endl;
+//        pdisplay(inner_polygon, points);
 
+        std::cerr << "=== HOLES ===" << std::endl;
+        holes(sph, inner_polygon, points, nr_holes);
+      }
 
 
 
@@ -131,8 +142,6 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
 
 
 
-
-
     } while ((strict && total_holes < nr_holes) || total_holes == 0);
 
     sph.push_back(polygon);
@@ -141,9 +150,10 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
   return UNEXPECTED_ERROR;
 }
 
-
 // function that accepts a simple polygon and returns a array of a polygon with its holes.
-// Input: 'polygon'     : a vector with vertices of 'points' set that is a simple polygon
+// Input:
+//        'sph'         : A vector of vectors of indices.  the first sph is the original polygon
+//        'polygon'     : a vector with vertices of 'points' set that is a simple polygon, can be an inner polygonal chain, but must be simple.
 //        'points'      : a vector of <Point> objects
 // Output: 'pol_array'  : an array of polygons, the first index is the outermost simple polygon, the rest are simple holes inside that polygon
 enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes) {
@@ -154,18 +164,24 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
   bool isll, isrl;
   unsigned int count_open=0, count_cont=0, count_close=0;
 
+//  pdisplay(polygon, points);
   //start with creating a vector for the lexicographically sorted indexes of 'points'
-  std::vector<unsigned int> lex (points.size());
-  fill_lex(lex, points); // fill 'lex' with the indexes
+  std::vector<unsigned int> lex (polygon.size());
+  fill_lex(lex, polygon, points); // fill 'lex' with the indexes
+//  std::cerr << "lex: " << std::endl;
+//  pdisplay(lex, points);
 
-  std::cerr << "sph: " << sph.size() << ", holes: " << nr_holes << std::endl;
+  std::cerr << "sph: " << sph[0].size() << ", holes: " << nr_holes << std::endl;
+  pdisplay(polygon, points);
 
   // go through all the points in lex. order, except the last.  We don't need to process the last vertex.
   for (unsigned int i = 0; i < lex.size()-1; ++i) {
     m = &points[lex[i]];
-    l = &points[polygon[(points.size() + (*m).v - 1) % points.size()]];
-    r = &points[polygon[(points.size() + (*m).v + 1) % points.size()]];
-    //std::cerr << "m: " << *m << ", l: " << *l << ", r: " << *r << std::endl;
+    // can't use sph, as the polygon is in 'polygon' and I have to traverse that..
+    std::cerr << "lex[i]: " << lex[i] << ", m.v: " << (*m).v << ", next: " << (polygon.size() + lex[i] + 1) % polygon.size() << std::endl;
+    l = &points[polygon[(polygon.size() + lex[i] - 1) % polygon.size()]];
+    r = &points[sph[0][(sph[0].size() + (*m).v + 1) % sph[0].size()]];
+    std::cerr << "m: " << *m << ", l: " << *l << ", r: " << *r << std::endl;
 
     // create 2 new c_edge
     C_Edge e1 = C_Edge (m, l);
@@ -178,14 +194,14 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
       e1.lower = false;
       e2.lower = true;
     }
-//    std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+    std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
 
     // check for 'o<', '-o-', '>o' condition
     (*m < *l) ? isll = false : isll = true;
     (*m < *r) ? isrl = false : isrl = true;
 
     if (isll && isrl) {
-//      std::cerr << "=== >o ===" << std::endl;
+      std::cerr << "=== >o ===" << std::endl;
       ++count_close;
       C_Edge new_end1, new_end2;
       std::pair<C_Edge, C_Edge> nu_p;
@@ -193,13 +209,16 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
 
       // find 'e1' and 'e2' in 'edgeS'
       retval1.first = edgeS.find(e1);
+      std::cerr << "here" << std::endl;
+      std::cerr << "e1: " << e1 << ", retval: " << ((retval1.first == edgeS.end()) ? "not found" : "found") << std::endl;
       assert(*(retval1.first) == e1);
       retval2.first = edgeS.find(e2);
       assert(*(retval2.first) == e2);
+
       // e1 and e2 only have vertex info, copy the rest from iterators
       e1 = *retval1.first;
       e2 = *retval2.first;
-//      std::cerr << "first copy: e1: " << e1 << ", e2: " << e2 << std::endl;
+      std::cerr << "first copy: e1: " << e1 << ", e2: " << e2 << std::endl;
       // continue the old curve ends to 'm', grab the open ends for a new curve
 //      std::cerr << "sc[e1.sc].ends[e1.par].first: " << sc[e1.sc].ends[e1.par].first << std::endl;
 //      std::cerr << "sc[e1.sc].ends[e1.par].second: " << sc[e1.sc].ends[e1.par].second << std::endl;
@@ -258,7 +277,7 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
       assert (retval2.second);
     }
     else if (isll ^ isrl) { // === '-o-' ===
-//      std::cerr << "=== -o- ===" << std::endl;
+      std::cerr << "=== -o- ===" << std::endl;
       ++count_cont;
 
       if (*e1.p1 < *e2.p2) {
@@ -295,7 +314,7 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
       }
     }
     else {
-//      std::cerr << "=== o< ===" << std::endl;
+      std::cerr << "=== o< ===" << std::endl;
       ++count_open;
 
       // create a new s_curve
@@ -373,8 +392,8 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
       sc.push_back(nu_c);
     }
 
-//    std::cout << "edges in 'edgeS':" << std::endl;
-//    for (std::set<C_Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+    std::cout << "edges in 'edgeS':" << std::endl;
+    for (std::set<C_Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
   }
 
   // Analysis of found curves in 'sc'
