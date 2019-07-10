@@ -5,6 +5,7 @@
 #include "edge.h"
 #include "basicFunctions.h"
 #include "rand.h"
+#include "pol.h"
 
 double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   double Area = 0;
@@ -93,14 +94,14 @@ unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigne
 //    'ascending' : boolean that defines to ascend through the polygonal index
 //                  from 'par.first' to 'par.second' or not
 // OUTPUT: length of the inner chain
-unsigned int get_chain_length(std::pair<I_Edge,I_Edge> par, unsigned int cycle) {
+unsigned int get_chain_length(Ends ends, unsigned int cycle) {
   unsigned int a, b, l;
 
   // 'a' is 'par.first' ch point 'v' value, 'b' is 'par.second' ch point 'v' value
-  a = (par.first.l2ch ? (*par.first.p1).v : (*par.first.p2).v);
-  b = (par.second.l2ch ? (*par.second.p1).v : (*par.second.p2).v);
+  a = (ends.par.first.l2ch ? (*ends.par.first.p1).v : (*ends.par.first.p2).v);
+  b = (ends.par.second.l2ch ? (*ends.par.second.p1).v : (*ends.par.second.p2).v);
 
-  if (is_ascending(par.first)) { // ascending from a to b
+  if (is_ascending(ends.par.first)) { // ascending from a to b
     // there's a cycle reset inside the chain
     // -1 because we assume a and b are on the convex hull, so one points needs to be deducted.
     if (b < a) l = b + cycle -a -1;
@@ -115,7 +116,7 @@ unsigned int get_chain_length(std::pair<I_Edge,I_Edge> par, unsigned int cycle) 
 
 // function that checks if the chain defined by the 2 edges in 'par' of
 // the polygon in 'polygon' of the points in 'points' is 2 dimensional.
-bool is_2D(std::pair<I_Edge,I_Edge> par, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   assert(polygon.size() > 2);
 
   unsigned int a, b, l;
@@ -125,15 +126,15 @@ bool is_2D(std::pair<I_Edge,I_Edge> par, std::vector<unsigned int>& polygon, std
   Point p;
 
   // 'a' is 'par.first' ch point 'v' value, 'b' is 'par.second' ch point 'v' value
-  a = (par.first.l2ch ? (*par.first.p1).v : (*par.first.p2).v);
-  b = (par.second.l2ch ? (*par.second.p1).v : (*par.second.p2).v);
+  a = (ends.par.first.l2ch ? (*ends.par.first.p1).v : (*ends.par.first.p2).v);
+  b = (ends.par.second.l2ch ? (*ends.par.second.p1).v : (*ends.par.second.p2).v);
 
   // get direction from 'a' to 'b' through the inner chain, whether it is ascending through the index or descending
-  ascending = is_ascending(par.first);
-  std::cerr << "a: " << a << ", b: " << b << ", ascending: " << (ascending ? "true" : "false") << std::endl;
+  ascending = is_ascending(ends.par.first);
+//  std::cerr << "a: " << a << ", b: " << b << ", ascending: " << (ascending ? "true" : "false") << std::endl;
   // get length of the inner chain
-  l = get_chain_length(par, polygon.size());
-  std::cerr << "length: " << l << std::endl;
+  l = get_chain_length(ends, polygon.size());
+//  std::cerr << "length: " << l << std::endl;
   if (l < 3) return false;
 
   if (ascending) it = 1;
@@ -153,7 +154,7 @@ bool is_2D(std::pair<I_Edge,I_Edge> par, std::vector<unsigned int>& polygon, std
 // function that fills the vector 'ch' with indexes of 'points' set that are the points on the convex get_convex_hull
 // input: 'ch' - vector of indexes <unsigned int> into 'points' that are the points on the convex hull
 //        'points' - a vector of <Point> points.
-void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, bool enforceCCWOrder=false) {
+void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, bool enforceCCWOrder) {
   assert(ch.size() == 0);
 
   //start with creating a vector for the lexicographically sorted indexes of 'points'
@@ -365,7 +366,7 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 
 // function to return the pairs of edges that are the beginning of a polygonal chain
 // that ends in incidental convex hull points.
-void get_inner_chains_to_ch(std::vector< std::pair<I_Edge,I_Edge> >& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   Point prev, p, next;
   unsigned int diff;
   bool is_left, inner;
@@ -411,8 +412,9 @@ void get_inner_chains_to_ch(std::vector< std::pair<I_Edge,I_Edge> >& ends, std::
       // set the l2ch boolean of the edges
       if (*e1.p1 == prev) e1.l2ch = true;
       if (*e2.p1 == p) e2.l2ch = true;
-//      std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
-      std::pair<I_Edge, I_Edge> par (e1, e2);
+//      std::cerr << "Edges: e1: " << e1 << ", e2: " << e2 << std::endl;
+      Ends par (e1, e2);
+//      std::cerr << "Ends: " << par << std::endl;
       ends.push_back(par);
     }
   }

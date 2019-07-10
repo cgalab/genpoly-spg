@@ -57,7 +57,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
   }
   if (points.size()-ch.size() > 3) {
     std::vector<unsigned int> polygon;
-    std::vector< std::pair<I_Edge,I_Edge> > ends;
+    std::vector<Ends> ends;
 
     bool strict;
     unsigned int total_holes = 0;
@@ -78,15 +78,16 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       std::cerr << "ends: " << std::endl;
       // now I have to go through the ends and make sure that there are enough points in each inner polygonal chain to create desired # of holes
       for (unsigned int i=0; i < ends.size(); ++i) {
-        std::cerr << "e1: " << ends[i].first << ", e2: " << ends[i].second << std::endl;
         // get length of inner polygonal chain
         if (is_2D(ends[i], polygon, points)) {
-          std::cerr << "is 2D" << std::endl;
+//          std::cerr << "is 2D" << std::endl;
           unsigned int diff = get_chain_length(ends[i], polygon.size());
-          total_holes = total_holes + (int)(diff/3);
+          ends[i].nr_holes = (int)(diff/3);
+          std::cerr << ends[i] << std::endl;
+          total_holes = total_holes + ends[i].nr_holes;
         }
         else {
-          std::cerr << "not 2D" << std::endl;
+//          std::cerr << "not 2D" << std::endl;
           ends.erase(std::next(ends.begin(),i));
         }
       }
@@ -115,7 +116,6 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       // after the first hole, I might have to quicksearch for the indexes to remove in sph[1]
 
       sph.push_back(polygon);
-
 
 
 
