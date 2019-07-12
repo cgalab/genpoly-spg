@@ -316,7 +316,7 @@ public:
 class C_Edge: public Edge {
 public:
   unsigned int sc;  // index into a vector of s_curves
-  unsigned int par;  // index into a vector of std::pair<uint, uint> of curve ends.
+  unsigned int par;  // index into a vector of < std::pair<uint, uint> > of curve ends.
   bool lower;       // whether the edge is an upper curve end or lower curve end.
 
   C_Edge() {p1=NULL; p2=NULL;l_idx=0; sc=0; par=0;}
@@ -337,6 +337,60 @@ public:
 		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
     << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
     << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [" << e.sc << "," << e.par << "]";
+		return os;
+	}
+};
+
+class D_Edge: public Edge {
+private:
+protected:
+public:
+  unsigned int curve_id; // should be a valid index into a vector of 'Curve's
+  bool lower;       // whether the edge is an upper curve end or lower curve end.
+                    // This can tell you which side 'inner' part of the curve is.
+
+  D_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0;}
+  D_Edge(Point *P1, Point *P2) {
+		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
+		else {p1=P2; p2=P1;}
+    l_idx=0;curve_id=0;
+	}
+
+  friend bool operator==(const D_Edge lhs, const D_Edge rhs) {
+		if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
+		else return false;
+	}
+
+  // to print out an edge, gives the format:
+  // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
+	friend std::ostream& operator<<(std::ostream& os, const D_Edge& e) {
+		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
+    << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [" << e.curve_id << "]";
+		return os;
+	}
+};
+
+class E_Edge: public D_Edge {
+private:
+protected:
+public:
+  D_Edge first; // first incidental edge this edge sees.
+  D_Edge last;  // last incidental edge this edge sees, both first and last must have same 'curve_id'.
+
+  E_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0;lower=false;}
+  E_Edge(Point *P1, Point *P2) {
+		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
+		else {p1=P2; p2=P1;}
+    l_idx=0;curve_id=0;lower=false;
+	}
+
+  // to print out an edge, gives the format:
+  // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
+	friend std::ostream& operator<<(std::ostream& os, const E_Edge& e) {
+		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
+    << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id << "]";
 		return os;
 	}
 };

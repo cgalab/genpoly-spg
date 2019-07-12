@@ -27,7 +27,8 @@ unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigne
 unsigned int get_chain_length(Ends ends, unsigned int cycle);
 bool is_2D(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& points);
-bool get_inner_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std::vector<unsigned int>& polygon);
+bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std::vector<unsigned int>& polygon);
+void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsigned int>& inner_polygon, std::vector<Point>& points);
 void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, bool enforceCCWOrder=false);
 void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& ch, std::vector<Point>& points);
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);

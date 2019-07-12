@@ -118,16 +118,18 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       sph.push_back(polygon); // need to find and remove the pol. chain that forms the hole, found here below.
 
       for (unsigned int i=0; i < ends.size(); ++i) {
+        std::cerr << "== Ends: " << i << "==" << std::endl;
         //create a vector of indexes that for the points of the inner pol. chain.
         std::vector<unsigned int> inner_polygon;
-        get_inner_polygon(inner_polygon, ends[i], polygon);
-        std::vector<Point> inner_points;
-        //get_inner_points(inner_points, inner_polygon, points);
-//        std::cerr << "== inner polygon: " << i << "==" << std::endl;
+        get_inner_chain_polygon(inner_polygon, ends[i], polygon);
+//        std::cerr << "== inner polygon: " << "==" << std::endl;
 //        pdisplay(inner_polygon, points);
-
+        std::vector<Point> inner_points;
+        get_inner_chain_points(inner_points, inner_polygon, points);
+//        std::cerr << "== inner points: " << "==" << std::endl;
+//        pdisplay(inner_points);
         std::cerr << "=== HOLES ===" << std::endl;
-        holes(sph, inner_polygon, points, nr_holes);
+        inner_holes(sph, inner_polygon, inner_points, nr_holes, true);
       }
 
 
@@ -148,6 +150,419 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
     return SUCCESS;
   }
   return UNEXPECTED_ERROR;
+}
+
+// Function to return which side of a 'Curve' is 'inner' side when creating a new curve.
+// INPUT:
+//  e                 : One of the 'E_Edge's that make up the new curve, (needs to be 'e1' specifically)
+//  y_set             : the linesweep structure for edges.
+//  retval1, retval2  : iterators to the edges 'e1' and 'e2' in 'y_set'
+//  inner_bool        : boolean for the polygon, whether it's an "inner polygonal chain" (true) or not.
+bool get_rin(E_Edge& e, std::vector<Curve> curves, std::set<E_Edge>& y_set, std::pair<std::set<E_Edge>::iterator, bool>& retval1, std::pair<std::set<E_Edge>::iterator, bool>& retval2, bool inner_bool) {
+  E_Edge before, after;
+  bool bef=false;
+  if (e.lower) {
+    // check if e1 is the lowest edge in 'edgeS'
+    if (retval1.first != y_set.begin()) {
+      before = *(std::prev(retval1.first));
+      bef = true;
+    }
+    else return inner_bool;
+    // check if e2 is highest edge in 'edgeS'
+    if (bef && (retval2.first != --y_set.end())) {
+      after = *(std::next(retval2.first));
+    }
+    else return inner_bool;
+  }
+  else {
+    // check if e2 is the lowest edge in 'edgeS'
+    if (retval2.first != y_set.begin()) {
+      before = *(std::prev(retval2.first));
+      bef = true;
+    }
+    else return inner_bool;
+    // check if e1 is highest edge in 'edgeS'
+    if (bef && (retval1.first != --y_set.end())) {
+      after = *(std::next(retval1.first));
+    }
+    else return inner_bool;
+  }
+
+  // if curve has other curves on both sides,
+  // check upper/lower orientation of adjacent s_curves
+  if (before.lower == after.lower) { // 2 inner curves inside an outer curve
+    if (before.lower == false) return curves[before.curve_id].rin; // the inner upper curve
+    else return !curves[before.curve_id].rin; // the inner lower curve
+  }
+  else if (before.curve_id == after.curve_id) return !curves[before.curve_id].rin; // one inner curve encapsulated by an outer curve
+  else return curves[before.curve_id].rin; // between 2 incidental inner curves
+}
+
+enum error inner_holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes, bool inner_bool) {
+  std::cerr << "sph: " << sph.size() << ", holes: " << nr_holes << ", inner_bool: " << inner_bool << std::endl;
+
+  //start with creating a vector for the lexicographically sorted indexes of 'points'
+  std::vector<unsigned int> lex (polygon.size());
+  fill_lex(lex, polygon, points);
+//  pdisplay(lex, points);
+
+  // I need to do a linesweep over the lex points
+  // When an edge 'e' is freshly inserted, check which edge is 'before' and 'after'
+  // for the 'before' and 'after' edges, add 'e' as the 'closest_before' or 'closest_after'
+  // I want to skip the edge between [0] and [n-1] as that's the edge between the convex hull points.
+
+  std::vector<Curve> curves; // container for curves and their valid edges to create holes from.
+  std::set<E_Edge> y_set; // container for the planesweep structure.
+  std::pair<std::set<E_Edge>::iterator, bool> retval1, retval2; // return values from the y_set 'insert' or 'erase' functions.
+  Point *m, *l, *r; // m is the current point at lex. position 'i' and 'l' and 'r' are the 2 points it connects to by edges.
+  bool isll, isrl; // are 'l' and 'r' points left of 'm'
+  unsigned int count_open=0, count_cont=0, count_close=0; // just for development verification.
+
+  for (unsigned int i = 0; i < lex.size()-1; ++i) {
+    m = &points[lex[i]];
+    l = &points[polygon[(polygon.size() + (*m).v - 1) % polygon.size()]];
+    r = &points[polygon[(polygon.size() + (*m).v + 1) % polygon.size()]];
+//    std::cerr << "m: " << *m << ", l: " << *l << ", r: " << *r << std::endl;
+
+    // create 2 new 'E_Edge's
+    E_Edge e1 = E_Edge (m, l);
+    E_Edge e2 = E_Edge (m, r);
+    if (e1 < e2) {
+      e1.lower = true;
+      e2.lower = false;
+    }
+    else {
+      e1.lower = false;
+      e2.lower = true;
+    }
+
+//    std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+    // check for 'o<', '-o-', '>o' condition
+    (*m < *l) ? isll = false : isll = true;
+    (*m < *r) ? isrl = false : isrl = true;
+
+    if (isll && isrl) {
+      std::cerr << "=== >o ===" << std::endl;
+      ++count_close;
+    }
+    else if (isll ^ isrl) {
+      std::cerr << "=== -o- ===" << std::endl;
+      ++count_cont;
+
+      E_Edge old_e, new_e;
+      if (*e1.p1 < *e2.p2) {
+        old_e = e1;
+        new_e = e2;
+      }
+      else {
+        old_e = e2;
+        new_e = e1;
+      }
+      // find 'old_e' in 'y_set'
+      retval1.first = y_set.find(old_e);
+      assert(*(retval1.first) == old_e);
+      // copy values from iterator to 'new_e'
+      new_e.curve_id = (*retval1.first).curve_id;
+      new_e.lower = (*retval1.first).lower;
+
+      // old_e needs to be removed, i.e. find the incidental edges and
+      // check conditions for 'last' and whether it's still the same curve.
+
+      // then add new_e and check incidental edges to add to 'first' and 'curve_id'
+    }
+    else {
+      std::cerr << "=== o< ===" << std::endl;
+      ++count_open;
+
+      Curve new_curve; // create a new Curve
+      new_curve.lsp = (*m).i; // assign index of first lex. point of curve
+      e1.curve_id = curves.size(); // assign curve index to edge.
+      e2.curve_id = curves.size(); // assign curve index to edge.
+      e1.first = e2; // assign e2 as first incidental edge of e1
+      e2.first = e1; // assign e1 as first incidental edge of e2
+
+      // insert both 'E_Edge's into y_set
+      retval1 = y_set.insert(e1);
+      assert(*retval1.first == e1);
+      assert(retval1.second == true);
+      retval2 = y_set.insert(e2);
+      assert(*retval2.first == e2);
+      assert(retval2.second == true);
+
+      new_curve.rin = get_rin(e1, curves, y_set, retval1, retval2, inner_bool);
+      std::cerr << "curve: " << new_curve << std::endl;
+
+    }
+
+    std::cout << "edges in 'y_set':" << std::endl;
+    for (std::set<E_Edge>::iterator it=y_set.begin(); it!=y_set.end(); ++it) std::cerr << *it << std::endl;
+  }
+
+  return SUCCESS;
+}
+
+
+
+// function that accepts a simple polygon that is assumed to be the inner polygonal chain defined by 2 incidental convex hull points,
+// and returns a array of a polygon with its holes.
+// Input:
+//        'sph'         : A vector of vectors of indices.  sph[0] is the original polygon
+//        'polygon'     : a vector with vertices of 'points' set that is a simple polygon, is an inner polygonal chain, but must be simple.
+//        'points'      : a vector of <Point> objects
+// Output: 'pol_array'  : an array of polygons, the first index is the outermost simple polygon, the rest are simple holes inside that polygon
+enum error inner_holes_old(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes, bool inner_bool) {
+  std::vector<s_curve> sc;
+  std::set<C_Edge> edgeS;
+  std::pair<std::set<C_Edge>::iterator, bool> retval1, retval2; // return values for the 'edgeS' set.
+  Point *m, *l, *r;
+  bool isll, isrl;
+  unsigned int count_open=0, count_cont=0, count_close=0;
+
+//  pdisplay(polygon, points);
+  //start with creating a vector for the lexicographically sorted indexes of 'points'
+  std::vector<unsigned int> lex (polygon.size());
+  fill_lex(lex, polygon, points); // fill 'lex' with the indexes
+//  std::cerr << "lex: " << std::endl;
+//  pdisplay(lex, points);
+
+  std::cerr << "sph: " << sph.size() << ", holes: " << nr_holes << std::endl;
+//  pdisplay(polygon, points);
+
+  // go through all the points in lex. order, except the last.  We don't need to process the last vertex.
+  for (unsigned int i = 0; i < lex.size()-1; ++i) {
+    m = &points[lex[i]];
+    // can't use sph, as the polygon is in 'polygon' and I have to traverse that..
+//    std::cerr << "lex[i]: " << lex[i] << ", m.v: " << (*m).v << ", next: " << (polygon.size() + lex[i] + 1) % polygon.size() << std::endl;
+    l = &points[polygon[(polygon.size() + (*m).v - 1) % polygon.size()]];
+    r = &points[polygon[(polygon.size() + (*m).v + 1) % polygon.size()]];
+//    std::cerr << "m: " << *m << ", l: " << *l << ", r: " << *r << std::endl;
+
+    // create 2 new c_edge
+    C_Edge e1 = C_Edge (m, l);
+    C_Edge e2 = C_Edge (m, r);
+    if (e1 < e2) {
+      e1.lower = true;
+      e2.lower = false;
+    }
+    else {
+      e1.lower = false;
+      e2.lower = true;
+    }
+//    std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+
+    // check for 'o<', '-o-', '>o' condition
+    (*m < *l) ? isll = false : isll = true;
+    (*m < *r) ? isrl = false : isrl = true;
+
+    if (isll && isrl) {
+//      std::cerr << "=== >o ===" << std::endl;
+      ++count_close;
+      C_Edge new_end1, new_end2;
+      std::pair<C_Edge, C_Edge> nu_p;
+      unsigned int nu_sc;
+
+      // find 'e1' and 'e2' in 'edgeS'
+      retval1.first = edgeS.find(e1);
+//      std::cerr << "e1: " << e1 << ", retval: " << ((retval1.first == edgeS.end()) ? "not found" : "found") << std::endl;
+      assert(*(retval1.first) == e1);
+      retval2.first = edgeS.find(e2);
+      assert(*(retval2.first) == e2);
+
+      // e1 and e2 only have vertex info, copy the rest from iterators
+      e1 = *retval1.first;
+      e2 = *retval2.first;
+//      std::cerr << "first copy: e1: " << e1 << ", e2: " << e2 << std::endl;
+      // continue the old curve ends to 'm', grab the open ends for a new curve
+//      std::cerr << "sc[e1.sc].ends[e1.par].first: " << sc[e1.sc].ends[e1.par].first << std::endl;
+//      std::cerr << "sc[e1.sc].ends[e1.par].second: " << sc[e1.sc].ends[e1.par].second << std::endl;
+//      std::cerr << "sc[e2.sc].ends[e2.par].first: " << sc[e2.sc].ends[e2.par].first << std::endl;
+//      std::cerr << "sc[e2.sc].ends[e2.par].second: " << sc[e2.sc].ends[e2.par].second << std::endl;
+      if (e1.lower) new_end1 = sc[e1.sc].ends[e1.par].first;
+      else new_end1 = sc[e1.sc].ends[e1.par].second;
+      if (e2.lower) new_end2 = sc[e2.sc].ends[e2.par].first;
+      else new_end2 = sc[e2.sc].ends[e2.par].second;
+
+//      std::cerr << "new end 1: " << new_end1 << ", new end2: " << new_end2 << std::endl;
+      // finished with the 2 edges, can be removed from 'edgeS'
+      edgeS.erase(retval1.first);
+      edgeS.erase(retval2.first);
+//      std::cout << "1dges in 'edgeS':" << std::endl;
+//      for (std::set<C_Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+      // set the 'sc' and 'par' indices
+      if (e1.sc < e2.sc) nu_sc = e1.sc; // new ends are designated as a new pair in the lower index curve, no need to add to both older curves
+      else nu_sc = e2.sc;
+      new_end1.sc = nu_sc;
+      new_end1.par = sc[nu_sc].ends.size();
+      new_end2.sc = nu_sc;
+      new_end2.par = sc[nu_sc].ends.size();
+      // set a pair of 'C_Edge's with the open ends of the old s_curves
+      if (new_end1 < new_end2) {
+        new_end1.lower = true;
+        new_end2.lower = false;
+        nu_p.first = new_end2;
+        nu_p.second = new_end1;
+      }
+      else {
+        new_end1.lower = false;
+        new_end2.lower = true;
+        nu_p.first = new_end1;
+        nu_p.second = new_end2;
+      }
+      // push the pair to the s_curve with lower 'lsp'
+      sc[nu_sc].ends.push_back(nu_p);
+      //find the 2 edges in 'edgeS'
+      retval1.first = edgeS.find(new_end1);
+      assert(*retval1.first == new_end1);
+      retval2.first = edgeS.find(new_end2);
+      assert(*retval2.first == new_end2);
+      // remove the edges from 'edgeS'
+      edgeS.erase(retval1.first);
+      edgeS.erase(retval2.first);
+//      std::cout << "3dges in 'edgeS':" << std::endl;
+//      for (std::set<C_Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+      retval1 = edgeS.insert(new_end1);
+      retval2 = edgeS.insert(new_end2);
+//      std::cout << "3dges in 'edgeS':" << std::endl;
+//      for (std::set<C_Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+      assert (*retval1.first == new_end1);
+      assert (retval1.second);
+      assert (*retval2.first == new_end2);
+      assert (retval2.second);
+    }
+    else if (isll ^ isrl) {
+//      std::cerr << "=== -o- ===" << std::endl;
+      ++count_cont;
+
+      if (*e1.p1 < *e2.p2) {
+        // find 'e1' in 'edgeS'
+        retval1.first = edgeS.find(e1);
+        assert(*(retval1.first) == e1);
+        // copy values from iterator to 'e2'
+        e2.sc = (*retval1.first).sc;
+        e2.par = (*retval1.first).par;
+        e2.lower = (*retval1.first).lower;
+        //update s_curve.ends with new edge.
+        if (e2.lower) sc[e2.sc].ends[e2.par].second = e2;
+        else          sc[e2.sc].ends[e2.par].first  = e2;
+        // remove e1, add e2 into 'edgeS'
+        edgeS.erase(retval1.first);
+        retval2 = edgeS.insert(e2);
+        assert(*retval2.first == e2);
+      }
+      else {
+        // find 'e2' in 'edgeS'
+        retval2.first = edgeS.find(e2);
+        assert(*retval2.first == e2);
+        // copy values from iterator to 'e2'
+        e1.sc = (*retval2.first).sc;
+        e1.par = (*retval2.first).par;
+        e1.lower = (*retval2.first).lower;
+        //update s_curve.ends with new endpoint.
+        if (e1.lower) sc[e1.sc].ends[e1.par].second = e1;
+        else          sc[e1.sc].ends[e1.par].first  = e1;
+        // remove e1, add e2 into 'edgeS'
+        edgeS.erase(retval2.first);
+        retval1 = edgeS.insert(e1);
+        assert(*retval1.first == e1);
+      }
+    }
+    else {
+//      std::cerr << "=== o< ===" << std::endl;
+      ++count_open;
+
+      // create a new s_curve
+      s_curve nu_c;
+      nu_c.lsp = (*m).i;
+      e1.sc = sc.size();
+      e1.par = 0;
+      e2.sc = sc.size();
+      e2.par = 0; // opening a new curve means these edges are the first pair.
+
+      // insert both c_edge into y-set
+      retval1 = edgeS.insert(e1);
+      assert(*retval1.first == e1);
+      assert(retval1.second == true);
+      retval2 = edgeS.insert(e2);
+      assert(*retval2.first == e2);
+      assert(retval2.second == true);
+      // check edge above and below the 2 edges in 'y' set for 'rin' value and set for the s_curve
+      if (e1.lower) {
+        C_Edge before, after;
+        bool bef=false;
+        // check if e1 is the lowest edge in 'edgeS'
+        if (retval1.first != edgeS.begin()) {
+          before = *(std::prev(retval1.first));
+          bef = true;
+        }
+        else nu_c.rin = !inner_bool; // UPDATE: inner polygons will have 'rin' as false as default, normal polygons have true.
+        // check if e2 is highest edge in 'edgeS'
+        if (bef && (retval2.first != --edgeS.end())) {
+          after = *(std::next(retval2.first));
+          // if curve has other curves on both sides,
+          // check upper/lower orientation of adjacent s_curves
+          if (before.lower == after.lower) { // 2 inner curves inside an outer curve
+            if (before.lower == false) nu_c.rin = sc[before.sc].rin; // the inner upper curve
+            else nu_c.rin = !sc[before.sc].rin; // the inner lower curve
+          }
+          else if (before.sc == after.sc) nu_c.rin = !sc[before.sc].rin; // one inner curve encapsulated by an outer curve
+          else nu_c.rin = sc[before.sc].rin; // between 2 incidental inner curves
+        }
+        else nu_c.rin = !inner_bool; // UPDATE: same as above
+
+        // set 'l' and 'r' as endpoints of the s_curve
+        std::pair<C_Edge, C_Edge> pp (e2, e1);
+        nu_c.ends.push_back(pp);
+      }
+      else {
+        C_Edge before, after;
+        bool bef=false;
+        // check if e2 is the lowest edge in 'edgeS'
+        if (retval2.first != edgeS.begin()) {
+          before = *(std::prev(retval2.first));
+          bef = true;
+        }
+        else nu_c.rin = !inner_bool; // UPDATE: same as above
+        // check if e1 is highest edge in 'edgeS'
+        if (bef && (retval1.first != --edgeS.end())) {
+          after = *(std::next(retval1.first));
+          // if curve has other curves on both sides,
+          // check upper/lower orientation of adjacent s_curves
+          if (before.lower == after.lower) {
+            if (before.lower == false) nu_c.rin = sc[before.sc].rin;
+            else nu_c.rin = !sc[before.sc].rin;
+          }
+          else if (before.sc == after.sc) nu_c.rin = !sc[before.sc].rin;
+          else nu_c.rin = sc[before.sc].rin;
+        }
+        else assert(nu_c.rin == !inner_bool); // UPDATE: same as above
+
+        // set 'l' and 'r' as endpoints of the s_curve
+        std::pair<C_Edge, C_Edge> pp (e1, e2);
+        nu_c.ends.push_back(pp);
+      }
+
+      // push s_curve to the 'sc' vector.
+      sc.push_back(nu_c);
+    }
+
+//    std::cout << "edges in 'edgeS':" << std::endl;
+//    for (std::set<C_Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+  }
+
+  // Analysis of found curves in 'sc'
+  std::cerr << "opened: " << count_open << ", continued: " << count_cont << ", closed: " << count_close << std::endl;
+  unsigned int valid_curves = 0;
+  for (unsigned int i = 0; i < sc.size(); ++i) {
+    if (sc[i].rin == false) {
+      ++valid_curves;
+      std::cerr << sc[i] << std::endl;
+    }
+  }
+
+  std::cerr << "valid curves to make holes out of: " << valid_curves << std::endl;
+
+
+  return SUCCESS;
 }
 
 // function that accepts a simple polygon and returns a array of a polygon with its holes.
@@ -172,16 +587,16 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
 //  pdisplay(lex, points);
 
   std::cerr << "sph: " << sph[0].size() << ", holes: " << nr_holes << std::endl;
-  pdisplay(polygon, points);
+//  pdisplay(polygon, points);
 
   // go through all the points in lex. order, except the last.  We don't need to process the last vertex.
   for (unsigned int i = 0; i < lex.size()-1; ++i) {
     m = &points[lex[i]];
     // can't use sph, as the polygon is in 'polygon' and I have to traverse that..
-    std::cerr << "lex[i]: " << lex[i] << ", m.v: " << (*m).v << ", next: " << (polygon.size() + lex[i] + 1) % polygon.size() << std::endl;
-    l = &points[polygon[(polygon.size() + lex[i] - 1) % polygon.size()]];
-    r = &points[sph[0][(sph[0].size() + (*m).v + 1) % sph[0].size()]];
-    std::cerr << "m: " << *m << ", l: " << *l << ", r: " << *r << std::endl;
+//    std::cerr << "lex[i]: " << lex[i] << ", m.v: " << (*m).v << ", next: " << (polygon.size() + lex[i] + 1) % polygon.size() << std::endl;
+    l = &points[polygon[(polygon.size() + (*m).v - 1) % polygon.size()]];
+    r = &points[polygon[(polygon.size() + (*m).v + 1) % polygon.size()]];
+//    std::cerr << "m: " << *m << ", l: " << *l << ", r: " << *r << std::endl;
 
     // create 2 new c_edge
     C_Edge e1 = C_Edge (m, l);
@@ -194,14 +609,14 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
       e1.lower = false;
       e2.lower = true;
     }
-    std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+//    std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
 
     // check for 'o<', '-o-', '>o' condition
     (*m < *l) ? isll = false : isll = true;
     (*m < *r) ? isrl = false : isrl = true;
 
     if (isll && isrl) {
-      std::cerr << "=== >o ===" << std::endl;
+//      std::cerr << "=== >o ===" << std::endl;
       ++count_close;
       C_Edge new_end1, new_end2;
       std::pair<C_Edge, C_Edge> nu_p;
@@ -209,8 +624,7 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
 
       // find 'e1' and 'e2' in 'edgeS'
       retval1.first = edgeS.find(e1);
-      std::cerr << "here" << std::endl;
-      std::cerr << "e1: " << e1 << ", retval: " << ((retval1.first == edgeS.end()) ? "not found" : "found") << std::endl;
+//      std::cerr << "e1: " << e1 << ", retval: " << ((retval1.first == edgeS.end()) ? "not found" : "found") << std::endl;
       assert(*(retval1.first) == e1);
       retval2.first = edgeS.find(e2);
       assert(*(retval2.first) == e2);
@@ -218,7 +632,7 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
       // e1 and e2 only have vertex info, copy the rest from iterators
       e1 = *retval1.first;
       e2 = *retval2.first;
-      std::cerr << "first copy: e1: " << e1 << ", e2: " << e2 << std::endl;
+//      std::cerr << "first copy: e1: " << e1 << ", e2: " << e2 << std::endl;
       // continue the old curve ends to 'm', grab the open ends for a new curve
 //      std::cerr << "sc[e1.sc].ends[e1.par].first: " << sc[e1.sc].ends[e1.par].first << std::endl;
 //      std::cerr << "sc[e1.sc].ends[e1.par].second: " << sc[e1.sc].ends[e1.par].second << std::endl;
@@ -277,7 +691,7 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
       assert (retval2.second);
     }
     else if (isll ^ isrl) { // === '-o-' ===
-      std::cerr << "=== -o- ===" << std::endl;
+//      std::cerr << "=== -o- ===" << std::endl;
       ++count_cont;
 
       if (*e1.p1 < *e2.p2) {
@@ -314,7 +728,7 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
       }
     }
     else {
-      std::cerr << "=== o< ===" << std::endl;
+//      std::cerr << "=== o< ===" << std::endl;
       ++count_open;
 
       // create a new s_curve
@@ -392,8 +806,8 @@ enum error holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsign
       sc.push_back(nu_c);
     }
 
-    std::cout << "edges in 'edgeS':" << std::endl;
-    for (std::set<C_Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+//    std::cout << "edges in 'edgeS':" << std::endl;
+//    for (std::set<C_Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
   }
 
   // Analysis of found curves in 'sc'

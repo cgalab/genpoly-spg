@@ -153,7 +153,7 @@ bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& po
 
 // function to fill the 'inner_polygon' vector with the inner polygonal chain of 'polygon' defined by 'ends'
 // This includes the points on the convex hull as they are a candidate to be used to create the hole.
-bool get_inner_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std::vector<unsigned int>& polygon) {
+bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std::vector<unsigned int>& polygon) {
   assert(polygon.size() > 2);
 
   unsigned int a, b, l;
@@ -184,6 +184,28 @@ bool get_inner_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std
     i = (i+it+polygon.size())%polygon.size();
   }
   return true;
+}
+
+// function to fill 'inner_polygon' with the points defined by 'ends' from the polygon in 'inner_polygon' with points in 'points'
+void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsigned int>& inner_polygon, std::vector<Point>& points) {
+  assert(inner_polygon.size() > 2);
+
+  Point p;
+
+  for (unsigned int i = 0; i < inner_polygon.size(); ++i) {
+//    std::cerr << "inner_polygon[i]: " << inner_polygon[i] << std::endl;
+    p = Point(points[inner_polygon[i]]);
+    p.setI(i);
+    p.setV(i);
+    p.setL(0);
+    inner_polygon[i] = i;
+//    std::cerr << p << std::endl;
+    inner_points.push_back(p);
+  }
+//  std::cerr << "points after inner chain:" << std::endl;
+//  pdisplay(inner_points);
+//  std::cerr << "polygon after inner chain:" << std::endl;
+//  pdisplay(inner_polygon, inner_points);
 }
 
 // function that fills the vector 'ch' with indexes of 'points' set that are the points on the convex get_convex_hull
