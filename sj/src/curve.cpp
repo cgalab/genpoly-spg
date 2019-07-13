@@ -227,16 +227,8 @@ enum error inner_holes(std::vector<std::vector<unsigned int>>& sph, std::vector<
     // create 2 new 'E_Edge's
     E_Edge e1 = E_Edge (m, l);
     E_Edge e2 = E_Edge (m, r);
-    if (e1 < e2) {
-      e1.lower = true;
-      e2.lower = false;
-    }
-    else {
-      e1.lower = false;
-      e2.lower = true;
-    }
 
-//    std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+    std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
     // check for 'o<', '-o-', '>o' condition
     (*m < *l) ? isll = false : isll = true;
     (*m < *r) ? isrl = false : isrl = true;
@@ -258,15 +250,39 @@ enum error inner_holes(std::vector<std::vector<unsigned int>>& sph, std::vector<
         old_e = e2;
         new_e = e1;
       }
+
       // find 'old_e' in 'y_set'
       retval1.first = y_set.find(old_e);
       assert(*(retval1.first) == old_e);
+
       // copy values from iterator to 'new_e'
+      old_e.curve_id = (*retval1.first).curve_id;
+      old_e.lower = (*retval1.first).lower;
       new_e.curve_id = (*retval1.first).curve_id;
       new_e.lower = (*retval1.first).lower;
+      std::cerr << "old: " << old_e << ", new: " << new_e << std::endl;
+      //std::cerr << "begin(): " << *(y_set.begin()) << ", end()-1: " << *(std::prev(y_set.end())) << std::endl;
 
-      // old_e needs to be removed, i.e. find the incidental edges and
+      // old_e needs to be removed, i.e. first find the incidental edges and
       // check conditions for 'last' and whether it's still the same curve.
+
+      // I need to find which side (bef or aft) is the "inside"
+      //bool inc_found = false; // NOT NECESSARY.
+      E_Edge inc_e; // incidental edge of the old_e.
+      if (curves[old_e.curve_id].rin) { // if lex. right of the curve is inside
+//std::cerr << "here" << std::endl;
+        // if the edge is a lower end of the curve
+        if (old_e.lower) inc_e = *(std::next(retval1.first));
+        else inc_e = *(std::prev(retval1.first));
+      }
+      else {
+        // I should never have to check if 'old_e' is at y_set.begin() or end()-1
+        if(old_e.lower) inc_e = *(std::prev(retval1.first));
+        else if (old_e.lower) inc_e = *(std::next(retval1.first));
+      }
+      std::cerr << "inc_e: " << inc_e << std::endl;
+
+
 
       // then add new_e and check incidental edges to add to 'first' and 'curve_id'
     }
@@ -280,6 +296,14 @@ enum error inner_holes(std::vector<std::vector<unsigned int>>& sph, std::vector<
       e2.curve_id = curves.size(); // assign curve index to edge.
       e1.first = e2; // assign e2 as first incidental edge of e1
       e2.first = e1; // assign e1 as first incidental edge of e2
+      if (e1 < e2) {
+        e1.lower = true;
+        e2.lower = false;
+      }
+      else {
+        e1.lower = false;
+        e2.lower = true;
+      }
 
       // insert both 'E_Edge's into y_set
       retval1 = y_set.insert(e1);
@@ -291,7 +315,7 @@ enum error inner_holes(std::vector<std::vector<unsigned int>>& sph, std::vector<
 
       new_curve.rin = get_rin(e1, curves, y_set, retval1, retval2, inner_bool);
       std::cerr << "curve: " << new_curve << std::endl;
-
+      curves.push_back(new_curve);
     }
 
     std::cout << "edges in 'y_set':" << std::endl;
