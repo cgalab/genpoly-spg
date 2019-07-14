@@ -151,14 +151,14 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
   }
   return UNEXPECTED_ERROR;
 }
-
+/*
 // Function to return which side of a 'Curve' is 'inner' side when creating a new curve.
 // INPUT:
 //  e                 : One of the 'E_Edge's that make up the new curve, (needs to be 'e1' specifically)
 //  y_set             : the linesweep structure for edges.
 //  retval1, retval2  : iterators to the edges 'e1' and 'e2' in 'y_set'
 //  inner_bool        : boolean for the polygon, whether it's an "inner polygonal chain" (true) or not.
-bool get_rin(E_Edge& e, std::vector<Curve> curves, std::set<E_Edge>& y_set, std::pair<std::set<E_Edge>::iterator, bool>& retval1, std::pair<std::set<E_Edge>::iterator, bool>& retval2, bool inner_bool) {
+bool get_bin(E_Edge& e, std::vector<Curve> curves, std::set<E_Edge>& y_set, std::pair<std::set<E_Edge>::iterator, bool>& retval1, std::pair<std::set<E_Edge>::iterator, bool>& retval2, bool inner_bool) {
   E_Edge before, after;
   bool bef=false;
   if (e.lower) {
@@ -191,12 +191,13 @@ bool get_rin(E_Edge& e, std::vector<Curve> curves, std::set<E_Edge>& y_set, std:
   // if curve has other curves on both sides,
   // check upper/lower orientation of adjacent s_curves
   if (before.lower == after.lower) { // 2 inner curves inside an outer curve
-    if (before.lower == false) return curves[before.curve_id].rin; // the inner upper curve
-    else return !curves[before.curve_id].rin; // the inner lower curve
+    if (before.lower == false) return curves[before.curve_id].bin; // the inner upper curve
+    else return !curves[before.curve_id].bin; // the inner lower curve
   }
-  else if (before.curve_id == after.curve_id) return !curves[before.curve_id].rin; // one inner curve encapsulated by an outer curve
-  else return curves[before.curve_id].rin; // between 2 incidental inner curves
+  else if (before.curve_id == after.curve_id) return !curves[before.curve_id].bin; // one inner curve encapsulated by an outer curve
+  else return curves[before.curve_id].bin; // between 2 incidental inner curves
 }
+*/
 
 enum error inner_holes(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes, bool inner_bool) {
   std::cerr << "sph: " << sph.size() << ", holes: " << nr_holes << ", inner_bool: " << inner_bool << std::endl;
@@ -236,6 +237,37 @@ enum error inner_holes(std::vector<std::vector<unsigned int>>& sph, std::vector<
     if (isll && isrl) {
       std::cerr << "=== >o ===" << std::endl;
       ++count_close;
+
+      // Here we need to make a big decision..
+      // Originally the inner polygonal chains were defined as 'curves' with
+      // a starting point at the first lexicographical point of the curve (i.e. at a 'o<')
+      // So when 2 curves joines, we had the end pairs saved so we can create
+      // a new curve with the open ends of the 2 now joined curves.
+
+      // If instead we create 2 chains from 'o<', I don't need to hunt down the ends.
+      // The chain just has to know if "inner" is above or below it
+      // so instead of 'rin' we can have 'bin' for "is below the chain the inner part"
+      // and we create 2 chains at a 'o<' condition.
+
+      // But.. bin is redundant with 'lower' of an D/E_Edge..
+      // So we can remove 'lower' and just save 'bin' as a part of the new curve class.
+
+      // so we just need to remove the 2 edges from the 'y_set'
+
+      // Why not do any checks?
+      // We do not need to do closest incidental edge check, see below.
+      // We do not need to push it to valid edges to make curves as we know that
+      // as the 2 edges are connecting in a point, it can never create a hole.
+
+      // find 'e1' and 'e2' in 'edgeS'
+      retval1.first = y_set.find(e1);
+//      std::cerr << "e1: " << e1 << ", retval: " << ((retval1.first == edgeS.end()) ? "not found" : "found") << std::endl;
+      assert(*(retval1.first) == e1);
+      retval2.first = y_set.find(e2);
+      assert(*(retval2.first) == e2);
+
+      y_set.erase(e1);
+      y_set.erase(e2);
     }
     else if (isll ^ isrl) {
       std::cerr << "=== -o- ===" << std::endl;
@@ -257,9 +289,7 @@ enum error inner_holes(std::vector<std::vector<unsigned int>>& sph, std::vector<
 
       // copy values from iterator to 'new_e'
       old_e.curve_id = (*retval1.first).curve_id;
-      old_e.lower = (*retval1.first).lower;
       new_e.curve_id = (*retval1.first).curve_id;
-      new_e.lower = (*retval1.first).lower;
       std::cerr << "old: " << old_e << ", new: " << new_e << std::endl;
       //std::cerr << "begin(): " << *(y_set.begin()) << ", end()-1: " << *(std::prev(y_set.end())) << std::endl;
 
@@ -269,41 +299,81 @@ enum error inner_holes(std::vector<std::vector<unsigned int>>& sph, std::vector<
       // I need to find which side (bef or aft) is the "inside"
       //bool inc_found = false; // NOT NECESSARY.
       E_Edge inc_e; // incidental edge of the old_e.
-      if (curves[old_e.curve_id].rin) { // if lex. right of the curve is inside
+      bool closest_below; // whether the edges being compared are above or below the edge; the '<' comparison switches.
+      if (curves[old_e.curve_id].bin) { // if below of the curve is inside
 //std::cerr << "here" << std::endl;
-        // if the edge is a lower end of the curve
-        if (old_e.lower) inc_e = *(std::next(retval1.first));
-        else inc_e = *(std::prev(retval1.first));
+        inc_e = *(std::prev(retval1.first));
+        closest_below = false;
       }
       else {
         // I should never have to check if 'old_e' is at y_set.begin() or end()-1
-        if(old_e.lower) inc_e = *(std::prev(retval1.first));
-        else if (old_e.lower) inc_e = *(std::next(retval1.first));
+        inc_e = *(std::next(retval1.first));
+        closest_below = true; // you're comparing 'old_e' and 'new_e' below 'inc_e' which is closer to 'inc_e'
       }
       std::cerr << "inc_e: " << inc_e << std::endl;
 
+      // Q: Do I have to make sure that incidental edges continuously only see the same curve?
+      // If yes: that means a curve_id could start as an incidental curve,
+      // then another curve_id could pop in, and then the original curve could be assigned as the end.
+      // For really long edges that could happen.
+      // So, the ultimate check would go through each curve pieces' [start, end] that was incidental to an edge,
+      // This could mean that one edge has to be compared to all the others (but all the others had only this to be compared to)
+      // 3 ways we can do it:
+      // 1) each edge has a vector of [start,end] of all the curves it is incidental to, and we can randomly pick one and check validity
+      // 2) grab the first or last curve it sees only (could be a nice first step that leads to 1) )
+      // 3) at each incidental edge, compare the edges, and only the closest edge gets saved as a candidate for a hole intersection.
+      // 3) might guarantee we do not need to check any intersections with the reset of the curve,
+      // but it possibly throws out a lot of possible valid candidates.
+      // As 3) seems the most simple currently, let's implement that.
 
+      // with the old edge, if enough points are between the 2 edges, push oldest to curves.edges[]
+      // with the new edge, it gets the incidental edge as closest edge.
+      // with the incidental edge, compare current closest and new and pick the closer edge.
 
-      // then add new_e and check incidental edges to add to 'first' and 'curve_id'
+      // Do I need to update old_e.closest?
+      // If yes: that means the current incidental edge had an edge between them
+      // which is why it wasn't processed for the old edge
+      // because new edges get the incidental edge as closest, and incidental edges
+      // get old/new comparison as closest, so if the current incidental edge of old edge
+      // wasn't processed with a comparison as a new or incidental edge, the current inc_e
+      // was never the closest edge, so old_edge only needs a length check..
+
+      // process 'old_e'
+      if (get_lower_cyclic_difference((*old_e.p1).v, (*inc_e.p1).v, polygon.size()) > 2) {
+        std::cerr << "pushing old edge to curve, lcd is: " << get_lower_cyclic_difference((*old_e.p1).v, (*inc_e.p1).v, polygon.size()) << std::endl;
+        curves[old_e.curve_id].edges.push_back(old_e);
+      }
+      y_set.erase(retval1.first);
+
+      // process 'new_e'
+      new_e.closest = inc_e;
+
+      // process 'inc_e'
+      if (closest_below) {
+        // closer edge is the larger edge
+        if (inc_e.closest < new_e) inc_e.closest = new_e;
+      }
+      else {
+        // closer edge is the smaller edge
+        if (new_e < inc_e.closest) inc_e.closest = new_e;
+      }
+
+      // then add new_e
+      retval2 = y_set.insert(new_e);
+      assert(*retval2.first == new_e);
+      assert(retval2.second == true);
     }
     else {
       std::cerr << "=== o< ===" << std::endl;
       ++count_open;
 
-      Curve new_curve; // create a new Curve
-      new_curve.lsp = (*m).i; // assign index of first lex. point of curve
+      Curve new_curve1, new_curve2; // create a new Curve
+      new_curve1.lsp = (*m).i; // assign index of first lex. point of curve
+      new_curve2.lsp = (*m).i;
       e1.curve_id = curves.size(); // assign curve index to edge.
-      e2.curve_id = curves.size(); // assign curve index to edge.
-      e1.first = e2; // assign e2 as first incidental edge of e1
-      e2.first = e1; // assign e1 as first incidental edge of e2
-      if (e1 < e2) {
-        e1.lower = true;
-        e2.lower = false;
-      }
-      else {
-        e1.lower = false;
-        e2.lower = true;
-      }
+      e2.curve_id = curves.size()+1; // assign curve index to edge.
+      e1.closest = e2; // assign e2 as closest incidental edge of e1
+      e2.closest = e1; // assign e1 as closest incidental edge of e2
 
       // insert both 'E_Edge's into y_set
       retval1 = y_set.insert(e1);
@@ -313,9 +383,14 @@ enum error inner_holes(std::vector<std::vector<unsigned int>>& sph, std::vector<
       assert(*retval2.first == e2);
       assert(retval2.second == true);
 
-      new_curve.rin = get_rin(e1, curves, y_set, retval1, retval2, inner_bool);
-      std::cerr << "curve: " << new_curve << std::endl;
-      curves.push_back(new_curve);
+      // as we're still dealing with complexities of "in" in regards to curves, it's still dependent on incidental 'bin' values.
+      //new_curve1.bin = get_rin();
+      //new_curve2.bin = get_rin();
+
+      std::cerr << "curve1: " << new_curve1 << std::endl;
+      std::cerr << "curve2: " << new_curve2 << std::endl;
+      curves.push_back(new_curve1);
+      curves.push_back(new_curve2);
     }
 
     std::cout << "edges in 'y_set':" << std::endl;
