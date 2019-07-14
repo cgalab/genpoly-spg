@@ -346,8 +346,6 @@ private:
 protected:
 public:
   unsigned int curve_id; // should be a valid index into a vector of 'Curve's
-  bool lower;       // whether the edge is an upper curve end or lower curve end.
-                    // This can tell you which side 'inner' part of the curve is.
 
   D_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0;}
   D_Edge(Point *P1, Point *P2) {
@@ -375,14 +373,15 @@ class E_Edge: public D_Edge {
 private:
 protected:
 public:
-  D_Edge first; // first incidental edge this edge sees.
-  D_Edge last;  // last incidental edge this edge sees, both first and last must have same 'curve_id'.
+  //D_Edge first; // first incidental edge this edge sees.
+  //D_Edge last;  // last incidental edge this edge sees, both first and last must have same 'curve_id'.
+  D_Edge closest; // of all the incidental edges, this was the closest.
 
-  E_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0;lower=false;}
+  E_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0;}
   E_Edge(Point *P1, Point *P2) {
 		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
 		else {p1=P2; p2=P1;}
-    l_idx=0;curve_id=0;lower=false;
+    l_idx=0;curve_id=0;
 	}
 
   // to print out an edge, gives the format:
@@ -390,7 +389,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const E_Edge& e) {
 		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
     << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
-    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id << "," << (e.lower ? "L" : "U") << "]";
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id << "]";
 		return os;
 	}
 };
