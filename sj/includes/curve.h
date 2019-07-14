@@ -13,15 +13,15 @@ public:
 
   // if the left side of the curves with this lex. start. point is "outside" the
   // simple polygon and thus right side is "inside", this boolean is 'true'.
-  bool rin;
+  bool bin;
 
   // a vector of 'D_Edge's (derived from C_Edge) that contain what edges are valid candidates.
   std::vector<E_Edge> edges;
 
-  Curve() {lsp=0;rin=true;}
+  Curve() {lsp=0;bin=true;}
 
   friend std::ostream& operator<<(std::ostream& os, const Curve& c) {
-		os << "lsp: " << c.lsp << ", rin: " << (c.rin ? "true" : "false") << "\n";
+		os << "lsp: " << c.lsp << ", bin: " << (c.bin ? "true" : "false") << "\n";
     os << "valid edges: \n";
     for (unsigned int i = 0; i < c.edges.size();++i) os << c.edges[i] << "\n";
 		return os;
