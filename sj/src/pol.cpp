@@ -7,6 +7,9 @@
 #include "rand.h"
 #include "pol.h"
 
+std::random_device rd;  // global variables for random engine from "rand.h"
+std::mt19937 mt (rd()); // global variables for random engine from "rand.h"
+
 double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   double Area = 0;
   Point prev, p;
@@ -83,6 +86,7 @@ unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigne
     diff1 = a-b;
     diff2 = b+cycle-a;
   }
+
   if (diff1 < diff2) return diff1;
   else return diff2;
 }
@@ -149,6 +153,31 @@ bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& po
     i = (i + it + polygon.size())%polygon.size();
   }
   return false;
+}
+
+// Temporary 'slow' function to fill 'hole' vector with the hole given by E_Edge 'h_e' in polygon 'polygon'
+void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& h_e, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  assert(hole.size() == 0);
+  assert(new_polygon.size() == 0);
+
+  bool inside = false;
+  Edge e1 = Edge(h_e.p1, h_e.p2);
+  Edge e2 = Edge(h_e.closest.p1, h_e.closest.p2);
+
+  Point p, prev;
+  prev = points[polygon[polygon.size()-1]];
+  for (unsigned int i = 0; i < polygon.size(); ++i) {
+//    std::cerr << "i: " << i << ", polygon[i]: " << polygon[i] << ", point: " << points[polygon[i]] << std::endl;
+    p = points[polygon[i]];
+    Edge i_e = Edge (&prev, &p);
+
+    if (i_e == e1 || i_e == e2) inside = !inside;
+
+    if (inside) hole.push_back(p.i);
+    else new_polygon.push_back(p.i);
+    prev = p;
+  }
+
 }
 
 // function to fill the 'inner_polygon' vector with the inner polygonal chain of 'polygon' defined by 'ends'

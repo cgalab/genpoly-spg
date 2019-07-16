@@ -15,15 +15,15 @@ public:
   // simple polygon and thus right side is "inside", this boolean is 'true'.
   bool bin;
 
-  // a vector of 'D_Edge's (derived from C_Edge) that contain what edges are valid candidates.
+  // a vector of 'E_Edge's (derived from D_Edge) that contain what edges are valid candidates.
   std::vector<E_Edge> edges;
 
-  Curve() {lsp=0;bin=true;}
+  Curve() {lsp=0;bin=true;edges.clear();}
 
   friend std::ostream& operator<<(std::ostream& os, const Curve& c) {
 		os << "lsp: " << c.lsp << ", bin: " << (c.bin ? "true" : "false") << "\n";
     os << "valid edges: \n";
-    for (unsigned int i = 0; i < c.edges.size();++i) os << c.edges[i] << "\n";
+    for (unsigned int i = 0; i < c.edges.size();++i) os << c.edges[i] << ", closest: " << c.edges[i].closest << "\n";
 		return os;
 	}
 };
@@ -54,7 +54,7 @@ public:
 
 enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
 enum error holes (std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes);
-enum error inner_holes (std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes, bool inner_bool);
+E_Edge inner_holes (std::vector<unsigned int>& polygon, std::vector<Point>& points);
 enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int randseed, unsigned int nr_holes);
 
 #endif

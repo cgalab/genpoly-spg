@@ -364,7 +364,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const D_Edge& e) {
 		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
     << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
-    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [" << e.curve_id << "]";
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id << "]";
 		return os;
 	}
 };
@@ -383,6 +383,10 @@ public:
 		else {p1=P2; p2=P1;}
     l_idx=0;curve_id=0;
 	}
+  E_Edge(D_Edge e) {
+    p1 = e.p1; p2 = e.p2;
+    l_idx = e.l_idx; curve_id = e.curve_id;
+  }
 
   // to print out an edge, gives the format:
   // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]

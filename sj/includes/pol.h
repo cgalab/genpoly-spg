@@ -27,6 +27,7 @@ unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigne
 unsigned int get_chain_length(Ends ends, unsigned int cycle);
 bool is_2D(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& h_e, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std::vector<unsigned int>& polygon);
 void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsigned int>& inner_polygon, std::vector<Point>& points);
 void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, bool enforceCCWOrder=false);
