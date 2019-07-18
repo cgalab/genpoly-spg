@@ -389,7 +389,16 @@ bool Vertex::checkSurroundingPolygonAdvanced(){
 	double angle, area;
 	Vertex *first, *second, *start;
 	Triangle *t;
-
+    
+    // TODO:
+    // the ordering by angle just yields the surrounding polygon if the triangulation
+    // is still correct. But if the triangulation is already broken, the vertices
+    // of the surrounding polygon may not any more be angular ordered.
+    // Maybe a better way to get the polygonal chain of the surrounding polygon:
+    // start with one triangle, insert the left and the the right vertex into the
+    // queue, get the other triangle of the edge between the vertex and the right
+    // vertex, insert the right vertex of this triangle and go on to the next
+    // till all triangles are done and we reach the first vertex again
 	for(auto& i : edges){
 		angle = (*i).getAngle(this);
 
