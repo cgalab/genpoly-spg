@@ -316,7 +316,7 @@ public:
 class C_Edge: public Edge {
 public:
   unsigned int sc;  // index into a vector of s_curves
-  unsigned int par;  // index into a vector of std::pair<uint, uint> of curve ends.
+  unsigned int par;  // index into a vector of < std::pair<uint, uint> > of curve ends.
   bool lower;       // whether the edge is an upper curve end or lower curve end.
 
   C_Edge() {p1=NULL; p2=NULL;l_idx=0; sc=0; par=0;}
@@ -341,7 +341,64 @@ public:
 	}
 };
 
-void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+class D_Edge: public Edge {
+private:
+protected:
+public:
+  unsigned int curve_id; // should be a valid index into a vector of 'Curve's
+
+  D_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0;}
+  D_Edge(Point *P1, Point *P2) {
+		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
+		else {p1=P2; p2=P1;}
+    l_idx=0;curve_id=0;
+	}
+
+  friend bool operator==(const D_Edge lhs, const D_Edge rhs) {
+		if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
+		else return false;
+	}
+
+  // to print out an edge, gives the format:
+  // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
+	friend std::ostream& operator<<(std::ostream& os, const D_Edge& e) {
+		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
+    << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id << "]";
+		return os;
+	}
+};
+
+class E_Edge: public D_Edge {
+private:
+protected:
+public:
+  //D_Edge first; // first incidental edge this edge sees.
+  //D_Edge last;  // last incidental edge this edge sees, both first and last must have same 'curve_id'.
+  D_Edge closest; // of all the incidental edges, this was the closest.
+
+  E_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0;}
+  E_Edge(Point *P1, Point *P2) {
+		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
+		else {p1=P2; p2=P1;}
+    l_idx=0;curve_id=0;
+	}
+  E_Edge(D_Edge e) {
+    p1 = e.p1; p2 = e.p2;
+    l_idx = e.l_idx; curve_id = e.curve_id;
+  }
+
+  // to print out an edge, gives the format:
+  // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
+	friend std::ostream& operator<<(std::ostream& os, const E_Edge& e) {
+		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
+    << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id << "]";
+		return os;
+	}
+};
+
+
 void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points, unsigned int randseed);
 double reldist(const Point& pa, const Point& pb, const Point& p);
 double reldist(const Edge& e, const Point& p);

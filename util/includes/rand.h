@@ -3,8 +3,8 @@
 
 #include <random>
 
-std::random_device rd;  // global variables for random engine
-std::mt19937 mt (rd());
+extern std::random_device rd;  // global variables for random engine
+extern std::mt19937 mt;
 
 // Min and Max are inclusive elements
 #define UniformRandomI(C, Min, Max)                   \

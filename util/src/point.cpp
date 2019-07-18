@@ -51,27 +51,6 @@ void pdisplay (const std::vector<unsigned int>& ind, const std::vector<Point>& p
     std::cerr << p[ind[i]] << std::endl;
   }
 }
-/*
-// function to get the orientation of b relative to a in a cyclic chain, such as a polygon
-void is_left(unsigned int a, unsigned int b, unsigned int cycle) {
-
-}
-*/
-// function to get the distance from one index to another in a cyclic index, such as a polygon
-unsigned int get_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle) {
-  int diff1, diff2;
-
-  if (a < b) {
-    diff1 = b-a;
-    diff2 = a+cycle-b;
-  }
-  else {
-    diff1 = a-b;
-    diff2 = b+cycle-a;
-  }
-  if (diff1 < diff2) return diff1;
-  else return diff2;
-}
 
 double getXmin(const std::vector<Point>& p) {
   double xmin = INFINITY;

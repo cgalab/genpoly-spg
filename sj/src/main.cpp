@@ -105,6 +105,8 @@ int main(int argc, char *argv[]) {
       }
       else if (alg == A_HOLE) {
          returnValue = holes2(sph, points, randseed, nr_holes);
+         //returnValue = opt2(polygon, points, randseed);
+         //returnValue = holes(sph, polygon, points, nr_holes);
       }
 
       if (returnValue == SUCCESS) {
