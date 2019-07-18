@@ -1,16 +1,23 @@
 #include "vertex.h"
 
 // Constructors
-Vertex::Vertex(double X, double Y) : x(X), y(Y), rectangleVertex(false), id(n), toPrev(NULL), toNext(NULL), T(NULL) {
+Vertex::Vertex(double X, double Y) : x(X), y(Y), rectangleVertex(false), id(n), reserveID(2 * n), toPrev(NULL), toNext(NULL), T(NULL) {
 	n++;
 }
 
-Vertex::Vertex(double X, double Y, bool RV) : x(X), y(Y), rectangleVertex(RV), id(n), toPrev(NULL), toNext(NULL), T(NULL) {
+Vertex::Vertex(double X, double Y, bool RV) : x(X), y(Y), rectangleVertex(RV), id(n), reserveID(2 * n), toPrev(NULL), toNext(NULL), T(NULL) {
 	n++;
 }
 
 Vertex* Vertex::getTranslated(double dx, double dy){
-	return new Vertex(x + dx, y + dy);
+	Vertex *v = new Vertex(x + dx, y + dy);
+
+	// a just copied version of the vertex has the same reserveID as the vertex, but a really translated one has an by
+	// 1 incremented reserveID
+	if(dx != 0 || dy != 0)
+		(*v).setRID(2 * id + 1);
+	
+	return v;
 }
 
 // Getter
@@ -28,6 +35,10 @@ std::list<Triangle*> Vertex::getTriangles(){
 
 unsigned long long Vertex::getID(){
 	return id;
+}
+
+unsigned long long Vertex::getRID(){
+	return reserveID;
 }
 
 TEdge* Vertex::getEdgeTo(Vertex* toV){
@@ -158,6 +169,10 @@ void Vertex::setToNext(TEdge* e){
 
 void Vertex::setID(unsigned long long n){
 	id = n;
+}
+
+void Vertex::setRID(unsigned long long rid){
+	reserveID = rid;
 }
 
 // Remover
@@ -362,120 +377,8 @@ void Vertex::checkSurroundingPolygonFast(){
 	}
 }
 
-/*
-void Vertex::checkSurroundingPolygonAdvanced(){
-	std::vector<TEdge*> surEdges;
-	double maxX = -1000, vx, maxY = -1000, vy;
-	Vertex* dummyVertex;
-	TEdge* dummyEdge;
-	int countE = 0, countV = 0;
-	IntersectionType intersection;
-
-
-	surEdges = getSurroundingEdges();
-
-	// find max x value
-	for(auto& i : surEdges){
-		vx = (*(*i).getV0()).getX();
-		if(vx > maxX)
-			maxX = vx;
-
-		vx = (*(*i).getV1()).getX();
-		if(vx > maxX)
-			maxX = vx;
-	}
-
-	if(x > maxX){
-		printf("Triangulation error 0: fromV is outside of its surrounding polygon\n");
-		printSurroundingTriangulation("env.graphml");
-		exit(6);
-	}
-
-	maxX = maxX + 10;
-
-	dummyVertex = new Vertex(maxX, y);
-	dummyEdge = new TEdge(this, dummyVertex);
-
-	for(auto& i : surEdges){
-		intersection = checkIntersection_new(dummyEdge, i, 0.000000001);
-		if(intersection == IntersectionType::EDGE)
-			countE++;
-		if(intersection == IntersectionType::VERTEX)
-			countV++;
-	}
-
-	delete dummyEdge;
-	delete dummyVertex;
-
-	if(countV != 0)
-		return;
-
-	if(countE % 2 != 0)
-		return;
-
-	// find max y value
-	for(auto& i : surEdges){
-		vy = (*(*i).getV0()).getY();
-		if(vy > maxY)
-			maxY = vy;
-
-		vy = (*(*i).getV1()).getY();
-		if(vy > maxY)
-			maxY = vy;
-	}
-
-	if(y > maxY){
-		printf("Triangulation error 0: fromV is outside of its surrounding polygon\n");
-		printSurroundingTriangulation("env.graphml");
-		exit(6);
-	}
-
-	maxY = maxY + 10;
-
-	dummyVertex = new Vertex(x, maxY);
-	dummyEdge = new TEdge(this, dummyVertex);
-
-	countE = 0;
-	countV = 0;
-
-	for(auto& i : surEdges){
-		intersection = checkIntersection_new(dummyEdge, i, 0.000000001);
-		if(intersection == IntersectionType::EDGE)
-			countE++;
-		if(intersection == IntersectionType::VERTEX)
-			countV++;
-	}
-
-	
-
-	if(countV != 0){
-		delete dummyEdge;
-		delete dummyVertex;
-
-		return;
-	}
-
-	if(countE % 2 == 0){
-		printf("Triangulation error 1: %llu is outside of its surrounding polygon\n", id);
-		printf("countE: %d countV: %d \n", countE, countV);
-
-		for(auto& i : triangles){
-			(*i).print();
-			printf("area: %.20f\n", (*i).signedArea());
-		}
-
-		(*T).addVertex(dummyVertex);
-		(*T).addEdge(dummyEdge);
-		printSurroundingTriangulation("env.graphml");
-		(*T).print("debug.graphml");
-		exit(6);
-	}
-
-	delete dummyEdge;
-	delete dummyVertex;
-}*/
-
-void Vertex::checkSurroundingPolygonAdvanced(){
+// return true if everything is all right
+bool Vertex::checkSurroundingPolygonAdvanced(){
 	std::priority_queue<std::pair<double, Vertex*>> Q;
 	std::pair<double, Vertex*> p;
 	double angle, area;
@@ -508,6 +411,7 @@ void Vertex::checkSurroundingPolygonAdvanced(){
 
 			printf("Triangulation error: %llu is outside of its surrounding polygon\n", id);
 			print();
+			printf("\n");
 
 			while(!Q.empty()){
 				Q.pop();
@@ -553,7 +457,7 @@ void Vertex::checkSurroundingPolygonAdvanced(){
 
 			printf("area: %.30f \n", area);
 
-			exit(6);
+			return false;
 		}
 
 	}
@@ -568,6 +472,11 @@ void Vertex::checkSurroundingPolygonAdvanced(){
 	if(signbit(area) == 0){
 		printf("Triangulation error: %llu is outside of its surrounding polygon\n", id);
 		print();
+		printf("\n");
+
+		while(!Q.empty()){
+			Q.pop();
+		}
 
 		for(auto& i : edges){
 			angle = (*i).getAngle(this);
@@ -575,16 +484,44 @@ void Vertex::checkSurroundingPolygonAdvanced(){
 			Q.push(std::make_pair(angle, (*i).getOtherVertex(this)));
 		}
 
+		p = Q.top();
+		start = p.second;
+		second = start;
+		Q.pop();
+
+		printf("at angle %.10f:\n", p.first / M_PI * 180);
+		(*p.second).print();
+
 		while(!Q.empty()){
 			p = Q.top();
 			Q.pop();
 
 			printf("at angle %.10f:\n", p.first / M_PI * 180);
 			(*p.second).print();
+
+			first = second;
+			second = p.second;
+
+			t = new Triangle(first, second, this);
+			area = (*t).signedArea();
+			delete t;
+
+			printf("area: %.30f \n", area);
 		}
 
-		exit(6);
+		first = second;
+		second = start;
+
+		t = new Triangle(first, second, this);
+		area = (*t).signedArea();
+		delete t;
+
+		printf("area: %.30f \n", area);
+
+		return false;
 	}
+
+	return true;
 }
 
 // Destructor

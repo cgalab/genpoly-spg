@@ -12,7 +12,7 @@ Insertion::Insertion(Triangulation* t, int index) : T(t), i(index) {
 bool Insertion::lengthControll(){
 	double l = (*e).length();
 
-	if(l < 0.001)
+	if(l < 0.0000001)
 		return false;
 
 	return true;

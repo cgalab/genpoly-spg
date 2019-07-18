@@ -6,12 +6,16 @@
 #include "statistics.h"
 #include "settings.h"
 #include "randomGenerator.h"
+#include "predicates.h"
+
 
 int main(){
 	Settings settings;
 	Triangulation* T;
 	int translations, performed;
 	RandomGenerator generator;
+
+	exactinit();
 
 	readSettings(settings);
 
@@ -31,7 +35,6 @@ int main(){
 
 	growPolygon(settings, generator, T);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", settings.getTargetSize(), settings.elapsedTime());
-	(*T).renumberVertices();
 
 	(*T).check();
 

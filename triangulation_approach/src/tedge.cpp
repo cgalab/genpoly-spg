@@ -103,7 +103,7 @@ void TEdge::setTriangle(Triangle* t){
 		exit(4);
 	}
 
-	if((*t0).getID() == (*t1).getID()){
+	if(t0 != NULL && t1 != NULL && (*t0).getID() == (*t1).getID()){
 		printf("The edge from vertex %llu to vertex %llu has already registered the same triangle! \n", (*v0).getID(), (*v1).getID());
 		exit(5);
 	}	
@@ -276,7 +276,7 @@ unsigned long long TEdge::n = 0;
 
 // Other non-member stuff
 // from steinthors Edge class
-double reldist(TEdge* e, Vertex* p){
+/*double reldist(TEdge* e, Vertex* p){
 	Vertex* pa = (*e).getV0();
 	Vertex* pb = (*e).getV1();
 	double px = (*p).getX();
@@ -372,13 +372,14 @@ enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1){
 		else 
 			return IntersectionType::NONE;
 	}
-}
+}*/
 
-enum IntersectionType checkIntersection_new(TEdge* e0, TEdge* e1, const double epsilon){
+enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1, const double epsilon){
 	Vertex *v00, *v01, *v10, *v11;
 	double area00, area01, area10, area11;
 	double x00, x01, x10, x11, y00, y01, y10, y11;
 	double l0, l1, d0x, d0y, d1x, d1y;
+	Triangle *t;
 
 	// get vertices
 	v00 = (*e0).getV0();
@@ -391,35 +392,43 @@ enum IntersectionType checkIntersection_new(TEdge* e0, TEdge* e1, const double e
 	l1 = (*e1).length();
 
 	// triangle areas containing edge e0
-	area00 = signedArea(v00, v01, v10);
-	area01 = signedArea(v00, v01, v11);
+	t = new Triangle(v00, v01, v10);
+	area00 = (*t).signedArea();
+	delete t;
+	t = new Triangle(v00, v01, v11);
+	area01 = (*t).signedArea();
+	delete t;
 	// triangle areas containing edge e1
-	area10 = signedArea(v10, v11, v00);
-	area11 = signedArea(v10, v11, v01);
+	t = new Triangle(v10, v11, v00);
+	area10 = (*t).signedArea();
+	delete t;
+	t = new Triangle(v10, v11, v01);
+	area11 = (*t).signedArea();
+	delete t;
 
 	// check whether v10 lays on e0
-	if(fabs(area00) / l0 <= epsilon){
+	if(fabs(area00) <= epsilon){
 		// check whether v10 lays between the vertices of e0
 		if((*e0).isBetween(v10))
 			return IntersectionType::VERTEX;
 	}
 
 	// check whether v11 lays on e0
-	if(fabs(area01) / l0 <= epsilon){
+	if(fabs(area01) <= epsilon){
 		// check whether v10 lays between the vertices of e0
 		if((*e0).isBetween(v11))
 			return IntersectionType::VERTEX;
 	}
 
 	// check whether v00 lays on e1
-	if(fabs(area10) / l1 <= epsilon){
+	if(fabs(area10) <= epsilon){
 		// check whether v10 lays between the vertices of e0
 		if((*e1).isBetween(v00))
 			return IntersectionType::VERTEX;
 	}
 
 	// check whether v01 lays on e1
-	if(fabs(area11) / l1 <= epsilon){
+	if(fabs(area11) <= epsilon){
 		// check whether v10 lays between the vertices of e0
 		if((*e1).isBetween(v01))
 			return IntersectionType::VERTEX;
@@ -457,33 +466,17 @@ Vertex* getIntersectionPoint(Vertex* s0, Vertex* e0, Vertex* s1, Vertex* e1){
 	// compute cross product of the translation vectors, if d0 x d1 = 0 then there is no single intersection point
 	crossD = crossProduct2D(d0x, d0y, d1x, d1y);
 
-	if(crossD == 0) return NULL;
+	if(crossD == 0)
+		return NULL;
 
 	// compute time of intersection
 	t = crossProduct2D(s1x - s0x, s1y - s0y, d1x, d1y) / crossD;
 	s = - crossProduct2D(s0x - s1x, s0y - s1y, d0x, d0y) / crossD; // don't understand why we need a minus here :O
 
-	if(0 <= t && t <= 1 && 0 <= s && s <= 1) return new Vertex(s0x + t * d0x, s0y + t * d0y);
+	if(0 <= t && t <= 1 && 0 <= s && s <= 1)
+		return new Vertex(s0x + t * d0x, s0y + t * d0y);
 
 	return NULL;
-}
-
-double signedArea(Vertex* v0, Vertex* v1, Vertex* v2){
-	double area;
-	double ax, ay, bx, by, cx, cy;
-
-	ax = (*v0).getX();
-	ay = (*v0).getY();
-
-	bx = (*v1).getX();
-	by = (*v1).getY();
-
-	cx = (*v2).getX();
-	cy = (*v2).getY();
-
-	area = 0.5 * (ay * (cx - bx) + by * (ax - cx) + cy * (bx - ax));
-
-	return area;
 }
 
 double crossProduct2D(double x0, double y0, double x1, double y1){

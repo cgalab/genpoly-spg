@@ -36,6 +36,12 @@ private:
 	static unsigned long long deleted;
 	unsigned long long id;
 
+	// is used for computing signed areas as by copying a vertex the id can not be copied
+	// for uncopied vertices the reserveID is 2 * id, for copied vertices it can be 2 * id or 2 * id + 1
+	unsigned long long reserveID;
+
+	void setRID(unsigned long long rid);
+
 	void getEnvironment(std::map<int, TEdge*> &es, std::map<int, Vertex*> &vs, int depth);
 public:
 
@@ -49,6 +55,7 @@ public:
 	double getY();
 	std::list<Triangle*> getTriangles();
 	unsigned long long getID();
+	unsigned long long getRID();
 	TEdge* getEdgeTo(Vertex* v);
 	std::vector<TEdge*> getSurroundingEdges();
 	std::list<TEdge*> getPolygonEdges();
@@ -85,7 +92,7 @@ public:
 	bool check();
 	void stretch(double factor);
 	void checkSurroundingPolygonFast();
-	void checkSurroundingPolygonAdvanced();
+	bool checkSurroundingPolygonAdvanced();
 	
 	// Destructor
 	~Vertex();

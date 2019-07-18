@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include "predicates.h"
 
 #ifndef __TRIANGLE_H_
 #define __TRIANGLE_H_
@@ -28,6 +29,8 @@ private:
 	unsigned long long id;
 	static unsigned long long n;
 
+	//double det(Vertex *V0, Vertex *V1, Vertex *V2);
+
 public:
 	
 	// Constructors
@@ -52,6 +55,7 @@ public:
 	// Others
 	bool contains(Vertex* v);
 	void enqueue();
+	void dequeue();
 	bool isEnqueued();
 	double calculateCollapseTime(Vertex* moving, double dx, double dy);
 	double signedArea();

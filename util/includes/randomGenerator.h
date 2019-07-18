@@ -11,7 +11,7 @@ class RandomGenerator{
 	public:
 		RandomGenerator(){
 			unsigned int seed = rd();
-			//seed = 2811168520;
+			seed = 812493984;
 
 			printf("seed: %u \n", seed);
 
@@ -24,7 +24,7 @@ class RandomGenerator{
 
 		double getTranslationNormal(double mean, double stddev){
 			double trans;
-			double limit = 0.001;
+			double limit = 0.0000001;
 
 			trans = std::normal_distribution<double> {mean, stddev} (generator);	
 

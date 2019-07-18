@@ -69,6 +69,7 @@ void Triangulation::removeEdge(TEdge* e){
 void Triangulation::print(const char* filename){
 	FILE* f;
 	TEdge* e;
+	int scale = 5000;
 
 	f = fopen(filename, "w");
 
@@ -78,13 +79,13 @@ void Triangulation::print(const char* filename){
 
 	fprintf(f, "<nodes>\n");
 
-	(*Rectangle0).print(f, 0);
-	(*Rectangle1).print(f, 0);
-	(*Rectangle2).print(f, 0);
-	(*Rectangle3).print(f, 0);
+	(*Rectangle0).print(f, scale);
+	(*Rectangle1).print(f, scale);
+	(*Rectangle2).print(f, scale);
+	(*Rectangle3).print(f, scale);
 
 	for(auto const& i : vertices){
-		if(i != NULL) (*i).print(f, 0);
+		if(i != NULL) (*i).print(f, scale);
 	}
 	fprintf(f, "</nodes>\n");
 

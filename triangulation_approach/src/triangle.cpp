@@ -289,11 +289,15 @@ void Triangle::enqueue(){
 	enqueued = true;
 }
 
+void Triangle::dequeue(){
+	enqueued = false;
+}
+
 bool Triangle::isEnqueued(){
 	return enqueued;
 }
 
-double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
+/*double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	double ax, ay, bx, by, cx, cy;
 	double numerator, denominator;
 
@@ -324,25 +328,114 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	denominator = dx * (ay - by) + dy * (bx - ax);
 
 	return numerator / denominator;
+}*/
+
+double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
+	double ax, ay, bx, by, cx, cy;
+	double areaOld, areaNew, portion;
+
+	if(!contains(moving))
+		return -1;
+
+	cx = (*moving).getX();
+	cy = (*moving).getY();
+
+	if((*moving).getID() == (*v0).getID()){
+		ax = (*v1).getX();
+		ay = (*v1).getY();
+		bx = (*v2).getX();
+		by = (*v2).getY();
+	}else if((*moving).getID() == (*v1).getID()){
+		ax = (*v0).getX();
+		ay = (*v0).getY();
+		bx = (*v2).getX();
+		by = (*v2).getY();
+	}else{
+		ax = (*v0).getX();
+		ay = (*v0).getY();
+		bx = (*v1).getX();
+		by = (*v1).getY();
+	}
+
+	// shift a to zero
+	bx = bx - ax;
+	by = by - ay;
+
+	cx = cx - ax;
+	cy = cy - ay;
+
+	dx = cx + dx;
+	dy = cy + dy;
+
+	areaOld = cx * by - cy * bx;
+	areaNew = bx * dy - by * dx;
+
+	portion = areaNew / areaOld;
+
+	return 1 / (portion + 1);
 }
 
 double Triangle::signedArea(){
+	point p0, p1, p2;
+
+	p0.x = (*v0).getX();
+	p0.y = (*v0).getY();
+
+	p1.x = (*v1).getX();
+	p1.y = (*v1).getY();
+
+	p2.x = (*v2).getX();
+	p2.y = (*v2).getY();
+
+	return orient2d(p0, p1, p2);
+}
+
+/*double Triangle::signedArea(){
+	unsigned long long id0, id1, id2;
 	double area;
-	double ax, ay, bx, by, cx, cy;
 
-	ax = (*v0).getX();
-	ay = (*v0).getY();
+	id0 = (*v0).getRID();
+	id1 = (*v1).getRID();
+	id2 = (*v2).getRID();
 
-	bx = (*v1).getX();
-	by = (*v1).getY();
-
-	cx = (*v2).getX();
-	cy = (*v2).getY();
-
-	area = 0.5 * (ay * (cx - bx) + by * (ax - cx) + cy * (bx - ax));
+	if(id0 < id1 && id0 < id2){
+		if(id1 < id2)
+			area = det(v0, v1, v2);
+		else
+			area = - det(v0, v2, v1);
+	}else if(id1 < id0 && id1 < id2){
+		if(id0 < id2)
+			area = - det(v1, v0, v2);
+		else
+			area = det(v1, v2, v0);
+	}else{
+		if(id0 < id1)
+			area = det(v2, v0, v1);
+		else
+			area = - det(v2, v1, v0);
+	}
 
 	return area;
 }
+
+// assert: V0.id < V1.id < V2.id
+double Triangle::det(Vertex *V0, Vertex *V1, Vertex *V2){
+	double area;
+	double ax, ay, bx, by, cx, cy;
+
+	ax = (*V0).getX();
+	ay = (*V0).getY();
+
+	bx = (*V1).getX();
+	by = (*V1).getY();
+
+	cx = (*V2).getX();
+	cy = (*V2).getY();
+
+	area = ay * (cx - bx) + by * (ax - cx) + cy * (bx - ax);
+
+	return area;
+}*/
 
 // Destructor
 Triangle::~Triangle(){

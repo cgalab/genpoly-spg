@@ -16,6 +16,8 @@
 
 enum class Executed {FULL, REJECTED, PARTIAL};
 
+enum class TranslationType {DEFAULT, SPLIT_PART_1, SPLIT_PART_2};
+
 class Translation{
 
 private:
@@ -39,22 +41,24 @@ private:
 
 	double actualTime;
 	bool split;
+	TranslationType type;
 	EventQueue Q;
-	const double epsilon = 0.0001;
-	const double epsilonInt = 0.00000001;
+	const double epsilon = 0.00001;
+	const double epsilonInt = 0.000000000001; // 10⁻¹²
 
 	Settings settings;
 
 	bool generateInitialQueue();
 
-	double signedArea(Vertex* v0, Vertex* v1, Vertex* v2);
-
 	bool insideQuadrilateral(Vertex* v);
 
 	bool checkEdge(Vertex* fromV, TEdge* newE);
 
+	void repairEnd();
+
 public:
 	Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY);
+	Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY, TranslationType tp);
 
 	bool checkOverroll();
 

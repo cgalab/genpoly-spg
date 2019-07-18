@@ -133,12 +133,16 @@ void EventQueue::print(){
 
 EventQueue::~EventQueue(){
 	struct Element *prev, *e;
+	Triangle *t;
 
 	e = first;
 
 	while(e != NULL){
 		prev = e;
 		e = prev -> next;
+
+		t = prev -> triangle;
+		(*t).dequeue();
 
 		free(prev);
 	}

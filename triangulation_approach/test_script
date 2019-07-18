@@ -10,8 +10,10 @@ code3=0
 code4=0
 code5=0
 code6=0
+code7=0
+code8=0
 
-for i in {1..20}
+for i in {1..50}
 do
 	echo try nr. $i
 
@@ -42,6 +44,12 @@ do
 	elif [ $rv -eq 6 ]
 	then
 		code6=$((code6+1))
+	elif [ $rv -eq 7 ]
+	then
+		code7=$((code7+1))
+	elif [ $rv -eq 8 ]
+	then
+		code8=$((code8+1))
 	fi
 done
 
@@ -52,3 +60,5 @@ echo Exit code 3: $code3
 echo Exit code 4: $code4
 echo Exit code 5: $code5
 echo Exit code 6: $code6
+echo Exit code 7: $code7
+echo Exit code 8: $code8
