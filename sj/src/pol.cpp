@@ -10,6 +10,302 @@
 std::random_device rd;  // global variables for random engine from "rand.h"
 std::mt19937 mt (rd()); // global variables for random engine from "rand.h"
 
+// swaps the order of points of the edge in the polygon,
+// i.e. v values of the points in the edge 'e' and order of points in 'polygon'.
+void polSwap(Edge e, std::vector<unsigned int>& polygon) {
+  unsigned int temp = (*e.p1).v;
+  (*e.p1).v = (*e.p2).v;
+  (*e.p2).v = temp;
+  polygon[(*e.p1).v] = (*e.p1).i;
+  polygon[(*e.p2).v] = (*e.p2).i;
+}
+void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon) {
+  unsigned int temp = (*a).v;
+  (*a).v = (*b).v;
+  (*b).v = temp;
+  polygon[(*a).v] = (*a).i;
+  polygon[(*b).v] = (*b).i;
+}
+
+// function that takes 3 points: a, b, and c that are already assumed collinear
+// a is assumed to be the lowest point lexicographically as well as the middle point in polygon of the 3 points.
+// swaps the points in the polygon so that the lex. order of the points is also the vertex order of the points.
+bool collSwap (Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  Point *lo, *mid, *hi;
+  //Edge e1, e2;
+  //bool be1=false, be2=false;
+
+  assert(*a < *b);
+  assert(*a < *c);
+
+  // sort the points into lo/mid/hi lex order.
+  if ((*a < *b) && (*a < *c)) {
+    lo = a;
+    if (*b < *c) {
+      mid = b;
+      hi = c;
+    } else {
+      mid = c;
+      hi = b;
+    }
+  }
+
+//  std::cerr << "erasing because of 3PC:";
+  // treating the case when vertices are at indices [0,1,...,size()-1]
+  if (((*lo).v == 0) && (((*mid).v + (*hi).v) == polygon.size())) {
+    eraseVertexFromSet(b, edgeS, polygon, points);
+    eraseVertexFromSet(c, edgeS, polygon, points);
+    polSwap(lo, mid, polygon);
+    if ((*lo).v == 1) polSwap(lo, hi, polygon);
+    return true;
+  }
+  //  std::cerr << "lo: " << *lo << ", mid: " << *mid << ", hi: " << *hi << std::endl;
+  else if (((*mid).v == 0) && (((*lo).v + (*hi).v) == polygon.size())) {
+    if ((*hi).v == 1) return false;
+    else {
+      eraseVertexFromSet(b, edgeS, polygon, points);
+      eraseVertexFromSet(c, edgeS, polygon, points);
+      polSwap(lo, hi, polygon);
+    }
+    return true;
+  }
+  else if (((*hi).v == 0) && (((*lo).v + (*mid).v) == polygon.size())) {
+    eraseVertexFromSet(b, edgeS, polygon, points);
+    eraseVertexFromSet(c, edgeS, polygon, points);
+    polSwap(mid, hi, polygon);
+    if ((*lo).v == 1) polSwap(lo, hi, polygon);
+    return true;
+  }
+
+  //treating the case when vertices are at indices [0,...,size()-2,size()-1]
+  if (((*lo).v == 0) && (((*mid).v + (*hi).v) == 2*polygon.size()-3)) {
+    eraseVertexFromSet(b, edgeS, polygon, points);
+    eraseVertexFromSet(c, edgeS, polygon, points);
+    polSwap(lo, hi, polygon);
+    if ((*lo).v == polygon.size()-1) polSwap(lo, mid, polygon);
+    return true;
+  }
+  else if (((*mid).v == 0) && (((*lo).v + (*hi).v) == 2*polygon.size()-3)) {
+    eraseVertexFromSet(b, edgeS, polygon, points);
+    eraseVertexFromSet(c, edgeS, polygon, points);
+    polSwap(mid, hi, polygon);
+    if ((*lo).v == polygon.size()-1) polSwap(lo, mid, polygon);
+    return true;
+  }
+  else if (((*hi).v == 0) && ((*lo).v+(*mid).v == 2*polygon.size()-3)) {
+    if (((*lo).v == polygon.size()-2) && ((*mid).v == polygon.size()-1)) {
+      return false; // no erasing of edges as no change in order was made.
+    }
+    if ((*lo).v == polygon.size()-1) {
+      eraseVertexFromSet(b, edgeS, polygon, points);
+      eraseVertexFromSet(c, edgeS, polygon, points);
+      polSwap(lo, mid, polygon);
+      return true;
+    }
+  }
+  else {
+    eraseVertexFromSet(b, edgeS, polygon, points);
+    eraseVertexFromSet(c, edgeS, polygon, points);
+    if ((*hi).v < (*mid).v) {polSwap(mid, hi, polygon);}
+    if ((*mid).v < (*lo).v) {polSwap(lo, mid, polygon);}
+    if ((*hi).v < (*mid).v) {polSwap(mid, hi, polygon);}
+    return true;
+  }
+  std::cerr << "Unexpected error in 3P collSwap!" << std::endl;
+  std::cerr << "lo: " << *lo << ", mid: " << *mid << ", hi: " << *hi << std::endl;
+  return false;
+}
+
+// Function that takes 2 edges, e1 and e2 that both intersect and are collinear
+bool collSwap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  bool d1, d2;
+  double rd1 = reldist(e1, *e2.p1);
+  double rd2 = reldist(e1, *e2.p2);
+
+  if (((*e1.p1).v == 0) && (*e1.p2).v == polygon.size()-1)
+    d1 = false;
+  else if (((*e1.p2).v == 0) && (*e1.p1).v == polygon.size()-1)
+    d1 = true;
+  else {
+    d1 = ((int)(*e1.p1).v - (int)(*e1.p2).v) < 0; // true  means edge order in poly is : [...p1p2...]
+  }
+
+  if (((*e2.p1).v == 0) && (*e2.p2).v == polygon.size()-1)
+    d2 = false;
+  else if (((*e2.p2).v == 0) && (*e2.p1).v == polygon.size()-1)
+    d2 = true;
+  else {
+    d2 = ((int)(*e2.p1).v - (int)(*e2.p2).v) < 0; // false means edge order in poly is : [...p2p1...]
+  }
+
+  if ((rd1 > 1) && (rd2 > 1)) return false;
+  if ((rd1 < 0) && (rd2 < 0)) return false;
+  //std::cerr << "erasing because of 4PC: e1: " << e1 << ", e2: " << e2 << std::endl;
+  if ( d1 &&  d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 1)) {
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    polSwap(e2.p1, e1.p2, polygon);
+    return true;
+  }
+  if ( d1 && !d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 1)) {
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e1.p2, e2.p2, polygon);
+    return true;
+  }
+  if (!d1 &&  d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 1)) {
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e1.p1, e2.p1, polygon);
+    return true;
+  }
+  if (!d1 && !d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e1.p1, e2.p1, polygon);
+    polSwap(e1.p2, e2.p2, polygon);
+    return true;
+  }
+
+  if ( d1 &&  d2 && (rd1 < 0) && (rd2 > 0) && (rd2 < 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    polSwap(e1.p1, e2.p2, polygon);
+    return true;
+  }
+  if (!d1 &&  d2 && (rd1 < 0) && (rd2 > 0) && (rd2 < 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e2.p2, e1.p2, polygon);
+    return true;
+  }
+  if ( d1 && !d2 && (rd1 < 0) && (rd2 > 0) && (rd2 < 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e2.p1, e1.p1, polygon);
+    return true;
+  }
+  if (!d1 && !d2 && (rd1 < 0) && (rd2 > 0) && (rd2 < 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e2.p1, e1.p1, polygon);
+    polSwap(e2.p2, e1.p2, polygon);
+    return true;
+  }
+
+  if ( d1 &&  d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 0) && (rd2 < 1)) {
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e2.p2, e1.p2, polygon);
+    return true;
+  }
+  if ( d1 && !d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 0) && (rd2 < 1)) {
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    polSwap(e2.p1, e1.p2, polygon);
+    return true;
+  }
+  if (!d1 &&  d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 0) && (rd2 < 1)) {
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e1.p1, e2.p1, polygon);
+    polSwap(e2.p2, e1.p2, polygon);
+    return true;
+  }
+  if (!d1 && !d2 && (rd1 > 0) && (rd1 < 1) && (rd2 > 0) && (rd2 < 1)) {
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    polSwap(e2.p1, e1.p2, polygon);
+    polSwap(e1.p1, e2.p1, polygon);
+    return true;
+  }
+
+  if ( d1 &&  d2 && (rd1 < 0) && (rd2 > 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e1.p2, e2.p2, polygon);
+    return true;
+  }
+  if (!d1 &&  d2 && (rd1 < 0) && (rd2 > 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    polSwap(e1.p1, e2.p2, polygon);
+    return true;
+  }
+  if ( d1 && !d2 && (rd1 < 0) && (rd2 > 1)) {
+    if ((*e1.p1).v + (*e1.p2).v < (*e2.p1).v + (*e2.p2).v) {
+      eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+      eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+      eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+      eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+      polSwap(e1.p1, e2.p1, polygon);
+      polSwap(e1.p2, e1.p1, polygon);
+      polSwap(e1.p2, e2.p2, polygon);
+      return true;
+    } else {
+      eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+      eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+      eraseVertexFromSet(e1.p2, edgeS, polygon, points);
+      eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+      polSwap(e1.p1, e2.p2, polygon);
+      polSwap(e1.p1, e1.p2, polygon);
+      polSwap(e2.p1, e2.p2, polygon);
+      return true;
+    }
+
+  }
+  if (!d1 && !d2 && (rd1 < 0) && (rd2 > 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p2, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    polSwap(e1.p1, e2.p2, polygon);
+    polSwap(e2.p1, e1.p1, polygon);
+    return true;
+  }
+  if (!d1 &&  d2 && (rd1 < 0) && (rd2 == 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    polSwap(e2.p1, e1.p1, polygon);
+    polSwap(e2.p1, e2.p2, polygon);
+    return true;
+  }
+  if ( d1 && !d2 && (rd1 < 0) && (rd2 == 1)) {
+    eraseVertexFromSet(e1.p1, edgeS, polygon, points);
+    eraseVertexFromSet(e2.p1, edgeS, polygon, points);
+    polSwap(e1.p1, e2.p1, polygon);
+    polSwap(e2.p1, e2.p2, polygon);
+    return true;
+  }
+
+  std::cerr << "ERROR in 4P collSwap: fallthrough!" << std::endl;
+  std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
+  std::cerr << "edge collswap: rd1: " << rd1 << ", rd2: " << rd2 << std::endl;
+  std::cerr << "d1: " << ((d1) ? "true" : "false") << ", d2: " << ((d2) ? "true" : "false") << std::endl;
+  return true;
+}
+
 double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   double Area = 0;
   Point prev, p;

@@ -1,12 +1,73 @@
 #include <iostream> // for endl
 #include <vector>
 #include <list>
+#include <set>
 #include <algorithm>
 #include <math.h> // for signbit
 #include <assert.h>
 #include "basicDefinitions.h"
 #include "edge.h"
 #include "point.h"
+
+
+// function to remove edges from 'edgeS' up to and including value of 'index'
+void decrementEdges(unsigned int index, std::set<Edge>& edgeS) {
+	std::set<Edge>::iterator it = edgeS.begin();
+	while (it != edgeS.end()) {
+		if ((*it).l_idx >= index) it = edgeS.erase(it);
+		else ++it;
+	}
+}
+
+// this function should be used to guarantee removal of an edge from the 'edgeS' set.
+bool eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS) {
+  std::set<Edge>::iterator it;
+
+//  std::cerr << "edge being erased: " << e << std::endl;
+  it = edgeS.find(e);
+
+  if (it != edgeS.end()) {
+    assert(e == *it);
+    edgeS.erase(it);
+    return true;
+  } else {
+    // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
+    // this is technically a crutch because there's a problem with the comparator function.
+    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) {
+      if (*it == e) {
+        edgeS.erase(it);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// function to remove edges connected to a single vertex from 'edgeS' set.
+// does not care whether it finds an edge or not, just attempts to remove it.
+void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  unsigned int before, after;
+  Point *p2, *p3;
+  Edge e1, e2;
+
+  before = ((*p1).v + points.size() -1) % points.size();
+  after =  ((*p1).v + points.size() +1) % points.size();
+
+  p2 = &points[polygon[before]];
+  p3 = &points[polygon[after]];
+
+  if (*p2 < *p3) {
+    e1 = Edge(p1, p2);
+    e2 = Edge(p1, p3);
+  } else {
+    e1 = Edge(p1, p3);
+    e2 = Edge(p1, p2);
+  }
+
+//  std::cerr << "erasing vertexes: e1: " << e1 << ", e2: " << e2 << std::endl;
+  edgeS.erase(e1); // even if I get the wrong iterator for e1, it's an iterator to e2, so ok to be removed.
+  edgeS.erase(e2); // same should be fine with e2.
+}
 
 // returns relative distance of a point to an edge.
 double reldist(const Point& pa, const Point& pb, const Point& p) {

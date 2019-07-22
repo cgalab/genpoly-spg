@@ -3,6 +3,7 @@
 
 #include <iostream> // for endl
 #include <vector>
+#include <set>
 #include <iomanip>      // std::setprecision
 #include "basicDefinitions.h"
 #include "point.h"
@@ -398,8 +399,10 @@ public:
 	}
 };
 
-
-void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points, unsigned int randseed);
+void decrementEdges(unsigned int index, std::set<Edge>& edgeS);
+bool eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS);
+void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+//void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points, unsigned int randseed);
 double reldist(const Point& pa, const Point& pb, const Point& p);
 double reldist(const Edge& e, const Point& p);
 double det(const Edge e, const Point p);
