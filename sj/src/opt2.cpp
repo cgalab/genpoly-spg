@@ -180,7 +180,6 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
 	unsigned int index=0, before, after;
-  unsigned int max_so_far, max_count, old_index;
 	//double d_idx;
   //compObject comp;
 	//std::pair<enum edge_t, std::set<Edge, setComp>::iterator> val1, val2;
@@ -195,24 +194,11 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 
   do {
     loop = false;
-    max_so_far = 0;
-    old_index = 0;
-    max_count = 0;
     index = 0;
     decrementEdges(index, edgeS);
 
     //std::cerr << "New loop" << std::endl;
   	while (index < points.size()) {
-
-  		if (max_so_far < index) {
-        max_so_far = index;
-        max_count = 0;
-      }
-      if ((index == 0) && (old_index == max_so_far)) {
-        ++max_count;
-        if (max_count > 20)
-          std::cerr << "max: " << max_so_far << ", counter: " << max_count << std::endl;
-      }
 
 //      std::cerr << std::endl << "index: " << index << std::endl;
   		val1.first = E_VALID; val2.first = E_VALID;
@@ -299,8 +285,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 
       //std::cout << "edges in 'edgeS':" << std::endl;
       //for (std::set<Edge, setComp>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
-  		index++;
-      old_index = index;
+  		++index;
   	}
   } while (loop);
 
