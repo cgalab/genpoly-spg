@@ -3,6 +3,7 @@
 
 #include <iostream> // for endl
 #include <vector>
+#include <cmath>
 #include "basicDefinitions.h"
 
 class Point {
@@ -51,11 +52,18 @@ public:
     else return false;
   }
 
+  bool operator == (const Point& s) const {
+//    std::cerr << "x comp: abs(" << x << " - " << s.x << ") = " <<  fabs(x - s.x) << std::endl;
+//    std::cerr << "y comp: abs(" << y << " - " << s.y << ") = " <<  fabs(y - s.y) << std::endl;
+    if ((fabs(x - s.x) < EPSILON) && (fabs(y - s.y)) < EPSILON) return true;
+    else return false;
+  }
+/*
   friend bool operator==(const Point & lhs, const Point & rhs) {
     if ((abs(lhs.x - rhs.x) < EPSILON) && (abs(lhs.y - rhs.y)) < EPSILON) return true;
     else return false;
   }
-
+*/
   friend bool operator!=(const Point & lhs, const Point & rhs) {
     if ((abs(lhs.x - rhs.x) > EPSILON) || (abs(lhs.y - rhs.y)) > EPSILON) return true;
     else return false;

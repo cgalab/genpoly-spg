@@ -4,6 +4,7 @@
 #include <set>
 #include <algorithm>
 #include <math.h> // for signbit
+#include <cmath> // for fabs
 #include <assert.h>
 #include "basicDefinitions.h"
 #include "edge.h"
@@ -72,7 +73,7 @@ void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned i
 // returns relative distance of a point to an edge.
 double reldist(const Point& pa, const Point& pb, const Point& p) {
 	double ans = ((p.x-pa.x)*(pb.x-pa.x) + (p.y-pa.y)*(pb.y-pa.y)) / ((pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y));
-	return (abs(ans) < EPSILON) ? 0 : ans;
+	return (fabs(ans) < EPSILON) ? 0 : ans;
 }
 double reldist(const Edge& e, const Point& p) {
 	return reldist(*e.p1, *e.p2, p);
@@ -83,7 +84,7 @@ double det(const Edge e, const Point p) {
 	const Point& pa = *e.p1;
 	const Point& pb = *e.p2;
 	double ans = (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
-	return (abs(ans) < EPSILON) ? 0 : ans;
+	return (fabs(ans) < EPSILON) ? 0 : ans;
 }
 
 double dety(const Edge e, const Point p) {
@@ -95,7 +96,7 @@ double dety(const Edge e, const Point p) {
 	}
 
 	double ans = (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
-	return (abs(ans) < EPSILON) ? 0 : ans;
+	return (fabs(ans) < EPSILON) ? 0 : ans;
 }
 
 Yval getYatX(const Edge& e, const double x) {
@@ -115,7 +116,7 @@ Yval getYatX(const Edge& e, const double x) {
 		double slope = (P2.y-P1.y) / (P2.x-P1.x);
 		double bias = P1.y - slope*P1.x;
 		double val = slope * x + bias;
-		if (abs(val) < EPSILON) y.set(0);
+		if (fabs(val) < EPSILON) y.set(0);
 		else y.set(val);
 		y.setX(x);
 	}
@@ -186,7 +187,7 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		else if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) ) col = true;
 
 		// 2opt function only cares about collinearity when it's 4 point and the points intercept in some way.
-		if ((abs(det_a)+abs(det_b)+abs(det_c)+abs(det_d) == 0) && col) return IS_4P_COLLINEAR;
+		if ((fabs(det_a)+fabs(det_b)+fabs(det_c)+fabs(det_d) == 0) && col) return IS_4P_COLLINEAR;
 		else if (same11) return IS_VERTEX11;
 		else if (same12) return IS_VERTEX12;
 		else if (same21) return IS_VERTEX21;

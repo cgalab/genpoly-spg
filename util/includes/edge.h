@@ -268,11 +268,18 @@ public:
     return false;
   }
 
+  bool operator == (const Edge e) const {
+//    std::cerr << "lhs: " << *this << ", rhs: " << e << std::endl;
+		if ((*p1 == *e.p1) && (*p2 == *e.p2)) return true;
+		else return false;
+  }
+/*
 	friend bool operator==(const Edge lhs, const Edge rhs) {
+    std::cerr << "lhs: " << lhs << ", rhs: " << rhs << std::endl;
 		if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
 		else return false;
 	}
-
+*/
   friend bool operator!=(const Edge lhs, const Edge rhs) {
 		if ((*lhs.p1 != *rhs.p1) || (*lhs.p2 != *rhs.p2)) return true;
 		else return false;

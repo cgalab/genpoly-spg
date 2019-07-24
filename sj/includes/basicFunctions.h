@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <math.h> // for signbit
+#include <cmath>  // for fabs
 #include <iostream> // for endl
 #include "point.h"
 #include "edge.h"
@@ -50,7 +51,7 @@ public:
       det2 = det(lhs, *rhs.p2);
 
       // 4P coll.
-      if ((abs(det1) < EPSILON) && (abs(det2) < EPSILON)) {
+      if ((fabs(det1) < EPSILON) && (fabs(det2) < EPSILON)) {
 //        std::cerr << "4Pc: " << std::endl;
         if (*lhs.p1 == *rhs.p1) return *lhs.p2 < *rhs.p2;
 //        std::cerr << ((*lhs.p1 < *rhs.p1) ? "true" : "false") << std::endl;
