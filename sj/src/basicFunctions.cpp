@@ -1,5 +1,6 @@
 #include <vector>
 #include "opt2.h"
+#include "opt2a.h"
 #include "curve.h"
 
 enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg, unsigned int randseed) {
@@ -13,6 +14,9 @@ enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       break;
     case A_2OPT:
       returnValue = opt2(polygon, points, randseed);
+      break;
+    case A_2OPT_A:
+      returnValue = opt2a(polygon, points, randseed);
       break;
     case A_CURVE:
       returnValue = curve(polygon, points, randseed);

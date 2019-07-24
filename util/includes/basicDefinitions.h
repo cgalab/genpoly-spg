@@ -33,6 +33,7 @@ enum alg_t {
   A_UNDEFINED,
   A_IDLE,
   A_2OPT,
+  A_2OPT_A,
   A_CURVE,
   A_HOLE
 };
