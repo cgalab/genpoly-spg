@@ -90,6 +90,8 @@ public:
     }
 };
 
+bool isPolLeft(Point *p1, Point *p2);
+bool isPol1Left(Point *p1, Point *p2, unsigned int cycle);
 void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points);
 void fill_lex(std::vector<unsigned int>& lex, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void pdisplay (const std::vector< Point >& vy);

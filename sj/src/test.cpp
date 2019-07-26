@@ -307,6 +307,29 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   std::cerr << std:: endl;
 
+  std::cerr << "=== isPol1Left test ===" << std::endl;
+
+  p1.setV(29);
+  p2.setV(0);
+  std::cerr << "is p1 1 left of p2 in pol; should be true: " << ((isPol1Left(&p1, &p2, 30) ? "true" : "false")) << std::endl;
+  p1.setV(0);
+  p2.setV(29);
+  std::cerr << "is p1 1 left of p2 in pol; should be false: " << ((isPol1Left(&p1, &p2, 30) ? "true" : "false")) << std::endl;
+  p1.setV(0);
+  p2.setV(1);
+  std::cerr << "is p1 1 left of p2 in pol; should be true: " << ((isPol1Left(&p1, &p2, 30) ? "true" : "false")) << std::endl;
+  p1.setV(1);
+  p2.setV(0);
+  std::cerr << "is p1 1 left of p2 in pol; should be false: " << ((isPol1Left(&p1, &p2, 30) ? "true" : "false")) << std::endl;
+  p1.setV(5);
+  p2.setV(6);
+  std::cerr << "is p1 1 left of p2 in pol; should be true: " << ((isPol1Left(&p1, &p2, 30) ? "true" : "false")) << std::endl;
+  p1.setV(5);
+  p2.setV(7);
+  std::cerr << "is p1 1 left of p2 in pol; should be false: " << ((isPol1Left(&p1, &p2, 30) ? "true" : "false")) << std::endl;
+
+  std::cerr << std:: endl;
+
   std::cerr << "=== Edge class >< comparison tests ===" << std::endl;
 
   // reuse the points variables from above, p1 & p2 are connected to e1 and p3 & p4 are connected to e2

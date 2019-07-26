@@ -1,6 +1,8 @@
 #include <vector>
 #include <iostream> // for std::endl
 #include <assert.h>
+#include <algorithm>    // std::sort
+#include <deque>
 #include "point.h"
 #include "edge.h"
 #include "basicFunctions.h"
@@ -27,93 +29,93 @@ void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon) {
   polygon[(*b).v] = (*b).i;
 }
 
-// function that takes 3 points: a, b, and c that are already assumed collinear
-// a is assumed to be the lowest point lexicographically as well as the middle point in polygon of the 3 points.
-// swaps the points in the polygon so that the lex. order of the points is also the vertex order of the points.
+// function that takes 3 points: a, b, and c that are already assumed collinear and fixes the collinearity
+// by sorting them in the polygon such that they are no longer intersecting.
 bool collSwap (Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
-  Point *lo, *mid, *hi;
-  //Edge e1, e2;
-  //bool be1=false, be2=false;
-
-  assert(*a < *b);
-  assert(*a < *c);
+  bool retval = false;
 
   // sort the points into lo/mid/hi lex order.
-  if ((*a < *b) && (*a < *c)) {
-    lo = a;
-    if (*b < *c) {
-      mid = b;
-      hi = c;
-    } else {
-      mid = c;
-      hi = b;
+  std::deque<Point*> lex {a, b, c};
+  sort(lex.begin(), lex.end(),
+    [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
+/*
+  for (unsigned int i = 0; i < lex.size();++i) {
+    std::cerr << "lex[" << i << "]: " << *lex[i] << std::endl;
+  }
+*/
+  // sort the points into lo/mid/hi polygon order.
+  std::deque<Point*> vert {a, b, c};
+  sort(vert.begin(), vert.end(),
+    [&](Point * p1, Point * p2) -> bool {return isPol1Left(p1, p2, polygon.size());});
+
+  unsigned int arr[] = {(*vert[0]).v, (*vert[1]).v, (*vert[2]).v};
+/*
+  for (unsigned int i = 0; i < 3;++i) {
+    std::cerr << "arr[" << i << "]: " << arr[i] << std::endl;
+  }
+*/
+  // we can erase the edges connected to lower and upper vertices from 'edgeS' set.
+  eraseVertexFromSet(vert[0], edgeS, polygon, points);
+  eraseVertexFromSet(vert[2], edgeS, polygon, points);
+
+  // then assign the proper 'vert' order to the 'lex' ordered points
+  for (unsigned int i = 0; i < lex.size(); ++i) {
+    if (*lex[i] != *vert[i]) {
+      (*lex[i]).v = arr[i];
+      polygon[(*lex[i]).v] = (*lex[i]).i;
+      retval = true;
     }
   }
 
-//  std::cerr << "erasing because of 3PC:";
-  // treating the case when vertices are at indices [0,1,...,size()-1]
-  if (((*lo).v == 0) && (((*mid).v + (*hi).v) == polygon.size())) {
-    eraseVertexFromSet(b, edgeS, polygon, points);
-    eraseVertexFromSet(c, edgeS, polygon, points);
-    polSwap(lo, mid, polygon);
-    if ((*lo).v == 1) polSwap(lo, hi, polygon);
-    return true;
-  }
-  //  std::cerr << "lo: " << *lo << ", mid: " << *mid << ", hi: " << *hi << std::endl;
-  else if (((*mid).v == 0) && (((*lo).v + (*hi).v) == polygon.size())) {
-    if ((*hi).v == 1) return false;
-    else {
-      eraseVertexFromSet(b, edgeS, polygon, points);
-      eraseVertexFromSet(c, edgeS, polygon, points);
-      polSwap(lo, hi, polygon);
-    }
-    return true;
-  }
-  else if (((*hi).v == 0) && (((*lo).v + (*mid).v) == polygon.size())) {
-    eraseVertexFromSet(b, edgeS, polygon, points);
-    eraseVertexFromSet(c, edgeS, polygon, points);
-    polSwap(mid, hi, polygon);
-    if ((*lo).v == 1) polSwap(lo, hi, polygon);
-    return true;
+  return retval;
+}
+
+// 'b' version for the reversing version of A_2OPT_B
+// function that takes 3 points: a, b, and c that are already assumed collinear and fixes the collinearity
+// by sorting them in the polygon such that they are no longer intersecting.
+bool collSwapb (Point *a, Point *b, Point *c, unsigned int& lowest_index, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  bool retval = false;
+
+  // sort the points into lo/mid/hi lex order.
+  std::deque<Point*> lex {a, b, c};
+  sort(lex.begin(), lex.end(),
+    [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
+
+  for (unsigned int i = 0; i < lex.size();++i) {
+    std::cerr << "lex[" << i << "]: " << *lex[i] << std::endl;
   }
 
-  //treating the case when vertices are at indices [0,...,size()-2,size()-1]
-  if (((*lo).v == 0) && (((*mid).v + (*hi).v) == 2*polygon.size()-3)) {
-    eraseVertexFromSet(b, edgeS, polygon, points);
-    eraseVertexFromSet(c, edgeS, polygon, points);
-    polSwap(lo, hi, polygon);
-    if ((*lo).v == polygon.size()-1) polSwap(lo, mid, polygon);
-    return true;
+  // sort the points into lo/mid/hi polygon order.
+  std::deque<Point*> vert {a, b, c};
+  sort(vert.begin(), vert.end(),
+    [&](Point * p1, Point * p2) -> bool {return isPol1Left(p1, p2, polygon.size());});
+
+  unsigned int arr[] = {(*vert[0]).v, (*vert[1]).v, (*vert[2]).v};
+
+  for (unsigned int i = 0; i < 3;++i) {
+    std::cerr << "arr[" << i << "]: " << arr[i] << std::endl;
   }
-  else if (((*mid).v == 0) && (((*lo).v + (*hi).v) == 2*polygon.size()-3)) {
-    eraseVertexFromSet(b, edgeS, polygon, points);
-    eraseVertexFromSet(c, edgeS, polygon, points);
-    polSwap(mid, hi, polygon);
-    if ((*lo).v == polygon.size()-1) polSwap(lo, mid, polygon);
-    return true;
-  }
-  else if (((*hi).v == 0) && ((*lo).v+(*mid).v == 2*polygon.size()-3)) {
-    if (((*lo).v == polygon.size()-2) && ((*mid).v == polygon.size()-1)) {
-      return false; // no erasing of edges as no change in order was made.
-    }
-    if ((*lo).v == polygon.size()-1) {
-      eraseVertexFromSet(b, edgeS, polygon, points);
-      eraseVertexFromSet(c, edgeS, polygon, points);
-      polSwap(lo, mid, polygon);
-      return true;
+
+  // we can erase the edges connected to lower and upper vertices from 'edgeS' set.
+  eraseVertexFromSet(vert[0], edgeS, polygon, points);
+  eraseVertexFromSet(vert[2], edgeS, polygon, points);
+
+  // then assign the proper 'vert' order to the 'lex' ordered points
+  for (unsigned int i = 0; i < lex.size(); ++i) {
+    if (*lex[i] != *vert[i]) {
+      (*lex[i]).v = arr[i];
+      polygon[(*lex[i]).v] = (*lex[i]).i;
+      retval = true;
+      if (arr[i] < lowest_index) lowest_index = arr[i];
     }
   }
-  else {
-    eraseVertexFromSet(b, edgeS, polygon, points);
-    eraseVertexFromSet(c, edgeS, polygon, points);
-    if ((*hi).v < (*mid).v) {polSwap(mid, hi, polygon);}
-    if ((*mid).v < (*lo).v) {polSwap(lo, mid, polygon);}
-    if ((*hi).v < (*mid).v) {polSwap(mid, hi, polygon);}
-    return true;
+
+  for (unsigned int i = 0; i < lex.size();++i) {
+    std::cerr << "lex[" << i << "]: " << *lex[i] << std::endl;
+    std::cerr << "point: " << points[polygon[(*lex[i]).v]] << std::endl;
   }
-  std::cerr << "Unexpected error in 3P collSwap!" << std::endl;
-  std::cerr << "lo: " << *lo << ", mid: " << *mid << ", hi: " << *hi << std::endl;
-  return false;
+
+  return retval;
 }
 
 // Function that takes 2 edges, e1 and e2 that both intersect and are collinear

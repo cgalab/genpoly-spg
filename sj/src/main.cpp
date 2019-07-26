@@ -16,6 +16,7 @@
 #include "pol.h"
 #include "opt2.h"
 #include "opt2a.h"
+#include "opt2b.h"
 #include "curve.h"
 
 int main(int argc, char *argv[]) {
@@ -107,6 +108,9 @@ int main(int argc, char *argv[]) {
       else if (alg == A_2OPT_A) {
         returnValue = opt2a(polygon, points, randseed);
       }
+      else if (alg == A_2OPT_B) {
+        returnValue = opt2b(polygon, points, randseed);
+      }
       else if (alg == A_HOLE) {
          returnValue = holes2(sph, points, randseed, nr_holes);
          //returnValue = opt2(polygon, points, randseed);
@@ -119,6 +123,7 @@ int main(int argc, char *argv[]) {
           switch(alg) {
             case A_2OPT:
             case A_2OPT_A:
+            case A_2OPT_B:
               returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
               break;
             case A_HOLE:

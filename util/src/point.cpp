@@ -6,6 +6,32 @@
 #include "point.h" // for Point class
 
 
+// check for if p1 is a 'left' vertex compared to p2
+bool isPolLeft(Point *p1, Point *p2) {
+  if ((*p1).v == 0) {
+    if ((*p2).v != 1) return false;
+    else return true;
+  }
+  if ((*p2).v == 0) {
+    if ((*p1).v == 1) return false;
+    else return true;
+  }
+  else
+    return (*p1).v < (*p2).v;
+}
+
+// check for if p1 is the incidental 'left' vertex compared to p2
+bool isPol1Left(Point *p1, Point *p2, unsigned int cycle) {
+  if ((*p1).v == 0) {
+    if ((*p2).v == 1) return true;
+  }
+  if ((*p2).v == 0) {
+    if ((*p1).v == cycle-1) return true;
+  }
+  if (((*p1).v < (*p2).v) && (abs((int)((*p1).v - (*p2).v)) == 1)) return true;
+  return false;
+}
+
 // Input:
 // lex:     vector for unsigned integers referencing indexes in point set 'points'
 // points:  vector of 'Point'

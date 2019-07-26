@@ -34,6 +34,7 @@ enum alg_t {
   A_IDLE,
   A_2OPT,
   A_2OPT_A,
+  A_2OPT_B,
   A_CURVE,
   A_HOLE
 };
