@@ -24,7 +24,8 @@ public:
 void polSwap(Edge e, std::vector<unsigned int>& polygon);
 void polSwap(Point* a, Point* b, std::vector<unsigned int>& polygon);
 bool collSwap (Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
-bool collSwapb (Point *a, Point *b, Point *c, unsigned int& lowest_index, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+bool coll4Swap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool collSwap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool is_ascending(I_Edge e);
