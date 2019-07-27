@@ -7,17 +7,29 @@
 
 
 // check for if p1 is a 'left' vertex compared to p2
-bool isPolLeft(Point *p1, Point *p2) {
-  if ((*p1).v == 0) {
-    if ((*p2).v != 1) return false;
+bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
+  unsigned int lo, hi, left, right;
+  bool p1_left;
+  if ((*p1).v < (*p2).v) {
+    lo = (*p1).v;
+    hi = (*p2).v;
+    p1_left = true;
+  } else {
+    lo = (*p2).v;
+    hi = (*p1).v;
+    p1_left = false;
+  }
+  left = lo;
+  right = lo + cycle;
+
+  if (hi - left < right - hi) {
+    if (p1_left) return false;
     else return true;
   }
-  if ((*p2).v == 0) {
-    if ((*p1).v == 1) return false;
-    else return true;
+  else {
+    if (p1_left) return true;
+    else return false;
   }
-  else
-    return (*p1).v < (*p2).v;
 }
 
 // check for if p1 is the incidental 'left' vertex compared to p2

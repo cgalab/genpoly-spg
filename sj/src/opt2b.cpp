@@ -2,6 +2,7 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <deque>
 #include <utility> // for std::pair
 #include <stdlib.h>  // for abs
 #include <algorithm>    // std::sort
@@ -22,6 +23,15 @@ void update_lowest_index(Edge e1, Edge e2, unsigned int& lowest_index) {
   else {
     if (e2.getLowerLexIdx() < lowest_index) lowest_index = e2.getLowerLexIdx();
   }
+}
+
+// function to update the 'lowest_index' variable if one of the points
+// is lex. lower than current value in 'lowest_index'
+void update_lowest_index(Point *a, Point *b, Point *c, unsigned int& lowest_index) {
+  std::deque<Point*> lex {a, b, c};
+  sort(lex.begin(), lex.end(),
+    [](Point* p1, Point* p2) -> bool {return (*p1).l < (*p2).l;});
+  if ((*lex[0]).l < lowest_index) lowest_index = (*lex[0]).l;
 }
 
 // function to purely remove edge 'e' from 'edgeS' if it's in there and check the 'before' and 'after' edges for intersection.
@@ -57,7 +67,7 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, std::set<Edg
       isval = checkIntersection(before, after);
       if (isval == IS_4P_COLLINEAR) {
         //std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
-        if (collSwap(before, after, edgeS, polygon, points)) {
+        if (coll4Swap(before, after, edgeS, polygon, points)) {
           //std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
           valid = E_SKIP;
           update_lowest_index(before, after, lowest_index);
@@ -129,19 +139,19 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     if (bef) {
       isval = checkIntersection(e, before);
       if (isval < IS_TRUE) {
-        std::cerr << "No intersection with before." << std::endl;
+//        std::cerr << "No intersection with before." << std::endl;
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {
-        std::cerr << "4P collinearity between:" << e << " and before: " << before << std::endl;
-        if (collSwap(e, before, edgeS, polygon, points)) {
-          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
+//        std::cerr << "4P collinearity between:" << e << " and before: " << before << std::endl;
+        if (coll4Swap(e, before, edgeS, polygon, points)) {
+//          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
           valid = E_SKIP;
           update_lowest_index(e, before, lowest_index);
         }
       }
       else {
-        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+//        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
         edgeS.erase(retval.first);
         eraseEdgeFromSet(before, edgeS);
         flip(e, before, polygon, points);
@@ -153,19 +163,19 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     if (af && (valid == E_VALID)) {
       isval = checkIntersection(e, after);
       if (isval < IS_TRUE) {
-        std::cerr << "No intersection with after." << std::endl;
+//        std::cerr << "No intersection with after." << std::endl;
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {
-        std::cerr << "4P collinearity between:" << e << " and aft: " << after << std::endl;
-        if (collSwap(e, after, edgeS, polygon, points)) {
+//        std::cerr << "4P collinearity between:" << e << " and aft: " << after << std::endl;
+        if (coll4Swap(e, after, edgeS, polygon, points)) {
 //          std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
           valid = E_SKIP;
           update_lowest_index(e, after, lowest_index);
         }
       }
       else {
-        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
+//        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
         edgeS.erase(retval.first);
         eraseEdgeFromSet(after, edgeS);
         //removeEdgeFromSetb(e, edgeS, polygon, points);
@@ -182,6 +192,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     // but if it's reversing and it hits an edge already in, earlier code should have caught it and removed it.
     std::cerr << "Error: Edge already exists in set!" << std::endl;
     std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
+    assert(false);
     valid = E_SKIP;
   }
 
@@ -229,9 +240,9 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
     //std::cerr << "New loop" << std::endl;
   	while (index < points.size()) {
-      std::cerr << "index: " << index << std::endl;
-      std::cout << "edges in 'edgeS':" << std::endl;
-      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+//      std::cerr << "index: " << index << std::endl;
+//      std::cout << "edges in 'edgeS':" << std::endl;
+//      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
 
 //      std::cerr << std::endl << "index: " << index << std::endl;
   		val1.first = E_VALID; val2.first = E_VALID;
@@ -260,7 +271,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
       //process first edge
       if ((revert && (*e1.p1 == *p1)) || (!revert && (*e1.p2 == *p1))) {
-        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
+//        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
         val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
         if (val1.first == E_SKIP) {loop=true;revert=true;}
       }
@@ -268,11 +279,12 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         // if I am about to process 'e1' I can start by clearing it of any collinearity with 'e2'
         if (val3 == 0) {
           // the 2 edges are collinear
-          std::cerr << "collinear check found a possible match."  << std::endl;
+//          std::cerr << "collinear check found a possible match."  << std::endl;
           if ((*p2 < *p1) && (*p3 < *p1)) {
-            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-            if (collSwapb(p1, p2, p3, lowest_index, edgeS, polygon, points)) {
-              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+//            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+            if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
+              update_lowest_index(p1, p2, p3, lowest_index);
+//              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
               loop = true;
               revert = true;
               continue;
@@ -280,25 +292,25 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
           } //else std::cerr << "false alarm." << std::endl;
         }
 
-        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
+//        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
         val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);
         if (val1.first == E_SKIP) {loop=true;revert=true;continue;}
       }
 
       // process second edge
       if ((revert && (*e2.p1 == *p1)) || (!revert && (*e2.p2 == *p1))) {
-        std::cerr << std::endl << "removing e2: " << e2 << std::endl;
+//        std::cerr << std::endl << "removing e2: " << e2 << std::endl;
         val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop=true;revert=true;}
       }
       else {
-        std::cerr << std::endl << "processing e2: " << e2 << std::endl;
+//        std::cerr << std::endl << "processing e2: " << e2 << std::endl;
         val2 = processEdgeb(e2, lowest_index, edgeS, polygon, points);
-        if (val2.first == E_SKIP) {loop=true;revert=true;continue;}
+        if (val2.first == E_SKIP) {
+          removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
+          loop=true;revert=true;continue;}
       }
 
-      std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
-      std::cerr << "lowest_index: " << lowest_index << std::endl;
       if (lowest_index == index) {
         revert = false;
         lowest_index = polygon.size();
@@ -306,6 +318,8 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       }
   		if (revert) --index;
       else ++index;
+//      std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
+//      std::cerr << "lowest_index: " << lowest_index << std::endl;
   	}
   } while (loop);
 
