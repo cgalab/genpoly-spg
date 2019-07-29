@@ -6,6 +6,8 @@ add_executable(spg
 					          src/inits.cpp
                     src/io.cpp
                     src/opt2.cpp
+                    src/opt2a.cpp
+                    src/opt2b.cpp
                     src/pol.cpp
                     src/test.cpp
 					src/curve.cpp
