@@ -392,7 +392,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
     e1.set(p1,p2);
     std::cerr.precision(17);
 
-    while (current != 1.0) {
+    while (fabs(current - 1.0) > EPSILON) {
       current = nextafter(current, 1.0);
       p1.set(current, current);
       area = det(e1, p1);

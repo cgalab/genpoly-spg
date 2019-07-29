@@ -3,7 +3,7 @@
 #include <list>
 #include <set>
 #include <utility> // for std::pair
-#include <stdlib.h>  // for abs
+#include <cmath>  // for fabs
 #include <algorithm>    // std::sort
 #include <iterator> // for std:prev and std::next
 #include <assert.h>
@@ -233,6 +233,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
   do {
     loop = false;
+    revert = true;
     index = 0;
     lowest_index = polygon.size();
     decrementEdges(index, edgeS);
@@ -276,7 +277,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       }
       else {
         // if I am about to process 'e1' I can start by clearing it of any collinearity with 'e2'
-        if (val3 == 0) {
+        if (fabs(val3) < EPSILON) {
           // the 2 edges are collinear
 //          std::cerr << "collinear check found a possible match."  << std::endl;
           if ((*p2 < *p1) && (*p3 < *p1)) {

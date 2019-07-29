@@ -35,20 +35,20 @@ public:
   // function to compare 2 points based on y axis first, then x.
   bool lessY (const Point& s) const {
     if (y < s.y) return true;
-    else if ((y == s.y) && (x < s.x)) return true;
+    else if ((fabs(y - s.y) < EPSILON) && (x < s.x)) return true;
     else return false;
   }
 
   // first priority is the x axis comparison, then y.
   bool operator < (const Point& s) const {
     if (x < s.x) return true;
-    else if ((x == s.x) && (y < s.y)) return true;
+    else if ((fabs(x - s.x) < EPSILON) && (y < s.y)) return true;
     else return false;
   }
 
   bool operator > (const Point& s) const {
     if (x > s.x) return true;
-    else if ((x == s.x) && (y > s.y)) return true;
+    else if ((fabs(x - s.x) < EPSILON) && (y > s.y)) return true;
     else return false;
   }
 
@@ -85,7 +85,7 @@ public:
     bool operator()(int i, int j)
     {
       if (value_vector[i].x < value_vector[j].x) return true;
-      else if ((value_vector[i].x == value_vector[j].x) && (value_vector[i].y < value_vector[j].y)) return true;
+      else if ((fabs(value_vector[i].x - value_vector[j].x) < EPSILON) && (value_vector[i].y < value_vector[j].y)) return true;
       else return false;
     }
 };

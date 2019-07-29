@@ -40,7 +40,6 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
 void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& ch, std::vector<Point>& points);
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
 void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
-unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle);
 void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points);
 

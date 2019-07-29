@@ -45,6 +45,7 @@ enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *poi
           p.set(x,y,i);
           (*points).push_back(p);
           break;
+        case IF_UNDEFINED:
         default:
           std::cout << "Warning: unidentified input file format. Use -? for help." << std::endl;
           returnValue = READ_ERROR_IFORMAT;
@@ -116,6 +117,70 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
       for (unsigned int i = 0; i < points.size(); ++i)
         fprintf(fout, "%lf %lf\n", points[i].x, points[i].y);
       break;
+    case OF_PURE_AND_PERM:
+      std::cerr << "Should not be handled by this function." << std::endl;
+      break;
+    case OF_UNDEFINED:
+      std::cerr << "output format undefined.  Use -? for help." << std::endl;
+      break;
+    default:
+      std::cerr << "unknown error writing output" << std::endl;
+      break;
+  }
+
+  fclose(fout);
+  return SUCCESS;
+}
+
+// crappy function that assumes you are working with integer input values, and thus you can write them out as integers.
+// Made to work with Peters' 'verify-it' code.
+enum error writeOutIntFile(char *outFile, out_format_t outFormat, bool writeNew, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  FILE *fout;
+
+  if(writeNew) {
+    fout = fopen(outFile, "r");
+
+    if(fout != NULL) {
+      //fprintf(stderr, "outFile already exists, need to create a new file\n");
+
+      int counter = 0;
+      char tempOutFile[255];
+
+      do {
+        snprintf(tempOutFile, sizeof(tempOutFile), "%s%d", outFile, counter);
+        fout = fopen(tempOutFile, "r");
+        ++counter;
+      } while (fout != NULL);
+          strcpy(outFile, tempOutFile);
+    }
+  }
+
+  fout = fopen(outFile, "w");
+
+  switch(outFormat) {
+    case OF_PERM:
+      for (unsigned int i = 0; i < polygon.size(); ++i)
+        fprintf(fout, "%u\n", polygon[i]);
+      break;
+    case OF_POLY:
+      fprintf(fout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
+      fprintf(fout, "%lu\n", points.size());
+      for (unsigned int i = 0; i < points.size(); ++i)
+        fprintf(fout, "%lf %lf\n", points[i].x, points[i].y);
+      break;
+    case OF_DAT:
+      fprintf(fout, "# X   Y\n");
+      for (unsigned int i = 0; i < points.size(); ++i)
+        fprintf(fout, "  %lf   %lf\n", points[polygon[i]].x, points[polygon[i]].y);
+      fprintf(fout, "  %lf   %lf\n", points[polygon[0]].x, points[polygon[0]].y);
+      break;
+    case OF_PURE:
+      for (unsigned int i = 0; i < points.size(); ++i)
+        fprintf(fout, "%u %u\n", (unsigned int)points[i].x, (unsigned int)points[i].y);
+      break;
+    case OF_PURE_AND_PERM:
+      std::cerr << "Should not be handled by this function." << std::endl;
+      break;
     case OF_UNDEFINED:
         std::cerr << "output format undefined.  Use -? for help." << std::endl;
       break;
@@ -179,8 +244,11 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
           fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
         fprintf(fout, "\n");
         break;
+      case OF_PURE_AND_PERM:
+        std::cerr << "Should not be handled by this function." << std::endl;
+        break;
       case OF_UNDEFINED:
-          std::cerr << "output format undefined.  Use -? for help." << std::endl;
+        std::cerr << "output format undefined.  Use -? for help." << std::endl;
         break;
       default:
         std::cerr << "unknown error writing output" << std::endl;

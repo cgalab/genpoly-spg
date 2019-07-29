@@ -127,9 +127,9 @@ int main(int argc, char *argv[]) {
               if (outFormat == OF_PURE_AND_PERM){
                 char tempFileName[255];
                 snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-pure");
-                returnValue = writeOutFile(tempFileName, OF_PURE, writeNew, polygon, points);
+                returnValue = writeOutIntFile(tempFileName, OF_PURE, writeNew, polygon, points);
                 snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-perm");
-                if (returnValue == SUCCESS) returnValue = writeOutFile(tempFileName, OF_PERM, writeNew, polygon, points);
+                if (returnValue == SUCCESS) returnValue = writeOutIntFile(tempFileName, OF_PERM, writeNew, polygon, points);
               }
               else returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
               break;

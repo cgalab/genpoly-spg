@@ -1,8 +1,11 @@
 #include <vector>
 #include "opt2.h"
 #include "opt2a.h"
+#include "opt2b.h"
 #include "curve.h"
+#include "basicDefinitions.h"
 
+enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg, unsigned int randseed);
 enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg, unsigned int randseed) {
   enum error returnValue;
   switch(alg) {
@@ -18,9 +21,13 @@ enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     case A_2OPT_A:
       returnValue = opt2a(polygon, points, randseed);
       break;
+    case A_2OPT_B:
+      returnValue = opt2b(polygon, points, randseed);
+      break;
     case A_CURVE:
       returnValue = curve(polygon, points, randseed);
       break;
+    case A_HOLE:
     default:
       returnValue = UNEXPECTED_ERROR;
       break;
@@ -28,6 +35,7 @@ enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   return returnValue;
 }
 
+void printEnum(enum intersect_t val);
 void printEnum(enum intersect_t val) {
   switch (val) {
     case IS_FALSE:

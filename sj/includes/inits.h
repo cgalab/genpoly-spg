@@ -3,12 +3,14 @@
 
 #include "point.h"
 
+enum error inFileInit(char *inFile, char *optarg);
+enum error outFileInit(char *outFile, char *optarg);
 //int initArgs(int argc, char *argv[], char *inFile, char *outFile, enum alg_t *alg, enum out_format_t *outFormat, enum in_format_t *inFormat);
-int algInit(enum alg_t *alg, char * optarg);
+enum error algInit(enum alg_t *alg, char *optarg);
 
-void ifInit(enum in_format_t *inFormat, char *optarg);
+enum error ifInit(enum in_format_t *inFormat, char *optarg);
 
-void ofInit(enum out_format_t *outFormat, char *optarg);
+enum error ofInit(enum out_format_t *outFormat, char *optarg);
 
 enum error argInit(	int argc, char *argv[],
 										char *inFile, char *outFile, enum alg_t *alg,
