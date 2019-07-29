@@ -120,6 +120,28 @@ TEdge* Triangle::getEdgeNotContaining(Vertex* v){
 	return NULL;
 }
 
+// gets one of the two edges containing vertex v
+// which one depends just on the ordering in the triangle
+TEdge* Triangle::getEdgeContaining(Vertex* v){
+	if((*e0).contains(v)) return e0;
+	if((*e1).contains(v)) return e1;
+	if((*e2).contains(v)) return e2;
+
+	printf("error: none of the edges is containing the vertex %llu \n", (*v).getID());
+	return NULL;
+}
+
+
+// gets the edge of the triangle which contains v, but is not e
+TEdge* Triangle::getOtherEdgeContaining(Vertex* v, TEdge* e){
+	if((*e).getID() != (*e0).getID() && (*e0).contains(v)) return e0;
+	if((*e).getID() != (*e1).getID() && (*e1).contains(v)) return e1;
+	if((*e).getID() != (*e2).getID() && (*e2).contains(v)) return e2;
+
+	printf("error: no other edge is containing the vertex %llu \n", (*v).getID());
+	return NULL;
+}
+
 std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
 	std::vector<TEdge*> out(2);
 	int index = 0;
@@ -296,39 +318,6 @@ void Triangle::dequeue(){
 bool Triangle::isEnqueued(){
 	return enqueued;
 }
-
-/*double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
-	double ax, ay, bx, by, cx, cy;
-	double numerator, denominator;
-
-	if(!contains(moving))
-		return -1;
-
-	cx = (*moving).getX();
-	cy = (*moving).getY();
-
-	if((*moving).getID() == (*v0).getID()){
-		ax = (*v1).getX();
-		ay = (*v1).getY();
-		bx = (*v2).getX();
-		by = (*v2).getY();
-	}else if((*moving).getID() == (*v1).getID()){
-		ax = (*v0).getX();
-		ay = (*v0).getY();
-		bx = (*v2).getX();
-		by = (*v2).getY();
-	}else{
-		ax = (*v0).getX();
-		ay = (*v0).getY();
-		bx = (*v1).getX();
-		by = (*v1).getY();
-	}
-
-	numerator = bx * ay - ax * by - cx * (ay - by) - cy * (bx - ax);
-	denominator = dx * (ay - by) + dy * (bx - ax);
-
-	return numerator / denominator;
-}*/
 
 double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	double ax, ay, bx, by, cx, cy;

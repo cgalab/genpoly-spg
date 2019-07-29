@@ -384,155 +384,55 @@ void Vertex::checkSurroundingPolygonFast(){
 // move it across this edge by accident => the vertex doesn't stay inside its
 // surrouding polygon 
 bool Vertex::checkSurroundingPolygonAdvanced(){
-	std::priority_queue<std::pair<double, Vertex*>> Q;
-	std::pair<double, Vertex*> p;
-	double angle, area;
-	Vertex *first, *second, *start;
-	Triangle *t;
+	std::queue<Vertex*> Q;
+	double area0, area;
+	Vertex *first, *second;
+	Triangle *t, *t0;
+	TEdge* e;
     
-    // TODO:
-    // the ordering by angle just yields the surrounding polygon if the triangulation
-    // is still correct. But if the triangulation is already broken, the vertices
-    // of the surrounding polygon may not any more be angular ordered.
-    // Maybe a better way to get the polygonal chain of the surrounding polygon:
-    // start with one triangle, insert the left and the the right vertex into the
-    // queue, get the other triangle of the edge between the vertex and the right
-    // vertex, insert the right vertex of this triangle and go on to the next
-    // till all triangles are done and we reach the first vertex again
-	for(auto& i : edges){
-		angle = (*i).getAngle(this);
+    // insert all vertices into the Q in the order they form the surrouding polygon
+    // the start vertex is is contained a second time at the end of the queue
+	t = triangles.front();
+	t0 = t;
+	e = (*t).getEdgeContaining(this);
+	first = (*e).getOtherVertex(this);
+	Q.push(first);
 
-		Q.push(std::make_pair(angle, (*i).getOtherVertex(this)));
+	e = (*t).getOtherEdgeContaining(this, e);
+	first = (*e).getOtherVertex(this);
+	Q.push(first);
+
+	t = (*e).getOtherTriangle(t);
+	while((*t).getID() != (*t0).getID()){
+		e = (*t).getOtherEdgeContaining(this, e);
+		first = (*e).getOtherVertex(this);
+		Q.push(first);
+
+		t = (*e).getOtherTriangle(t);
 	}
 
-	p = Q.top();
-	start = p.second;
-	second = start;
+	// compute the area of the first triangle outside of the loop to get the right sign
+	first = Q.front();
 	Q.pop();
+	second = Q.front();
+	Q.pop();
+
+	t = new Triangle(first, second, this);
+	area0 = (*t).signedArea();
+	delete t;
 
 	while(!Q.empty()){
 		first = second;
-		p = Q.top();
-		second = p.second;
+		second = Q.front();
 		Q.pop();
-
+        
 		t = new Triangle(first, second, this);
 		area = (*t).signedArea();
 		delete t;
 
-		// for the first run we don't know whether the sign will be positive or negative
-		if(signbit(area) == 0){
-
-			printf("Triangulation error: %llu is outside of its surrounding polygon\n", id);
-			print();
-			printf("\n");
-
-			while(!Q.empty()){
-				Q.pop();
-			}
-
-			for(auto& i : edges){
-				angle = (*i).getAngle(this);
-
-				Q.push(std::make_pair(angle, (*i).getOtherVertex(this)));
-			}
-
-			p = Q.top();
-			start = p.second;
-			second = start;
-			Q.pop();
-
-			printf("at angle %.10f:\n", p.first / M_PI * 180);
-			(*p.second).print();
-
-			while(!Q.empty()){
-				p = Q.top();
-				Q.pop();
-
-				printf("at angle %.10f:\n", p.first / M_PI * 180);
-				(*p.second).print();
-
-				first = second;
-				second = p.second;
-
-				t = new Triangle(first, second, this);
-				area = (*t).signedArea();
-				delete t;
-
-				printf("area: %.30f \n", area);
-			}
-
-			first = second;
-			second = start;
-
-			t = new Triangle(first, second, this);
-			area = (*t).signedArea();
-			delete t;
-
-			printf("area: %.30f \n", area);
-
+		// compare orientation with the oriantation of the first triangle
+		if(signbit(area) != signbit(area0))
 			return false;
-		}
-
-	}
-
-	first = second;
-	second = start;
-
-	t = new Triangle(first, second, this);
-	area = (*t).signedArea();
-	delete t;
-
-	if(signbit(area) == 0){
-		printf("Triangulation error: %llu is outside of its surrounding polygon\n", id);
-		print();
-		printf("\n");
-
-		while(!Q.empty()){
-			Q.pop();
-		}
-
-		for(auto& i : edges){
-			angle = (*i).getAngle(this);
-
-			Q.push(std::make_pair(angle, (*i).getOtherVertex(this)));
-		}
-
-		p = Q.top();
-		start = p.second;
-		second = start;
-		Q.pop();
-
-		printf("at angle %.10f:\n", p.first / M_PI * 180);
-		(*p.second).print();
-
-		while(!Q.empty()){
-			p = Q.top();
-			Q.pop();
-
-			printf("at angle %.10f:\n", p.first / M_PI * 180);
-			(*p.second).print();
-
-			first = second;
-			second = p.second;
-
-			t = new Triangle(first, second, this);
-			area = (*t).signedArea();
-			delete t;
-
-			printf("area: %.30f \n", area);
-		}
-
-		first = second;
-		second = start;
-
-		t = new Triangle(first, second, this);
-		area = (*t).signedArea();
-		delete t;
-
-		printf("area: %.30f \n", area);
-
-		return false;
 	}
 
 	return true;

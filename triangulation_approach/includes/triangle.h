@@ -44,6 +44,8 @@ public:
 	TEdge* getEdge(int index);
 	Vertex* getOtherVertex(TEdge* e);
 	TEdge* getEdgeNotContaining(Vertex* v);
+	TEdge* getEdgeContaining(Vertex* v);
+	TEdge* getOtherEdgeContaining(Vertex* v, TEdge* e);
 	std::vector<TEdge*> getOtherEdges(TEdge* e);
 	TEdge* getLongestEdge(int epsilon);
 	TEdge* getLongestEdgeAlt();
