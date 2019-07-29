@@ -92,6 +92,7 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 	else if (strcmp(optarg,"poly") == 0) *outFormat = OF_POLY;
 	else if (strcmp(optarg,"dat") == 0) *outFormat = OF_DAT;
 	else if (strcmp(optarg,"pure") == 0) *outFormat = OF_PURE;
+	else if (strcmp(optarg,"pp") == 0) *outFormat = OF_PURE_AND_PERM; // pp for pure and perm
 	else {
 		*outFormat = OF_UNDEFINED;
 		std::cerr << "Error:  --outformat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'perm', 'dat', or 'poly'." << std::endl;

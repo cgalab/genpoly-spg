@@ -45,7 +45,8 @@ enum out_format_t {
   OF_PERM,
   OF_POLY,
   OF_DAT,
-  OF_PURE
+  OF_PURE,
+  OF_PURE_AND_PERM
 };
 
 // the input format of the point set.

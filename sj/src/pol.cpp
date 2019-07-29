@@ -2,7 +2,6 @@
 #include <iostream> // for std::endl
 #include <assert.h>
 #include <algorithm>    // std::sort
-#include <deque>
 #include "point.h"
 #include "edge.h"
 #include "basicFunctions.h"
@@ -35,7 +34,7 @@ bool collSwap (Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   bool retval = false;
 
   // sort the points into lo/mid/hi lex order.
-  std::deque<Point*> lex {a, b, c};
+  std::vector<Point*> lex {a, b, c};
   sort(lex.begin(), lex.end(),
     [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
 /*
@@ -44,7 +43,7 @@ bool collSwap (Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   }
 */
   // sort the points into lo/mid/hi polygon order.
-  std::deque<Point*> vert {a, b, c};
+  std::vector<Point*> vert {a, b, c};
   sort(vert.begin(), vert.end(),
     [&](Point * p1, Point * p2) -> bool {return isPol1Left(p1, p2, polygon.size());});
 
@@ -77,7 +76,7 @@ bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   bool retval = false;
 
   // sort the points into lo/mid/hi lex order.
-  std::deque<Point*> lex {a, b, c};
+  std::vector<Point*> lex {a, b, c};
   sort(lex.begin(), lex.end(),
     [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
 /*
@@ -86,7 +85,7 @@ bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   }
 */
   // sort the points into lo/mid/hi polygon order.
-  std::deque<Point*> vert {a, b, c};
+  std::vector<Point*> vert {a, b, c};
   sort(vert.begin(), vert.end(),
     [&](Point * p1, Point * p2) -> bool {return isPol1Left(p1, p2, polygon.size());});
 
@@ -132,7 +131,7 @@ bool coll4Swap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned 
 
 
   // sort the points into lex order.
-  std::deque<Point*> lex {e1.p1, e1.p2, e2.p1, e2.p2};
+  std::vector<Point*> lex {e1.p1, e1.p2, e2.p1, e2.p2};
   sort(lex.begin(), lex.end(),
     [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
 /*
@@ -141,7 +140,7 @@ bool coll4Swap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned 
   }
 */
   // sort the points into polygon order.
-  std::deque<Point*> vert {e1.p1, e1.p2, e2.p1, e2.p2};
+  std::vector<Point*> vert {e1.p1, e1.p2, e2.p1, e2.p2};
   sort(vert.begin(), vert.end(),
     [&](Point * p1, Point * p2) -> bool {return isPolLeft(p1, p2, polygon.size());});
 

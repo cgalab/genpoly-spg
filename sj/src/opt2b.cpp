@@ -2,7 +2,6 @@
 #include <vector>
 #include <list>
 #include <set>
-#include <deque>
 #include <utility> // for std::pair
 #include <stdlib.h>  // for abs
 #include <algorithm>    // std::sort
@@ -28,7 +27,7 @@ void update_lowest_index(Edge e1, Edge e2, unsigned int& lowest_index) {
 // function to update the 'lowest_index' variable if one of the points
 // is lex. lower than current value in 'lowest_index'
 void update_lowest_index(Point *a, Point *b, Point *c, unsigned int& lowest_index) {
-  std::deque<Point*> lex {a, b, c};
+  std::vector<Point*> lex {a, b, c};
   sort(lex.begin(), lex.end(),
     [](Point* p1, Point* p2) -> bool {return (*p1).l < (*p2).l;});
   if ((*lex[0]).l < lowest_index) lowest_index = (*lex[0]).l;

@@ -1,16 +1,16 @@
 
 
 add_executable(spg
-                    src/main.cpp
                     src/basicFunctions.cpp
+                    src/curve.cpp
 					          src/inits.cpp
                     src/io.cpp
+                    src/main.cpp
                     src/opt2.cpp
                     src/opt2a.cpp
                     src/opt2b.cpp
                     src/pol.cpp
                     src/test.cpp
-					src/curve.cpp
                     )
 
 target_include_directories(spg PUBLIC
