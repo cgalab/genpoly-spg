@@ -15,7 +15,7 @@ target_include_directories(util PUBLIC
     PRIVATE src)
 
 # manually inserted..
-add_definitions(-DNDEBUG)
+#add_definitions(-DNDEBUG)
 
 # 'make install' to the correct locations (provided by GNUInstallDirs).
 #install(TARGETS util EXPORT MyLibraryConfig

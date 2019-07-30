@@ -206,34 +206,26 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
 enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points, randseed);
-  //createCHRandPol(polygon, points, randseed);
-  // .
-  //pdisplay(polygon, points);
-  //assert(1 == 0);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'
-	// Now it can be sorted lexicographically
+	// Now it can be sorted lexicographically, each points lex. index is also stored in 'l'
+  // 'lex' is an "event-point-schedule" object.
 	std::vector<unsigned int> lex (points.size());
 	fill_lex(lex, points); // fill 'lex' with the indexes
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
 	unsigned int index=0, before, after, lowest_index;
-	//double d_idx;
-  //compObject comp;
-	//std::pair<enum edge_t, std::set<Edge, setComp>::iterator> val1, val2;
   std::pair<enum edge_t, std::set<Edge>::iterator> val1, val2;
   double val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
   bool loop, revert;
-	//std::set<Edge, setComp> edgeS(comp); // a set of edges.
-  std::set<Edge> edgeS; // a set of edges.
-
+  std::set<Edge> edgeS; // a sweep-line-status object.
 
   do {
     loop = false;
-    revert = true;
+    revert = false;
     index = 0;
     lowest_index = polygon.size();
     decrementEdges(index, edgeS);
