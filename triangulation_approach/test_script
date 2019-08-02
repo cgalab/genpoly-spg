@@ -13,7 +13,7 @@ code6=0
 code7=0
 code8=0
 
-for i in {1..50}
+for i in {1..2000}
 do
 	echo try nr. $i
 

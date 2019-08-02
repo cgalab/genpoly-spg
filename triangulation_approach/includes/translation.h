@@ -42,7 +42,7 @@ private:
 	double actualTime;
 	bool split;
 	TranslationType type;
-	EventQueue Q;
+	EventQueue *Q;
 	const double epsilon = 0.00001;
 	const double epsilonInt = 0.000000000001; // 10⁻¹²
 

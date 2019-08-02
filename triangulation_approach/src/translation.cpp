@@ -2,7 +2,7 @@
 
 // Constructors
 Translation::Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY) : 
-Q(EventQueue(epsilon)), dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false), settings(set), type(TranslationType::DEFAULT)
+dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false), settings(set), type(TranslationType::DEFAULT)
 
 {
 	original = (*T).getVertex(index);
@@ -20,10 +20,12 @@ Q(EventQueue(epsilon)), dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(fa
 
 	prevNewE = new TEdge(prevV, newV);
 	nextNewE = new TEdge(newV, nextV);
+
+	Q = new EventQueue(epsilon, original, oldV, newV);
 }
 
 Translation::Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY, TranslationType tp) : 
-Q(EventQueue(epsilon)), dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false), settings(set), type(tp)
+dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false), settings(set), type(tp)
 
 {
 	original = (*T).getVertex(index);
@@ -41,6 +43,8 @@ Q(EventQueue(epsilon)), dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(fa
 
 	prevNewE = new TEdge(prevV, newV);
 	nextNewE = new TEdge(newV, nextV);
+
+	Q = new EventQueue(epsilon, original, oldV, newV);
 }
 
 // old version with non-exact arithmetic
@@ -70,6 +74,7 @@ Q(EventQueue(epsilon)), dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(fa
 	return true;
 }*/
 
+/*
 bool Translation::generateInitialQueue(){
 	double t;
 	std::list<Triangle*> triangles = (*original).getTriangles();
@@ -141,6 +146,68 @@ bool Translation::generateInitialQueue(){
 	}
 
 	return true;
+}
+*/
+
+bool Translation::generateInitialQueue(){
+	double t;
+	std::list<Triangle*> triangles = (*original).getTriangles();
+	TEdge *opposite;
+	Vertex *v0, *v1;
+	double areaOld, areaNew;
+	Triangle *tr;
+	bool ok;
+	
+	for(auto& i : triangles){
+		opposite = (*i).getEdgeNotContaining(original);
+		v0 = (*opposite).getV0();
+		v1 = (*opposite).getV1();
+
+		tr = new Triangle(v0, v1, oldV);
+		areaOld = (*tr).signedArea();
+		delete tr;
+
+		tr = new Triangle(v0, v1, newV);
+		areaNew = (*tr).signedArea();
+		delete tr;
+
+		if(areaOld == 0 || (areaNew == 0 && type != TranslationType::SPLIT_PART_1)){
+			printf("The vertex %llu to be translated lays exactly on an edge :0\n", (*original).getID());
+			printf("areaOld: %.20f areaNew: %.20f \n", areaOld, areaNew);
+
+			(*newV).print();
+			(*v0).print();
+			(*v1).print();
+
+			(*T).addVertex(newV);
+			(*T).print("debug.graphml");
+			exit(7);
+		}
+
+		if(signbit(areaOld) == signbit(areaNew))
+			continue;
+		else{
+			t = (*i).calculateCollapseTime(original, dx, dy);
+
+			if(t < 0){
+				printf("numerical correction: collapse time of collapsing triangle was %.20f \n", t);
+				t = 0;
+			}
+
+			if(t > 1){
+				printf("numerical correction: collapse time of collapsing triangle was %.20f \n", t);
+				t = 1;
+			}
+
+			(*i).enqueue();
+
+			(*Q).insertWithoutCheck(t, i);
+		}
+	}
+
+	ok = (*Q).makeStable(true);
+
+	return ok;
 }
 
 // https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
@@ -489,15 +556,15 @@ enum Executed Translation::execute(){
 		if(!generateInitialQueue())
 			return Executed::REJECTED;
 
-		while(Q.size() > 0){
-			e = Q.pop();
+		while((*Q).size() > 0){
+			e = (*Q).pop();
 			actualTime = e.first;
 			t = e.second;
-			if((*original).getID() == 6758885)
-				printf("event time: %.20f \n", actualTime);
 
-			if(!flip(t, false))
+			if(!flip(t, false)){
+				printf("aborted\n");
 				return Executed::PARTIAL;
+			}
 		}
 
 		//(*original).setPosition((*oldV).getX() + dx, (*oldV).getY() + dy);
@@ -507,7 +574,269 @@ enum Executed Translation::execute(){
 	}
 }
 
-bool Translation::flip(Triangle* t0, bool singleFlip){
+bool Translation::flip(Triangle *t0, bool singleFlip){
+	bool ok = true;
+	TEdge *e, *e1, *e2;
+	Triangle *t1;
+	Vertex *vj0, *vj1; // joint vertices
+	Vertex *vn0, *vn1; // non-joint vertices
+	// we call it an oppositeFlip, if the flipped edge is the one opposite to the moving vertex
+	// i.e. it doesn't contain the moving vertex
+	bool oppositeFlip;
+	Vertex *dummyVertex;
+	TEdge *dummyEdge;
+	double x, y;
+	double area0, area1;
+	Triangle *dummyTriangle;
+	bool insertion = false; //indicates whether a new triangle was inserted into the eventqueue
+	double time;
+
+	if(!singleFlip)
+		// move vertex to event time
+		(*original).setPosition((*oldV).getX() + dx * actualTime, (*oldV).getY() + dy * actualTime);
+
+	// get the edge which should be flipped
+	e = (*t0).getLongestEdgeAlt();
+	if((*e).getEdgeType() == EdgeType::POLYGON){
+		printf("Flip: polygon edge gets deleted\n");
+		printf("id: %llu index: %d dx: %f dy: %f \n", (*original).getID(), index, dx, dy);
+
+		(*T).check();
+		exit(3);
+	}
+
+	// check for flip type
+	if((*e).contains(original))
+		oppositeFlip = false;
+	else
+		oppositeFlip = true;
+
+	// remove the other triangle from the eventqueue if it is enqueued
+	t1 =(*e).getOtherTriangle(t0);
+	if((*t1).isEnqueued())
+		(*Q).remove(t1);
+
+	// get all vertices of the triangles which are removed
+	vj0 = (*e).getV0();
+	vj1 = (*e).getV1();
+	vn0 = (*t0).getOtherVertex(e);
+	vn1 = (*t1).getOtherVertex(e);
+
+	delete e;
+
+	// new triangle vn0, vn1, vj0
+	e = new TEdge(vn0, vn1);
+	(*T).addEdge(e);
+
+	e1 = (*vj0).getEdgeTo(vn0);
+	e2 = (*vj0).getEdgeTo(vn1);
+
+	t0 = new Triangle(e, e1, e2, vn0, vn1, vj0, "Flip1", ok);
+
+	// new triangle vn0, vn1, vj1
+	(*T).addEdge(e);
+
+	e1 = (*vj1).getEdgeTo(vn0);
+	e2 = (*vj1).getEdgeTo(vn1);
+
+	t1 = new Triangle(e, e1, e2, vn0, vn1, vj1, "Flip2", ok);
+
+	if(!singleFlip){
+		// reset coordinates temporarely to original position
+		x = (*original).getX();
+		y = (*original).getY();
+		(*original).setPosition((*oldV).getX(), (*oldV).getY());
+
+		// decide which of the new triangles has to be inserted into the eventqueue
+		// if the opposite edge was flipped potentially both triangles can collapse in the future
+		if(oppositeFlip){
+			// first decide whether the non-moving vertex which is shared by both triangles
+			// after the flip (we call it static vertex in the following)
+			// is inside the corridor built by the two lines parallel to the transition line through
+			// the non-shared vertices
+
+			// find the static vertex (store in vn0)
+			if((*vn0).getID() == (*original).getID())
+				vn0 = vn1;
+
+			dummyVertex = (*vj0).getTranslated(dx, dy);
+			dummyTriangle = new Triangle(vj0, dummyVertex, vn0);
+			area0 = (*dummyTriangle).signedArea();
+			delete dummyTriangle;
+			delete dummyVertex;
+
+			dummyVertex = (*vj1).getTranslated(dx, dy);
+			dummyTriangle = new Triangle(vj1, dummyVertex, vn0);
+			area1 = (*dummyTriangle).signedArea();
+			delete dummyTriangle;
+			delete dummyVertex;
+
+			// the static vertex is inside the corridor
+			// i.e. both new triangles will collapse in the future
+			if(signbit(area0) != signbit(area1)){
+				// now we have to check for both new triangles, whether they collapse before
+				// the end of the translation
+
+				// for t0 (consisting of vn0, vn1, vj0)
+				// we have to check the edge from the static vertex vn0 to the joint vertex vj0
+				dummyTriangle = new Triangle(vn0, vj0, oldV);
+				area0 = (*dummyTriangle).signedArea();
+				delete dummyTriangle;
+
+				dummyTriangle = new Triangle(vn0, vj0, newV);
+				area1 = (*dummyTriangle).signedArea();
+				delete dummyTriangle;
+
+				if(signbit(area0) != signbit(area1)){
+					time = (*t0).calculateCollapseTime(original, dx, dy);
+					(*Q).insertWithoutCheck(time, t0);
+					(*t0).enqueue();
+					insertion = true;
+				}
+
+				// for t1 (consisting of vn0, vn1, vj1)
+				// we have to check the edge from the static vertex vn0 to the joint vertex vj1
+				dummyTriangle = new Triangle(vn0, vj1, oldV);
+				area0 = (*dummyTriangle).signedArea();
+				delete dummyTriangle;
+
+				dummyTriangle = new Triangle(vn0, vj1, newV);
+				area1 = (*dummyTriangle).signedArea();
+				delete dummyTriangle;
+
+				if(signbit(area0) != signbit(area1)){
+					time = (*t1).calculateCollapseTime(original, dx, dy);
+					(*Q).insertWithoutCheck(time, t1);
+					(*t1).enqueue();
+					insertion = true;
+				}
+
+			// the static vertex is not inside the corridor
+			}else{
+				// now we have to find out which of the two new triangles is the one which collapses
+				// in the future
+
+				// try t0 (consisting of vn0, original, vj0)
+				// the non-joint vertex of t0 is vj0
+
+				// now we can take a look whether the static and the moving vertex are on different sides
+				// of the line parallel to the transition line through the non-joint vertex
+
+				dummyVertex = (*vj0).getTranslated(dx, dy);
+
+				dummyTriangle = new Triangle(vj0, dummyVertex, vn0);
+				area0 = (*dummyTriangle).signedArea();
+				delete dummyTriangle;
+
+				dummyTriangle = new Triangle(vj0, dummyVertex, original);
+				area0 = (*dummyTriangle).signedArea();
+				delete dummyTriangle;
+
+				delete dummyVertex;
+
+				// if they are on different sides, then t1 is the triangle which will collapse in the future
+				// t1 consists of original, vn0 (static) and vj1
+				if(signbit(area0) != signbit(area1)){
+					// now we have to check whether the triangle t1 collapses before the end of the translation
+					// i.e. start and end position have to be on different side of the edge (vn0, vj1)
+
+					dummyTriangle = new Triangle(vn0, vj1, oldV);
+					area0 = (*dummyTriangle).signedArea();
+					delete dummyTriangle;
+
+					dummyTriangle = new Triangle(vn0, vj1, newV);
+					area1 = (*dummyTriangle).signedArea();
+					delete dummyTriangle;
+
+					if(signbit(area0) != signbit(area1)){
+						time = (*t1).calculateCollapseTime(original, dx, dy);
+						(*Q).insertWithoutCheck(time, t1);
+						(*t1).enqueue();
+						insertion = true;
+					}
+				}else{
+					// now we have to check whether the triangle t0 collapses before the end of the translation
+					// i.e. start and end position have to be on different side of the edge (vn0, vj0)
+
+					dummyTriangle = new Triangle(vn0, vj0, oldV);
+					area0 = (*dummyTriangle).signedArea();
+					delete dummyTriangle;
+
+					dummyTriangle = new Triangle(vn0, vj0, newV);
+					area1 = (*dummyTriangle).signedArea();
+					delete dummyTriangle;
+
+					if(signbit(area0) != signbit(area1)){
+						time = (*t0).calculateCollapseTime(original, dx, dy);
+						(*Q).insertWithoutCheck(time, t0);
+						(*t0).enqueue();
+						insertion = true;
+					}
+				}
+			}
+
+
+		// a non-opposite edge was flipped, so just one triangle can collapse in the future
+		}else{
+			// the new triangle will collapse in the future if the non-joint vertex of the triangle
+			// which won't change anymore is on the same side of the new edge (vn0, vn1) as the 
+			// target position is
+
+
+			// find the static vertex (store in vj0)
+			if((*vj0).getID() == (*original).getID())
+				vj0 = vj1;
+
+			dummyTriangle = new Triangle(vn0, vn1, vj0);
+			area0 = (*dummyTriangle).signedArea();
+			delete dummyTriangle;
+
+			dummyTriangle = new Triangle(vn0, vn1, newV);
+			area1 = (*dummyTriangle).signedArea();
+			delete dummyTriangle;
+
+			delete dummyVertex;
+
+			// otherwise none of the two new triangles will collapse in the future
+			if(signbit(area0) == signbit(area1)){
+				// get the triangle which still contains the moving vertex
+				if(!(*t0).contains(original))
+					t0 = t1;
+
+				// now we have to check whether the new triangle will collapse before the
+				// translation ends, i.e. the start position end the end position of the movements
+				// are on different sides of the new edge which is given by vn0 and vn1
+
+				dummyTriangle = new Triangle(vn0, vn1, oldV);
+				area0 = (*dummyTriangle).signedArea();
+				delete dummyTriangle;
+
+				dummyTriangle = new Triangle(vn0, vn1, newV);
+				area1 = (*dummyTriangle).signedArea();
+				delete dummyTriangle;
+
+				if(signbit(area0) != signbit(area1)){
+					time = (*t0).calculateCollapseTime(original, dx, dy);
+					(*Q).insertWithoutCheck(time, t0);
+					(*t0).enqueue();
+					insertion = true;
+				}
+			}	
+		}
+
+		// get original back to actual position
+		(*original).setPosition(x, y);
+
+		if(insertion)
+			return (*Q).makeStable(false);
+		else
+			return true;
+	}
+
+	return true;
+}
+
+/*bool Translation::flip(Triangle* t0, bool singleFlip){
 	Triangle *t1;
 	Vertex *vj0, *vj1; // joint vertices
 	Vertex *vn0, *vn1; // non joint vertices
@@ -563,7 +892,7 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 
 	t1 =(*e).getOtherTriangle(t0);
 	if((*t1).isEnqueued())
-		Q.remove(t1);
+		(*Q).remove(t1);
 
 	
 
@@ -608,11 +937,8 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 
 		if(t >= actualTime && t <= 1){
 			(*t0).enqueue();
-			stable = stable && Q.insert(t, t0);
+			stable = stable && (*Q).insert(t, t0);
 		}
-
-		if((*original).getID() == 6758885)
-				printf("event time for new triangle: %.20f \n", t);
 
 		t = (*t1).calculateCollapseTime(original, dx, dy); // again between 0 and 1
 
@@ -624,17 +950,14 @@ bool Translation::flip(Triangle* t0, bool singleFlip){
 
 		if(t >= actualTime && t <= 1){
 			(*t1).enqueue();
-			stable = stable && Q.insert(t, t1);
+			stable = stable && (*Q).insert(t, t1);
 		}
-
-		if((*original).getID() == 6758885)
-				printf("event time for new triangle: %.20f \n", t);
 
 		(*original).setPosition(x, y);
 	}
 	
 	return stable;
-}
+}*/
 
 bool Translation::checkSimplicityOfTranslation(){
 	bool simple;
@@ -665,9 +988,13 @@ Translation::~Translation(){
 	if(!ok){
 		printf("\nstart position:\n");
 		(*oldV).print();
+		printf("original position:\n");
+		(*original).print();
 		printf("target position:\n");
 		(*newV).print();
 		printf("translation vector: dx = %.20f dy = %.20f \n", dx, dy);
+
+		(*T).print("bug.graphml");
 
 		exit(6);
 	}
