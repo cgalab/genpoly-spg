@@ -14,6 +14,9 @@ target_include_directories(util PUBLIC
     $<INSTALL_INTERFACE:includes>
     PRIVATE src)
 
+# manually inserted..
+#add_definitions(-DNDEBUG)
+
 # 'make install' to the correct locations (provided by GNUInstallDirs).
 #install(TARGETS util EXPORT MyLibraryConfig
 #    ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -2,7 +2,6 @@
 #include <iostream> // for std::endl
 #include <assert.h>
 #include <algorithm>    // std::sort
-#include <deque>
 #include "point.h"
 #include "edge.h"
 #include "basicFunctions.h"
@@ -35,7 +34,7 @@ bool collSwap (Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   bool retval = false;
 
   // sort the points into lo/mid/hi lex order.
-  std::deque<Point*> lex {a, b, c};
+  std::vector<Point*> lex {a, b, c};
   sort(lex.begin(), lex.end(),
     [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
 /*
@@ -44,7 +43,7 @@ bool collSwap (Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   }
 */
   // sort the points into lo/mid/hi polygon order.
-  std::deque<Point*> vert {a, b, c};
+  std::vector<Point*> vert {a, b, c};
   sort(vert.begin(), vert.end(),
     [&](Point * p1, Point * p2) -> bool {return isPol1Left(p1, p2, polygon.size());});
 
@@ -77,7 +76,7 @@ bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   bool retval = false;
 
   // sort the points into lo/mid/hi lex order.
-  std::deque<Point*> lex {a, b, c};
+  std::vector<Point*> lex {a, b, c};
   sort(lex.begin(), lex.end(),
     [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
 /*
@@ -86,7 +85,7 @@ bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   }
 */
   // sort the points into lo/mid/hi polygon order.
-  std::deque<Point*> vert {a, b, c};
+  std::vector<Point*> vert {a, b, c};
   sort(vert.begin(), vert.end(),
     [&](Point * p1, Point * p2) -> bool {return isPol1Left(p1, p2, polygon.size());});
 
@@ -132,7 +131,7 @@ bool coll4Swap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned 
 
 
   // sort the points into lex order.
-  std::deque<Point*> lex {e1.p1, e1.p2, e2.p1, e2.p2};
+  std::vector<Point*> lex {e1.p1, e1.p2, e2.p1, e2.p2};
   sort(lex.begin(), lex.end(),
     [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
 /*
@@ -141,7 +140,7 @@ bool coll4Swap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned 
   }
 */
   // sort the points into polygon order.
-  std::deque<Point*> vert {e1.p1, e1.p2, e2.p1, e2.p2};
+  std::vector<Point*> vert {e1.p1, e1.p2, e2.p1, e2.p2};
   sort(vert.begin(), vert.end(),
     [&](Point * p1, Point * p2) -> bool {return isPolLeft(p1, p2, polygon.size());});
 
@@ -333,14 +332,14 @@ bool collSwap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned i
     polSwap(e2.p1, e1.p1, polygon);
     return true;
   }
-  if (!d1 &&  d2 && (rd1 < 0) && (rd2 == 1)) {
+  if (!d1 &&  d2 && (rd1 < 0) && (fabs(rd2 - 1) < EPSILON)) {
     eraseVertexFromSet(e1.p1, edgeS, polygon, points);
     eraseVertexFromSet(e2.p1, edgeS, polygon, points);
     polSwap(e2.p1, e1.p1, polygon);
     polSwap(e2.p1, e2.p2, polygon);
     return true;
   }
-  if ( d1 && !d2 && (rd1 < 0) && (rd2 == 1)) {
+  if ( d1 && !d2 && (rd1 < 0) && (fabs(rd2 - 1) < EPSILON)) {
     eraseVertexFromSet(e1.p1, edgeS, polygon, points);
     eraseVertexFromSet(e2.p1, edgeS, polygon, points);
     polSwap(e1.p1, e2.p1, polygon);
@@ -613,8 +612,8 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
       double y_j = y_i - points[upper[j]].y;
       double a_j;
 
-      if (x_j > 0) a_j = y_j/x_j;
-      else if (x_j == 0) a_j = (1 + signbit(y_j)*(-2))*INFINITY;
+      if (fabs(x_j) < EPSILON) a_j = (1 + signbit(y_j)*(-2))*INFINITY;
+      else a_j = y_j/x_j;
 //      std::cerr << "j: " << j << ", p: " << points[upper[j]] << ", x_j: " << x_j << ", y_j: " << y_j << ", a_j: " << a_j << std::endl;
 
       // get relative x and y values for lex[i]-upper[j+1]
@@ -623,8 +622,8 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
         double y_next = points[upper[j+1]].y - points[upper[j]].y;
         double a_next;
 
-        if (x_next > 0) a_next = y_next/x_next;
-        else if (x_next == 0) a_next = (1 + signbit(y_next)*(-2))*INFINITY ;
+        if (fabs(x_next) < EPSILON) a_next = (1 + signbit(y_next)*(-2))*INFINITY ;
+        else a_next = y_next/x_next;
 //        std::cerr << "upper: next point: " << points[upper[j+1]] << ", x_next: " << x_next << ", y_next: " << y_next << ", a_next: " << a_next << std::endl;
 
         // if the ratio of i-j is larger than i-(j+1), then lex[i] should be a new upper[j+1]
@@ -653,8 +652,9 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
       double y_j = y_i - points[lower[j]].y;
       double a_j;
 
-      if (x_j > 0) a_j = y_j/x_j;
-      else if (x_j == 0) a_j = (1 + signbit(y_j)*(-2))*INFINITY;
+      if (fabs(x_j) < EPSILON) a_j = (1 + signbit(y_j)*(-2))*INFINITY;
+      else a_j = y_j/x_j;
+
 //      std::cerr << "j: " << j << ", p: " << points[upper[j]] << ", x_j: " << x_j << ", y_j: " << y_j << ", a_j: " << a_j << std::endl;
 
       // get relative x and y values for lex[i]-lower[j+1]
@@ -663,8 +663,8 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
         double y_next = points[lower[j+1]].y - points[lower[j]].y;
         double a_next;
 
-        if (x_next > 0) a_next = y_next/x_next;
-        else if (x_next == 0) a_next = (1 + signbit(y_next)*(-2))*INFINITY;
+        if (fabs(x_next) < EPSILON) a_next = (1 + signbit(y_next)*(-2))*INFINITY;
+        else a_next = y_next/x_next;
 //        std::cerr << "lower: next point: " << points[upper[j+1]] << ", x_next: " << x_next << ", y_next: " << y_next << ", a_next: " << a_next << std::endl;
 
         // if the ratio of lex[i]-lower[j] is smaller than lex[i]-lower[j+1], then lex[i] should be a new lower[j+1]

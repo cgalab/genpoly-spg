@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <iomanip>      // std::setprecision
+#include <cmath> // for fabs()
 #include "basicDefinitions.h"
 #include "point.h"
 
@@ -46,7 +47,7 @@ public:
     if (x < s.getX()) {return true;}
     else if (s.getX() < x) {return false;}
     else {
-      if (min == s.getMin()) return (max < s.getMax());
+      if (fabs(min - s.getMin()) < EPSILON) return (max < s.getMax());
       else return (min < s.getMin());
     }
     std::cerr << "Error: fallthrough in Yval < comparison!" << std::endl;
@@ -59,7 +60,7 @@ public:
   bool operator > (const Yval s) const {
     if (x > s.getX()) return true;
     else if (min > s.getMin()) return true;
-    else if ((min == s.getMin()) && (max > s.getMax())) return true;
+    else if ((fabs(min - s.getMin()) < EPSILON) && (max > s.getMax())) return true;
     else return false;
   }
 
@@ -81,7 +82,7 @@ public:
 	}
 
   friend std::ostream& operator<<(std::ostream& os, const Yval& y) {
-    if (y.getMin() == y.getMax())
+    if (fabs(y.getMin() - y.getMax()) < EPSILON)
       os << std::setprecision(15) << "x:" << y.getX() << ", (" << y.min << "," << y.max << ")";
     else
       os << std::setprecision(15) << "x:" << y.getX() << ", [" << y.min << "," << y.max << "]";
@@ -168,7 +169,7 @@ public:
 
   	//assert((x <= P2.x) && (P1.x <= x));
 
-  	if ((P2.x - P1.x) == 0) {
+  	if (fabs(P2.x - P1.x) < EPSILON) {
   		y.set(P1.y, P2.y);
   		y.setX(P1.x);
   	}
@@ -176,7 +177,7 @@ public:
   		double slope = (P2.y-P1.y) / (P2.x-P1.x);
   		double bias = P1.y - slope*P1.x;
   		double val = slope * x + bias;
-  		if (abs(val) < EPSILON) y.set(0);
+  		if (fabs(val) < EPSILON) y.set(0);
   		else y.set(val);
   		y.setX(x);
   	}
@@ -187,7 +188,7 @@ public:
   	const Point& pa = *p1;
   	const Point& pb = *p2;
   	double ans = (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
-  	return (abs(ans) < EPSILON) ? 0 : ans;
+  	return (fabs(ans) < EPSILON) ? 0 : ans;
   }
 
   // check for if p1 is a 'left' vertex compared to p2
@@ -207,8 +208,8 @@ public:
   // check if the edge crosses an value on the x-axis 'x'
   // An edge already has p1 and p2 in lex. order.
   enum intersect_t checkCrossing(double x) {
-    if ((*p1).x == x) return IS_VERTEX11;
-    if ((*p2).x == x) return IS_VERTEX22;
+    if (fabs((*p1).x - x) < EPSILON) return IS_VERTEX11;
+    if (fabs((*p2).x - x) < EPSILON) return IS_VERTEX22;
     if ((*p1).x < x) {
       if (x < (*p2).x) return IS_TRUE;
     }

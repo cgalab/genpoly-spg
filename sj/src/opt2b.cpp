@@ -2,9 +2,8 @@
 #include <vector>
 #include <list>
 #include <set>
-#include <deque>
 #include <utility> // for std::pair
-#include <stdlib.h>  // for abs
+#include <cmath>  // for fabs
 #include <algorithm>    // std::sort
 #include <iterator> // for std:prev and std::next
 #include <assert.h>
@@ -28,7 +27,7 @@ void update_lowest_index(Edge e1, Edge e2, unsigned int& lowest_index) {
 // function to update the 'lowest_index' variable if one of the points
 // is lex. lower than current value in 'lowest_index'
 void update_lowest_index(Point *a, Point *b, Point *c, unsigned int& lowest_index) {
-  std::deque<Point*> lex {a, b, c};
+  std::vector<Point*> lex {a, b, c};
   sort(lex.begin(), lex.end(),
     [](Point* p1, Point* p2) -> bool {return (*p1).l < (*p2).l;});
   if ((*lex[0]).l < lowest_index) lowest_index = (*lex[0]).l;
@@ -207,33 +206,26 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
 enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points, randseed);
-  //createCHRandPol(polygon, points, randseed);
-  // .
-  //pdisplay(polygon, points);
-  //assert(1 == 0);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'
-	// Now it can be sorted lexicographically
+	// Now it can be sorted lexicographically, each points lex. index is also stored in 'l'
+  // 'lex' is an "event-point-schedule" object.
 	std::vector<unsigned int> lex (points.size());
 	fill_lex(lex, points); // fill 'lex' with the indexes
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
 	unsigned int index=0, before, after, lowest_index;
-	//double d_idx;
-  //compObject comp;
-	//std::pair<enum edge_t, std::set<Edge, setComp>::iterator> val1, val2;
   std::pair<enum edge_t, std::set<Edge>::iterator> val1, val2;
   double val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
   bool loop, revert;
-	//std::set<Edge, setComp> edgeS(comp); // a set of edges.
-  std::set<Edge> edgeS; // a set of edges.
-
+  std::set<Edge> edgeS; // a sweep-line-status object.
 
   do {
     loop = false;
+    revert = false;
     index = 0;
     lowest_index = polygon.size();
     decrementEdges(index, edgeS);
@@ -277,7 +269,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       }
       else {
         // if I am about to process 'e1' I can start by clearing it of any collinearity with 'e2'
-        if (val3 == 0) {
+        if (fabs(val3) < EPSILON) {
           // the 2 edges are collinear
 //          std::cerr << "collinear check found a possible match."  << std::endl;
           if ((*p2 < *p1) && (*p3 < *p1)) {

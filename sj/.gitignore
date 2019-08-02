@@ -1,4 +1,5 @@
 *.m
+*.txt
 in.*
 out.*
 tkn
@@ -6,3 +7,5 @@ tkn
 obj/
 build/
 app
+verify-perm
+verify-pure

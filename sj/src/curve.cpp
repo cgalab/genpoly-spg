@@ -502,7 +502,7 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
   std::cerr << "total possible candidates: " << count << std::endl;
   // these are candidates for a single inner polygon..
 
-  unsigned int r_c, r_e;
+  unsigned int r_c=0, r_e=0;
 
   if (curves.size() > 0) {
     do {

@@ -3,7 +3,7 @@
 #include <list>
 #include <set>
 #include <utility> // for std::pair
-#include <stdlib.h>  // for abs
+#include <cmath>  // for fabs
 #include <algorithm>    // std::sort
 #include <iterator> // for std:prev and std::next
 #include <assert.h>
@@ -262,7 +262,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   		  }
 //        std::cerr << "processing e1: " << e1 << ", and e2: " << e2 << std::endl;
 //        std::cerr << "det3: " << val3 << std::endl;
-        if (val3 == 0) {
+        if (fabs(val3) < EPSILON) {
           // the 2 edges are collinear
           //std::cerr << "collinear check found a possible match."  << std::endl;
           if ((*p1 < *p2) && (*p1 < *p3)) {

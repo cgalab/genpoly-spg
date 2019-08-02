@@ -124,7 +124,14 @@ int main(int argc, char *argv[]) {
             case A_2OPT:
             case A_2OPT_A:
             case A_2OPT_B:
-              returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
+              if (outFormat == OF_PURE_AND_PERM){
+                char tempFileName[255];
+                snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-pure");
+                returnValue = writeOutIntFile(tempFileName, OF_PURE, writeNew, polygon, points);
+                snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-perm");
+                if (returnValue == SUCCESS) returnValue = writeOutIntFile(tempFileName, OF_PERM, writeNew, polygon, points);
+              }
+              else returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
               break;
             case A_HOLE:
               returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);

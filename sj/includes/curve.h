@@ -54,7 +54,12 @@ public:
 
 enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
 enum error holes (std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes);
+bool get_bin(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& retval1, std::set<E_Edge>::iterator& retval2, std::set<E_Edge>& y_set, std::vector<Curve> curves);
+bool check_ix_edges(E_Edge e1, E_Edge e2);
+E_Edge get_inc_edge_from_set(E_Edge& e, std::vector<Curve>& curves, std::set<E_Edge>::iterator it);
+void update_edge_in_set(E_Edge& e, std::pair<std::set<E_Edge>::iterator, bool>& retval, std::set<E_Edge>& y_set);
 E_Edge inner_holes (std::vector<unsigned int>& polygon, std::vector<Point>& points);
+enum error inner_holes_old(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes, bool inner_bool);
 enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int randseed, unsigned int nr_holes);
 
 #endif
