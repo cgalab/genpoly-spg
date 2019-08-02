@@ -165,6 +165,7 @@ bool Triangulation::check(){
 
 	for(auto const& i : vertices){
 		ok = ok && (*i).check();
+		ok = ok && (*i).checkSurroundingPolygonAdvanced();
 	}
 
 	return ok;
