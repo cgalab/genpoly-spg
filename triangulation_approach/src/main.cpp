@@ -12,7 +12,7 @@
 int main(){
 	Settings settings;
 	Triangulation* T;
-	int translations, performed;
+	int performed;
 	RandomGenerator generator;
 
 	exactinit();

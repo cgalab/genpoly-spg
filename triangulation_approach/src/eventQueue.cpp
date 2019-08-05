@@ -6,7 +6,7 @@ first(NULL), n(0), epsilon(eps), original(orig), oldV(oV), newV(nV) {}
 void EventQueue::insertWithoutCheck(double time, Triangle* t){
 	struct Event* e0;
 	struct Event* e1, *prev = NULL;
-	double time1, prevTime = -100;
+	double time1;
 
 	e1 = first;
 	while(e1 != NULL){
@@ -32,7 +32,6 @@ void EventQueue::insertWithoutCheck(double time, Triangle* t){
 		}
 		
 		prev = e1;
-		prevTime = time1;
 
 		e1 = e1 -> next;
 	}
@@ -134,7 +133,6 @@ void EventQueue::insertWithoutCheck(double time, Triangle* t){
 bool EventQueue::makeStable(bool initial){
 	struct Event *e0, *e1;
 	double time0, time1, dif;
-	Triangle *t0, *t1;
 
 	if(n == 0)
 		return true;
@@ -150,14 +148,14 @@ bool EventQueue::makeStable(bool initial){
 		// two events are at the same time
 		if(dif < epsilon){
 			// check first whether there is a third event at the same time
-			/*dif = fabs(time1 - e1 -> collapseTime);
+			dif = fabs(time1 - e1 -> collapseTime);
 			if(dif < epsilon){
 				if(initial)
 					printf("Eventqueue: More than two events at the same time -> refused translation\n");
 				else
 					printf("Eventqueue: More than two events at the same time -> aborted translation\n");
 				return false;
-			}*/
+			}
 
 			// Attentione: do not change the ordering of e0 and e1 in stabilize, otherwise you would
 			// get an infinite loop here!

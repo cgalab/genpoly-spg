@@ -1,7 +1,7 @@
 #include "triangulation.h"
 
 // Constructors
-Triangulation::Triangulation(int n) : N(n), Rectangle0(NULL), Rectangle1(NULL), Rectangle2(NULL), Rectangle3(NULL) { 
+Triangulation::Triangulation(int n) : Rectangle0(NULL), Rectangle1(NULL), Rectangle2(NULL), Rectangle3(NULL), N(n) { 
 	vertices.reserve(N);
 }
 
@@ -189,11 +189,10 @@ void Triangulation::stretch(double factor){
 }
 
 void Triangulation::renumberVertices(){
-	Vertex *v, *start;
+	Vertex *v;
 	unsigned long long n = 1;
 
 	v = vertices[0];
-	start = v;
 	(*v).setID(0);
 
 	v = (*v).getNext();

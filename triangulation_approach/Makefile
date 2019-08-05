@@ -1,6 +1,6 @@
 PP = g++
 # maybe add -Werror -Wall
-WFLAGS = -Wextra -O3 -std=c++11
+WFLAGS = -Wextra -O3 -std=c++11 -Wall -Wno-format
 
 SDIR = src
 ODIR = obj

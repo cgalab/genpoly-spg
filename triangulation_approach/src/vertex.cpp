@@ -1,11 +1,11 @@
 #include "vertex.h"
 
 // Constructors
-Vertex::Vertex(double X, double Y) : x(X), y(Y), rectangleVertex(false), id(n), reserveID(2 * n), toPrev(NULL), toNext(NULL), T(NULL) {
+Vertex::Vertex(double X, double Y) : T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(false), id(n), reserveID(2 * n) {
 	n++;
 }
 
-Vertex::Vertex(double X, double Y, bool RV) : x(X), y(Y), rectangleVertex(RV), id(n), reserveID(2 * n), toPrev(NULL), toNext(NULL), T(NULL) {
+Vertex::Vertex(double X, double Y, bool RV) : T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(RV), id(n), reserveID(2 * n) {
 	n++;
 }
 
@@ -93,7 +93,6 @@ double Vertex::getMediumEdgeLength(){
 
 double Vertex::getDirectedEdgeLength(double alpha){
 	double length, angle;
-	int count = 0;
 
 	for(auto const& i : triangles){
 		length = (*i).getRange(this, alpha);
@@ -440,7 +439,6 @@ bool Vertex::checkSurroundingPolygonAdvanced(){
 
 // Destructor
 Vertex::~Vertex(){
-	TEdge *e0, *e1, *e2;
 	int nEdges = edges.size();
 	int nTriangles = triangles.size();
 	int i;

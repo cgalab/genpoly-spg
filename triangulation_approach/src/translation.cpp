@@ -2,7 +2,7 @@
 
 // Constructors
 Translation::Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY) : 
-dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false), settings(set), type(TranslationType::DEFAULT)
+T(Tr), index(i), dx(dX), dy(dY), actualTime(0), split(false), type(TranslationType::DEFAULT), settings(set)
 
 {
 	original = (*T).getVertex(index);
@@ -25,7 +25,7 @@ dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false), settings(set), typ
 }
 
 Translation::Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY, TranslationType tp) : 
-dx(dX), dy(dY), index(i), T(Tr), actualTime(0), split(false), settings(set), type(tp)
+T(Tr), index(i), dx(dX), dy(dY), actualTime(0), split(false), type(tp), settings(set)
 
 {
 	original = (*T).getVertex(index);
@@ -394,7 +394,7 @@ void Translation::repairEnd(){
 			edge = (*i).getLongestEdgeAlt();
 
 			if(type == TranslationType::DEFAULT)
-				printf("intersectiontype: %d\n", checkIntersection(transPath, edge, epsilonInt));
+				printf("intersectiontype: %d\n", (int)checkIntersection(transPath, edge, epsilonInt));
 
 			if((*edge).getEdgeType() != EdgeType::POLYGON)
 				flip(i, true);
@@ -459,7 +459,7 @@ enum Executed Translation::execute(){
 	Triangle* t = NULL;
 	std::pair<double, Triangle*> e;
 	Translation* trans;
-	double middleX, middleY, transX, transY, oldArea, newArea, area;
+	double middleX, middleY, transX, transY, oldArea, newArea;
 	TEdge* edge;
 	Vertex* intersectionPoint;
 	enum Executed ex;
@@ -584,7 +584,6 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 	// i.e. it doesn't contain the moving vertex
 	bool oppositeFlip;
 	Vertex *dummyVertex;
-	TEdge *dummyEdge;
 	double x, y;
 	double area0, area1;
 	Triangle *dummyTriangle;
