@@ -4,6 +4,9 @@
 #include <string>
 #include "predicates.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #ifndef __TRIANGLE_H_
 #define __TRIANGLE_H_
 
