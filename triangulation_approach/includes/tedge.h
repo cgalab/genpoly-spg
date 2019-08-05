@@ -1,7 +1,9 @@
 #include <stdio.h>
-#include <math.h>
 #include <string>
 #include "basicDefinitions.h"
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #ifndef __INTERSECTTYPE_
 #define __INTERSECTTYPE_
