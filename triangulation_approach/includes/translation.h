@@ -43,7 +43,7 @@ private:
 	bool split;
 	TranslationType type;
 	EventQueue *Q;
-	const double epsilon = 0.0000001;
+	const double epsilon = 0.0000000001; //10^-10
 	const double epsilonInt = 0.000000000001; // 10⁻¹²
 
 	Settings settings;

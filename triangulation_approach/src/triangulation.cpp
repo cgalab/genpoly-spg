@@ -137,6 +137,7 @@ bool Triangulation::check(){
 	int n;
 	TEdge* e;
 	bool ok = true;
+	bool part;
 
 	for(auto const& i : edges){
 		e = i.second;
@@ -165,7 +166,12 @@ bool Triangulation::check(){
 
 	for(auto const& i : vertices){
 		ok = ok && (*i).check();
-		ok = ok && (*i).checkSurroundingPolygonAdvanced();
+		part = (*i).checkSurroundingPolygonAdvanced();
+		ok = ok && part;
+
+		if(!part){
+			printf("Triangulation error: vertex %llu is outside of its surrounding polygon\n", (*i).getID());
+		}
 	}
 
 	return ok;

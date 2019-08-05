@@ -41,7 +41,12 @@ int main(){
 	performed = transformPolygonByMoves(settings, generator, T, 1000000, false);
 	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed, 1000000, settings.elapsedTime());
 	printf("number of vertices: %d \n", (*T).getActualNumberOfVertices());
-	(*T).check();
+	
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation at the end\n");
+		exit(6);
+	}
 
 	Vertex::printStats();
 	

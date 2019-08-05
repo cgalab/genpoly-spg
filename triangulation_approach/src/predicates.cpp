@@ -495,7 +495,7 @@ void expansion_print(int elen, double *e)
 /*                                                                           */
 /*****************************************************************************/
 
-double doublerand()
+/*double doublerand()
 {
   double result;
   double expo;
@@ -513,14 +513,14 @@ double doublerand()
   }
   return result;
 }
-
+*/
 /*****************************************************************************/
 /*                                                                           */
 /*  narrowdoublerand()   Generate a double with random 53-bit significand    */
 /*                       and a random exponent in [0, 7].                    */
 /*                                                                           */
 /*****************************************************************************/
-
+/*
 double narrowdoublerand()
 {
   double result;
@@ -539,13 +539,13 @@ double narrowdoublerand()
   }
   return result;
 }
-
+*/
 /*****************************************************************************/
 /*                                                                           */
 /*  uniformdoublerand()   Generate a double with random 53-bit significand.  */
 /*                                                                           */
 /*****************************************************************************/
-
+/*
 double uniformdoublerand()
 {
   double result;
@@ -556,14 +556,14 @@ double uniformdoublerand()
   result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
   return result;
 }
-
+*/
 /*****************************************************************************/
 /*                                                                           */
 /*  floatrand()   Generate a float with random 24-bit significand and a      */
 /*                random exponent in [0, 63].                                */
 /*                                                                           */
 /*****************************************************************************/
-
+/*
 float floatrand()
 {
   float result;
@@ -581,14 +581,14 @@ float floatrand()
   }
   return result;
 }
-
+*/
 /*****************************************************************************/
 /*                                                                           */
 /*  narrowfloatrand()   Generate a float with random 24-bit significand and  */
 /*                      a random exponent in [0, 7].                         */
 /*                                                                           */
 /*****************************************************************************/
-
+/*
 float narrowfloatrand()
 {
   float result;
@@ -606,13 +606,13 @@ float narrowfloatrand()
   }
   return result;
 }
-
+*/
 /*****************************************************************************/
 /*                                                                           */
 /*  uniformfloatrand()   Generate a float with random 24-bit significand.    */
 /*                                                                           */
 /*****************************************************************************/
-
+/*
 float uniformfloatrand()
 {
   float result;
@@ -622,7 +622,7 @@ float uniformfloatrand()
   result = (float) ((a - 1073741824) >> 6);
   return result;
 }
-
+*/
 /*****************************************************************************/
 /*                                                                           */
 /*  exactinit()   Initialize the variables used for exact arithmetic.        */

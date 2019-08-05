@@ -795,8 +795,6 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 			area1 = (*dummyTriangle).signedArea();
 			delete dummyTriangle;
 
-			delete dummyVertex;
-
 			// otherwise none of the two new triangles will collapse in the future
 			if(signbit(area0) == signbit(area1)){
 				// get the triangle which still contains the moving vertex

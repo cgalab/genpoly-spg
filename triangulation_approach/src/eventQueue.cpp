@@ -58,7 +58,7 @@ void EventQueue::insertWithoutCheck(double time, Triangle* t){
 }
 
 
-bool EventQueue::insert(double time, Triangle* t){
+/*bool EventQueue::insert(double time, Triangle* t){
 	struct Event* e0;
 	struct Event* e1, *prev = NULL;
 	double time1, prevTime = -100;
@@ -129,7 +129,7 @@ bool EventQueue::insert(double time, Triangle* t){
 	n++;
 
 	return true;
-}
+}*/
 
 bool EventQueue::makeStable(bool initial){
 	struct Event *e0, *e1;
@@ -150,14 +150,14 @@ bool EventQueue::makeStable(bool initial){
 		// two events are at the same time
 		if(dif < epsilon){
 			// check first whether there is a third event at the same time
-			dif = fabs(time1 - e1 -> collapseTime);
+			/*dif = fabs(time1 - e1 -> collapseTime);
 			if(dif < epsilon){
-				/*if(initial)
+				if(initial)
 					printf("Eventqueue: More than two events at the same time -> refused translation\n");
 				else
-					printf("Eventqueue: More than two events at the same time -> aborted translation\n");*/
+					printf("Eventqueue: More than two events at the same time -> aborted translation\n");
 				return false;
-			}
+			}*/
 
 			// Attentione: do not change the ordering of e0 and e1 in stabilize, otherwise you would
 			// get an infinite loop here!
@@ -279,7 +279,7 @@ void EventQueue::stabilizeConvex(struct Event* e0, struct Event* e1, TEdge* comm
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.16f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 
 	// transition line intersects one of the oppossing edges
@@ -296,7 +296,7 @@ void EventQueue::stabilizeConvex(struct Event* e0, struct Event* e1, TEdge* comm
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.16f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 	}
 }
@@ -350,7 +350,7 @@ void EventQueue::stabilizeNonConvex(struct Event* e0, struct Event* e1, TEdge* c
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.16f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 
 	// transition line intersects one of the oppossing edges
@@ -367,7 +367,7 @@ void EventQueue::stabilizeNonConvex(struct Event* e0, struct Event* e1, TEdge* c
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.16f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 	}
 }
