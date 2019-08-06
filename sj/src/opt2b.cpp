@@ -191,7 +191,6 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     // but if it's reversing and it hits an edge already in, earlier code should have caught it and removed it.
     std::cerr << "Error: Edge already exists in set!" << std::endl;
     std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
-    assert(false);
     valid = E_NOT_VALID;
   }
 
@@ -216,7 +215,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 	fill_lex(lex, points); // fill 'lex' with the indexes
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
-	unsigned int index=0, before, after, lowest_index;
+	unsigned int index, before, after, lowest_index;
   std::pair<enum edge_t, std::set<Edge>::iterator> val1, val2;
   double val3;
 	Point *p1, *p2, *p3;
@@ -267,6 +266,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
         val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
         if (val1.first == E_SKIP) {loop=true;revert=true;}
+        if (val1.first == E_NOT_VALID) break;
       }
       else {
         // if I am about to process 'e1' I can start by clearing it of any collinearity with 'e2'
@@ -288,7 +288,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
         val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);
         if (val1.first == E_SKIP) {loop=true;revert=true;continue;}
-        if (val1.first == E_NOT_VALID) {retval=UNEXPECTED_ERROR; break;}
+        if (val1.first == E_NOT_VALID) break;
       }
 
       // process second edge
@@ -296,14 +296,17 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        std::cerr << std::endl << "removing e2: " << e2 << std::endl;
         val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop=true;revert=true;}
-        if (val2.first == E_NOT_VALID) {retval=UNEXPECTED_ERROR; break;}
+        if (val2.first == E_NOT_VALID) break;
       }
       else {
 //        std::cerr << std::endl << "processing e2: " << e2 << std::endl;
         val2 = processEdgeb(e2, lowest_index, edgeS, polygon, points);
         if (val2.first == E_SKIP) {
-          removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
-          loop=true;revert=true;continue;}
+          val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
+          if (val1.first == E_NOT_VALID) break;
+          loop=true;revert=true;continue;
+        }
+        if (val2.first == E_NOT_VALID) break;
       }
 
       if (lowest_index == index) {
@@ -316,6 +319,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //      std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
 //      std::cerr << "lowest_index: " << lowest_index << std::endl;
   	}
+    if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
   } while (loop);
 
 	return retval;
