@@ -2,7 +2,7 @@
 
 // Constructors
 Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2) :
-e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) { 
+e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) { 
 
 	(*e0).setTriangle(this);
 	(*e1).setTriangle(this);
@@ -16,7 +16,7 @@ e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) {
 }
 
 Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2, std::string context, bool &ok) :
-e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) { 
+e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) { 
 	Triangle* t;
 	bool cont;
 
@@ -66,7 +66,7 @@ e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) {
 
 // Attention: this triangles are just for testing
 Triangle::Triangle(Vertex* V0, Vertex* V1, Vertex* V2) :
-e0(NULL), e1(NULL), e2(NULL), v0(V0), v1(V1), v2(V2), id(n), enqueued(false) { 
+e0(NULL), e1(NULL), e2(NULL), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) { 
 
 	(*v0).addTriangle(this);
 	(*v1).addTriangle(this);
@@ -214,7 +214,6 @@ TEdge* Triangle::getLongestEdge(int epsilon){
 
 // seems to work right and the problem of getting a PE here is caused by an error in the triangulation
 TEdge* Triangle::getLongestEdgeAlt(){
-	TEdge* e;
 	Vertex* v;
 
 	v = getOtherVertex(e0);
@@ -247,8 +246,6 @@ TEdge* Triangle::getLongestEdgeAlt(){
 double Triangle::getRange(Vertex* v, double alpha){
 	TEdge *e, *f, *g;
 	double alpha1, alpha2, l;
-	Vertex *test;
-	bool inside;
 
 	if(!(*e0).contains(v)){
 		e = e1;

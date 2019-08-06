@@ -377,8 +377,7 @@ enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1){
 enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1, const double epsilon){
 	Vertex *v00, *v01, *v10, *v11;
 	double area00, area01, area10, area11;
-	double x00, x01, x10, x11, y00, y01, y10, y11;
-	double l0, l1, d0x, d0y, d1x, d1y;
+	//double l0, l1;
 	Triangle *t;
 
 	// get vertices
@@ -388,8 +387,8 @@ enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1, const double epsil
 	v11 = (*e1).getV1();
 
 	// compute edge lengths
-	l0 = (*e0).length();
-	l1 = (*e1).length();
+	//l0 = (*e0).length();
+	//l1 = (*e1).length();
 
 	// triangle areas containing edge e0
 	t = new Triangle(v00, v01, v10);

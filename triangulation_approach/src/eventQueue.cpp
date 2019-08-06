@@ -6,7 +6,7 @@ first(NULL), n(0), epsilon(eps), original(orig), oldV(oV), newV(nV) {}
 void EventQueue::insertWithoutCheck(double time, Triangle* t){
 	struct Event* e0;
 	struct Event* e1, *prev = NULL;
-	double time1, prevTime = -100;
+	double time1;
 
 	e1 = first;
 	while(e1 != NULL){
@@ -32,7 +32,6 @@ void EventQueue::insertWithoutCheck(double time, Triangle* t){
 		}
 		
 		prev = e1;
-		prevTime = time1;
 
 		e1 = e1 -> next;
 	}
@@ -134,7 +133,6 @@ void EventQueue::insertWithoutCheck(double time, Triangle* t){
 bool EventQueue::makeStable(bool initial){
 	struct Event *e0, *e1;
 	double time0, time1, dif;
-	Triangle *t0, *t1;
 
 	if(n == 0)
 		return true;

@@ -7,5 +7,5 @@ tkn
 obj/
 build/
 app
-verify-perm
-verify-pure
+ver*
+ver*

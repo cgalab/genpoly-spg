@@ -41,6 +41,7 @@ private:
 	bool split;
 	TranslationType type;
 	EventQueue *Q;
+
 	const double epsilon = 0.0001; //10^-4
 	const double epsilonInt = 0.000000000001; // 10⁻¹²
 
