@@ -5,7 +5,7 @@
 #include "point.h"
 
 
-enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *points) {
+enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& points) {
   enum error returnValue = SUCCESS;
 
   FILE *fin = fopen(inFile, "r");
@@ -24,7 +24,7 @@ enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *poi
         case IF_POINTS:  // each line has only "x y" on it
           sscanf(aLine,"%lf %lf",&x,&y);
           p.set(x,y,counter);
-          (*points).push_back(p);
+          points.push_back(p);
           break;
         case IF_POLY:
           if (counter == 0) {
@@ -36,14 +36,14 @@ enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *poi
           else {
             sscanf(aLine,"%lf %lf",&x,&y);
             p.set(x,y,i);
-            (*points).push_back(p);
+            points.push_back(p);
             ++i;
           }
           break;
         case IF_COMP:    // each line has "i x y" on it
           sscanf(aLine,"%u %lf %lf",&i,&x,&y);
           p.set(x,y,i);
-          (*points).push_back(p);
+          points.push_back(p);
           break;
         case IF_UNDEFINED:
         default:
@@ -72,6 +72,35 @@ enum error readInFile(char *inFile,in_format_t inFormat, std::vector<Point> *poi
   return returnValue;
 }
 
+
+enum error readvFile(char *vFile, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  enum error returnValue = SUCCESS;
+
+  FILE *fin = fopen(vFile, "r");
+  if (fin != NULL) {
+    char aLine[256];
+    unsigned int i=0, counter=0;
+
+    while (fgets(aLine, sizeof(aLine), fin) != NULL) {
+      if(aLine[0] == '#') continue; // ignore lines beginning with #
+
+      sscanf(aLine,"%u",&i);
+      polygon.push_back(i);
+      points[i].v = counter;
+
+      ++counter;
+    }
+  }
+  else if (fin == NULL) {
+    returnValue = READ_ERROR_IFILE;
+    std::cout << "Error: unable to open 'verify' file.  Use -? for help.: " << ((vFile[0] == 0) ? "No input given" : vFile)  << std::endl;
+  }
+  else {
+    returnValue = UNEXPECTED_ERROR;
+    std::cout << "Error:  unknown error opening input file." << std::endl;
+  }
+  return returnValue;
+}
 
 enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   FILE *fout;

@@ -101,11 +101,29 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 	return returnValue;
 }
 
+enum error vFileInit(char *vFile, char *optarg) {
+	enum error returnValue = SUCCESS;
+	if(optarg[0] == 0) {
+		std::cerr << "Error: no input entered to verify polygonal data. Use -? for help." << std::endl;
+		returnValue = NO_VERIFY_FILE;
+	}
+	else if (optarg[0] == '-') {
+		std::cerr << "Error: another command set as input <string> for --verify. Use -? for help." << std::endl;
+		returnValue = READ_ERROR_IFILE;
+	}
+	else {
+		strcpy(vFile, optarg);
+	}
+
+	return returnValue;
+}
+
 enum error argInit(	int argc, char *argv[],
 										char *inFile, char *outFile, enum alg_t *alg,
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
 										bool& writeNew, bool& area,	double& areaMin, double& areaMax,
-										unsigned int& randseed, bool& checkSimple, unsigned int& holes) {
+										unsigned int& randseed, bool& checkSimple, unsigned int& holes,
+										char *vFile) {
 	enum error returnValue = SUCCESS;
 	int comm;
 
@@ -116,6 +134,7 @@ enum error argInit(	int argc, char *argv[],
 		{"alg", required_argument, NULL, 'a'},
 		{"informat", required_argument, NULL, 'b'},
 		{"outformat", required_argument, NULL, 'c'},
+		{"verify", required_argument, NULL, 'v'},
 		{"areamin", optional_argument, NULL, 'n'},
 		{"areamax", optional_argument, NULL, 'x'},
 		{"randseed", required_argument, NULL, 'r'},
@@ -126,26 +145,32 @@ enum error argInit(	int argc, char *argv[],
 		{0, 0, 0, 0}
 	};
 
-	while( (comm = getopt_long (argc, argv, "i:o:a:b:c:h:r:w?stn::x::", long_options, NULL)) != -1 ) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:v:h:r:w?stn::x::", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
+//				std::cerr << "inFile returnValue: " << returnValue << std::endl;
 				break;
 			case 'o':
 				returnValue = outFileInit(outFile, optarg);
+//				std::cerr << "outFile returnValue: " << returnValue << std::endl;
 				break;
 			case 'a':
 				returnValue = algInit(alg, optarg);
+//				std::cerr << "algorithm returnValue: " << returnValue << std::endl;
 				break;
 			case 'b':
 				returnValue = ifInit(inFormat, optarg);
+//				std::cerr << "inFormat returnValue: " << returnValue << std::endl;
 				break;
 			case 'c':
 				returnValue = ofInit(outFormat, optarg);
+//				std::cerr << "outFormat returnValue: " << returnValue << std::endl;
 				break;
 			case 'h':
 				holes = atoi(optarg);
 				*alg = A_HOLE;
+//				std::cerr << "Nr. of holes: " << holes << std::endl;
 				break;
 			case 'n':
 				area = true;
@@ -160,6 +185,13 @@ enum error argInit(	int argc, char *argv[],
 				break;
 			case 't':
 				returnValue = RUN_TESTS;
+				break;
+			case 'v':
+				returnValue = vFileInit(vFile, optarg);
+				if (returnValue == SUCCESS) {
+					returnValue = RUN_SIMPLE_CHECK;
+				}
+//				std::cerr << "verify returnValue: " << returnValue << std::endl;
 				break;
 			case 'w':
 				writeNew = true;

@@ -4,6 +4,7 @@ project(util VERSION 0.1 LANGUAGES CXX)
 add_library(util
     src/edge.cpp
     src/point.cpp
+    src/simple_pol_check.cpp
     )
 
 # Define headers for this library. PUBLIC headers are used for
