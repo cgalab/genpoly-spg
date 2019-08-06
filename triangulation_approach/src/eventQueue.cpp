@@ -150,14 +150,14 @@ bool EventQueue::makeStable(bool initial){
 		// two events are at the same time
 		if(dif < epsilon){
 			// check first whether there is a third event at the same time
-			/*dif = fabs(time1 - e1 -> collapseTime);
+			dif = fabs(time1 - e1 -> collapseTime);
 			if(dif < epsilon){
 				if(initial)
 					printf("Eventqueue: More than two events at the same time -> refused translation\n");
 				else
 					printf("Eventqueue: More than two events at the same time -> aborted translation\n");
 				return false;
-			}*/
+			}
 
 			// Attentione: do not change the ordering of e0 and e1 in stabilize, otherwise you would
 			// get an infinite loop here!

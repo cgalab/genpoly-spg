@@ -1,6 +1,7 @@
 #include "triangle.h"
 #include "vertex.h"
 #include "tedge.h"
+#include <stdlib.h>
 
 #ifndef __EVENTQUEUE_H_
 #define __EVENTQUEUE_H_

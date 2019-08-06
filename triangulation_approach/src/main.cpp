@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "triangulation.h"
 #include "polygonTransformer.h"
-#include "statistics.h"
 #include "settings.h"
 #include "randomGenerator.h"
 #include "predicates.h"

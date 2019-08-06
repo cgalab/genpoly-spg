@@ -2,14 +2,12 @@
 #include "triangle.h"
 #include "tedge.h"
 #include "triangulation.h"
-#include "customPriorityQueue.h"
 #include <list>
-#include <math.h>
+#include <cmath>
 #include <limits>
 #include <string>
 #include "eventQueue.h"
 #include "settings.h"
-
 
 #ifndef __TRANSLATION_H_
 #define __TRANSLATION_H_
@@ -43,7 +41,7 @@ private:
 	bool split;
 	TranslationType type;
 	EventQueue *Q;
-	const double epsilon = 0.0000000001; //10^-10
+	const double epsilon = 0.0001; //10^-4
 	const double epsilonInt = 0.000000000001; // 10⁻¹²
 
 	Settings settings;
