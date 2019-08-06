@@ -8,6 +8,7 @@
 //#include "bst.h"
 #include "basicFunctions.h" //for setComp (Edge set test)
 #include "pol.h"
+#include "heap.h"
 
 
 /*
@@ -434,4 +435,10 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   btest = verify_simple_polygon(polygon, points);
   std::cerr << "is simple: should be false: " << ((btest) ? "true" : "false") << std::endl;
 */
+
+  std::cerr << "=========== Heap's alg. test ================" << std::endl;
+
+  std::vector<unsigned int> a = {1, 2, 3, 4, 5};
+  heap(a, a.size());
+  
 }

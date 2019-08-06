@@ -18,6 +18,7 @@ add_definitions(-O3 -DNDEBUG)
 add_executable(spg
                     src/basicFunctions.cpp
                     src/curve.cpp
+                    src/heap.cpp
 					          src/inits.cpp
                     src/io.cpp
                     src/main.cpp
