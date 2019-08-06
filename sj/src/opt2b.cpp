@@ -192,11 +192,11 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     std::cerr << "Error: Edge already exists in set!" << std::endl;
     std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
     assert(false);
-    valid = E_SKIP;
+    valid = E_NOT_VALID;
   }
 
   retval2.first = valid;
-  if (valid == E_SKIP) retval2.second = edgeS.end();
+  if (valid != E_VALID) retval2.second = edgeS.end();
   else retval2.second = retval.first;
 
   return retval2;
@@ -204,6 +204,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
 
 // Have a max_back index that the algorithm goes to before moving forward again.
 enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+  enum error retval = SUCCESS;
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points, randseed);
 
@@ -287,6 +288,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
         val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);
         if (val1.first == E_SKIP) {loop=true;revert=true;continue;}
+        if (val1.first == E_NOT_VALID) {retval=UNEXPECTED_ERROR; break;}
       }
 
       // process second edge
@@ -294,6 +296,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        std::cerr << std::endl << "removing e2: " << e2 << std::endl;
         val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop=true;revert=true;}
+        if (val2.first == E_NOT_VALID) {retval=UNEXPECTED_ERROR; break;}
       }
       else {
 //        std::cerr << std::endl << "processing e2: " << e2 << std::endl;
@@ -315,5 +318,5 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   	}
   } while (loop);
 
-	return SUCCESS;
+	return retval;
 }
