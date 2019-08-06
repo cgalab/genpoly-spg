@@ -1,5 +1,5 @@
 #include <vector>
-#include <iostream> // for endl
+#include <iostream> // for endl and cerr
 #include <algorithm>    // for std::sort
 #include <assert.h> // for assert
 #include <math.h>
