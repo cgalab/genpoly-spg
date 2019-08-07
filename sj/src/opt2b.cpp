@@ -107,7 +107,6 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
   Edge before, after;
   std::pair<std::set<Edge>::iterator,bool> retval;
   std::pair<enum edge_t, std::set<Edge>::iterator> retval2;
-  //std::set<Edge, setComp>::key_compare mycomp = edgeS.key_comp();
 
   retval = edgeS.insert(e);
 /*
@@ -191,6 +190,8 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     // but if it's reversing and it hits an edge already in, earlier code should have caught it and removed it.
     std::cerr << "Error: Edge already exists in set!" << std::endl;
     std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
+//    std::cout << "edges in 'edgeS':" << std::endl;
+//    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
     valid = E_NOT_VALID;
   }
 
@@ -230,11 +231,14 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     lowest_index = polygon.size();
     decrementEdges(index, edgeS);
 
-    //std::cerr << "New loop" << std::endl;
+//    std::cerr << "New loop" << std::endl;
   	while (index < points.size()) {
-//      std::cerr << "index: " << index << std::endl;
-//      std::cout << "edges in 'edgeS':" << std::endl;
-//      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+/*      if (index > 32576 && index < 32579) {
+        std::cerr << "index: " << index << std::endl;
+        std::cout << "edges in 'edgeS':" << std::endl;
+        for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+      }
+*/
 
 //      std::cerr << std::endl << "index: " << index << std::endl;
   		val1.first = E_VALID; val2.first = E_VALID;
@@ -249,7 +253,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   		p3 = &points[polygon[after]];
 
       // construct the edges
-      //std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
+//      std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
       if ((!revert && (*p2 < *p3)) || (revert && (*p3 < *p2))) {  // make sure the earlier edge gets processed first.
         e1 = Edge (p1, p2, index);
         e2 = Edge (p1, p3, index);
@@ -265,7 +269,12 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       if ((revert && (*e1.p1 == *p1)) || (!revert && (*e1.p2 == *p1))) {
 //        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
         val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
-        if (val1.first == E_SKIP) {loop=true;revert=true;}
+        if (val1.first == E_SKIP) {
+          // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
+          if ((revert && (*e2.p1 == *p1)) || (!revert && (*e2.p2 == *p1))) {
+            removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+          }
+          loop=true;revert=true;}
         if (val1.first == E_NOT_VALID) break;
       }
       else {
