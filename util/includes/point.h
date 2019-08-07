@@ -65,7 +65,7 @@ public:
   }
 */
   friend bool operator!=(const Point & lhs, const Point & rhs) {
-    if ((abs(lhs.x - rhs.x) > EPSILON) || (abs(lhs.y - rhs.y)) > EPSILON) return true;
+    if ((fabs(lhs.x - rhs.x) > EPSILON) || (fabs(lhs.y - rhs.y)) > EPSILON) return true;
     else return false;
   }
 
