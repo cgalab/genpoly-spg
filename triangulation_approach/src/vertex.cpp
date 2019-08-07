@@ -420,6 +420,11 @@ bool Vertex::checkSurroundingPolygonAdvanced(){
 	area0 = (*t).signedArea();
 	delete t;
 
+	if(area0 == 0){
+		printf("surrouding polygon check: area is exactly 0!\n");
+		exit(9);
+	}
+
 	while(!Q.empty()){
 		first = second;
 		second = Q.front();
@@ -428,6 +433,11 @@ bool Vertex::checkSurroundingPolygonAdvanced(){
 		t = new Triangle(first, second, this);
 		area = (*t).signedArea();
 		delete t;
+
+		if(area == 0){
+			printf("surrouding polygon check: area is exactly 0!\n");
+			exit(9);
+		}
 
 		// compare orientation with the oriantation of the first triangle
 		if(signbit(area) != signbit(area0))
