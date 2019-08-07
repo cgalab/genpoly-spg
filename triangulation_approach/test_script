@@ -12,6 +12,7 @@ code5=0
 code6=0
 code7=0
 code8=0
+code9=0
 
 for i in {1..1000}
 do
@@ -50,6 +51,9 @@ do
 	elif [ $rv -eq 8 ]
 	then
 		code8=$((code8+1))
+	elif [ $rv -eq 9 ]
+	then
+		code9=$((code9+1))
 	fi
 done
 
@@ -62,3 +66,4 @@ echo Exit code 5: $code5
 echo Exit code 6: $code6
 echo Exit code 7: $code7
 echo Exit code 8: $code8
+echo Exit code 9: $code9

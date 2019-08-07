@@ -42,7 +42,7 @@ private:
 	TranslationType type;
 	EventQueue *Q;
 
-	const double epsilon = 0.0001; //10^-4
+	const double epsilon = 0.00001; //10^-5
 	const double epsilonInt = 0.000000000001; // 10⁻¹²
 
 	Settings settings;
