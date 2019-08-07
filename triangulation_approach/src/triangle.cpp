@@ -234,8 +234,6 @@ TEdge* Triangle::getLongestEdgeAlt(){
 	(*v0).print();
 	(*v1).print();
 	(*v2).print();
-	//(*(*v0).getTriangulation()).print("strang.graphml");
-	//exit(1);
 
 	// questionable whether this is really helpful
 	return getLongestEdge(0.0001);

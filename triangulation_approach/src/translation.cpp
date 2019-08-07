@@ -167,22 +167,25 @@ bool Translation::generateInitialQueue(){
 		areaOld = (*tr).signedArea();
 		delete tr;
 
+		// if the vertex lays at an edge at the begining of the translation then try to flip
+		if(areaOld == 0){
+			opposite = (*i).getLongestEdgeAlt();
+
+			// if the longest edge is a polygon edge, then we have an error here
+			if((*opposite).getEdgeType() == EdgeType::POLYGON){
+				printf("The vertex %llu to be translated lays exactly on a polygon edge :0\n", (*original).getID());
+				exit(7);
+			}
+
+			// otherwise we can do a flip
+			printf("The moving vertex lays exactly on an edge before the translation -> security flip\n");
+			flip(i, true);
+			continue;
+		}
+
 		tr = new Triangle(v0, v1, newV);
 		areaNew = (*tr).signedArea();
 		delete tr;
-
-		if(areaOld == 0 || (areaNew == 0 && type != TranslationType::SPLIT_PART_1)){
-			printf("The vertex %llu to be translated lays exactly on an edge :0\n", (*original).getID());
-			printf("areaOld: %.20f areaNew: %.20f \n", areaOld, areaNew);
-
-			(*newV).print();
-			(*v0).print();
-			(*v1).print();
-
-			(*T).addVertex(newV);
-			(*T).print("debug.graphml");
-			exit(7);
-		}
 
 		if(signbit(areaOld) == signbit(areaNew))
 			continue;
