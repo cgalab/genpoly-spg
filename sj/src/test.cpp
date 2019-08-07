@@ -66,16 +66,24 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   std::cerr << std::endl;
 
-  std::cerr << "=== checkIntersection tests ===" << std::endl;
-  std::cerr << "=== 'should be true' is a comparison 'itest >= IS_TRUE' : true when intersection exists ===" << std::endl;
-  enum intersect_t itest;
+  std::cerr << "=== Edge comparison with points ===" << std::endl;
 
-  p1.set(0,0);
-  p2.set(0,0);
-  p3.set(0,0);
+  p1.set(118532,919572,32577,48380,32577);
+  p2.set(118532,978866,32578,48379,32578);
+  p3.set(2,2,2,2,2);
+  p4.set(3,3,3,3,3);
 
   Edge e1 = Edge(&p1, &p2);
   Edge e2 = Edge(&p3, &p4);
+
+  std::cerr << "(*e1.p1): " << *e1.p1 << " == *p1: " << p1 << " : " <<  ((*e1.p1 == p1) ? "true" : "false") << std::endl;
+  std::cerr << "(*e1.p2): " << *e1.p1 << " == *p2: " << p2 << " : " <<  ((*e1.p2 == p2) ? "true" : "false") << std::endl;
+
+  std::cerr << std::endl;
+
+  std::cerr << "=== checkIntersection tests ===" << std::endl;
+  std::cerr << "=== 'should be true' is a comparison 'itest >= IS_TRUE' : true when intersection exists ===" << std::endl;
+  enum intersect_t itest;
 
   itest = checkIntersection(e1, e2);
   std::cerr << "intersection: " << e1 << " with " << e2 << ", should be true : " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
@@ -436,9 +444,10 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "is simple: should be false: " << ((btest) ? "true" : "false") << std::endl;
 */
 
+/*
   std::cerr << "=========== Heap's alg. test ================" << std::endl;
 
   std::vector<unsigned int> a = {1, 2, 3, 4, 5};
   heap(a, a.size());
-  
+*/
 }
