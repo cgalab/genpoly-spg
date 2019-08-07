@@ -25,7 +25,9 @@ enum error {
   ERR_AREA_NEGATIVE = 13,
   ERR_AREA_NOT_BETTER = 14,
   TOO_FEW_INNER_POINTS_FOR_HOLE = 15,
-  INNER_POINTS_COLLINEAR = 16
+  INNER_POINTS_COLLINEAR = 16,
+  NO_VERIFY_FILE = 17,
+  RUN_SIMPLE_CHECK = 18
 };
 
 // the algorithms that should be selectable.

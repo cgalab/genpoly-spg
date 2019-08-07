@@ -163,7 +163,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgea(Edge& e, std::set<
     // edge already existed in set.
     // this can happen if an index was reset when inserting 'e2' and we're dealing with insertion of e1 again.
     std::cerr << "Error: Edge already exists in set! : " << *retval.first << std::endl;
-    valid = E_SKIP;
+    valid = E_NOT_VALID;
   }
   retval2.first = valid;
   retval2.second = retval.first;
@@ -173,6 +173,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgea(Edge& e, std::set<
 
 // here we restart the index we look for after every found and fixed intersection.
 enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+  enum error retval = SUCCESS;
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points, randseed);
   //createCHRandPol(polygon, points, randseed);
@@ -228,8 +229,10 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        std::cerr << std::endl << "removing: " << e1 << ", and: " << e2 << std::endl;
         val1.first = removeEdgeFromSeta(e1, edgeS, polygon, points);
         if (val1.first == E_SKIP) {loop = true;}
+        if (val1.first == E_NOT_VALID) break;
         val2.first = removeEdgeFromSeta(e2, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop = true;}
+        if (val2.first == E_NOT_VALID) break;
 //        std::cerr << "skipping index" << std::endl;
       } else if ((*p1 < *p2) && (*p3 < *p1)) {
         e1 = Edge(p1, p2, index);
@@ -239,6 +242,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        std::cerr << std::endl << "removed p3: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdgea(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true;}
+        if (val1.first == E_NOT_VALID) break;
       } else if ((*p2 < *p1) && (*p1 < *p3) ) {
         e1 = Edge(p1, p3, index);
         e2 = Edge(p1, p2, index);
@@ -247,6 +251,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        std::cerr << std::endl << "removed p2: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdgea(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true;}
+        if (val1.first == E_NOT_VALID) break;
       } else {
         // construct the edges
         //std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
@@ -279,15 +284,13 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
   		  //std::cerr << std::endl << "processing e1: " << e1 << std::endl;
   		  val1 = processEdgea(e1, edgeS, polygon, points);
-  		  if (val1.first == E_SKIP) {
-          loop = true;
-        }
+  		  if (val1.first == E_SKIP) loop = true;
+        if (val1.first == E_NOT_VALID) break;
 
   		  //std::cerr << std::endl << "processing e2: " << e2 << std::endl;
   		  val2 = processEdgea(e2, edgeS, polygon, points);
-  		  if (val2.first == E_SKIP) {
-          loop = true;
-        }
+  		  if (val2.first == E_SKIP) loop = true;
+        if (val2.first == E_NOT_VALID) break;
       }
 
 //      std::cout << "edges in 'edgeS':" << std::endl;
@@ -299,7 +302,8 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
   		++index;
   	}
+    if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
   } while (loop);
 
-	return SUCCESS;
+	return retval;
 }
