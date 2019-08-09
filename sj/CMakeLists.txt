@@ -25,6 +25,7 @@ add_executable(spg
                     src/opt2.cpp
                     src/opt2a.cpp
                     src/opt2b.cpp
+                    src/opt2c.cpp
                     src/pol.cpp
                     src/test.cpp
                     )
