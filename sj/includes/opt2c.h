@@ -1,5 +1,5 @@
-#ifndef __2OPTB_H_
-#define __2OPTB_H_
+#ifndef __2OPTC_H_
+#define __2OPTC_H_
 
 #include <vector>
 #include <utility> // for std::pair

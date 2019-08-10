@@ -293,7 +293,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
           if ((*p2 < *p1) && (*p3 < *p1)) {
 //            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
             if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
-              update_lowest_index(p1, p2, p3, lowest_index);
+              update_lowest_index_c(p1, p2, p3, lowest_index);
 //              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
               if (revert) rev_found = true;
               else {edgeS_old = edgeS;rev_found=false;old_index=index;}
