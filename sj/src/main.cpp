@@ -17,6 +17,7 @@
 #include "opt2.h"
 #include "opt2a.h"
 #include "opt2b.h"
+#include "opt2c.h"
 #include "curve.h"
 #include "simple_pol_check.h"
 
@@ -112,6 +113,9 @@ int main(int argc, char *argv[]) {
       else if (alg == A_2OPT_B) {
         returnValue = opt2b(polygon, points, randseed);
       }
+      else if (alg == A_2OPT_C) {
+          returnValue = opt2c(polygon, points, randseed);
+      }
       else if (alg == A_HOLE) {
 
         returnValue = holes2(sph, points, randseed, nr_holes);
@@ -126,6 +130,7 @@ int main(int argc, char *argv[]) {
             case A_2OPT:
             case A_2OPT_A:
             case A_2OPT_B:
+            case A_2OPT_C:
               if (outFormat == OF_PURE_AND_PERM){
                 char tempFileName[255];
                 snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-pure");
