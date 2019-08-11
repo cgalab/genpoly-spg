@@ -1,12 +1,12 @@
 #include "translation.h"
 
 // Constructors
-Translation::Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY) : 
+Translation::Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY) :
 T(Tr), index(i), dx(dX), dy(dY), actualTime(0), split(false), type(TranslationType::DEFAULT), settings(set)
 
 {
 	original = (*T).getVertex(index);
-	
+
 	prevV = (*original).getPrev();
 	nextV = (*original).getNext();
 
@@ -22,6 +22,14 @@ T(Tr), index(i), dx(dX), dy(dY), actualTime(0), split(false), type(TranslationTy
 	nextNewE = new TEdge(newV, nextV);
 
 	Q = new EventQueue(epsilon, original, oldV, newV);
+
+	/*if((*original).getID() == 10463193){
+		printf("start default translation\n");
+		printf("oldV:\n");
+		(*oldV).print();
+		printf("newV:\n");
+		(*newV).print();
+	}*/
 }
 
 Translation::Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY, TranslationType tp) : 
@@ -29,7 +37,7 @@ T(Tr), index(i), dx(dX), dy(dY), actualTime(0), split(false), type(tp), settings
 
 {
 	original = (*T).getVertex(index);
-	
+
 	prevV = (*original).getPrev();
 	nextV = (*original).getNext();
 
@@ -45,6 +53,9 @@ T(Tr), index(i), dx(dX), dy(dY), actualTime(0), split(false), type(tp), settings
 	nextNewE = new TEdge(newV, nextV);
 
 	Q = new EventQueue(epsilon, original, oldV, newV);
+
+	/*if((*original).getID() == 10463193)
+		printf("start translation of type %d \n", (int)type);*/
 }
 
 // old version with non-exact arithmetic
@@ -157,7 +168,7 @@ bool Translation::generateInitialQueue(){
 	double areaOld, areaNew;
 	Triangle *tr;
 	bool ok;
-	
+
 	for(auto& i : triangles){
 		opposite = (*i).getEdgeNotContaining(original);
 		v0 = (*opposite).getV0();
@@ -180,6 +191,11 @@ bool Translation::generateInitialQueue(){
 			// otherwise we can do a flip
 			printf("The moving vertex lays exactly on an edge before the translation -> security flip\n");
 			flip(i, true);
+			/*if((*original).getID() == 10463193){
+				ok = (*original).checkSurroundingPolygonAdvanced();
+				if(!ok)
+					printf("the security flip didn't work out\n");
+			}*/
 			continue;
 		}
 
@@ -187,7 +203,8 @@ bool Translation::generateInitialQueue(){
 		areaNew = (*tr).signedArea();
 		delete tr;
 
-		if(signbit(areaOld) == signbit(areaNew))
+		// note: the triangle will also collapse if areaNew is exactly zero (zero can have both signs)
+		if((areaNew != 0) && (signbit(areaOld) == signbit(areaNew)))
 			continue;
 		else{
 			t = (*i).calculateCollapseTime(original, dx, dy);
@@ -207,6 +224,9 @@ bool Translation::generateInitialQueue(){
 			(*Q).insertWithoutCheck(t, i);
 		}
 	}
+
+	/*if((*original).getID() == 10463193)
+		printf("initial event queue generated\n");*/
 
 	ok = (*Q).makeStable(true);
 
@@ -287,7 +307,7 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 		if(iType == IntersectionType::EDGE){
 			count++;
 			intersectedE = i;
-		}	
+		}
 	}
 
 	// no intersection -> the new vertex stays in the surrounding polygon
@@ -314,7 +334,7 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 		nextT = (*intersectedE).getTriangleNotContaining(fromV);
 		surEdges = (*nextT).getOtherEdges(intersectedE);
 	}
-	
+
 	// iterate over the adjacent triangles if there was an intersection with a triangulation edge
 	// here surEdges always have the length 2
 	while(true){
@@ -360,7 +380,7 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 		}else{
 			nextT = (*intersectedE).getOtherTriangle(nextT);
 			surEdges = (*nextT).getOtherEdges(intersectedE);
-		}	
+		}
 	}
 
 	return true;
@@ -377,7 +397,7 @@ void Translation::repairEnd(){
 	TEdge *edge;
 	Translation *trans;
 	enum Executed ex;
-	
+
 	triangles = (*original).getTriangles();
 
 	for(auto& i : triangles){
@@ -468,7 +488,6 @@ enum Executed Translation::execute(){
 	enum Executed ex;
 
 	if(split){
-		
 		t = new Triangle(prevV, nextV, oldV);
 		oldArea = (*t).signedArea();
 		delete t;
@@ -477,9 +496,17 @@ enum Executed Translation::execute(){
 		newArea = (*t).signedArea();
 		delete t;
 
+		/*if((*original).getID() == 10463193){
+			printf("areaOld: %.25f areaNew: %.25f\n", oldArea, newArea);
+			if(signbit(oldArea) == signbit(newArea))
+				printf("split without side change\n");
+			else
+				printf("split with side change\n");
+		}*/
+
 		// vertex stays on the same side of the edge between the neighboring vertices
 		if(signbit(oldArea) == signbit(newArea)){
-			
+
 			// compute the intersection point to split the translation
 			intersectionPoint = getIntersectionPoint(prevV, oldV, nextV, newV);
 			if(intersectionPoint == NULL)
@@ -538,7 +565,7 @@ enum Executed Translation::execute(){
 				t = (*edge).getTriangleContaining(original);
 				flip(t, true);
 				//printf("did a security flip\n");
-			}				
+			}
 
 			// get translation from middle to end
 			transX = (*newV).getX() - (*original).getX();
@@ -644,7 +671,7 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 	t1 = new Triangle(e, e1, e2, vn0, vn1, vj1, "Flip2", ok);
 
 	if(!singleFlip){
-		// reset coordinates temporarely to original position
+		// reset coordinates temporarely to original position for the calcalation of the event time
 		x = (*original).getX();
 		y = (*original).getY();
 		(*original).setPosition((*oldV).getX(), (*oldV).getY());
@@ -689,7 +716,9 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 				area1 = (*dummyTriangle).signedArea();
 				delete dummyTriangle;
 
-				if(signbit(area0) != signbit(area1)){
+				// note: the triangle will also collapse if the test triangle with the new
+				// vertex is exact zero (which can have both signs)
+				if((area1 == 0) || (signbit(area0) != signbit(area1))){
 					time = (*t0).calculateCollapseTime(original, dx, dy);
 					(*Q).insertWithoutCheck(time, t0);
 					(*t0).enqueue();
@@ -706,7 +735,7 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 				area1 = (*dummyTriangle).signedArea();
 				delete dummyTriangle;
 
-				if(signbit(area0) != signbit(area1)){
+				if((area1 == 0) || (signbit(area0) != signbit(area1))){
 					time = (*t1).calculateCollapseTime(original, dx, dy);
 					(*Q).insertWithoutCheck(time, t1);
 					(*t1).enqueue();
@@ -750,7 +779,7 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 					area1 = (*dummyTriangle).signedArea();
 					delete dummyTriangle;
 
-					if(signbit(area0) != signbit(area1)){
+					if((area1 == 0) || (signbit(area0) != signbit(area1))){
 						time = (*t1).calculateCollapseTime(original, dx, dy);
 						(*Q).insertWithoutCheck(time, t1);
 						(*t1).enqueue();
@@ -768,7 +797,7 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 					area1 = (*dummyTriangle).signedArea();
 					delete dummyTriangle;
 
-					if(signbit(area0) != signbit(area1)){
+					if((area1 == 0) || (signbit(area0) != signbit(area1))){
 						time = (*t0).calculateCollapseTime(original, dx, dy);
 						(*Q).insertWithoutCheck(time, t0);
 						(*t0).enqueue();
@@ -815,13 +844,13 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 				area1 = (*dummyTriangle).signedArea();
 				delete dummyTriangle;
 
-				if(signbit(area0) != signbit(area1)){
+				if((area1 == 0) || (signbit(area0) != signbit(area1))){
 					time = (*t0).calculateCollapseTime(original, dx, dy);
 					(*Q).insertWithoutCheck(time, t0);
 					(*t0).enqueue();
 					insertion = true;
 				}
-			}	
+			}
 		}
 
 		// get original back to actual position
@@ -998,6 +1027,9 @@ Translation::~Translation(){
 
 		exit(6);
 	}
+
+	if((*original).getID() == 10463193)
+		printf("end translation of type %d \n", (int) type);
 
 	delete transPath;
 	delete oldV;
