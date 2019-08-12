@@ -14,10 +14,10 @@
 #include "pol.h"
 #include "opt2base.h"
 
-// Version of BO-2opt that reverses to a lower index as well as saves the sweep-line status in case no intersections occurred going back.
+// Version of BO-2opt that only flips the edges and not the whole chain.
 
 // Have a max_back index that the algorithm goes to before moving forward again.
-enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+enum error opt2d(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
   enum error retval = SUCCESS;
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points, randseed);
@@ -30,20 +30,18 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 	fill_lex(lex, points); // fill 'lex' with the indexes
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
-	unsigned int index, old_index, before, after, lowest_index;
+	unsigned int index, before, after, lowest_index;
   std::pair<enum edge_t, std::set<Edge>::iterator> val1, val2;
   double val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
-  bool loop, revert, rev_found;
+  bool loop, revert;
   std::set<Edge> edgeS; // a sweep-line-status object.
-  std::set<Edge> edgeS_old; // the old sweep line.
 
   do {
     loop = false;
     revert = false;
-    rev_found = false;
-    index = 0; old_index = 0;
+    index = 0;
     lowest_index = polygon.size();
     decrementEdges(index, edgeS);
 
@@ -84,15 +82,12 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       //process first edge
       if ((revert && (*e1.p1 == *p1)) || (!revert && (*e1.p2 == *p1))) {
 //        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
-        val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
+        val1.first = removeEdgeFromSetd(e1, lowest_index, edgeS, polygon, points);
         if (val1.first == E_SKIP) {
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if ((revert && (*e2.p1 == *p1)) || (!revert && (*e2.p2 == *p1))) {
-            val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
-            if (val2.first == E_NOT_VALID) break;
+            removeEdgeFromSetd(e2, lowest_index, edgeS, polygon, points);
           }
-          if (revert) rev_found = true;
-          else {edgeS_old = edgeS;rev_found=false;old_index=index;}
           loop=true;revert=true;}
         if (val1.first == E_NOT_VALID) break;
       }
@@ -106,52 +101,40 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
             if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
               update_lowest_index(p1, p2, p3, lowest_index);
 //              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-              if (revert) rev_found = true;
-              else {edgeS_old = edgeS;rev_found=false;old_index=index;}
-              loop = true;revert = true;continue;
+              loop = true;
+              revert = true;
+              continue;
             }
           } //else std::cerr << "false alarm." << std::endl;
         }
 
 //        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
-        val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);
-        if (val1.first == E_SKIP) {
-          if(revert)rev_found=true;
-          else {edgeS_old = edgeS;rev_found=false;old_index=index;}
-          loop=true;revert=true;continue;}
+        val1 = processEdged(e1, lowest_index, edgeS, polygon, points);
+        if (val1.first == E_SKIP) {loop=true;revert=true;continue;}
         if (val1.first == E_NOT_VALID) break;
       }
 
       // process second edge
       if ((revert && (*e2.p1 == *p1)) || (!revert && (*e2.p2 == *p1))) {
 //        std::cerr << std::endl << "removing e2: " << e2 << std::endl;
-        val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+        val2.first = removeEdgeFromSetd(e2, lowest_index, edgeS, polygon, points);
+        if (val2.first == E_SKIP) {loop=true;revert=true;}
         if (val2.first == E_NOT_VALID) break;
-        if (val2.first == E_SKIP) {
-          if(revert)rev_found=true;
-          else {edgeS_old = edgeS;rev_found=false;old_index=index;}
-          loop=true;revert=true;}
       }
       else {
 //        std::cerr << std::endl << "processing e2: " << e2 << std::endl;
-        val2 = processEdgeb(e2, lowest_index, edgeS, polygon, points);
-        if (val2.first == E_NOT_VALID) break;
+        val2 = processEdged(e2, lowest_index, edgeS, polygon, points);
         if (val2.first == E_SKIP) {
-          val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
+          val1.first = removeEdgeFromSetd(e1, lowest_index, edgeS, polygon, points);
           if (val1.first == E_NOT_VALID) break;
-          if(revert)rev_found=true;
-          else {edgeS_old = edgeS;rev_found=false;old_index=index;}
           loop=true;revert=true;continue;
         }
+        if (val2.first == E_NOT_VALID) break;
       }
 
       if (lowest_index == index) {
         revert = false;
         lowest_index = polygon.size();
-        if (!rev_found) {
-          index = old_index;
-          edgeS = edgeS_old;
-        }
         continue;
       }
   		if (revert) --index;

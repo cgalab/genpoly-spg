@@ -22,10 +22,12 @@ add_executable(spg
 					          src/inits.cpp
                     src/io.cpp
                     src/main.cpp
+                    src/opt2base.cpp
                     src/opt2.cpp
                     src/opt2a.cpp
                     src/opt2b.cpp
                     src/opt2c.cpp
+                    src/opt2d.cpp
                     src/pol.cpp
                     src/test.cpp
                     )

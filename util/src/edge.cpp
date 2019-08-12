@@ -294,6 +294,23 @@ void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon
 	}
 }
 
+// Only switches the 2 edges, does not reverse the whole polygonal chain.
+void flip2(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon) {
+	//std::cout << "inside flip" << std::endl;
+
+	// edges being lex. sorted points, e.p1 is always lower than e.p2, so only the 2 latter points have to be switched.
+	Point *temp = e1.p2;
+	e1.p2 = e2.p2;
+	e2.p2 = temp;
+
+	unsigned int tmp = (*e1.p2).v;
+	(*e1.p2).v = (*e2.p2).v;
+	(*e2.p2).v = tmp;
+
+	polygon[(*e1.p2).v] = (*e1.p2).i;
+	polygon[(*e2.p2).v] = (*e2.p2).i;
+}
+
 // simple function to print out a polygon
 void poldisplay (std::vector<unsigned int>& p) {
 	for (unsigned int i = 0; i < p.size();++i) {

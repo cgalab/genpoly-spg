@@ -38,6 +38,7 @@ enum alg_t {
   A_2OPT_A,
   A_2OPT_B,
   A_2OPT_C,
+  A_2OPT_D,
   A_CURVE,
   A_HOLE
 };
