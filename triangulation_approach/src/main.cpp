@@ -22,6 +22,7 @@ code 	name						meaning
 8		temporarly empty
 9		Triangulation error			Some vertex has left its surrouding polygon but it hasn't been recognized
 									during the translation
+10		Vertex at PE end 			The surrounding polygon check recognizes a vertex exactly laying on a PE
 */
 
 

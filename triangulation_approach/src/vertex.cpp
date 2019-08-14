@@ -114,8 +114,6 @@ double Vertex::getDirectedEdgeLength(double alpha){
 	}
 	
 	printf("was not able to find the triangle for vertex %llu in direction %f, truely zero: \n", id, alpha);
-	/*printSurroundingTriangulation("env.graphml");
-	exit(7);*/
 	
 	return - getMediumEdgeLength();
 }
@@ -138,6 +136,16 @@ Vertex* Vertex::getNext(){
 
 Triangulation* Vertex::getTriangulation(){
 	return T;
+}
+
+Triangle* Vertex::getTriangleWith(Vertex* v0, Vertex* v1){
+
+	for(auto const& i : triangles){
+		if((*i).contains(v0) && (*i).contains(v1))
+			return i;
+	}
+
+	return NULL;
 }
 
 // Setter
@@ -420,8 +428,13 @@ bool Vertex::checkSurroundingPolygonAdvanced(){
 	area0 = (*t).signedArea();
 	delete t;
 
-	if(area0 == 0)
+	if(area0 == 0){
+		t = getTriangleWith(first, second);
+		e = (*t).getLongestEdgeAlt();
 		printf("surrouding polygon check: area is exactly 0!\n");
+		if((*e).getEdgeType() == EdgeType::POLYGON)
+			exit(10);
+	}
 
 	while(!Q.empty()){
 		first = second;
@@ -433,8 +446,13 @@ bool Vertex::checkSurroundingPolygonAdvanced(){
 		delete t;
 
 		if(area == 0){
+			t = getTriangleWith(first, second);
+			e = (*t).getLongestEdgeAlt();
 			printf("surrouding polygon check: area is exactly 0!\n");
-			continue;
+			if((*e).getEdgeType() == EdgeType::POLYGON)
+				exit(10);
+			else
+				continue;
 		}
 
 		// compare orientation with the oriantation of the first triangle

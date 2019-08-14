@@ -70,6 +70,7 @@ public:
 	Vertex* getPrev();
 	Vertex* getNext();
 	Triangulation* getTriangulation();
+	Triangle* getTriangleWith(Vertex* v0, Vertex* v1);
 
 	// Setters
 	void setTriangulation(Triangulation* t);
