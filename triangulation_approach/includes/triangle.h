@@ -64,6 +64,7 @@ public:
 	bool isEnqueued();
 	double calculateCollapseTime(Vertex* moving, double dx, double dy);
 	double signedArea();
+	double det(Vertex *V0, Vertex *V1, Vertex *V2);
 	
 	// Destructor
 	~Triangle();	

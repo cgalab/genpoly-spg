@@ -359,7 +359,7 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	return 1 / (portion + 1);
 }
 
-double Triangle::signedArea(){
+/*double Triangle::signedArea(){
 	point p0, p1, p2;
 
 	p0.x = (*v0).getX();
@@ -372,9 +372,9 @@ double Triangle::signedArea(){
 	p2.y = (*v2).getY();
 
 	return orient2d(p0, p1, p2);
-}
+}*/
 
-/*double Triangle::signedArea(){
+double Triangle::signedArea(){
 	unsigned long long id0, id1, id2;
 	double area;
 
@@ -419,7 +419,7 @@ double Triangle::det(Vertex *V0, Vertex *V1, Vertex *V2){
 	area = ay * (cx - bx) + by * (ax - cx) + cy * (bx - ax);
 
 	return area;
-}*/
+}
 
 // Destructor
 Triangle::~Triangle(){
