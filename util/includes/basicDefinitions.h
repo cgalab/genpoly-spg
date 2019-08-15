@@ -27,7 +27,8 @@ enum error {
   TOO_FEW_INNER_POINTS_FOR_HOLE = 15,
   INNER_POINTS_COLLINEAR = 16,
   NO_VERIFY_FILE = 17,
-  RUN_SIMPLE_CHECK = 18
+  RUN_SIMPLE_CHECK = 18,
+  CONVERT_FORMAT = 19
 };
 
 // the algorithms that should be selectable.
