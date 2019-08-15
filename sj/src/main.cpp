@@ -183,6 +183,22 @@ int main(int argc, char *argv[]) {
     }
     else std::cerr << "Error reading points input file." << std::endl;
   }
+  else if (returnValue == CONVERT_FORMAT) {
+    // points from input file saved in a vector if 'Point' class
+    std::vector<Point> points;
+    // 'polygon' is an unsigned integer list of indexes into vector 'points'
+    std::vector<unsigned int> polygon;
+
+    returnValue = readInFile(inFile, inFormat, points);
+
+    if (returnValue == SUCCESS) {
+      // as we are only writing the points to another format, only a lexicogrpahical indes is needed.
+      for (unsigned int i=0; i < points.size(); ++i) polygon.push_back(i);
+      returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
+    }
+    else std::cerr << "Error reading infile!" << std::endl;
+
+  }
   else if (returnValue == RUN_TESTS) test();
 
   //begin = clock();

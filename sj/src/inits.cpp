@@ -147,11 +147,12 @@ enum error argInit(	int argc, char *argv[],
 		{"writenew", no_argument, NULL, 'w'},
 		{"simplecalc", no_argument, NULL, 's'},
 		{"holes", no_argument, NULL, 'h'},
+		{"convert", no_argument, NULL, 'k'},
 		{"help", no_argument, NULL, '?'},
 		{0, 0, 0, 0}
 	};
 
-	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:v:h:r:w?stn::x::", long_options, NULL)) != -1) && returnValue == SUCCESS) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:v:h:r:w?kstn::x::", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -190,7 +191,10 @@ enum error argInit(	int argc, char *argv[],
 				checkSimple = true;
 				break;
 			case 't':
-				returnValue = RUN_TESTS;
+				returnValue = RUN_TESTS; // needs no other arguments.
+				break;
+			case 'k':
+				returnValue = CONVERT_FORMAT; // must be the last argument.
 				break;
 			case 'v':
 				returnValue = vFileInit(vFile, optarg);
