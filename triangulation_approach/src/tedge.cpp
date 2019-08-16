@@ -229,7 +229,6 @@ double TEdge::getAngle(Vertex* v){
 	if(alpha == 0 && dx < 0)
 		alpha = M_PI;
 
-
 	return alpha;
 }
 
@@ -275,106 +274,8 @@ TEdge::~TEdge(){
 unsigned long long TEdge::n = 0;
 
 // Other non-member stuff
-// from steinthors Edge class
-/*double reldist(TEdge* e, Vertex* p){
-	Vertex* pa = (*e).getV0();
-	Vertex* pb = (*e).getV1();
-	double px = (*p).getX();
-	double py = (*p).getY();
-	double pax = (*pa).getX();
-	double pay = (*pa).getY();
-	double pbx = (*pb).getX();
-	double pby = (*pb).getY();
-
-	return ((px - pax) * (pbx - pax) + (py - pay) * (pby - pay) / ((pbx - pax) * (pbx - pax) + (pby - pay) * (pby - pay)));
-}
-
-double det(TEdge* e, Vertex* p){
-	Vertex* pa = (*e).getV0();
-	Vertex* pb = (*e).getV1();
-	double px = (*p).getX();
-	double py = (*p).getY();
-	double pax = (*pa).getX();
-	double pay = (*pa).getY();
-	double pbx = (*pb).getX();
-	double pby = (*pb).getY();
-
-	return (px * (pay - pby) - py * (pax - pbx) + (pax * pby - pbx * pay));
-}
 
 enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1){
-	double det_a, det_b, det_c, det_d;
-	double dp_1, dp_2, dp_3, dp_4;
-	bool same00 = false, same01 = false, same10 = false, same11 = false;
-
-	// determinant between edge 0 and a point in edge 1
-	det_a = det(e0, (*e1).getV0());
-	det_b = det(e0, (*e1).getV1());
-	// determinant between edge 1 and a point in edge 0
-	det_c = det(e1, (*e0).getV0());
-	det_d = det(e1, (*e0).getV1());
-
-	if(fabs(det_a * det_b * det_c * det_d) < 0.00000000000000000001){
-		bool col = false; // if true, check for collinearity
-
-		//quick check if the edges share a vertex
-		if((*(*e0).getV0()).getID() == (*(*e1).getV0()).getID())
-			same00 = true;
-		if((*(*e0).getV0()).getID() == (*(*e1).getV1()).getID())
-			same01 = true;
-		if((*(*e0).getV1()).getID() == (*(*e1).getV0()).getID())
-			same10 = true;
-		if((*(*e0).getV1()).getID() == (*(*e1).getV1()).getID())
-			same11 = true;
-
-		// TODO: this makes no sense if the vertices in the edges are unordered
-		// is e1 and e2 the same edge? then return IS_TRUE
-		if(same00 && same11)
-			return IntersectionType::VERTEX;
-
-		// some determinant was 0, need to check if it's inside an edge or outside.
-		dp_1 = reldist(e0, (*e1).getV0());
-		dp_2 = reldist(e0, (*e1).getV1());
-		dp_3 = reldist(e1, (*e0).getV0());
-		dp_4 = reldist(e1, (*e0).getV1());
-
-		//std::cout << "dp1: " << dp_1 << std::endl;
-		//std::cout << "dp2: " << dp_2 << std::endl;
-		//std::cout << "dp3: " << dp_3 << std::endl;
-		//std::cout << "dp4: " << dp_4 << std::endl;
-
-		if((det_a == 0) && (dp_1 > 0) && (dp_1 < 1))
-			col = true;
-		else if((det_b == 0) && (dp_2 > 0) && (dp_2 < 1))
-			col = true;
-		else if((det_c == 0) && (dp_3 > 0) && (dp_3 < 1))
-			col = true;
-		else if((det_d == 0) && (dp_4 > 0) && (dp_4 < 1))
-			col = true;
-
-		if(col)
-			return IntersectionType::VERTEX;
-		else if(same00)
-			return IntersectionType::VERTEX;
-		else if(same01)
-			return IntersectionType::VERTEX;
-		else if(same10)
-			return IntersectionType::VERTEX;
-		else if(same11)
-			return IntersectionType::VERTEX;
-		else
-			return IntersectionType::VERTEX;
-
-	}else{
-		// none of the determinants were 0, so just need to check the sign for intersection.
-		if((signbit(det_a) ^ signbit(det_b)) && (signbit(det_c) ^ signbit(det_d)))
- 			return IntersectionType::EDGE;
-		else 
-			return IntersectionType::NONE;
-	}
-}*/
-
-enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1, const double epsilon){
 	Vertex *v00, *v01, *v10, *v11;
 	double area00, area01, area10, area11;
 	//double l0, l1;
@@ -406,28 +307,28 @@ enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1, const double epsil
 	delete t;
 
 	// check whether v10 lays on e0
-	if(fabs(area00) <= epsilon){
+	if(fabs(area00) <= Settings::epsInt){
 		// check whether v10 lays between the vertices of e0
 		if((*e0).isBetween(v10))
 			return IntersectionType::VERTEX;
 	}
 
 	// check whether v11 lays on e0
-	if(fabs(area01) <= epsilon){
+	if(fabs(area01) <= Settings::epsInt){
 		// check whether v10 lays between the vertices of e0
 		if((*e0).isBetween(v11))
 			return IntersectionType::VERTEX;
 	}
 
 	// check whether v00 lays on e1
-	if(fabs(area10) <= epsilon){
+	if(fabs(area10) <= Settings::epsInt){
 		// check whether v10 lays between the vertices of e0
 		if((*e1).isBetween(v00))
 			return IntersectionType::VERTEX;
 	}
 
 	// check whether v01 lays on e1
-	if(fabs(area11) <= epsilon){
+	if(fabs(area11) <= Settings::epsInt){
 		// check whether v10 lays between the vertices of e0
 		if((*e1).isBetween(v01))
 			return IntersectionType::VERTEX;

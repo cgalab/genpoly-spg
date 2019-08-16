@@ -42,11 +42,6 @@ private:
 	TranslationType type;
 	EventQueue *Q;
 
-	const double epsilon = 0.00001; //10^-5
-	const double epsilonInt = 0.000000000001; // 10⁻¹²
-
-	Settings settings;
-
 	bool generateInitialQueue();
 
 	bool insideQuadrilateral(Vertex* v);
@@ -56,8 +51,8 @@ private:
 	void repairEnd();
 
 public:
-	Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY);
-	Translation(Triangulation* Tr, Settings &set, int i, double dX, double dY, TranslationType tp);
+	Translation(Triangulation* Tr, int i, double dX, double dY);
+	Translation(Triangulation* Tr, int i, double dX, double dY, TranslationType tp);
 
 	bool checkOverroll();
 

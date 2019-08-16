@@ -1,11 +1,13 @@
 #include "vertex.h"
 
 // Constructors
-Vertex::Vertex(double X, double Y) : T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(false), id(n), reserveID(2 * n) {
+Vertex::Vertex(double X, double Y) :
+T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(false), id(n), reserveID(2 * n) {
 	n++;
 }
 
-Vertex::Vertex(double X, double Y, bool RV) : T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(RV), id(n), reserveID(2 * n) {
+Vertex::Vertex(double X, double Y, bool RV) :
+T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(RV), id(n), reserveID(2 * n) {
 	n++;
 }
 

@@ -10,8 +10,7 @@
 enum class RPShapes {RPS_FLAT, RPS_QUADRATIC};
 
 //Polygon* generateRectangularPolygon(int n, enum RPShapes type);
-Triangulation* generateRegularPolygon(Settings &settings);
-void initialTriangulationPseudoStar(Triangulation* T, int n);
-void initialTriangulationStar(Triangulation* T, int n);
-void initialTriangulationZigZag(Triangulation* T, int n);
-void boxPolygon(Settings &settings, Triangulation* T, int startIndex);
+Triangulation* generateRegularPolygon();
+void initialTriangulationPseudoStar(Triangulation* T);
+void initialTriangulationZigZag(Triangulation* T);
+void boxPolygon(Triangulation* T, int startIndex);

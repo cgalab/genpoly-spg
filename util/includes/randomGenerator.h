@@ -9,9 +9,9 @@ class RandomGenerator{
 		std::mt19937 generator;
 
 	public:
-		RandomGenerator(){
-			unsigned int seed = rd();
-			//seed = 3937068631;
+		RandomGenerator(bool fixedSeed, unsigned int seed){
+			if(!fixedSeed)
+				seed = rd();
 
 			printf("seed: %u \n", seed);
 

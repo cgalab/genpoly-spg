@@ -2,7 +2,7 @@
 #include <string>
 #include <math.h>
 
-int transformPolygonByMoves(Settings &settings, RandomGenerator &generator, Triangulation* T, int iterations, bool fixed){
+int transformPolygonByMoves(Triangulation* T, int iterations){
 	int index = 0;
 	double dx = 0, dy = 0, stddev, alpha, r; // radius of the initial polygon was 30
 	bool simple, overroll;
@@ -17,22 +17,19 @@ int transformPolygonByMoves(Settings &settings, RandomGenerator &generator, Tria
 
 	for(int i = 0; i < iterations; i++){
 
-		if(fixed)
-			index = 123235;
-		else
-			index = generator.getRandomIndex(n);
+		index = (*Settings::generator).getRandomIndex(n);
 
 		v = (*T).getVertex(index);
 
-		alpha = generator.getTranslationUniform(- M_PI, M_PI);
+		alpha = (*Settings::generator).getTranslationUniform(- M_PI, M_PI);
 		stddev = (*v).getDirectedEdgeLength(alpha);
 
-		r = generator.getTranslationNormal(stddev / 2, stddev / 6);
+		r = (*Settings::generator).getTranslationNormal(stddev / 2, stddev / 6);
 
 		dx = r * cos(alpha);
 		dy = r * sin(alpha);
 
-		trans = new Translation(T, settings, index, dx, dy);
+		trans = new Translation(T, index, dx, dy);
 
 		overroll = (*trans).checkOverroll();
 
@@ -50,28 +47,28 @@ int transformPolygonByMoves(Settings &settings, RandomGenerator &generator, Tria
 
 		delete trans;
 
-		if(i % div == 0 && settings.getFBMode() != FeedbackMode::LACONIC)
-			printf("%f%% of %d translations performed after %f seconds \n", (double)i / (double)iterations * 100, iterations, settings.elapsedTime());
+		if(i % div == 0 && Settings::feedback != FeedbackMode::LACONIC)
+			printf("%f%% of %d translations performed after %f seconds \n", (double)i / (double)iterations * 100, iterations, (*Settings::timer).elapsedTime());
 	}
 
 	return performedTranslations;
 }
 
-void growPolygon(Settings &settings, RandomGenerator &generator, Triangulation* T){
+void growPolygon(Triangulation* T){
 	int n, index, actualN, i;
 	Insertion *in;
 	bool ok;
 	int div;
 	int counter = 0;
 
-	n = settings.getTargetSize() - (*T).getActualNumberOfVertices();
+	n = Settings::targetSize - (*T).getActualNumberOfVertices();
 	div = 0.01 * n;
 
 	for(i = 0; i < n;){
 		
 		actualN = (*T).getActualNumberOfVertices();
 
-		index = generator.getRandomIndex(actualN);
+		index = (*Settings::generator).getRandomIndex(actualN);
 
 		in = new Insertion(T, index);
 
@@ -89,13 +86,13 @@ void growPolygon(Settings &settings, RandomGenerator &generator, Triangulation* 
 		counter = 0;
 
 		(*in).execute();		
-		(*in).translate(settings, generator);
+		(*in).translate();
 
 		delete in;
 
 		i++;
 
-		if(i % div == 0 && settings.getFBMode() != FeedbackMode::LACONIC)
-			printf("%f%% of %d insertions performed after %f seconds \n", (double)i / (double)n * 100, n, settings.elapsedTime());
+		if(i % div == 0 && Settings::feedback != FeedbackMode::LACONIC)
+			printf("%f%% of %d insertions performed after %f seconds \n", (double)i / (double)n * 100, n, (*Settings::timer).elapsedTime());
 	}
 }

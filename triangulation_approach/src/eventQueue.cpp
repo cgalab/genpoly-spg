@@ -1,7 +1,7 @@
 #include "eventQueue.h"
 
-EventQueue::EventQueue(double eps, Vertex* orig, Vertex* oV, Vertex* nV) : 
-first(NULL), n(0), epsilon(eps), original(orig), oldV(oV), newV(nV) {}
+EventQueue::EventQueue(Vertex* orig, Vertex* oV, Vertex* nV) : 
+first(NULL), n(0), original(orig), oldV(oV), newV(nV) {}
 
 void EventQueue::insertWithoutCheck(double time, Triangle* t){
 	struct Event* e0;
@@ -146,10 +146,10 @@ bool EventQueue::makeStable(bool initial){
 		dif = fabs(time1 - time0);
 
 		// two events are at the same time
-		if(dif < epsilon){
+		if(dif < Settings::epsEventTime){
 			// check first whether there is a third event at the same time
 			dif = fabs(time1 - e1 -> collapseTime);
-			if(dif < epsilon){
+			if(dif < Settings::epsEventTime){
 				if(initial)
 					printf("Eventqueue: More than two events at the same time -> refused translation\n");
 				else

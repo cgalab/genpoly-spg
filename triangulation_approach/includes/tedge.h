@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string>
 #include "basicDefinitions.h"
+#include "settings.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -86,6 +87,6 @@ public:
 
 #endif
 
-enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1, const double epsilon);
+enum IntersectionType checkIntersection(TEdge* e0, TEdge* e1);
 Vertex* getIntersectionPoint(Vertex* s0, Vertex* e0, Vertex* s1, Vertex* e1);
 double crossProduct2D(double x0, double y0, double x1, double y1);

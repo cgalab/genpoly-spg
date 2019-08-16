@@ -12,7 +12,7 @@ Insertion::Insertion(Triangulation* t, int index) : T(t), i(index) {
 bool Insertion::lengthControll(){
 	double l = (*e).length();
 
-	if(l < 0.0000001)
+	if(l < Settings::minLength)
 		return false;
 
 	return true;
@@ -79,26 +79,25 @@ void Insertion::execute(){
 	}
 }
 
-void Insertion::translate(Settings &settings, RandomGenerator &generator){
+void Insertion::translate(){
 	int index;
 	bool overroll, simple = false;
 	double alpha, stddev, r, dx, dy;
 	Translation* trans;
 	int count = 0;
-	int max = settings.getInsertionTries();
 
 	index = (*T).getActualNumberOfVertices() - 1;
 
-	while(!simple && count < max){
-		alpha = generator.getTranslationUniform(- M_PI, M_PI);
+	while(!simple && count < Settings::insertionTries){
+		alpha = (*Settings::generator).getTranslationUniform(- M_PI, M_PI);
 		stddev = (*newV).getDirectedEdgeLength(alpha);
 
-		r = generator.getTranslationNormal(stddev / 2, stddev / 6);
+		r = (*Settings::generator).getTranslationNormal(stddev / 2, stddev / 6);
 
 		dx = r * cos(alpha);
 		dy = r * sin(alpha);
 
-		trans = new Translation(T, settings, index, dx, dy);
+		trans = new Translation(T, index, dx, dy);
 
 		overroll = (*trans).checkOverroll();
 
@@ -117,6 +116,6 @@ void Insertion::translate(Settings &settings, RandomGenerator &generator){
 		count++;
 	}
 
-	if(settings.getFBMode() == FeedbackMode::VERBOSE && count == max)
+	if(Settings::feedback == FeedbackMode::VERBOSE && count == Settings::insertionTries)
 		printf("translation after insertion was impossible!\n");
 }

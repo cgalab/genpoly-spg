@@ -1,6 +1,6 @@
 PP = g++
-# maybe add -Werror -Wall
-WFLAGS = -Wextra -O3 -std=c++11 -Wall -Wno-format
+# maybe add -Werror -Wall  
+WFLAGS = -Wextra -O3 -Wall -Wno-format -std=c++11
 
 SDIR = src
 ODIR = obj

@@ -1,23 +1,21 @@
 #include "initialPolygonGenerator.h"
 
-Triangulation* generateRegularPolygon(Settings &settings){
-	double r, alpha;
+Triangulation* generateRegularPolygon(){
+	double alpha;
 	int i;
 	Vertex* v;
-	int n = settings.getInitialSize();
-	Triangulation* T = new Triangulation(settings.getTargetSize());
+	Triangulation* T = new Triangulation(Settings::targetSize);
 	
-	alpha = 2 * M_PI / n;
-	r = settings.getRadius();
+	alpha = 2 * M_PI / Settings::initialSize;
 
-	for(i = 0; i < n; i++){
-		v = new Vertex(r * cos(i * alpha), r * sin(i * alpha));
+	for(i = 0; i < Settings::initialSize; i++){
+		v = new Vertex(Settings::radius * cos(i * alpha), Settings::radius * sin(i * alpha));
 		(*T).addVertex(v);
 	}
 
-	initialTriangulationZigZag(T, n);
+	initialTriangulationZigZag(T);
 
-	boxPolygon(settings, T, 0);
+	boxPolygon(T, 0);
 
 	return T; 
 	
@@ -25,7 +23,7 @@ Triangulation* generateRegularPolygon(Settings &settings){
 
 // boxPolygon startindex 1
 // works in principle, but is slow as shit
-void initialTriangulationPseudoStar(Triangulation* T, int n){
+void initialTriangulationPseudoStar(Triangulation* T){
 	int i;
 	Vertex *center, *v0, *v1;
 	TEdge *e0, *e1, *e2, *start;
@@ -47,7 +45,7 @@ void initialTriangulationPseudoStar(Triangulation* T, int n){
 
 	new Triangle(e0, e1, start, v0, v1, center, "initialGeneratorStart", ok);
 
-	for(i = 3; i < n; i++){
+	for(i = 3; i < Settings::initialSize; i++){
 		v0 = v1;
 		v1 = (*T).getVertex(i);
 
@@ -69,50 +67,7 @@ void initialTriangulationPseudoStar(Triangulation* T, int n){
 }
 
 // boxPolygon startindex 0
-// doesn't work at all
-void initialTriangulationStar(Triangulation* T, int n){
-	int i;
-	Vertex *center, *v0, *v1;
-	TEdge *e0, *e1, *e2, *start;
-
-	center = new Vertex(0, 0, true);
-	(*T).addVertex(center);
-
-	v0 = (*T).getVertex(0);
-	v1 = (*T).getVertex(1);
-
-	e0 = new TEdge(v0, v1, EdgeType::POLYGON); // e0 is the polygon edge
-	e1 = new TEdge(v1, center); // e1 is the edge of the higher vertex to the center
-	start = new TEdge(center, v0);
-	(*T).addEdge(e0);
-	(*T).addEdge(e1);
-	(*T).addEdge(start);
-
-	new Triangle(e0, e1, start, v0, v1, center);
-
-	for(i = 2; i < n; i++){
-		v0 = v1;
-		v1 = (*T).getVertex(i);
-
-		e0 = new TEdge(v0, v1, EdgeType::POLYGON);
-		e2 = e1;
-		e1 = new TEdge(v1, center);
-
-		(*T).addEdge(e0);
-		(*T).addEdge(e1);
-
-		new Triangle(e0, e1, e2, v0, v1, center);
-	}
-
-	v0 = (*T).getVertex(n - 1);
-	v1 = (*T).getVertex(0);
-	e0 = new TEdge(v0, v1, EdgeType::POLYGON);
-	(*T).addEdge(e0);
-	new Triangle(e0, e1, start, v0, v1, center);
-}
-
-// boxPolygon startindex 0
-void initialTriangulationZigZag(Triangulation* T, int n){
+void initialTriangulationZigZag(Triangulation* T){
 	int i;
 	Vertex* v0 = NULL, *v1 = NULL, *v2 = NULL;
 	TEdge* e0 = NULL, *e1 = NULL, *e2 = NULL;
@@ -120,10 +75,10 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 
 	// the inital triangulation contains n-2 triangles
 	v0 = (*T).getVertex(0);
-	v1 = (*T).getVertex(n - 1);
+	v1 = (*T).getVertex(Settings::initialSize - 1);
 	e0 = new TEdge(v1, v0, EdgeType::POLYGON);
 	(*T).addEdge(e0);
-	for(i = 0; i < n - 2; i++){
+	for(i = 0; i < Settings::initialSize - 2; i++){
 		ok = true;
 		if(i % 2 == 0){
 			// v0 stays as it is and v1 becomes v2
@@ -142,7 +97,7 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 		}else{
 			// v1 becomes v0 and v2 stays as it is
 			v0 = v1;
-			v1 = (*T).getVertex(n - i / 2 - 2);
+			v1 = (*T).getVertex(Settings::initialSize - i / 2 - 2);
 
 			// e1 becomes e2
 			e2 = e1;
@@ -158,23 +113,21 @@ void initialTriangulationZigZag(Triangulation* T, int n){
 		//(*t).print();
 	}
 
-	if(n % 2 == 0){
+	if(Settings::initialSize % 2 == 0){
 		(*e0).setEdgeType(EdgeType::POLYGON);
 	}else{
 		(*e1).setEdgeType(EdgeType::POLYGON);
 	}
 }
 
-void boxPolygon(Settings &settings, Triangulation* T, int startIndex){
+void boxPolygon(Triangulation* T, int startIndex){
 	// vertices and edges of the rectangle
 	Vertex *rv0, *rv1, *rv2, *rv3;
 	TEdge *re0, *re1, *re2, *re3;
 	int limit0, limit1, limit2, i;
 	TEdge *start, *prev, *next;
 	Vertex *v0, *v1;
-	double a = settings.getBoxSize(); // lenght of a side
 	bool ok = false;
-	int n = settings.getInitialSize();
 
 	// generate the rectangle
 	/*
@@ -182,10 +135,10 @@ void boxPolygon(Settings &settings, Triangulation* T, int startIndex){
 		|   |
 		2 - 3
 	*/
-	rv0 = new Vertex(a / 2, a / 2, true);
-	rv1 = new Vertex(-a / 2, a / 2, true);
-	rv2 = new Vertex(- a / 2, - a / 2, true);
-	rv3 = new Vertex(a / 2, - a / 2, true);
+	rv0 = new Vertex(Settings::boxSize / 2, Settings::boxSize / 2, true);
+	rv1 = new Vertex(-Settings::boxSize / 2, Settings::boxSize / 2, true);
+	rv2 = new Vertex(- Settings::boxSize / 2, - Settings::boxSize / 2, true);
+	rv3 = new Vertex(Settings::boxSize / 2, - Settings::boxSize / 2, true);
 	(*T).setRectangle(rv0, rv1, rv2, rv3);
 	re0 = new TEdge(rv0, rv1, EdgeType::FRAME);
 	re1 = new TEdge(rv1, rv2, EdgeType::FRAME);
@@ -197,9 +150,9 @@ void boxPolygon(Settings &settings, Triangulation* T, int startIndex){
 	(*T).addEdge(re3);
 
 	// studieren geht über probieren :D
-	limit0 = (n + 1) / 4;
-	limit1 = n / 2;
-	limit2 = 3 * n / 4;
+	limit0 = (Settings::initialSize + 1) / 4;
+	limit1 = Settings::initialSize / 2;
+	limit2 = 3 * Settings::initialSize / 4;
 
 	// first quadrant
 	v0 = (*T).getVertex(startIndex);
@@ -258,7 +211,7 @@ void boxPolygon(Settings &settings, Triangulation* T, int startIndex){
 	new Triangle(prev, next, re2, v0, rv2, rv3, "box polygon 6", ok);
 	prev = next;
 
-	for(; i < n; i++){
+	for(; i < Settings::initialSize; i++){
 		v1 = (*T).getVertex(i);
 		next = new TEdge(v1, rv3);
 		(*T).addEdge(next);

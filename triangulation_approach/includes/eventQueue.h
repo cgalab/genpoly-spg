@@ -19,7 +19,6 @@ private:
 
 	struct Event* first;
 	int n;
-	double epsilon;
 
 	Vertex* original;
 	Vertex* oldV;
@@ -31,7 +30,7 @@ private:
 
 public:
 
-	EventQueue(double eps, Vertex* orig, Vertex* oV, Vertex* nV);
+	EventQueue(Vertex* orig, Vertex* oV, Vertex* nV);
 
 	bool insert(double time, Triangle* t);
 	void insertWithoutCheck(double time, Triangle* t);

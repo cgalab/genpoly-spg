@@ -14,5 +14,5 @@
 #include "insertion.h"
 #include "settings.h"
 
-int transformPolygonByMoves(Settings &settings, RandomGenerator &generator, Triangulation* T, int iterations, bool fiexd);
-void growPolygon(Settings &settings, RandomGenerator &generator, Triangulation* T);
+int transformPolygonByMoves(Triangulation* T, int iterations);
+void growPolygon(Triangulation* T);
