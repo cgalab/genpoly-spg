@@ -2,7 +2,7 @@
 
 // Constructors
 Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2) :
-e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) { 
+e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 
 	(*e0).setTriangle(this);
 	(*e1).setTriangle(this);
@@ -16,7 +16,7 @@ e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 }
 
 Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2, std::string context, bool &ok) :
-e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) { 
+e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 	Triangle* t;
 	bool cont;
 
@@ -66,7 +66,7 @@ e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 
 // Attention: this triangles are just for testing
 Triangle::Triangle(Vertex* V0, Vertex* V1, Vertex* V2) :
-e0(NULL), e1(NULL), e2(NULL), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) { 
+e0(NULL), e1(NULL), e2(NULL), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 
 	(*v0).addTriangle(this);
 	(*v1).addTriangle(this);
@@ -88,7 +88,7 @@ Vertex* Triangle::getVertex(int index){
 	if(index == 2)
 		return v2;
 
-	return NULL;	
+	return NULL;
 }
 
 TEdge* Triangle::getEdge(int index){
@@ -103,12 +103,12 @@ TEdge* Triangle::getEdge(int index){
 }
 
 Vertex* Triangle::getOtherVertex(TEdge* e){
-	if(!(*e).contains(v0)) 
+	if(!(*e).contains(v0))
 		return v0;
 	else if(!(*e).contains(v1))
 		return v1;
 	else
-		return v2; 
+		return v2;
 }
 
 TEdge* Triangle::getEdgeNotContaining(Vertex* v){
@@ -270,7 +270,7 @@ double Triangle::getRange(Vertex* v, double alpha){
 	}
 
 	l = ((*e).length() + (*f).length()) / 2;
-	
+
 	// assume: alpha1 >= alpha2
 	if(alpha1 - alpha2 <= M_PI){
 		if(alpha <= alpha1 && alpha >= alpha2)
@@ -427,7 +427,7 @@ Triangle::~Triangle(){
 	(*v0).removeTriangle(this);
 	(*v1).removeTriangle(this);
 	(*v2).removeTriangle(this);
-	
+
 	// some test triangles may not have assigned edges
 	if(e0 != NULL)
 		(*e0).removeTriangle(this);
