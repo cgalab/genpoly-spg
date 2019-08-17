@@ -6,6 +6,7 @@
 #define __SETTINGS_H_
 
 enum class FeedbackMode {LACONIC, EXECUTION, VERBOSE};
+enum class Arithmetics {EXACT, DOUBLE};
 
 class Settings{
 public:
@@ -45,6 +46,7 @@ public:
 	// are interpreted as zero
 	static constexpr double epsInt = 0.000000000001; // 10⁻¹²
 
+	static Arithmetics arithmetics;
 
 	/*
 		Polygon growth

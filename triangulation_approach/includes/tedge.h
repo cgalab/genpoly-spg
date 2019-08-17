@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string>
-#include "basicDefinitions.h"
 #include "settings.h"
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
 #include <math.h>
+#endif
 
 #ifndef __INTERSECTTYPE_
 #define __INTERSECTTYPE_

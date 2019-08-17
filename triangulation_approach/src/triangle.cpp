@@ -359,7 +359,14 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	return 1 / (portion + 1);
 }
 
-/*double Triangle::signedArea(){
+double Triangle::signedArea(){
+	if(Settings::arithmetics == Arithmetics::EXACT)
+		return signedAreaExact();
+	else
+		return signedAreaDouble();
+}
+
+double Triangle::signedAreaExact(){
 	point p0, p1, p2;
 
 	p0.x = (*v0).getX();
@@ -372,9 +379,9 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	p2.y = (*v2).getY();
 
 	return orient2d(p0, p1, p2);
-}*/
+}
 
-double Triangle::signedArea(){
+double Triangle::signedAreaDouble(){
 	unsigned long long id0, id1, id2;
 	double area;
 
@@ -403,6 +410,7 @@ double Triangle::signedArea(){
 }
 
 // assert: V0.id < V1.id < V2.id
+// moves V0 to the origin
 double Triangle::det(Vertex *V0, Vertex *V1, Vertex *V2){
 	double area;
 	double ax, ay, bx, by, cx, cy;
@@ -410,13 +418,14 @@ double Triangle::det(Vertex *V0, Vertex *V1, Vertex *V2){
 	ax = (*V0).getX();
 	ay = (*V0).getY();
 
-	bx = (*V1).getX();
-	by = (*V1).getY();
+	bx = (*V1).getX() - ax;
+	by = (*V1).getY() - ay;
 
-	cx = (*V2).getX();
-	cy = (*V2).getY();
+	cx = (*V2).getX() - ax;
+	cy = (*V2).getY() - ay;
 
-	area = ay * (cx - bx) + by * (ax - cx) + cy * (bx - ax);
+	//area = ay * (cx - bx) + by * (ax - cx) + cy * (bx - ax);
+	area = cy * bx - by * cx;
 
 	return area;
 }

@@ -8,7 +8,6 @@
 #include <list>
 #include <vector>
 #include <map>
-#include "basicDefinitions.h"
 #include <math.h>
 #include "translation.h"
 #include "insertion.h"

@@ -4,9 +4,10 @@
 #include <map>
 #include <queue>
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
 #include <math.h>
-
+#endif
 
 #ifndef __VERTEX_H_
 #define __VERTEX_H_

@@ -5,6 +5,7 @@ double Settings::radius = 0.1;
 double Settings::boxSize = 3.0;
 int Settings::initialTranslationFactor = 1000;
 int Settings::initialTranslationNumber = -1;
+Arithmetics Settings::arithmetics = Arithmetics::DOUBLE;
 int Settings::targetSize = 1000000;
 int Settings::insertionTries = 100;
 double Settings::minLength = 0.0000001;

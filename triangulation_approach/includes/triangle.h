@@ -4,8 +4,10 @@
 #include <string>
 #include "predicates.h"
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
 #include <math.h>
+#endif
 
 #ifndef __TRIANGLE_H_
 #define __TRIANGLE_H_
@@ -32,7 +34,9 @@ private:
 	unsigned long long id;
 	static unsigned long long n;
 
-	//double det(Vertex *V0, Vertex *V1, Vertex *V2);
+	double det(Vertex *V0, Vertex *V1, Vertex *V2);
+	double signedAreaExact();
+	double signedAreaDouble();
 
 public:
 	
@@ -64,7 +68,6 @@ public:
 	bool isEnqueued();
 	double calculateCollapseTime(Vertex* moving, double dx, double dy);
 	double signedArea();
-	double det(Vertex *V0, Vertex *V1, Vertex *V2);
 	
 	// Destructor
 	~Triangle();	
