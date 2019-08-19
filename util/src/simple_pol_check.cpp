@@ -17,9 +17,9 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
 //  std::cerr << "edge to be removed: " << e << std::endl;
   it = edgeS.find(e);
 
-  if (it != edgeS.end()) {
+  assert(e == *it);
+  if (*it == e) {
 //    std::cerr << "*it: " << *it << std::endl;
-    assert(e == *it);
 
     // get edges before and after
     if (it != edgeS.begin()) {
