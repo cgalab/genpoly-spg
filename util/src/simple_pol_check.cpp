@@ -38,7 +38,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
       //std::cerr << "before: " << before << ", after: " << after << std::endl;
       isval = checkIntersection(before, after);
       if (isval >= IS_TRUE) {
-        std::cerr << "Intersection between: " << before << " and " << after << std::endl;
+        std::cerr << "Removing: Intersection between: before: " << before << " and after: " << after << std::endl;
         valid = E_NOT_VALID;
       }
     }
@@ -63,7 +63,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
           //std::cerr << "before: " << before << ", after: " << after << std::endl;
           isval = checkIntersection(before, after);
           if (isval >= IS_TRUE) {
-            std::cerr << "Intersection found between: " << before << " and " << after << std::endl;
+            std::cerr << "Removing: Intersection found between: before: " << before << " and after:" << after << std::endl;
             valid = E_NOT_VALID;
           }
         }
@@ -112,7 +112,7 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
     if (bef) {
       isval = checkIntersection(e, before);
       if (isval >= IS_TRUE) {
-        std::cerr << "Intersection found between: " << e << " and " << before << std::endl;
+        std::cerr << "Processing: Intersection found between: " << e << " and " << before << std::endl;
         valid = E_NOT_VALID;
       }
     }
@@ -120,7 +120,7 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
     if (af && (valid == E_VALID)) {
       isval = checkIntersection(e, after);
       if (isval >= IS_TRUE) {
-        std::cerr << "Intersection found between: " << e << " and " << after << std::endl;
+        std::cerr << "Processing: Intersection found between: " << e << " and " << after << std::endl;
         valid = E_NOT_VALID;
       }
     }
