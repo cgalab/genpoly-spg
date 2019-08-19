@@ -14,12 +14,12 @@
 #include "pol.h"
 #include "opt2base.h"
 
+// 2opt that was used for the competition.
 enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
   enum error retval = SUCCESS;
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points, randseed);
   //createCHRandPol(polygon, points, randseed);
-  // .
   //pdisplay(polygon, points);
   //assert(1 == 0);
 
@@ -42,7 +42,6 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 	//std::set<Edge, setComp> edgeS(comp); // a set of edges.
   std::set<Edge> edgeS; // a set of edges.
 
-
   do {
     loop = false;
     index = 0;
@@ -63,83 +62,70 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   		p2 = &points[polygon[before]];
   		p3 = &points[polygon[after]];
 
-      // From the current index you do not want to add edges to a lower lex point,
-      // so only process both edges if p2 and p3 are higher lex. order.
-      // BUT, the edges need to be checked if they are in 'edgeS' and if so, remove them and check BEFORE and AFTER edges.
-      if ((*p1 > *p2) && (*p1 > *p3)) {
-        e1 = Edge(p1, p2, index);
-        e2 = Edge(p1, p3, index);
-//        std::cerr << std::endl << "removing: " << e1 << ", and: " << e2 << std::endl;
+      // construct the edges
+//      std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
+      if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
+        e1 = Edge (p1, p2, index);
+        e2 = Edge (p1, p3, index);
+        val3 = det(e1, *p3);
+      }
+      else {
+        e1 = Edge (p1, p3, index);
+        e2 = Edge (p1, p2, index);
+        val3 = det(e1, *p2);
+      }
+
+      // start by clearing edges of any collinearity
+      if (fabs(val3) < EPSILON) {
+        // the 2 edges are collinear
+//          std::cerr << "collinear check found a possible match."  << std::endl;
+        if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) {
+//            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+          if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
+//              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+            loop = true;
+            continue;
+          }
+        } //else std::cerr << "false alarm." << std::endl;
+      }
+
+      //process first edge
+      if (*e1.p2 == *p1) {
+//        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
         val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
-        if (val1.first == E_SKIP) {loop = true;}
         if (val1.first == E_NOT_VALID) break;
-        val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
-        if (val2.first == E_SKIP) {loop = true;}
-        if (val2.first == E_NOT_VALID) break;
-//        std::cerr << "skipping index" << std::endl;
-      } else if ((*p1 < *p2) && (*p1 > *p3)) {
-        e1 = Edge(p1, p2, index);
-        e2 = Edge(p1, p3, index);
-        val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
-        if (val2.first == E_SKIP) {loop = true;}
-        if (val2.first == E_NOT_VALID) break;
-//        std::cerr << std::endl << "removed p3: " << e2 << ", processing: " << e1 << std::endl;
-  		  val1 = processEdge(e1, edgeS, polygon, points);
-  		  if (val1.first == E_SKIP) {loop = true;continue;}
-        if (val1.first == E_NOT_VALID) break;
-      } else if ((*p1 > *p2) && (*p1 < *p3) ) {
-        e1 = Edge(p1, p3, index);
-        e2 = Edge(p1, p2, index);
-        val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
-        if (val2.first == E_SKIP) {loop = true;}
-        if (val2.first == E_NOT_VALID) break;
-//        std::cerr << std::endl << "removed p2: " << e2 << ", processing: " << e1 << std::endl;
-  		  val1 = processEdge(e1, edgeS, polygon, points);
-  		  if (val1.first == E_SKIP) {loop = true; continue;}
-        if (val1.first == E_NOT_VALID) break;
-      } else {
-        // construct the edges
-        //std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
-  		  if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
-  			  e1 = Edge (p1, p2, index);
-  			  e2 = Edge (p1, p3, index);
-          val3 = det(e1, *p3);
-  		  }
-  		  else {
-  			  e1 = Edge (p1, p3, index);
-  			  e2 = Edge (p1, p2, index);
-          val3 = det(e1, *p2);
-  		  }
-//        std::cerr << "processing e1: " << e1 << ", and e2: " << e2 << std::endl;
-
-        if (fabs(val3) < EPSILON) {
-          // the 2 edges are collinear
-          //std::cerr << "collinear check found a possible match."  << std::endl;
-          if ((*p1 < *p2) && (*p1 < *p3)) {
-            //std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-            old_e1 = e1;
-            old_e2 = e2;
-            if (collSwap(p1, p2, p3, edgeS, polygon, points)) {
-              //std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-              loop = true;
-              continue;
-            }
-          } //else std::cerr << "false alarm." << std::endl;
+        if (val1.first == E_SKIP) {
+          // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
+          if (*e2.p2 == *p1) {
+            val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
+            if (val2.first == E_NOT_VALID) break;
+          }
+          loop=true;continue;
         }
-
-  		  //std::cerr << std::endl << "processing e1: " << e1 << std::endl;
-  		  val1 = processEdge(e1, edgeS, polygon, points);
-  		  if (val1.first == E_SKIP) {loop = true;continue;}
+      }
+      else {
+//        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
+        val1 = processEdge(e1, edgeS, polygon, points);
         if (val1.first == E_NOT_VALID) break;
+        if (val1.first == E_SKIP) {loop=true;continue;}
+      }
 
-  		  //std::cerr << std::endl << "processing e2: " << e2 << std::endl;
-  		  val2 = processEdge(e2, edgeS, polygon, points);
-  		  if (val2.first == E_SKIP) {
-          loop = true;
-          edgeS.erase(val1.second);
-          continue;
-        }
+      // process second edge
+      if (*e2.p2 == *p1) {
+//        std::cerr << std::endl << "removing e2: " << e2 << std::endl;
+        val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
+        if (val2.first == E_SKIP) {loop=true;continue;} // if this happens, e1 was guaranteed removed as e1 < e2 and e2.p2 > e2.p1 > e1.p1
+      }
+      else {
+//        std::cerr << std::endl << "processing e2: " << e2 << std::endl;
+        val2 = processEdge(e2, edgeS, polygon, points);
+        if (val2.first == E_NOT_VALID) break;
+        if (val2.first == E_SKIP) {
+          val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
+          if (val1.first == E_NOT_VALID) break;
+          loop=true;continue;
+        }
       }
 
       //std::cout << "edges in 'edgeS':" << std::endl;
