@@ -45,6 +45,9 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
   } else {
     // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
     // this is technically a crutch because there's a problem with the comparator function.
+    std::cout << "edges in 'edgeS':" << std::endl;
+    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+    
     for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
       if (*it1 == e) {
         // get edges before and after
@@ -63,7 +66,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
           //std::cerr << "before: " << before << ", after: " << after << std::endl;
           isval = checkIntersection(before, after);
           if (isval >= IS_TRUE) {
-            std::cerr << "Removing: Intersection found between: before: " << before << " and after:" << after << std::endl;
+            std::cerr << "Removing: Intersection found between: before: " << before << " and after: " << after << std::endl;
             valid = E_NOT_VALID;
           }
         }
