@@ -15,8 +15,6 @@
 #include "opt2base.h"
 
 // Version of BO-2opt that only flips the edges and not the whole chain.
-
-// Have a max_back index that the algorithm goes to before moving forward again.
 enum error opt2d(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
   enum error retval = SUCCESS;
 	// initialise and create a random permutation for the polygon

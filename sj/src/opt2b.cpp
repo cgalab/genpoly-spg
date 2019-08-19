@@ -13,9 +13,7 @@
 #include "edge.h"
 #include "pol.h"
 #include "opt2base.h"
-
 // Version of BO-2opt that reverses to the lowest index when an intersection is found, then continues.
-
 // Have a max_back index that the algorithm goes to before moving forward again.
 enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
   enum error retval = SUCCESS;

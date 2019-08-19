@@ -82,6 +82,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         e2 = Edge(p1, p3, index);
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop = true;}
+        if (val2.first == E_NOT_VALID) break;
 //        std::cerr << std::endl << "removed p3: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true;}
@@ -91,6 +92,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         e2 = Edge(p1, p2, index);
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_SKIP) {loop = true;}
+        if (val2.first == E_NOT_VALID) break;
 //        std::cerr << std::endl << "removed p2: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
   		  if (val1.first == E_SKIP) {loop = true;}
@@ -139,10 +141,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //      std::cout << "edges in 'edgeS':" << std::endl;
 //      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
 
-      if (loop) {
-        break;
-      }
-
+      if (loop) {break;}
   		++index;
   	}
     if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
