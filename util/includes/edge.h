@@ -39,11 +39,11 @@ public:
   double getMin() const {return min;}
   double getMax() const {return max;}
 
-  bool operator < (const double s) const {
+  bool operator< (const double s) const {
     if (min < s) return true;
     else return false;
   }
-  bool operator < (const Yval s) const {
+  bool operator< (const Yval s) const {
     if (x < s.getX()) {return true;}
     else if (s.getX() < x) {return false;}
     else {
@@ -53,31 +53,31 @@ public:
     std::cerr << "Error: fallthrough in Yval < comparison!" << std::endl;
     return false;
   }
-  bool operator > (const double s) const {
+  bool operator> (const double s) const {
     if (min > s) return true;
     else return false;
   }
-  bool operator > (const Yval s) const {
+  bool operator> (const Yval s) const {
     if (x > s.getX()) return true;
     else if (min > s.getMin()) return true;
     else if ((fabs(min - s.getMin()) < EPSILON) && (max > s.getMax())) return true;
     else return false;
   }
 
-  friend bool operator==(const Yval lhs, const Yval rhs) {
+  bool operator== (const Yval rhs) {
     //std::cerr << std::setprecision(15) << (abs(lhs.min - rhs.min)) << " < " << EPSILON << " should be true : " << ((abs(lhs.min - rhs.min) < EPSILON) ? "true" : "false") << std::endl;
     //std::cerr << std::setprecision(15) << (abs(lhs.max - rhs.max)) << " < " << EPSILON << " should be true : " << ((abs(lhs.max - rhs.max) < EPSILON) ? "true" : "false") << std::endl;
     //std::cerr << std::setprecision(15) << (abs(lhs.x - rhs.x)) << " < " << EPSILON << " should be true : " << ((abs(lhs.x - rhs.x) < EPSILON) ? "true" : "false") << std::endl;
-    if ((abs(lhs.min - rhs.min) < EPSILON) &&
-        (abs(lhs.max - rhs.max) < EPSILON) &&
-        (abs(lhs.x - rhs.x) < EPSILON)) return true;
+    if ((abs(min - rhs.min) < EPSILON) &&
+        (abs(max - rhs.max) < EPSILON) &&
+        (abs(x - rhs.x) < EPSILON)) return true;
 		else return false;
 	}
 
-  friend bool operator!=(const Yval lhs, const Yval rhs) {
-		if ((abs(lhs.min - rhs.min) > EPSILON) ||
-        (abs(lhs.max - rhs.max) > EPSILON) ||
-        (abs(lhs.x - rhs.x) > EPSILON)) return true;
+  bool operator!= (const Yval rhs) {
+		if ((abs(min - rhs.min) > EPSILON) ||
+        (abs(max - rhs.max) > EPSILON) ||
+        (abs(x - rhs.x) > EPSILON)) return true;
 		else return false;
 	}
 
@@ -227,14 +227,14 @@ public:
     Yval yl, yr;
     double s;
     // comparison always starts at lex. higher of the P1 points.
-    if ((*p1 == *e.p1) && (*p2 == *e.p2)) return false;
+    if ((*p1 == *e.p1) && (*p2 == *e.p2)) {return false;} // e is same edge as 'this'
     if (*p1 == *e.p1) {
-      if (*p2 < *e.p2) s = (*p2).x;
-      else s = (*e.p2).x;
+      if (*p2 < *e.p2) {s = (*p2).x;}
+      else {s = (*e.p2).x;}
     }
-    else if (*p1 < *e.p1) s = (*e.p1).x;
-    else s = (*p1).x;
-    //std::cerr << ", s: " << s << std::endl;
+    else if (*p1 < *e.p1) {s = (*e.p1).x;} // covers *e.p2 = *p2
+    else {s = (*p1).x;}
+//    std::cerr << ", s: " << s << std::endl;
     yl = (*this).getYatX(s);
     yr = e.getYatX(s);
 
@@ -244,7 +244,7 @@ public:
       det2 = (*this).det(*e.p2);
 
       // 4P coll.
-      if ((abs(det1) < EPSILON) && (abs(det2) < EPSILON)) {
+      if ((fabs(det1) < EPSILON) && (fabs(det2) < EPSILON)) {
 //        std::cerr << "4Pc: " << std::endl;
         if (*p1 == *e.p1) return *p2 < *e.p2;
 //        std::cerr << ((*lhs.p1 < *rhs.p1) ? "true" : "false") << std::endl;

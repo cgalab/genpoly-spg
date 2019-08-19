@@ -14,46 +14,61 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
   enum intersect_t isval;
   std::set<Edge>::iterator it;
 
-//  std::cerr << "edge to be removed: " << e << std::endl;
-  it = edgeS.find(e);
+  it = edgeS.find(e); // will return edgeS.end() which if edge not found.
 
   if (it != edgeS.end()) {
+//    std::cerr << "edge to be removed: " << e << std::endl;
 //    std::cerr << "*it: " << *it << std::endl;
-    assert(e == *it);
-
-    // get edges before and after
-    if (it != edgeS.begin()) {
-      before = *(std::prev(it));
-      bef = true;
-    }
-    if (it != std::prev(edgeS.end())) {
-      after  = *(std::next(it));
-      af = true;
-    }
-
-//    std::cerr << "removing edge from set(): " << *it << std::endl;
-    edgeS.erase(it);
-
-    if (bef && af) {
-      //std::cerr << "before: " << before << ", after: " << after << std::endl;
-      isval = checkIntersection(before, after);
-      if (isval >= IS_TRUE) {
-        std::cerr << "Intersection between: " << before << " and " << after << std::endl;
-        valid = E_NOT_VALID;
+    if (*it == e) {
+      // get edges before and after
+      if (it != edgeS.begin()) {
+        before = *(std::prev(it));
+        bef = true;
       }
+      if (it != std::prev(edgeS.end())) {
+        after  = *(std::next(it));
+        af = true;
+      }
+
+  //    std::cerr << "removing edge from set(): " << *it << std::endl;
+      edgeS.erase(it);
+
+      if (bef && af) {
+        //std::cerr << "before: " << before << ", after: " << after << std::endl;
+        isval = checkIntersection(before, after);
+        if (isval >= IS_TRUE) {
+//          std::cerr << "Removing: Intersection between: before: " << before << " and after: " << after << std::endl;
+          valid = E_NOT_VALID;
+        }
+      }
+    }
+    else {
+      std::cerr << "Removing: ERROR:  edge found was not the same edge!" << std::endl;
+      std::cerr << "edge: " << e << std::endl;
+      std::cerr << " *it: " << *it << std::endl;
+      std::cerr << "edges in 'edgeS':" << std::endl;
+      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+
     }
   } else {
     // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
     // this is technically a crutch because there's a problem with the comparator function.
+//    std::cerr << "Crutch" << std::endl;
+//    std::cerr << "Edge: " << e << std::endl;
+//    if (it != edgeS.end()) std::cerr << "*it: " << *it << std::endl;
+//    std::cerr << "edges in 'edgeS':" << std::endl;
+//    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+
     for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
       if (*it1 == e) {
+//        std::cerr << "*it1: " << *it1 << std::endl;
         // get edges before and after
-        if (it != edgeS.begin()) {
-          before = *(std::prev(it));
+        if (it1 != edgeS.begin()) {
+          before = *(std::prev(it1));
           bef = true;
         }
-        if (it != std::prev(edgeS.end())) {
-          after  = *(std::next(it));
+        if (it1 != std::prev(edgeS.end())) {
+          after  = *(std::next(it1));
           af = true;
         }
 
@@ -63,7 +78,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
           //std::cerr << "before: " << before << ", after: " << after << std::endl;
           isval = checkIntersection(before, after);
           if (isval >= IS_TRUE) {
-            std::cerr << "Intersection found between: " << before << " and " << after << std::endl;
+            std::cerr << "Removing: Intersection found between: before: " << before << " and after: " << after << std::endl;
             valid = E_NOT_VALID;
           }
         }
@@ -93,46 +108,54 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
    }
 */
   assert(*retval.first == e);
-
-  //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
-  if (retval.first != edgeS.begin()) {
-    before = *(std::prev(retval.first));
-    //std::cerr << "before: " << before << std::endl;
-    bef = true;
-  }
-  //std::cerr << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
-  if (retval.first != --edgeS.end()) {
-    after  = *(std::next(retval.first));
-    //std::cerr << "after : " << after << std::endl;
-    af = true;
-  }
-
-  if (retval.second) {  // successfully inserted edge.
-    // check incidental edge 'before' if it intersects with 'e'
-    if (bef) {
-      isval = checkIntersection(e, before);
-      if (isval >= IS_TRUE) {
-        std::cerr << "Intersection found between: " << e << " and " << before << std::endl;
-        valid = E_NOT_VALID;
-      }
+  if (*retval.first == e) {
+    //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
+    if (retval.first != edgeS.begin()) {
+      before = *(std::prev(retval.first));
+      //std::cerr << "before: " << before << std::endl;
+      bef = true;
     }
-    // check incidental edge 'after' if it intersects with 'e'
-    if (af && (valid == E_VALID)) {
-      isval = checkIntersection(e, after);
-      if (isval >= IS_TRUE) {
-        std::cerr << "Intersection found between: " << e << " and " << after << std::endl;
-        valid = E_NOT_VALID;
-      }
+    //std::cerr << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
+    if (retval.first != std::prev(edgeS.end())) {
+      after = *(std::next(retval.first));
+      //std::cerr << "after : " << after << std::endl;
+      af = true;
     }
 
-  } else {
-    // edge already existed in set.
-    // this can happen if an index is going backwards through the lex. order of points.
-    // but if it's reversing and it hits an edge already in, earlier code should have caught it and removed it.
-    std::cerr << "Error: Edge already exists in set!" << std::endl;
-    std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
-    valid = E_NOT_VALID;
+    if (retval.second) {  // successfully inserted edge.
+      // check incidental edge 'before' if it intersects with 'e'
+      if (bef) {
+        isval = checkIntersection(e, before);
+        if (isval >= IS_TRUE) {
+          std::cerr << "Processing: Intersection found between: " << e << " and " << before << std::endl;
+          valid = E_NOT_VALID;
+        }
+      }
+      // check incidental edge 'after' if it intersects with 'e'
+      if (af && (valid == E_VALID)) {
+        isval = checkIntersection(e, after);
+        if (isval >= IS_TRUE) {
+          std::cerr << "Processing: Intersection found between: " << e << " and " << after << std::endl;
+          valid = E_NOT_VALID;
+        }
+      }
+
+    } else {
+      // edge already existed in set.
+      // this can happen if an index is going backwards through the lex. order of points.
+      // but if it's reversing and it hits an edge already in, earlier code should have caught it and removed it.
+      std::cerr << "Error: Edge already exists in set!" << std::endl;
+      std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
+      valid = E_NOT_VALID;
+    }
   }
+  else {
+    std::cerr << "Error: Iterator did not return same edge." << std::endl;
+    std::cerr << "Edge: " << e << std::endl;
+    std::cerr << "*it" << *retval.first << std::endl;
+  }
+
+
 
   return valid;
 }
@@ -153,9 +176,9 @@ enum error simple_pol_check(std::vector<unsigned int>& polygon, std::vector<Poin
   std::set<Edge> edgeS; // a sweep-line-status object.
 
   while (index < points.size()) {
-//      std::cerr << "index: " << index << std::endl;
-//      std::cout << "edges in 'edgeS':" << std::endl;
-//      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+      //std::cerr << "index: " << index << std::endl;
+      //std::cout << "edges in 'edgeS':" << std::endl;
+      //for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
 
 //      std::cerr << std::endl << "index: " << index << std::endl;
 

@@ -69,7 +69,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsign
       isval = checkIntersection(before, after);
       if (isval == IS_4P_COLLINEAR) {
         //std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
-        if (collSwap(before, after, edgeS, polygon, points)) {
+        if (coll4Swap(before, after, edgeS, polygon, points)) {
           //std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
           valid = E_SKIP;
         }
@@ -276,7 +276,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
       }
       else if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << e << " and bef: " << before << std::endl;
-        if (collSwap(e, before, edgeS, polygon, points)) {
+        if (coll4Swap(e, before, edgeS, polygon, points)) {
 //          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
           valid = E_SKIP;
         }
@@ -298,7 +298,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
       }
       else if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << e << " and aft: " << after << std::endl;
-        if (collSwap(e, after, edgeS, polygon, points)) {
+        if (coll4Swap(e, after, edgeS, polygon, points)) {
 //          std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
           valid = E_SKIP;
         }
