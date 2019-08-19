@@ -75,37 +75,39 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
         val3 = det(e1, *p2);
       }
 
+      // start by clearing edges of any collinearity
+      if (fabs(val3) < EPSILON) {
+        // the 2 edges are collinear
+//          std::cerr << "collinear check found a possible match."  << std::endl;
+        if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) {
+//            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+          if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
+//              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+            loop = true;
+            continue;
+          }
+        } //else std::cerr << "false alarm." << std::endl;
+      }
+
       //process first edge
       if (*e1.p2 == *p1) {
 //        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
         val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
+        if (val1.first == E_NOT_VALID) break;
         if (val1.first == E_SKIP) {
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if (*e2.p2 == *p1) {
-            removeEdgeFromSet(e2, edgeS, polygon, points);
+            val2 = removeEdgeFromSet(e2, edgeS, polygon, points);
+            if (val2.first == E_NOT_VALID) break;
           }
-          loop=true;continue;}
-        if (val1.first == E_NOT_VALID) break;
+          loop=true;continue;
+        }
       }
       else {
-        // if I am about to process 'e1' I can start by clearing it of any collinearity with 'e2'
-        if (fabs(val3) < EPSILON) {
-          // the 2 edges are collinear
-//          std::cerr << "collinear check found a possible match."  << std::endl;
-          if ((*p2 < *p1) && (*p3 < *p1)) {
-//            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-            if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
-//              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-              loop = true;
-              continue;
-            }
-          } //else std::cerr << "false alarm." << std::endl;
-        }
-
 //        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
         val1 = processEdge(e1, edgeS, polygon, points);
-        if (val1.first == E_SKIP) {loop=true;continue;}
         if (val1.first == E_NOT_VALID) break;
+        if (val1.first == E_SKIP) {loop=true;continue;}
       }
 
       // process second edge
