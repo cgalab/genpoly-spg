@@ -120,10 +120,8 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
         val2 = processEdge(e2, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_SKIP) {
-          if (*e1.p1 == *p1) {
-            val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
-            if (val1.first == E_NOT_VALID) break;
-          }
+          val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
+          if (val1.first == E_NOT_VALID) break;
           loop=true;continue;
         }
       }
