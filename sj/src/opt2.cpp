@@ -97,7 +97,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
         if (val1.first == E_SKIP) {
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if (*e2.p2 == *p1) {
-            val2 = removeEdgeFromSet(e2, edgeS, polygon, points);
+            val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
             if (val2.first == E_NOT_VALID) break;
           }
           loop=true;continue;
