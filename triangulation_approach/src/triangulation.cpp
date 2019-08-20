@@ -1,19 +1,101 @@
 #include "triangulation.h"
 
-// Constructors
-Triangulation::Triangulation(int n) : Rectangle0(NULL), Rectangle1(NULL), Rectangle2(NULL), Rectangle3(NULL), N(n) { 
+/*
+	C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
+*/
+
+/*
+	Constructor:
+	Already allocates memory for the vector of vertices
+
+	@param 	n 	Final number of vertices (including the vertices of inner polygons)
+*/
+Triangulation::Triangulation(int n) :
+	Rectangle0(NULL), Rectangle1(NULL), Rectangle2(NULL), Rectangle3(NULL), N(n) { 
+	
 	vertices.reserve(N);
 }
 
-// Getter
+
+
+/*
+	S ~ E ~ T ~ T ~ E ~ R ~ S
+*/
+
+/*
+	@param	v 	Vertex to be added to the vertices vector
+*/
+void Triangulation::addVertex(Vertex *v){
+	vertices.push_back(v);
+
+	// Do not forget the register the triangulation at the vertex
+	(*v).setTriangulation(this);
+}
+
+/*
+	@param	e 	Edge to be added to the edge map
+*/
+void Triangulation::addEdge(TEdge *e){
+	edges.insert(std::pair<int, TEdge*>((*e).getID(), e));
+
+	// Do not forget the register the triangulation at the edge
+	(*e).setTriangulation(this);
+}
+
+/*
+	The function setRectangle() sets the vertices of the Rectangle0, ..., Rectangle3 of
+	bounding box for the polygons
+
+	@param	v0, v1, v2, v3 	Vertices building the bounding box for the polygon (ordering
+							doesn't matter as the vertices are connected by their edges)
+*/
+void Triangulation::setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3){
+	Rectangle0 = v0;
+	Rectangle1 = v1;
+	Rectangle2 = v2;
+	Rectangle3 = v3;
+
+	// Do not forget the register the triangulation at the vertices
+	(*v0).setTriangulation(this);
+	(*v1).setTriangulation(this);
+	(*v2).setTriangulation(this);
+	(*v3).setTriangulation(this);
+}
+
+
+
+/*
+	G ~ E ~ T ~ T ~ E ~ R ~ S
+*/
+
+/*
+	@return		Final number of vertices the polygon will contain (including the vertices
+				of inner polygons)
+*/
 int Triangulation::getTargetNumberOfVertices(){
 	return N;
 }
 
+/*
+	@return		The number of vertices the polygon does contain now (including the vertices
+				of inner polygons)
+*/
 int Triangulation::getActualNumberOfVertices(){
 	return vertices.size();
 }
 
+/*
+	@param	i 	Index of the vertex in the vertices vector
+	@return 	The vertex at index i in the vertices vector
+
+	Note:
+		- Be n the actual number of vertices in the vertex vector, then i < 0 
+			returns the vertex with index n + i and i >= n returns the vertex at index
+			i - n. This is helpful to get the previous and next vertex while generating
+			the initial polygon.
+		- This will not work after inserting additional vertices, as the vertices won't be 
+			in the same order in the vertices vector as they are in the polygon
+*/
 Vertex* Triangulation::getVertex(int i){ 	
 	int n;
 
@@ -29,66 +111,80 @@ Vertex* Triangulation::getVertex(int i){
 	 return NULL;
 }
 
-// Setter
-void Triangulation::addVertex(Vertex* v){
-	vertices.push_back(v);
-	(*v).setTriangulation(this);
-}
 
-void Triangulation::addEdge(TEdge* e){
-	edges.insert(std::pair<int, TEdge*>((*e).getID(), e));
-	(*e).setTriangulation(this);
-}
 
-void Triangulation::setRectangle(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3){
-	Rectangle0 = v0;
-	Rectangle1 = v1;
-	Rectangle2 = v2;
-	Rectangle3 = v3;
+/*
+	R ~ E ~ M ~ O ~ V ~ E ~ R
+*/
 
-	(*v0).setTriangulation(this);
-	(*v1).setTriangulation(this);
-	(*v2).setTriangulation(this);
-	(*v3).setTriangulation(this);
-}
+/*
+	The function removeVertex() removes one vertex from the vector of vertices and sets the
+	entry NULL
 
-// Remover
+	@param	i 	Index of the vertex to be removed
+
+	Note:
+		- This function is just for debugging purposes and should normally not be used
+			anywhere in the code
+*/
 void Triangulation::removeVertex(int index){
 	vertices[index] = NULL;
 }
 
-void Triangulation::removeEdge(TEdge* e){
+/*
+	The function removeEdge() searches one edge by its ID in the edges map and removes it
+
+	@param	e 	The edge to be removed
+*/
+void Triangulation::removeEdge(TEdge *e){
 	edges.erase((*e).getID());
 }
 
-// Printer
 
-// prints triangulation as graph into a graphml file
-// https://de.wikipedia.org/wiki/GraphML
-// works here: http://graphonline.ru/en/
-void Triangulation::print(const char* filename){
-	FILE* f;
-	TEdge* e;
+
+/*
+	P ~ R ~ I ~ N ~ T ~ E ~ R
+*/
+
+/*
+	The function print() prints the whole triangulation in .graphml style into a file
+
+	@param	filename	The name of the .graphml file
+
+	Note:
+		- This function just works, if the triangulation stores all edges
+		- Graphml: https://de.wikipedia.org/wiki/GraphML
+		- Works here: http://graphonline.ru/en/
+		- This crappy website is the reason why we need the scaling factor here
+*/
+void Triangulation::print(const char *filename){
+	FILE *f;
+	TEdge *e;
 	int scale = 5000;
 
 	f = fopen(filename, "w");
 
+	// Print the graphml header
 	fprintf(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 	fprintf(f, "<graphml>\n");
 	fprintf(f, "<graph id=\"Graph\" edgeDefault=\"undirected\">\n");
 
+	// Print all nodes
 	fprintf(f, "<nodes>\n");
 
+	// Start with the bounding box
 	(*Rectangle0).print(f, scale);
 	(*Rectangle1).print(f, scale);
 	(*Rectangle2).print(f, scale);
 	(*Rectangle3).print(f, scale);
 
+	// Then all polygon vertices
 	for(auto const& i : vertices){
 		if(i != NULL) (*i).print(f, scale);
 	}
 	fprintf(f, "</nodes>\n");
 
+	// Print all edges from the edge map
 	fprintf(f, "<edges>\n");
 	for(auto const& i : edges){
 		e = i.second;
@@ -102,22 +198,36 @@ void Triangulation::print(const char* filename){
 	fclose(f);
 }
 
-void Triangulation::printPolygon(const char* filename){
-	FILE* f;
-	TEdge* e;
+/*
+	The function printPolygon() prints just the polygon in .graphml style into a file
+
+	@param	filename	The name of the .graphml file
+
+	Note:
+		- Graphml: https://de.wikipedia.org/wiki/GraphML
+		- Works here: http://graphonline.ru/en/
+*/
+void Triangulation::printPolygon(const char *filename){
+	FILE *f;
+	TEdge *e;
 
 	f = fopen(filename, "w");
 
+	// Print the graphml header
 	fprintf(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 	fprintf(f, "<graphml>\n");
 	fprintf(f, "<graph id=\"Graph\" edgeDefault=\"undirected\">\n");
 
+	// Print all polygon nodes
 	fprintf(f, "<nodes>\n");
 	for(auto const& i : vertices){
 		if(i != NULL && !(*i).isRectangleVertex()) (*i).print(f, 0);
 	}
 	fprintf(f, "</nodes>\n");
 
+	// Print all polygon edges
+	// TODO:
+	// Make this more efficient by using the function Vertex::getToNext()
 	fprintf(f, "<edges>\n");
 	for(auto const& i : edges){
 		e = i.second;
@@ -131,11 +241,27 @@ void Triangulation::printPolygon(const char* filename){
 	fclose(f);
 }
 
-// Others
+
+
+/*
+	O ~ T ~ H ~ E ~ R ~ S
+*/
+
+/*
+	The function check() checks for errors in the triangulation. It checks the following
+	criterions:
+		- Has each edge of the bounding box exactly one triangle assigned
+		- Has each other edge exactly two triangles assigned
+		- Has each edge to different vertices assigned
+		- Has each vertex a previous and a next vertex connected by a polygon edge
+		- Stays each vertex inside of its surrounding polygon
+
+	@return 	true if everything is alright, otherwise false
+*/
 bool Triangulation::check(){
 	EdgeType type;
 	int n;
-	TEdge* e;
+	TEdge *e;
 	bool ok = true;
 	bool part;
 
@@ -144,6 +270,7 @@ bool Triangulation::check(){
 		type = (*e).getEdgeType();
 		n = (*e).nrAssignedTriangles();
 
+		// Check the number of triangles for each edge
 		if(type == EdgeType::FRAME){
 			if(n != 1){
 				printf("Edge of type FRAME with %d triangles:\n \t", n);
@@ -158,6 +285,7 @@ bool Triangulation::check(){
 			}
 		}
 
+		// Check whether there is a circle edge
 		if((*e).getV0() == (*e).getV1()){
 			printf("Edge %llu has two identical vertices with id %llu \n", (*e).getID(), (*(*e).getV1()).getID());
 			ok = false;
@@ -165,7 +293,9 @@ bool Triangulation::check(){
 	}
 
 	for(auto const& i : vertices){
+		// Check whether each vertex as a next and a previous vertex
 		ok = ok && (*i).check();
+		// Check whether each vertex lives inside its surrounding polygon
 		part = (*i).checkSurroundingPolygonAdvanced();
 		ok = ok && part;
 
@@ -177,6 +307,16 @@ bool Triangulation::check(){
 	return ok;
 }
 
+/*
+	The function stretch() stretches the whole polygon by a constant factor, i.e. the
+	x- and y-coordinates of all vertices get multiplied by the factor.
+
+	@param	factor	The factor by which all vertex coordinates get multiplied
+
+	Note:
+		- It is not checked, whether this operations is numerically stable!
+		- It is not used anywhere at the moment
+*/
 void Triangulation::stretch(double factor){
 	(*Rectangle0).stretch(factor);
 	(*Rectangle1).stretch(factor);
@@ -188,6 +328,16 @@ void Triangulation::stretch(double factor){
 	}
 }
 
+/*
+	The function renumberVertices() renumbers all vertices of the outer polygon such that
+	the vertex with ID n is then connected by polygon edges to the vertices n-1 and n+1.
+
+	Note:
+		- Of course, the vertex with ID 0 is then connected to the vertex with the maximum ID
+		- This should not be applied while working with non-exact arithmetics, because this
+			may change the ordering of the vertices in the determinant calculation
+		- At the moment this will not work properly for polygons with holes
+*/
 void Triangulation::renumberVertices(){
 	Vertex *v;
 	unsigned long long n = 1;
@@ -195,6 +345,7 @@ void Triangulation::renumberVertices(){
 	v = vertices[0];
 	(*v).setID(0);
 
+	// Move one time around the whole polygon
 	v = (*v).getNext();
 	while((*v).getID() != 0){
 		(*v).setID(n);
@@ -202,6 +353,4 @@ void Triangulation::renumberVertices(){
 		n++;
 		v = (*v).getNext();
 	}
-
-	printf("n: %llu \n", n);
 }
