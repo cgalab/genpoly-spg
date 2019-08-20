@@ -27,7 +27,7 @@ public:
 	Insertion(Triangulation* t, int index);
 
 	// Others
-	bool lengthControll();
+	bool checkStability();
 	void execute();
 	void translate();
 };

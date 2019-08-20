@@ -9,11 +9,22 @@ Insertion::Insertion(Triangulation* t, int index) : T(t), i(index) {
 }
 
 // Others
-bool Insertion::lengthControll(){
+bool Insertion::checkStability(){
 	double l = (*e).length();
+	Triangle *t;
 
 	if(l < Settings::minLength)
 		return false;
+
+	if(Settings::arithmetics == Arithmetics::DOUBLE){
+		t = (*e).getT0();
+		if(fabs((*t).signedArea()) < Settings::minDetInsertion)
+			return false;
+
+		t = (*e).getT1();
+		if(fabs((*t).signedArea()) < Settings::minDetInsertion)
+			return false;
+	}
 
 	return true;
 }

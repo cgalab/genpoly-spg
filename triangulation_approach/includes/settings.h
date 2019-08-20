@@ -46,6 +46,11 @@ public:
 	// are interpreted as zero
 	static constexpr double epsInt = 0.000000000001; // 10⁻¹²
 
+	// Minimal allowed determinant for triangles attached to edges for insertion
+	// To small triangles on the edge of insertion can lead to the vertex moving
+	// out of its surrounding polygon (just with double arithmetics)
+	static constexpr double minDetInsertion = 0.000000000001; // 10⁻¹²
+
 	static Arithmetics arithmetics;
 
 	/*

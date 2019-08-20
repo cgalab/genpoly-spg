@@ -29,6 +29,7 @@
 */
 Triangulation *generateRegularPolygon();
 
+
 /*
 	The function initialTriangulationPseudoStar adds the polygon edges to the
 	vertices of a regular shaped polygon with no holes. Then it moves the
@@ -45,6 +46,7 @@ Triangulation *generateRegularPolygon();
 */
 void initialTriangulationPseudoStar(Triangulation *T);
 
+
 /*
 	The function initialTriangulationZigZag adds the polygon edges to the
 	vertices of a regular shaped polygon with no holes and triangulates the
@@ -58,6 +60,7 @@ void initialTriangulationPseudoStar(Triangulation *T);
 				linked vertices of the start polygon
 */
 void initialTriangulationZigZag(Triangulation *T);
+
 
 /*
 	The function boxPolygon generates a square around the polygon and

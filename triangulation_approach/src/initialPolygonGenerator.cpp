@@ -36,6 +36,7 @@ Triangulation *generateRegularPolygon(){
 	return T; 	
 }
 
+
 /*
 	The function initialTriangulationPseudoStar adds the polygon edges to the
 	vertices of a regular shaped polygon with no holes. Then it moves the
@@ -158,6 +159,7 @@ void initialTriangulationZigZag(Triangulation *T){
 		(*e1).setEdgeType(EdgeType::POLYGON);
 	}
 }
+
 
 /*
 	The function boxPolygon generates a square around the polygon and

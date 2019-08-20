@@ -72,7 +72,7 @@ void growPolygon(Triangulation* T){
 
 		in = new Insertion(T, index);
 
-		ok = (*in).lengthControll();
+		ok = (*in).checkStability();
 		if(!ok){
 			delete in;
 
