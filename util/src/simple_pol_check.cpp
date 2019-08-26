@@ -168,9 +168,9 @@ enum error simple_pol_check(std::vector<unsigned int>& polygon, std::vector<Poin
 //  pdisplay(lex, points);
 
   // Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
-	unsigned int index=0, before, after;
+	unsigned int index=0, before=0, after=0;
   enum edge_t val1 = E_VALID, val2 = E_VALID;
-  double val3;
+  double val3=1.0;
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
   std::set<Edge> edgeS; // a sweep-line-status object.

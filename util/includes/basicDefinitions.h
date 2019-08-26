@@ -41,7 +41,8 @@ enum alg_t {
   A_2OPT_C,
   A_2OPT_D,
   A_CURVE,
-  A_HOLE
+  A_HOLE,
+  A_STAR
 };
 
 // the output format of the result.

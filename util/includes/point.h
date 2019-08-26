@@ -16,6 +16,7 @@ public:
 
   Point() {x=0; y=0; i=0; v=0;l=0;}
   Point(const Point& p) {x=p.x;y=p.y;i=p.i;v=p.v;l=p.l;}
+  Point(double X, double Y) {x=X;y=Y;i=0;v=0;l=0;}
   Point(double X, double Y, unsigned int I) {x=X;y=Y;i=I;v=0;l=0;}
   Point(double X, double Y, unsigned int I, unsigned int V) {x=X;y=Y;i=I;v=V;l=0;}
   Point(double X, double Y, unsigned int I, unsigned int V, unsigned int L) {x=X;y=Y;i=I;v=V;l=L;}
@@ -90,6 +91,9 @@ public:
     }
 };
 
+double det(const Point& pa, const Point& pb, const Point& p);
+void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, bool enforceCCWOrder=false);
+void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& ch, std::vector<Point>& points);
 bool isPolLeft(Point *p1, Point *p2, unsigned int cycle);
 bool isPol1Left(Point *p1, Point *p2, unsigned int cycle);
 void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points);
@@ -100,6 +104,6 @@ double getXmin(const std::vector<Point>& p);
 double getXmax(const std::vector<Point>& p);
 double getYmin(const std::vector<Point>& p);
 double getYmax(const std::vector<Point>& p);
-
+bool angleComparator (Point i,Point j);
 
 #endif
