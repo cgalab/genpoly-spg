@@ -12,7 +12,7 @@
 #define __TRIANGULATION_H_
 
 /*
-	Define and invlude headers to the entites contained by triangulations
+	Define and include headers to the entites contained by triangulations
 */
 class Vertex;
 class TEdge;

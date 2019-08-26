@@ -478,7 +478,6 @@ enum Executed Translation::execute(){
 }
 
 bool Translation::flip(Triangle *t0, bool singleFlip){
-	bool ok = true;
 	TEdge *e, *e1, *e2;
 	Triangle *t1;
 	Vertex *vj0, *vj1; // joint vertices
@@ -533,7 +532,7 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 	e1 = (*vj0).getEdgeTo(vn0);
 	e2 = (*vj0).getEdgeTo(vn1);
 
-	t0 = new Triangle(e, e1, e2, vn0, vn1, vj0, "Flip1", ok);
+	t0 = new Triangle(e, e1, e2, vn0, vn1, vj0);
 
 	// new triangle vn0, vn1, vj1
 	(*T).addEdge(e);
@@ -541,7 +540,7 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 	e1 = (*vj1).getEdgeTo(vn0);
 	e2 = (*vj1).getEdgeTo(vn1);
 
-	t1 = new Triangle(e, e1, e2, vn0, vn1, vj1, "Flip2", ok);
+	t1 = new Triangle(e, e1, e2, vn0, vn1, vj1);
 
 	if(!singleFlip){
 		// reset coordinates temporarely to original position for the calcalation of the event time

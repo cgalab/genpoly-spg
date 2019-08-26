@@ -4,58 +4,11 @@
 Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2) :
 e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 
+	// TODO:
+	// find a new way to check whether a triangle with the same edges already exists
 	(*e0).setTriangle(this);
 	(*e1).setTriangle(this);
 	(*e2).setTriangle(this);
-
-	(*v0).addTriangle(this);
-	(*v1).addTriangle(this);
-	(*v2).addTriangle(this);
-
-	n++;
-}
-
-Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2, std::string context, bool &ok) :
-e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
-	Triangle* t;
-	bool cont;
-
-	t = (*e0).setTriangle(this, context, ok);
-	if(t != NULL){
-		cont = (*t).contains(V0);
-		cont = cont && (*t).contains(V1);
-		cont = cont && (*t).contains(V2);
-		if(cont){
-			printf("0An equal triangle already exists, context: %s\n", context.c_str());
-			printf("vertex IDs: %llu %llu %llu \n", (*V0).getID(), (*V1).getID(), (*V2).getID());
-			exit(5);
-			ok = false;
-		}
-	}
-	t = (*e1).setTriangle(this, context, ok);
-	if(t != NULL){
-		cont = (*t).contains(V0);
-		cont = cont && (*t).contains(V1);
-		cont = cont && (*t).contains(V2);
-		if(cont){
-			printf("1An equal triangle already exists, context: %s\n", context.c_str());
-			printf("vertex IDs: %llu %llu %llu \n", (*V0).getID(), (*V1).getID(), (*V2).getID());
-			exit(5);
-			ok = false;
-		}
-	}
-	t = (*e2).setTriangle(this, context, ok);
-	if(t != NULL){
-		cont = (*t).contains(V0);
-		cont = cont && (*t).contains(V1);
-		cont = cont && (*t).contains(V2);
-		if(cont){
-			printf("2An equal triangle already exists, context: %s\n", context.c_str());
-			printf("vertex IDs: %llu %llu %llu \n", (*V0).getID(), (*V1).getID(), (*V2).getID());
-			exit(5);
-			ok = false;
-		}
-	}
 
 	(*v0).addTriangle(this);
 	(*v1).addTriangle(this);
