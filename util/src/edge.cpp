@@ -79,7 +79,7 @@ double reldist(const Edge& e, const Point& p) {
 	return reldist(*e.p1, *e.p2, p);
 }
 
-// calculates the determinant of the vertices of 'e' and the point p
+// calculates the determinant of the vertices of 'e' and the point p (similar function in point.cpp for 3 points)
 double det(const Edge e, const Point p) {
 	const Point& pa = *e.p1;
 	const Point& pb = *e.p2;
