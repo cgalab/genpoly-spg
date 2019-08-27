@@ -40,6 +40,7 @@ struct Event{
 class EventQueue{
 
 private:
+	
 	/*
 		A pointer to the first (earliest) event in the event queue.
 		Has to be NULL as long as the event queue is empty
@@ -69,7 +70,7 @@ private:
 		A copy at the target position of the translation
 	*/
 	Vertex *newV;
-	
+
 
 	/*
 		P ~ R ~ I ~ V ~ A ~ T ~ E 	M ~ E ~ M ~ B ~ E ~ R 	F ~ U ~ N ~ C ~ T ~ I ~ O ~ N ~ S

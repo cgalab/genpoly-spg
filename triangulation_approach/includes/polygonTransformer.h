@@ -36,4 +36,12 @@
 */
 int transformPolygonByMoves(Triangulation *T, int iterations);
 
+/*
+	The function growPolygon() grows the polygon by insertions to Settings::targetSize.
+
+	@param 	T 	The triangulation the polygon lives in
+
+	Note:
+		This function works just for polygons without holes!
+*/
 void growPolygon(Triangulation *T);
