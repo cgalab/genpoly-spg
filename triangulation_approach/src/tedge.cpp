@@ -551,7 +551,7 @@ Vertex *getIntersectionPoint(Vertex *s0, Vertex *e0, Vertex *s1, Vertex *e1){
 
 	// Compute time of intersection
 	t = crossProduct2D(s1x - s0x, s1y - s0y, d1x, d1y) / crossD;
-	s = - crossProduct2D(s0x - s1x, s0y - s1y, d0x, d0y) / crossD; // don't understand why we need a minus here :O
+	s = - crossProduct2D(s0x - s1x, s0y - s1y, d0x, d0y) / crossD; // Don't understand why we need a minus here :O
 
 	if(0 <= t && t <= 1 && 0 <= s && s <= 1)
 		return new Vertex(s0x + t * d0x, s0y + t * d0y);
