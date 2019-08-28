@@ -209,18 +209,6 @@ public:
 			- It is not used anywhere at the moment
 	*/
 	void stretch(double factor);
-
-	/*
-		The function renumberVertices() renumbers all vertices of the outer polygon such that
-		the vertex with ID n is then connected by polygon edges to the vertices n-1 and n+1.
-
-		Note:
-			- Of course, the vertex with ID 0 is then connected to the vertex with the maximum ID
-			- This should not be applied while working with non-exact arithmetics, because this
-				may change the ordering of the vertices in the determinant calculation
-			- At the moment this will not work properly for polygons with holes
-	*/
-	void renumberVertices();
 };
 
 #endif

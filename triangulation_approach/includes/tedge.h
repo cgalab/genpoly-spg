@@ -16,7 +16,10 @@
 
 
 /*
-	Define the different intersection types
+	Define the different intersection types:
+		NONE: 	No intersection between two edges
+		EDGE: 	One edge is crossing the other edge
+		VERTEX: One vertex lays exactly on the other edge
 */
 #ifndef __INTERSECTTYPE_
 #define __INTERSECTTYPE_
@@ -40,9 +43,9 @@ class Vertex;
 
 /*
 	Define the different edge types:
-		POLYGON: An edge belonging to a polygon
-		FRAME: An edge belonging to the bounding box
-		TRIANGULATION: All other edges of the triangulation
+		POLYGON: 		An edge belonging to a polygon
+		FRAME: 			An edge belonging to the bounding box
+		TRIANGULATION: 	All other edges of the triangulation
 */
 enum class EdgeType {POLYGON, FRAME, TRIANGULATION};
 
@@ -75,7 +78,7 @@ private:
 	EdgeType type;
 
 	/*
-		The ID of the edge
+		The unique ID of the edge
 	*/
 	unsigned long long id;
 

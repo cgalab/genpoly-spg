@@ -296,7 +296,7 @@ bool Triangulation::check(){
 		// Check whether each vertex as a next and a previous vertex
 		ok = ok && (*i).check();
 		// Check whether each vertex lives inside its surrounding polygon
-		part = (*i).checkSurroundingPolygonAdvanced();
+		part = (*i).checkSurroundingPolygon();
 		ok = ok && part;
 
 		if(!part){
@@ -325,32 +325,5 @@ void Triangulation::stretch(double factor){
 
 	for(auto const& i : vertices){
 		(*i).stretch(factor);
-	}
-}
-
-/*
-	The function renumberVertices() renumbers all vertices of the outer polygon such that
-	the vertex with ID n is then connected by polygon edges to the vertices n-1 and n+1.
-
-	Note:
-		- Of course, the vertex with ID 0 is then connected to the vertex with the maximum ID
-		- This should not be applied while working with non-exact arithmetics, because this
-			may change the ordering of the vertices in the determinant calculation
-		- At the moment this will not work properly for polygons with holes
-*/
-void Triangulation::renumberVertices(){
-	Vertex *v;
-	unsigned long long n = 1;
-
-	v = vertices[0];
-	(*v).setID(0);
-
-	// Move one time around the whole polygon
-	v = (*v).getNext();
-	while((*v).getID() != 0){
-		(*v).setID(n);
-
-		n++;
-		v = (*v).getNext();
 	}
 }

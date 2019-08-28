@@ -173,8 +173,6 @@ bool Translation::checkEdge(Vertex* fromV, TEdge* newE){
 	Triangle* nextT = NULL;
 	int count = 0;
 
-	(*fromV).checkSurroundingPolygonFast();
-
 	surEdges = (*fromV).getSurroundingEdges();
 
 	// iterate over all edges of the surrounding polygon
@@ -761,7 +759,7 @@ Translation::~Translation(){
 
 	repairEnd();
 
-	ok = (*original).checkSurroundingPolygonAdvanced();
+	ok = (*original).checkSurroundingPolygon();
 
 	if(!ok){
 		printf("\nstart position:\n");
