@@ -14,27 +14,30 @@ enum error verify_point_set(std::vector<Point>& points) {
   std::vector<unsigned int> lex (points.size());
 	fill_lex(lex, points);
 
-  // if any points are the same point, it will be incidental in the lex. sorted vector.
-  // if all points are collinear, they will all be collinear to the edge made up of lex. first and lex. last point.
+  //check if any point is coincidental
   Point prev, cur;
-  Edge e = Edge(&points[lex[0]], &points[lex[lex.size()-1]]);
-  bool collinear = true;
-  for (unsigned int i=1; i < points.size()-1;++i) { //-1 so we don't check collinearity of the last point
-    prev = points[i-1];
-    cur  = points[i];
+  for (unsigned int i=1; i < lex.size();++i) { //-1 so we don't check collinearity of the last point
+    prev = points[lex[i-1]];
+    cur  = points[lex[i]];
     if (prev == cur) {
       retval = COINCIDENTAL_POINTS;
+      std::cerr << "Error: Found 2 points with same coordinates!" << std::endl;
       break;
     }
-    if(e.det(cur) != 0) collinear = false;
   }
-  // check if last point is coincidental with its neighbor
-  if (points[lex[lex.size()-1]] == points[lex[lex.size()]]) retval = COINCIDENTAL_POINTS;
 
-  if (retval == COINCIDENTAL_POINTS) std::cerr << "Error:  Found 2 points with same coordinates!" << std::endl;
-  if (collinear == true) {
+  if (retval == SUCCESS) {
     retval = COLLINEAR_POINTS;
-    std::cerr << "Error:  all points are collinear!" << std::endl;
+    // check if all points are collinear
+    Edge e = Edge(&points[lex[0]], &points[lex[lex.size()-1]]);
+    for (unsigned int i=1; i < lex.size()-1;++i) { //-1 so we don't check collinearity of the last point
+      cur = points[lex[i]];
+      if(fabs(det(e,cur)) > 0) {
+        retval = SUCCESS;
+        break;
+      }
+    }
+    if (retval == COLLINEAR_POINTS) std::cerr << "Error: all points are collinear!" << std::endl;
   }
   return retval;
 }
@@ -318,9 +321,11 @@ bool angleComparator (Point i,Point j) {
   double aj = j.y/j.x;
   double lj = sqrt(j.x*j.x + j.y*j.y);
 
-  if (ai < aj) return true;
-  if (aj < ai) return false;
-  if (li < lj) return true;
+  if (fabs(ai - aj) < EPSILON) {
+    if (fabs(li - lj) < EPSILON) return false;
+    else return (li < lj);
+  }
+  else return (ai < aj);
   std::cerr << "ERROR!  Fallthrough in angle comparison function!" << std::endl;
   return false;
 }
