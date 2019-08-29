@@ -86,7 +86,7 @@ private:
 	unsigned long long reserveID;
 
 	/*
-		The number of already generated edges
+		The number of already generated vertices
 	*/
 	static unsigned long long n;
 

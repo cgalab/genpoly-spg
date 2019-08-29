@@ -1,11 +1,149 @@
 #include "triangle.h"
 
-// Constructors
-Triangle::Triangle(TEdge* E0, TEdge* E1, TEdge* E2, Vertex* V0, Vertex* V1, Vertex* V2) :
-e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
+/*
+	S ~ T ~ A ~ T ~ I ~ C 	V ~ A ~ R ~ I ~ A ~ B ~ L ~ E ~ S
+*/
+
+/*
+	The number of already generated triangles
+*/
+unsigned long long Triangle::n = 0;
+
+
+/*
+	P ~ R ~ I ~ V ~ A ~ T ~ E 	M ~ E ~ M ~ B ~ E ~ R 	F ~ U ~ N ~ C ~ T ~ I ~ O ~ N ~ S
+*/
+
+/*
+	The function signedAreaExact() computes an estimate of the signed area of the triangle
+	by using Shewchuks "Routines for Arbitrary Precision Floating-point Arithmetic and Fast
+	Robust Geometric Predicates". So in fact the sign of this signed area is absolutelly
+	trustworthy, whereas the exact value might still have numerical errors. Also 0 is
+	trustworthy.
+
+	@return 	The estimate for the signed area
+
+	Note:
+		In fact this functions computes 2 times the signed area of the triangle.
+*/
+// TODO:
+// Would it make sense to also move a vertex to the origin here?
+double Triangle::signedAreaExact(){
+	point p0, p1, p2;
+
+	p0.x = (*v0).getX();
+	p0.y = (*v0).getY();
+
+	p1.x = (*v1).getX();
+	p1.y = (*v1).getY();
+
+	p2.x = (*v2).getX();
+	p2.y = (*v2).getY();
+
+	return orient2d(p0, p1, p2);
+}
+
+/*
+	The function signedAreaDouble() computes an estimate of the signed area of the triangle
+	with standard floating-point arithmetics. To provide stability it orders the vertices by
+	reserveID before computing the determinant, such that the vertices in the determinant always
+	have the same order independent of the ordering of the vertices in the triangle class. The
+	correct sign therefore is ensured by the case distinctions here.
+
+	@return 	The estimate for the signed area
+
+	Note:
+		- In fact this functions computes 2 times the signed area of the triangle.
+*/
+double Triangle::signedAreaDouble(){
+	unsigned long long id0, id1, id2;
+	double area;
+
+	id0 = (*v0).getRID();
+	id1 = (*v1).getRID();
+	id2 = (*v2).getRID();
+
+	// If the vertices are not order by ID, reorder them and take this into account for the
+	// sign
+	if(id0 < id1 && id0 < id2){
+		if(id1 < id2)
+			area = det(v0, v1, v2);
+		else
+			area = - det(v0, v2, v1);
+	}else if(id1 < id0 && id1 < id2){
+		if(id0 < id2)
+			area = - det(v1, v0, v2);
+		else
+			area = det(v1, v2, v0);
+	}else{
+		if(id0 < id1)
+			area = det(v2, v0, v1);
+		else
+			area = - det(v2, v1, v0);
+	}
+
+	return area;
+}
+
+/*
+	The function det() computes the determinant of three 2D vertices. It asserts that the
+	input vertices are already sorted by their reserveID! Then it shifts the vertices in
+	a way that V0 is exactly at the origin to reduce the number of necessary calculations
+	and therefore improve the numerical correctness of the result.
+
+	@param 	V0 	Vertex placed in the first row of the matrix
+	@param 	V1 	Vertex placed in the second row of the matrix
+	@param 	V2 	Vertex placed in the third row of the matrix
+	@return 	The determinant of the vertices matrix
+
+	Note:
+		This is just default floating-point arithmetic!
+*/
+double Triangle::det(Vertex *V0, Vertex *V1, Vertex *V2){
+	double area;
+	double ax, ay, bx, by, cx, cy;
+
+	ax = (*V0).getX();
+	ay = (*V0).getY();
+
+	bx = (*V1).getX() - ax;
+	by = (*V1).getY() - ay;
+
+	cx = (*V2).getX() - ax;
+	cy = (*V2).getY() - ay;
+
+	area = cy * bx - by * cx;
+
+	return area;
+}
+
+
+/*
+	C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
+*/
+
+/*
+	Constructor:
+	Builds a triangle by their vertices and edges. It automatically registers the new triangle
+	at their vertices and edges and sets the property enqueued to false.
+
+	@param 	E0 	The first edge of the triangle
+	@param 	E1 	The second edge of the triangle
+	@param 	E2 	The third edge of the triangle
+	@param 	V0 	The first vertex of the triangle
+	@param 	V1 	The second vertex of the triangle
+	@param 	V2 	The third vertex of the triangle
+
+	Note:
+		- The order of the edges is not important if relative to the order of the vertices
+		- The order of the vertices is just important if you want to check the orientation
+			of the triangle
+*/
+Triangle::Triangle(TEdge *E0, TEdge *E1, TEdge *E2, Vertex *V0, Vertex *V1, Vertex *V2) :
+	e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 
 	// TODO:
-	// find a new way to check whether a triangle with the same edges already exists
+	// Find a new way to check whether a triangle with the same edges already exists
 	(*e0).setTriangle(this);
 	(*e1).setTriangle(this);
 	(*e2).setTriangle(this);
@@ -17,9 +155,23 @@ e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 	n++;
 }
 
-// Attention: this triangles are just for testing
-Triangle::Triangle(Vertex* V0, Vertex* V1, Vertex* V2) :
-e0(NULL), e1(NULL), e2(NULL), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
+/*
+	Constructor:
+	This constructor generates triangles just for orientation tests, i.e. these triangles
+	are not fully generated as they have not assigned any edges and are not assigned to any
+	edges. So the triangles are basically just their three vertices and can be used for
+	computing the signed area of the vertex group only.
+
+	@param 	V0 	The first vertex of the triangle
+	@param 	V1 	The second vertex of the triangle
+	@param 	V2 	The third vertex of the triangle
+
+	Note:
+		The order of the vertices is important to check the orientation. It is always the
+		ordering v0 -> v1 -> v2 considered.
+*/
+Triangle::Triangle(Vertex *V0, Vertex *V1, Vertex *V2) :
+	e0(NULL), e1(NULL), e2(NULL), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 
 	(*v0).addTriangle(this);
 	(*v1).addTriangle(this);
@@ -28,12 +180,31 @@ e0(NULL), e1(NULL), e2(NULL), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 	n++;
 }
 
-// Getter
+
+/*
+	G ~ E ~ T ~ T ~ E ~ R ~ S
+*/
+
+/*
+	@return 	The ID of the vertex
+*/
 unsigned long long Triangle::getID(){
 	return id;
 }
 
-Vertex* Triangle::getVertex(int index){
+/*
+	The function getVertex() returns the vertex which is assigned to the position index which
+	depends just on the ordering the vertices were given to the constructor. If the index is
+	not 0, 1 or 2 it returns NULL.
+
+	@param 	index 	The index of the vertex you want
+	@return 		The vertex you want if the index is reasonable, otherwise NULL
+
+	Note:
+		This function is basically just useful if you want to enumarate all vertices of the
+		triangle.
+*/
+Vertex *Triangle::getVertex(int index){
 	if(index == 0)
 		return v0;
 	if(index == 1)
@@ -44,7 +215,19 @@ Vertex* Triangle::getVertex(int index){
 	return NULL;
 }
 
-TEdge* Triangle::getEdge(int index){
+/*
+	The function getEdge() returns the edge which is assigned to the position index which
+	depends just on the ordering the edges were given to the constructor. If the index is
+	not 0, 1 or 2 it returns NULL.
+
+	@param 	index 	The index of the edge you want
+	@return 		The edge you want if the index is reasonable, otherwise NULL
+
+	Note:
+		This function is basically just useful if you want to enumarate all edges of the
+		triangle.
+*/
+TEdge *Triangle::getEdge(int index){
 	if(index == 0)
 		return e0;
 	if(index == 1)
@@ -55,7 +238,11 @@ TEdge* Triangle::getEdge(int index){
 	return NULL;
 }
 
-Vertex* Triangle::getOtherVertex(TEdge* e){
+/*
+	@param 	e 	One of the triangle's edges
+	@return 	The vertex which is contained by the triangle, but not by the edge e
+*/
+Vertex *Triangle::getOtherVertex(TEdge *e){
 	if(!(*e).contains(v0))
 		return v0;
 	else if(!(*e).contains(v1))
@@ -64,7 +251,14 @@ Vertex* Triangle::getOtherVertex(TEdge* e){
 		return v2;
 }
 
-TEdge* Triangle::getEdgeNotContaining(Vertex* v){
+/*
+	@param 	v 	One of the triangle's vertices
+	@return 	The edge of the triangle which does not contain v
+
+	Note:
+		If all edges contain v, the function returns NULL, but then anything is wrong anyway
+*/
+TEdge *Triangle::getEdgeNotContaining(Vertex *v){
 	if(!(*e0).contains(v)) return e0;
 	if(!(*e1).contains(v)) return e1;
 	if(!(*e2).contains(v)) return e2;
@@ -73,9 +267,16 @@ TEdge* Triangle::getEdgeNotContaining(Vertex* v){
 	return NULL;
 }
 
-// gets one of the two edges containing vertex v
-// which one depends just on the ordering in the triangle
-TEdge* Triangle::getEdgeContaining(Vertex* v){
+/*
+	The function getEdgeContaining() gets one of the two edges of the triangle which contains
+	the vertex v (if the vertex v is part of the triangle, otherwise it returns NULL). Which
+	of the two edges you get just depends on the ordering of the edges given to the contructor.
+
+	@param 	v 	The vertex which should be contained by the edge
+	@return 	Any edge contained by the triangle which contains v (NULL of v is not part of
+				the triangle)
+*/
+TEdge *Triangle::getEdgeContaining(Vertex *v){
 	if((*e0).contains(v)) return e0;
 	if((*e1).contains(v)) return e1;
 	if((*e2).contains(v)) return e2;
@@ -85,8 +286,16 @@ TEdge* Triangle::getEdgeContaining(Vertex* v){
 }
 
 
-// gets the edge of the triangle which contains v, but is not e
-TEdge* Triangle::getOtherEdgeContaining(Vertex* v, TEdge* e){
+/*
+	The function getOtherEdgeContaining() gets you the edge of the triangle which is not e
+	but contains the vertex v.
+
+	@param 	v 	The vertex the edge should contain
+	@param 	e 	The egde you do not want
+	@return 	The edge you search for or NULL if such an edge does not exist (then something
+				is wrong)
+*/
+TEdge *Triangle::getOtherEdgeContaining(Vertex *v, TEdge *e){
 	if((*e).getID() != (*e0).getID() && (*e0).contains(v)) return e0;
 	if((*e).getID() != (*e1).getID() && (*e1).contains(v)) return e1;
 	if((*e).getID() != (*e2).getID() && (*e2).contains(v)) return e2;
@@ -95,6 +304,10 @@ TEdge* Triangle::getOtherEdgeContaining(Vertex* v, TEdge* e){
 	return NULL;
 }
 
+/*
+	@param 	e 	One edge which should be part of the triangle
+	@return 	A vector of all other edges part of the triangle
+*/
 std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
 	std::vector<TEdge*> out(2);
 	int index = 0;
@@ -115,7 +328,20 @@ std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
 	return out;
 }
 
-TEdge* Triangle::getLongestEdge(int epsilon){
+/*
+	The function getLongestEdge() computes the euclidean length of all edges and returns
+	the longest one. If the longest one is a polygon edge it checks whether there is another
+	edge which is less then epsilon shorter then the longest edge and returns this if existing.
+
+	@param 	epsilon 	The length difference which is considered the be equal
+	@return 			The longest edge
+
+	Note:
+		As the computation of the euclidean distance requires two multiplication and a square
+		root this function could be very faulty, therefore it is by default replaced by
+		getLongestEdgeAlt() 
+*/
+TEdge *Triangle::getLongestEdge(int epsilon){
 	double l0 = (*e0).length();
 	double l1 = (*e1).length();
 	double l2 = (*e2).length();
@@ -157,6 +383,7 @@ TEdge* Triangle::getLongestEdge(int epsilon){
 		}
 	}
 
+	// Check whether the longest edge is a polygon edge and replace it if possible
 	if((*longestE).getEdgeType() == EdgeType::POLYGON){
 		if(longest - epsilon <= second)
 			longestE = secondE;
@@ -165,9 +392,22 @@ TEdge* Triangle::getLongestEdge(int epsilon){
 	return longestE;
 }
 
-// seems to work right and the problem of getting a PE here is caused by an error in the triangulation
-TEdge* Triangle::getLongestEdgeAlt(){
-	Vertex* v;
+/*
+	The function getLongestEdgeAlt() finds the longest edge of the triangle not by computing
+	any length, but by comparing the coordinates of the vertices. Therefore it is assumed that
+	all vertices lay very close to one line, then it is possible to get the middle vertex by
+	comparing the coordinates. The longest edge is the edge which does not contain the middle
+	vertex. If something should go wrong there the function calls the function getLongestEdge()
+	as replacement.
+	
+	@return 	The longest edge of the triangle
+
+	Note:
+		This function works just if all vertices lay very close to one line which should be the
+		case at each flip event!
+*/
+TEdge *Triangle::getLongestEdgeAlt(){
+	Vertex *v;
 
 	v = getOtherVertex(e0);
 	if((*e0).isBetween(v))
@@ -188,13 +428,22 @@ TEdge* Triangle::getLongestEdgeAlt(){
 	(*v1).print();
 	(*v2).print();
 
-	// questionable whether this is really helpful
+	// Questionable whether this is really helpful
 	return getLongestEdge(0.0001);
 }
 
-// assumption: - pi <= alpha <= pi
-// returns -1 if the direction is not inside the triangle
-double Triangle::getRange(Vertex* v, double alpha){
+/*
+	The function getRange() checks whether the triangle lays in direction alpha seen from
+	vertex v. If it does so, it returns the mean length of the two edges of the triangle
+	incident to v, otherwise it returns -1. The result can be used as estimate for the
+	distance of the vertex v to the opposite edge of the triangle.
+
+	@param 	v 		The vertex which will move
+	@param 	alpha 	The direction in which v will move (-pi < alpha <= pi)
+	@return 		Estimate for the distance v can move in direction alpha till it crashes
+					into an edge
+*/
+double Triangle::getRange(Vertex *v, double alpha){
 	TEdge *e, *f, *g;
 	double alpha1, alpha2, l;
 
@@ -212,6 +461,7 @@ double Triangle::getRange(Vertex* v, double alpha){
 	alpha1 = (*e).getAngle(v);
 	alpha2 = (*f).getAngle(v);
 
+	// Order alpha1 and alpha2
 	if(alpha1 < alpha2){
 		l = alpha1;
 		alpha1 = alpha2;
@@ -224,7 +474,7 @@ double Triangle::getRange(Vertex* v, double alpha){
 
 	l = ((*e).length() + (*f).length()) / 2;
 
-	// assume: alpha1 >= alpha2
+	// Assume: alpha1 >= alpha2
 	if(alpha1 - alpha2 <= M_PI){
 		if(alpha <= alpha1 && alpha >= alpha2)
 			return l;
@@ -233,11 +483,18 @@ double Triangle::getRange(Vertex* v, double alpha){
 			return l;
 	}
 
-	// alpha is not inside this triangle
+	// Alpha is not inside this triangle
 	return -1;
 }
 
-// Printer
+
+/*
+	P ~ R ~ I ~ N ~ T ~ E ~ R
+*/
+
+/*
+	The function print() prints all three vertices of the triangle
+*/
 void Triangle::print(){
 	printf("Triangle %llu:\n", id);
 	(*v0).print();
@@ -245,8 +502,18 @@ void Triangle::print(){
 	(*v2).print();
 }
 
-// Others
-bool Triangle::contains(Vertex* v){
+
+/*
+	O ~ T ~ H ~ E ~ R ~ S
+*/
+
+/*
+	The function contains() checks whether the triangle contains the vertex v.
+
+	@param 	v 	The vertex of interest
+	@return 	True if the triangle contains v, otherwise false
+*/
+bool Triangle::contains(Vertex *v){
 	unsigned long long id = (*v).getID();
 
 	if((*v0).getID() == id) return true;
@@ -255,18 +522,45 @@ bool Triangle::contains(Vertex* v){
 	return false;
 }
 
+/*
+	The function enqueue() sets the triangle's enqueued flag.
+*/
 void Triangle::enqueue(){
 	enqueued = true;
 }
 
+/*
+	The function dequeue() unsets the triangle's enqueued flag.
+*/
 void Triangle::dequeue(){
 	enqueued = false;
 }
 
+/*
+	@return 	True if the triangle is enqueued in the event queue at the moment, otherwise
+				false
+*/
 bool Triangle::isEnqueued(){
 	return enqueued;
 }
 
+/*
+	The function calculateCollapseTime() computes at which time of a translation of the vertex
+	moving in direction (dx, dy) this triangle will collapse, i.e. its area gets zero. The time
+	is the start time of the translation, the time 1 is the time at which the vertex is
+	translated exactly by (dx, dy). The time is calculated by the quotient of the triangle
+	areas of the two triangles consisting of the opposite edge of this triangle and the start
+	and end position of the moving vertex. For details take a look at my Master Thesis.
+
+	@param 	moving 	The vertex to be translated
+	@param 	dx 		The x-component of the translation vector
+	@param 	dy 		The y-component of the translation vector
+	@return 		The time when the triangles araa gets zero during the translation
+
+	Note:
+		This function also can give you collapse times not between 0 and 1! This means that
+		the triangle will not become zero during this translation.
+*/
 double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	double ax, ay, bx, by, cx, cy;
 	double areaOld, areaNew, portion;
@@ -294,7 +588,7 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 		by = (*v1).getY();
 	}
 
-	// shift a to zero
+	// Shift a to zero
 	bx = bx - ax;
 	by = by - ay;
 
@@ -304,6 +598,10 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	dx = cx + dx;
 	dy = cy + dy;
 
+	// TODO:
+	// Maybe it would make sense to use here also the exact arithmetics
+	// Maybe even the signedArea function
+
 	areaOld = cx * by - cy * bx;
 	areaNew = bx * dy - by * dx;
 
@@ -312,6 +610,14 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	return 1 / (portion + 1);
 }
 
+/*
+	The function signedArea() computes an estimate of the signed area of the triangle.
+	Depending on Settings::arithmetics it uses Shewchuck's predicates or simple floating-
+	point arithmetics to do so.
+
+	Note:
+		In fact, it computes two times the signed area of the triangle.
+*/
 double Triangle::signedArea(){
 	if(Settings::arithmetics == Arithmetics::EXACT)
 		return signedAreaExact();
@@ -319,78 +625,22 @@ double Triangle::signedArea(){
 		return signedAreaDouble();
 }
 
-double Triangle::signedAreaExact(){
-	point p0, p1, p2;
 
-	p0.x = (*v0).getX();
-	p0.y = (*v0).getY();
+/*
+	D ~ E ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R
+*/
 
-	p1.x = (*v1).getX();
-	p1.y = (*v1).getY();
-
-	p2.x = (*v2).getX();
-	p2.y = (*v2).getY();
-
-	return orient2d(p0, p1, p2);
-}
-
-double Triangle::signedAreaDouble(){
-	unsigned long long id0, id1, id2;
-	double area;
-
-	id0 = (*v0).getRID();
-	id1 = (*v1).getRID();
-	id2 = (*v2).getRID();
-
-	if(id0 < id1 && id0 < id2){
-		if(id1 < id2)
-			area = det(v0, v1, v2);
-		else
-			area = - det(v0, v2, v1);
-	}else if(id1 < id0 && id1 < id2){
-		if(id0 < id2)
-			area = - det(v1, v0, v2);
-		else
-			area = det(v1, v2, v0);
-	}else{
-		if(id0 < id1)
-			area = det(v2, v0, v1);
-		else
-			area = - det(v2, v1, v0);
-	}
-
-	return area;
-}
-
-// assert: V0.id < V1.id < V2.id
-// moves V0 to the origin
-double Triangle::det(Vertex *V0, Vertex *V1, Vertex *V2){
-	double area;
-	double ax, ay, bx, by, cx, cy;
-
-	ax = (*V0).getX();
-	ay = (*V0).getY();
-
-	bx = (*V1).getX() - ax;
-	by = (*V1).getY() - ay;
-
-	cx = (*V2).getX() - ax;
-	cy = (*V2).getY() - ay;
-
-	//area = ay * (cx - bx) + by * (ax - cx) + cy * (bx - ax);
-	area = cy * bx - by * cx;
-
-	return area;
-}
-
-// Destructor
+/*
+	Destructor:
+	Removes also the dangling pointers from the vertices' an edges' triangles' lists.
+*/
 Triangle::~Triangle(){
 
 	(*v0).removeTriangle(this);
 	(*v1).removeTriangle(this);
 	(*v2).removeTriangle(this);
 
-	// some test triangles may not have assigned edges
+	// Some test triangles may not have assigned edges
 	if(e0 != NULL)
 		(*e0).removeTriangle(this);
 	if(e0 != NULL)
@@ -398,6 +648,3 @@ Triangle::~Triangle(){
 	if(e0 != NULL)
 		(*e2).removeTriangle(this);
 }
-
-// static member variables
-unsigned long long Triangle::n = 0;
