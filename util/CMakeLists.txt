@@ -2,8 +2,11 @@
 project(util VERSION 0.1 LANGUAGES CXX)
 
 add_library(util
+    src/basicFunctions.cpp
     src/edge.cpp
     src/point.cpp
+    src/pol.cpp
+    src/predicates.cpp
     src/simple_pol_check.cpp
     )
 

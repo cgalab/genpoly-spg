@@ -28,7 +28,9 @@ enum error {
   INNER_POINTS_COLLINEAR = 16,
   NO_VERIFY_FILE = 17,
   RUN_SIMPLE_CHECK = 18,
-  CONVERT_FORMAT = 19
+  CONVERT_FORMAT = 19,
+  COINCIDENTAL_POINTS = 20,
+  COLLINEAR_POINTS = 21
 };
 
 // the algorithms that should be selectable.

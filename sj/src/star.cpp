@@ -107,7 +107,7 @@ enum error star(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 //  std::cerr << "q4: " << std:: endl;
 //  pdisplay(q4);
 
-  // then push the points to the star vector, q2 needs to be reversed
+  // then push the points to the star vector
   for (unsigned int i=0; i < q1.size();++i) {
     polygon.push_back(q1[i].i);
   }

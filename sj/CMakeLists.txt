@@ -16,7 +16,6 @@ add_definitions(-O2 -DNDEBUG)
 
 
 add_executable(spg
-                    src/basicFunctions.cpp
                     src/curve.cpp
                     src/heap.cpp
 					          src/inits.cpp
@@ -28,7 +27,7 @@ add_executable(spg
                     src/opt2b.cpp
                     src/opt2c.cpp
                     src/opt2d.cpp
-                    src/pol.cpp
+                    src/star.cpp
                     src/test.cpp
                     )
 

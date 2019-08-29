@@ -65,102 +65,106 @@ int main(int argc, char *argv[]) {
 
     returnValue = readInFile(inFile, inFormat, points);
     if(returnValue == SUCCESS) {
-      // get a simple polygon with a given method
-      if (alg == A_2OPT) {
-        if (calcArea)
-        {
-          runAreaLoopFor = 1000;
-          maxTime = 600;
-          double area = 0;
-          areaLoopCounter = 0;
-          areaTimerStart = clock();
-          do
+      // verify that the point set is valid, i.e. no points are equal and the whole set isn't collinear.
+      returnValue = verify_point_set(points);
+      if(returnValue == SUCCESS) {
+        // get a simple polygon with a given method
+        if (alg == A_2OPT) {
+          if (calcArea)
           {
-            ++areaLoopCounter;
+            runAreaLoopFor = 1000;
+            maxTime = 600;
+            double area = 0;
+            areaLoopCounter = 0;
+            areaTimerStart = clock();
+            do
+            {
+              ++areaLoopCounter;
 
+              // get a simple polygon with a given method
+              returnValue = opt2(polygon, points, randseed);
+
+              area = pol_calc_area(polygon, points);
+              areaTimerEnd = clock();
+              areaTimerElapsed = (areaTimerEnd - areaTimerStart) / CLOCKS_PER_SEC;
+
+              //std::cerr << "areaMin: " << areaMin << ", areaMax: " << areaMax << ", area: " << area << std::endl;
+              //std::cerr << "time elapsed: " << areaTimerElapsed << ", areaLoopCounter: " << areaLoopCounter << std::endl;
+
+              if ((areaMin >= 0) && (area > 0) && (area > areaMin)) break;
+              if ((areaMax > 0)  && (area > 0) && (area < areaMax)) break;
+              if (randseed) break;
+            } while ((areaLoopCounter < runAreaLoopFor) && (areaTimerElapsed < maxTime));
+
+
+            if(area < 0) {
+              doFlip(0, polygon.size()-1, polygon, points);
+              area = pol_calc_area(polygon, points);
+              std::cout << std::setprecision(15) << area << std::endl;
+            }
+            else if (((areaMin >= 0) && (area > areaMin)) || ((areaMax > 0) && (area < areaMax)))
+              std::cout << std::setprecision(15) << area << std::endl;
+            else
+              returnValue = ERR_AREA_NOT_BETTER;
+          }
+          else {
             // get a simple polygon with a given method
             returnValue = opt2(polygon, points, randseed);
-
-            area = pol_calc_area(polygon, points);
-            areaTimerEnd = clock();
-            areaTimerElapsed = (areaTimerEnd - areaTimerStart) / CLOCKS_PER_SEC;
-
-            //std::cerr << "areaMin: " << areaMin << ", areaMax: " << areaMax << ", area: " << area << std::endl;
-            //std::cerr << "time elapsed: " << areaTimerElapsed << ", areaLoopCounter: " << areaLoopCounter << std::endl;
-
-            if ((areaMin >= 0) && (area > 0) && (area > areaMin)) break;
-            if ((areaMax > 0)  && (area > 0) && (area < areaMax)) break;
-            if (randseed) break;
-          } while ((areaLoopCounter < runAreaLoopFor) && (areaTimerElapsed < maxTime));
-
-
-          if(area < 0) {
-            doFlip(0, polygon.size()-1, polygon, points);
-            area = pol_calc_area(polygon, points);
-            std::cout << std::setprecision(15) << area << std::endl;
           }
-          else if (((areaMin >= 0) && (area > areaMin)) || ((areaMax > 0) && (area < areaMax)))
-            std::cout << std::setprecision(15) << area << std::endl;
-          else
-            returnValue = ERR_AREA_NOT_BETTER;
         }
-        else {
-          // get a simple polygon with a given method
-          returnValue = opt2(polygon, points, randseed);
+        else if (alg == A_2OPT_A) {
+          returnValue = opt2a(polygon, points, randseed);
         }
-      }
-      else if (alg == A_2OPT_A) {
-        returnValue = opt2a(polygon, points, randseed);
-      }
-      else if (alg == A_2OPT_B) {
-        returnValue = opt2b(polygon, points, randseed);
-      }
-      else if (alg == A_2OPT_C) {
-          returnValue = opt2c(polygon, points, randseed);
-      }
-      else if (alg == A_2OPT_D) {
-          returnValue = opt2c(polygon, points, randseed);
-      }
-      else if (alg == A_STAR) {
-          returnValue = star(polygon, points, randseed);
-      }
-      else if (alg == A_HOLE) {
+        else if (alg == A_2OPT_B) {
+          returnValue = opt2b(polygon, points, randseed);
+        }
+        else if (alg == A_2OPT_C) {
+            returnValue = opt2c(polygon, points, randseed);
+        }
+        else if (alg == A_2OPT_D) {
+            returnValue = opt2c(polygon, points, randseed);
+        }
+        else if (alg == A_STAR) {
+            returnValue = star(polygon, points, randseed);
+        }
+        else if (alg == A_HOLE) {
 
-        returnValue = holes2(sph, points, randseed, nr_holes);
-        //returnValue = opt2(polygon, points, randseed);
-        //returnValue = holes(sph, polygon, points, nr_holes);
-      }
+          returnValue = holes2(sph, points, randseed, nr_holes);
+          //returnValue = opt2(polygon, points, randseed);
+          //returnValue = holes(sph, polygon, points, nr_holes);
+        }
 
-      if (returnValue == SUCCESS) {
-        if (checkSimple) checkAllIntersections(polygon, points);
-        if (outFile[0] != 0) {
-          switch(alg) {
-            case A_2OPT:
-            case A_2OPT_A:
-            case A_2OPT_B:
-            case A_2OPT_C:
-            case A_2OPT_D:
-            case A_STAR:
-              if (outFormat == OF_PURE_AND_PERM){
-                char tempFileName[255];
-                snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-pure");
-                returnValue = writeOutIntFile(tempFileName, OF_PURE, writeNew, polygon, points);
-                snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-perm");
-                if (returnValue == SUCCESS) returnValue = writeOutIntFile(tempFileName, OF_PERM, writeNew, polygon, points);
-              }
-              else returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
-              break;
-            case A_HOLE:
-              returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);
-              break;
-            case A_CURVE:
-            case A_IDLE:
-            case A_UNDEFINED:
-            default:
-              returnValue = UNEXPECTED_ERROR;
-              break;
+        if (returnValue == SUCCESS) {
+          if (checkSimple) checkAllIntersections(polygon, points);
+          if (outFile[0] != 0) {
+            switch(alg) {
+              case A_2OPT:
+              case A_2OPT_A:
+              case A_2OPT_B:
+              case A_2OPT_C:
+              case A_2OPT_D:
+              case A_STAR:
+                if (outFormat == OF_PURE_AND_PERM){
+                  char tempFileName[255];
+                  snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-pure");
+                  returnValue = writeOutIntFile(tempFileName, OF_PURE, writeNew, polygon, points);
+                  snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-perm");
+                  if (returnValue == SUCCESS) returnValue = writeOutIntFile(tempFileName, OF_PERM, writeNew, polygon, points);
+                }
+                else returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
+                break;
+              case A_HOLE:
+                returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);
+                break;
+              case A_CURVE:
+              case A_IDLE:
+              case A_UNDEFINED:
+              default:
+                returnValue = UNEXPECTED_ERROR;
+                break;
+            }
+
           }
-
         }
       }
     }

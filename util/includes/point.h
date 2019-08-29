@@ -91,6 +91,7 @@ public:
     }
 };
 
+enum error verify_point_set(std::vector<Point>& points);
 double det(const Point& pa, const Point& pb, const Point& p);
 void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, bool enforceCCWOrder=false);
 void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& ch, std::vector<Point>& points);
