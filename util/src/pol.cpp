@@ -78,7 +78,11 @@ bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   // sort the points into lo/mid/hi lex order.
   std::vector<Point*> lex {a, b, c};
   sort(lex.begin(), lex.end(),
-    [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
+    [](Point* p1, Point* p2) -> bool {
+                                      //std::cerr.precision(24);
+                                      //std::cerr<<"p1: "<<*p1<<", p2: "<<*p2<<std::endl;
+                                      //std::cerr<<"<: " <<((*p1 < *p2) ? "true" : "false")<<std::endl;
+                                      return (*p1 < *p2);});
 /*
   for (unsigned int i = 0; i < lex.size();++i) {
     std::cerr << "lex[" << i << "]: " << *lex[i] << std::endl;
@@ -95,9 +99,6 @@ bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
     std::cerr << "arr[" << i << "]: " << arr[i] << std::endl;
   }
 */
-  // we can erase the edges connected to lower and upper vertices from 'edgeS' set.
-
-  eraseVertexFromSet(vert[2], edgeS, polygon, points);
 
   // then assign the proper 'vert' order to the 'lex' ordered points
   for (unsigned int i = 0; i < lex.size(); ++i) {
