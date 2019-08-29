@@ -9,6 +9,7 @@
 #include "basicFunctions.h" //for setComp (Edge set test)
 #include "pol.h"
 #include "heap.h"
+#include "predicates.h"
 
 
 /*
@@ -258,7 +259,21 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   printEnum(itest);
   std::cerr << std::endl;
 
+  p1.set(-0.6034851544931661, -0.0572553943219186);
+  p2.set(-0.6034827734680771, -0.0568532372913607);
+  e1.set(p1,p2);
+  p3.set(-0.6034851421330270, -0.0572554178266569);
+  p4.set(-0.6034829978440949, -0.0568532654878436);
+  e2.set(p3,p4);
+
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  printEnum(itest);
+  std::cerr << std::endl;
+
   std::cerr << std:: endl;
+
+
 /*
   Testing Yval class in edge.h
 */
@@ -450,4 +465,31 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::vector<unsigned int> a = {1, 2, 3, 4, 5};
   heap(a, a.size());
 */
+  std::cerr << std::endl;
+  std::cerr << "======= Shewchuks Predicates test ===============" << std::endl;
+
+  point pa, pb, pc, pd;
+  pa.x = -0.6034851544931661; //-0.603485;
+  pa.y = -0.0572553943219186; //-0.0572554;
+  pb.x = -0.6034851421330270; //-0.603485;
+  pb.y = -0.0572554178266569; //-0.0572554;
+  pc.x = -0.6034829978440949; //-0.603483;
+  pc.y = -0.0568532654878436; //-0.0568533;
+  pd.x = -0.6034827734680771; //-0.603483;
+  pd.y = -0.0568532372913607; //-0.0568532;
+  p1.set(-0.6034851544931661, -0.0572553943219186);
+  p2.set(-0.6034851421330270, -0.0572554178266569);
+  p3.set(-0.6034829978440949, -0.0568532654878436);
+  p4.set(-0.6034827734680771, -0.0568532372913607);
+
+  std::cerr << std::setprecision(24);
+  std::cerr << "pa.x: " << pa.x << ", pa.y: " << pa.y << std::endl;
+  std::cerr << "pb.x: " << pb.x << ", pb.y: " << pb.y << std::endl;
+  std::cerr << "pc.x: " << pc.x << ", pc.y: " << pc.y << std::endl;
+  std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
+  std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+  std::cerr << "det(pa, pb, pc)   : " << det(p1, p2, p3) << std::endl;
+
+
+
 }

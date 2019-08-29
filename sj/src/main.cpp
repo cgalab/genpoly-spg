@@ -22,6 +22,7 @@
 #include "curve.h"
 #include "simple_pol_check.h"
 #include "star.h"
+#include "predicates.h"
 
 int main(int argc, char *argv[]) {
 
@@ -36,9 +37,10 @@ int main(int argc, char *argv[]) {
   enum alg_t alg = A_UNDEFINED;
   enum in_format_t inFormat = IF_UNDEFINED;
   enum out_format_t outFormat = OF_UNDEFINED;
-  bool writeNew = false;
-  bool calcArea = false;
-  bool checkSimple = false;
+  bool writeNew = false; // whether to write a new file instead of saving over an existing file.
+  bool calcArea = false;  // calculate and return the area
+  bool checkSimple = false; // only verify a given point set and polygon is simple.
+  //bool shew_pred = false; // enable shewchucks' predicates
   double areaMin = -1, areaMax = -1;
   int runAreaLoopFor, areaLoopCounter;
   clock_t areaTimerStart, areaTimerEnd;
@@ -53,10 +55,11 @@ int main(int argc, char *argv[]) {
 //  std::cerr << "returnvalue: " << returnValue << std::endl;
 
   if (returnValue == SUCCESS) {
+    // initialize Shewchuks' predicates
+    exactinit();
     //std::cout << "all good to go" << std::endl;
 
     // points from input file saved in a vector
-    // needs to be public so the lexComp function can access values for comparison
     std::vector<Point> points;
     // 'polygon' is an unsigned integer list of indexes into vector 'points'
     std::vector<unsigned int> polygon;
@@ -68,6 +71,7 @@ int main(int argc, char *argv[]) {
       // verify that the point set is valid, i.e. no points are equal and the whole set isn't collinear.
       returnValue = verify_point_set(points);
       if(returnValue == SUCCESS) {
+//        std::cerr << "point set verified." << std::endl;
         // get a simple polygon with a given method
         if (alg == A_2OPT) {
           if (calcArea)
