@@ -325,6 +325,8 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
   retval2.second = retval.first;
   return retval2;
 }
+
+
 // updates lowest_index
 std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned int& lowest_index, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum edge_t valid = E_VALID;

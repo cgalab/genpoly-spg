@@ -79,14 +79,29 @@ double reldist(const Edge& e, const Point& p) {
 	return reldist(*e.p1, *e.p2, p);
 }
 
+
 // calculates the determinant of the vertices of 'e' and the point p (similar function in point.cpp for 3 points)
 double det(const Edge e, const Point p) {
 	const Point& pa = *e.p1;
 	const Point& pb = *e.p2;
 	double ans = (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
+//	std::cerr << "det: " << ans << std::endl;
 	return (fabs(ans) < EPSILON) ? 0 : ans;
 }
 
+/*
+// simpler calculates of the determinant where pb is moved to (0.0) and thus it is removed from the other 2 points.
+double det(const Edge e, const Point p) {
+	Point pa = Point(*e.p1);
+	Point pb = Point(*e.p2);
+	Point pc = Point(p);
+	pb.x = pb.x - pa.x;pb.y = pb.y - pa.y;
+	pc.x = pc.x - pa.x;pc.y = pc.y - pa.x;
+	double ans = (pc.y * (pb.x) - pc.x * (pb.y));
+	std::cerr << "det: " << ans << std::endl;
+	return (fabs(ans) < EPSILON) ? 0 : ans;
+}
+*/
 double dety(const Edge e, const Point p) {
 	Point pa = *e.p1;
 	Point pb = *e.p2;
@@ -135,10 +150,10 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	double dp_1, dp_2, dp_3, dp_4;
 	bool same11 = false, same12 = false, same21 = false, same22 = false;
 
-	//std::cout << "e1.p1 == e2.p1: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << ", e1.p1: " << *e1.p1 << std::endl;
-	//std::cout << "e1.p1 == e2.p2: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << ", e1.p2: " << *e1.p2 << std::endl;
-	//std::cout << "e1.p2 == e2.p1: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << ", e2.p1: " << *e2.p1 << std::endl;
-	//std::cout << "e1.p2 == e2.p2: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << ", e2.p2: " << *e2.p2 << std::endl;
+//	std::cout << "e1.p1 == e2.p1: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << ", e1.p1: " << *e1.p1 << std::endl;
+//	std::cout << "e1.p1 == e2.p2: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << ", e1.p2: " << *e1.p2 << std::endl;
+//	std::cout << "e1.p2 == e2.p1: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << ", e2.p1: " << *e2.p1 << std::endl;
+//	std::cout << "e1.p2 == e2.p2: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << ", e2.p2: " << *e2.p2 << std::endl;
 
 	// determinant between edge 1 and a point in edge 2
 	det_a = det(e1, *e2.p1);
@@ -151,11 +166,11 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	//int sig,ex;
 	//sig = frexp(det_d, &ex);
 	//std::cerr << "sig: " << sig << ", exp: " << ex << std::endl;
-	//std::cerr.precision(17);
-	//std::cerr << "det_a: " << det_a << std::endl;
-	//std::cerr << "det_b: " << det_b << std::endl;
-	//std::cerr << "det_c: " << det_c << std::endl;
-	//std::cerr << "det_d: " << det_d << std::endl;
+	std::cerr.precision(17);
+//	std::cerr << "det_a: " << det_a << std::endl;
+//	std::cerr << "det_b: " << det_b << std::endl;
+//	std::cerr << "det_c: " << det_c << std::endl;
+//	std::cerr << "det_d: " << det_d << std::endl;
 
 	if (det_a*det_b*det_c*det_d == 0) {
 		bool col = false;

@@ -14,7 +14,6 @@
 #include "pol.h"
 #include "opt2base.h"
 // Version of BO-2opt that reverses to the lowest index when an intersection is found, then continues.
-// Have a max_back index that the algorithm goes to before moving forward again.
 enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
   enum error retval = SUCCESS;
 	// initialise and create a random permutation for the polygon
@@ -26,6 +25,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   // 'lex' is an "event-point-schedule" object.
 	std::vector<unsigned int> lex (points.size());
 	fill_lex(lex, points); // fill 'lex' with the indexes
+//  pdisplay(lex, points);
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
 	unsigned int index, before, after, lowest_index;
@@ -37,22 +37,26 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   std::set<Edge> edgeS; // a sweep-line-status object.
 
   do {
+    std::cerr << "looping" << std::endl;
     loop = false;
     revert = false;
     index = 0;
     lowest_index = polygon.size();
     decrementEdges(index, edgeS);
 
-//    std::cerr << "New loop" << std::endl;
   	while (index < points.size()) {
-/*      if (index > 32576 && index < 32579) {
-        std::cerr << "index: " << index << std::endl;
+/*
+      if (index > 1350 && index < 1355) {
+        std::cerr << std::endl << "index: " << index << std::endl;
+        std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
+        std::cerr << "lowest_index: " << lowest_index << std::endl;
         std::cout << "edges in 'edgeS':" << std::endl;
         for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
       }
 */
-
-//      std::cerr << std::endl << "index: " << index << std::endl;
+      std::cerr << std::endl << "index: " << index << std::endl;
+      std::cerr << "lowest_index: " << lowest_index << std::endl;
+      std::cerr << "loop: " << loop << std::endl;
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];
@@ -99,9 +103,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
             if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
               update_lowest_index(p1, p2, p3, lowest_index);
 //              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-              loop = true;
-              revert = true;
-              continue;
+              loop = true;revert = true;continue;
             }
           } //else std::cerr << "false alarm." << std::endl;
         }
