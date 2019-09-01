@@ -55,6 +55,7 @@ enum class EdgeType {POLYGON, FRAME, TRIANGULATION};
 class TEdge{
 
 private:
+	
 	/*
 		The Triangulation the edge lives in
 	*/

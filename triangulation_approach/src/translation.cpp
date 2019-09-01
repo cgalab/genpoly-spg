@@ -2,7 +2,7 @@
 
 // Constructors
 Translation::Translation(Triangulation* Tr, int i, double dX, double dY) :
-T(Tr), index(i), dx(dX), dy(dY), actualTime(0), split(false), type(TranslationType::DEFAULT)
+T(Tr), index(i), dx(dX), dy(dY), split(false), type(TranslationType::DEFAULT), actualTime(0)
 
 {
 	original = (*T).getVertex(index);
@@ -25,7 +25,7 @@ T(Tr), index(i), dx(dX), dy(dY), actualTime(0), split(false), type(TranslationTy
 }
 
 Translation::Translation(Triangulation* Tr, int i, double dX, double dY, TranslationType tp) : 
-T(Tr), index(i), dx(dX), dy(dY), actualTime(0), split(false), type(tp)
+T(Tr), index(i), dx(dX), dy(dY), split(false), type(tp), actualTime(0)
 
 {
 	original = (*T).getVertex(index);
