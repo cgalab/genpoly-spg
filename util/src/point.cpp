@@ -41,11 +41,24 @@ enum error verify_point_set(std::vector<Point>& points) {
   }
   return retval;
 }
-
+/*
 // calculates the determinant of the vertices of 'e' and the point p (similar function in edge.cpp for 1 edge and a point)
 double det(const Point& pa, const Point& pb, const Point& p) {
 	double ans = (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
-	return (fabs(ans) < EPSILON) ? 0 : ans;
+	return ans; //(fabs(ans) < EPSILON) ? 0 : ans;
+}
+*/
+// simpler calculates of the determinant where pb is moved to (0.0) and thus it is removed from the other 2 points.
+double det(Point& p1, Point& p2, Point& p) {
+	Point pa = Point(p1);
+	Point pb = Point(p2);
+	Point pc = Point(p);
+	pa.x = pa.x - pb.x;pa.y = pa.y - pb.y;
+	pc.x = pc.x - pb.x;pc.y = pc.y - pb.y;
+	double ans = pc.x * pa.y - pc.y * pa.x;
+	//std::cerr << "det: " << ans << std::endl;
+	//return (fabs(ans) < EPSILON) ? 0 : ans;
+	return ans;
 }
 
 // function that fills the vector 'ch' with indexes of 'points' set that are the points on the convex get_convex_hull

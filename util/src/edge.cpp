@@ -73,35 +73,38 @@ void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned i
 // returns relative distance of a point to an edge.
 double reldist(const Point& pa, const Point& pb, const Point& p) {
 	double ans = ((p.x-pa.x)*(pb.x-pa.x) + (p.y-pa.y)*(pb.y-pa.y)) / ((pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y));
-	return (fabs(ans) < EPSILON) ? 0 : ans;
+	//return (fabs(ans) < EPSILON) ? 0 : ans;
+	return ans;
 }
 double reldist(const Edge& e, const Point& p) {
 	return reldist(*e.p1, *e.p2, p);
 }
 
-
+/*
 // calculates the determinant of the vertices of 'e' and the point p (similar function in point.cpp for 3 points)
 double det(const Edge e, const Point p) {
 	const Point& pa = *e.p1;
 	const Point& pb = *e.p2;
 	double ans = (p.x * (pa.y - pb.y) - p.y * (pa.x-pb.x) + (pa.x*pb.y - pb.x*pa.y));
 //	std::cerr << "det: " << ans << std::endl;
-	return (fabs(ans) < EPSILON) ? 0 : ans;
+	//return (fabs(ans) < EPSILON) ? 0 : ans;
+	return ans;
 }
+*/
 
-/*
 // simpler calculates of the determinant where pb is moved to (0.0) and thus it is removed from the other 2 points.
 double det(const Edge e, const Point p) {
 	Point pa = Point(*e.p1);
 	Point pb = Point(*e.p2);
 	Point pc = Point(p);
-	pb.x = pb.x - pa.x;pb.y = pb.y - pa.y;
-	pc.x = pc.x - pa.x;pc.y = pc.y - pa.x;
-	double ans = (pc.y * (pb.x) - pc.x * (pb.y));
-	std::cerr << "det: " << ans << std::endl;
-	return (fabs(ans) < EPSILON) ? 0 : ans;
+	pa.x = pa.x - pb.x;pa.y = pa.y - pb.y;
+	pc.x = pc.x - pb.x;pc.y = pc.y - pb.y;
+	double ans = pc.x * pa.y - pc.y * pa.x;
+	//std::cerr << "det: " << ans << std::endl;
+	//return (fabs(ans) < EPSILON) ? 0 : ans;
+	return ans;
 }
-*/
+
 double dety(const Edge e, const Point p) {
 	Point pa = *e.p1;
 	Point pb = *e.p2;
@@ -191,10 +194,10 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		dp_4 = reldist(e2, *e1.p2);
 
 		//std::cerr.precision(17);
-		//std::cerr << "det_a: " << det_a << ", dp1: " << dp_1 << ", same11: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << std::endl;
-		//std::cerr << "det_b: " << det_b << ", dp2: " << dp_2 << ", same12: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << std::endl;
-		//std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << ", same21: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << std::endl;
-		//std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << ", same22: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << std::endl;
+//		std::cerr << "det_a: " << det_a << ", dp1: " << dp_1 << ", same11: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << std::endl;
+//		std::cerr << "det_b: " << det_b << ", dp2: " << dp_2 << ", same12: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << std::endl;
+//		std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << ", same21: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << std::endl;
+//		std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << ", same22: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << std::endl;
 
 				 if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) ) col = true;
 		else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) ) col = true;
