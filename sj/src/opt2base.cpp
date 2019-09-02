@@ -106,11 +106,15 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, std::set<Edg
   enum intersect_t isval;
   std::set<Edge>::iterator it;
 
-//  std::cerr << "edge to be removed: " << e << std::endl;
   it = edgeS.find(e);
 
   if (it != edgeS.end()) {
-//    std::cerr << "*it: " << *it << std::endl;
+    if (e != *it) {
+      std::cerr << "edge to be removed: " << e << std::endl;
+      std::cerr << "*it: " << *it << std::endl;
+      std::cerr << "edges in 'edgeS':" << std::endl;
+      for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) std::cerr << *it1 << std::endl;
+    }
     assert(e == *it);
 
     // get edges before and after
@@ -393,9 +397,9 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {
-//        std::cerr << "4P collinearity between:" << e << " and aft: " << after << std::endl;
+//        std::cerr << "collinearity between:" << e << " and aft: " << after << std::endl;
         if (coll4Swap(e, after, edgeS, polygon, points)) {
-//          std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
+//          std::cerr << "coll. after swap: " << e << " and " << after << std::endl;
           valid = E_SKIP;
           update_lowest_index(e, after, lowest_index);
         }
