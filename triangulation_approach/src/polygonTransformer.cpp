@@ -38,11 +38,11 @@ int transformPolygonByMoves(Triangulation *T, int iterations){
 		v = (*T).getVertex(index);
 
 		// Chose a direction randomly and get a suitable stddev for the distance
-		alpha = (*Settings::generator).getTranslationUniform(- M_PI, M_PI);
+		alpha = (*Settings::generator).getDoubleUniform(- M_PI, M_PI);
 		stddev = (*v).getDirectedEdgeLength(alpha);
 
 		// Generate a random distance
-		r = (*Settings::generator).getTranslationNormal(stddev / 2, stddev / 6);
+		r = (*Settings::generator).getDoubleNormal(stddev / 2, stddev / 6);
 
 		// Split the translation into x- and y-components
 		dx = r * cos(alpha);

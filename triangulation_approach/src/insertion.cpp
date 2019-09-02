@@ -129,12 +129,12 @@ void Insertion::translate(){
 
 	while(!simple && count < Settings::insertionTries){
 		// Chose a random direction for the movement
-		alpha = (*Settings::generator).getTranslationUniform(- M_PI, M_PI);
+		alpha = (*Settings::generator).getDoubleUniform(- M_PI, M_PI);
 		// Compute suitable distribution parameters
 		stddev = (*newV).getDirectedEdgeLength(alpha);
 
 		// Generate the translation distance
-		r = (*Settings::generator).getTranslationNormal(stddev / 2, stddev / 6);
+		r = (*Settings::generator).getDoubleNormal(stddev / 2, stddev / 6);
 
 		// Split the translation in x- and y-components
 		dx = r * cos(alpha);
