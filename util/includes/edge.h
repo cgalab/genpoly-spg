@@ -228,6 +228,8 @@ public:
     double s;
     // comparison always starts at lex. higher of the P1 points.
     if ((*p1 == *e.p1) && (*p2 == *e.p2)) {return false;} // e is same edge as 'this'
+    if (*p1 == *e.p2) {return false;}
+    if (*p2 == *e.p1) {return true;}
     if (*p1 == *e.p1) {
       if (*p2 < *e.p2) {s = (*p2).x;}
       else {s = (*e.p2).x;}
