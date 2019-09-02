@@ -79,8 +79,21 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   std::cerr << "(*e1.p1): " << *e1.p1 << " == *p1: " << p1 << " : " <<  ((*e1.p1 == p1) ? "true" : "false") << std::endl;
   std::cerr << "(*e1.p2): " << *e1.p1 << " == *p2: " << p2 << " : " <<  ((*e1.p2 == p2) ? "true" : "false") << std::endl;
-
   std::cerr << std::endl;
+
+  p1.set(0.1776512115938656,0.59801348903157514,3008,2320,3010);
+  p2.set(0.32086761784458201,0.58090142848487081,3415,2321,3415);
+  p3.set(0.17057308659368181,0.59801348903163565,2985,2317,2985);
+  p4.set(0.1776512115938656,0.59801348903157514,3008,2320,3010);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+
+  std::cerr << std::setprecision(15);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
 
   std::cerr << "=== checkIntersection tests ===" << std::endl;
   std::cerr << "=== 'should be true' is a comparison 'itest >= IS_TRUE' : true when intersection exists ===" << std::endl;
@@ -264,6 +277,18 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   e1.set(p1,p2);
   p3.set(-0.6034851421330270, -0.0572554178266569);
   p4.set(-0.6034829978440949, -0.0568532654878436);
+  e2.set(p3,p4);
+
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  printEnum(itest);
+  std::cerr << std::endl;
+
+  p1.set(-0.0003922779898438,  0.1603560581152343);
+  p2.set(-0.0002011321564974,  0.2376256472348480);
+  e1.set(p1,p2);
+  p3.set(-0.0004140803492565,  0.1464613835869469);
+  p4.set(-0.0002011321556713,   0.2376256472341352);
   e2.set(p3,p4);
 
   itest = checkIntersection(e1, e2);
@@ -459,24 +484,14 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "is simple: should be false: " << ((btest) ? "true" : "false") << std::endl;
 */
 
-/*
-  std::cerr << "=========== Heap's alg. test ================" << std::endl;
-
-  std::vector<unsigned int> a = {1, 2, 3, 4, 5};
-  heap(a, a.size());
-*/
   std::cerr << std::endl;
   std::cerr << "======= Shewchuks Predicates test ===============" << std::endl;
 
   point pa, pb, pc, pd;
-  pa.x = -0.6034851544931661; //-0.603485;
-  pa.y = -0.0572553943219186; //-0.0572554;
-  pb.x = -0.6034851421330270; //-0.603485;
-  pb.y = -0.0572554178266569; //-0.0572554;
-  pc.x = -0.6034829978440949; //-0.603483;
-  pc.y = -0.0568532654878436; //-0.0568533;
-  pd.x = -0.6034827734680771; //-0.603483;
-  pd.y = -0.0568532372913607; //-0.0568532;
+  pa.x = -0.6034851544931661; pa.y = -0.0572553943219186; //-0.0572554;
+  pb.x = -0.6034851421330270; pb.y = -0.0572554178266569; //-0.0572554;
+  pc.x = -0.6034829978440949; pc.y = -0.0568532654878436; //-0.0568533;
+  pd.x = -0.6034827734680771; pd.y = -0.0568532372913607; //-0.0568532;
   p1.set(-0.6034851544931661, -0.0572553943219186);
   p2.set(-0.6034851421330270, -0.0572554178266569);
   p3.set(-0.6034829978440949, -0.0568532654878436);
@@ -490,6 +505,46 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
   std::cerr << "det(pa, pb, pc)   : " << det(p1, p2, p3) << std::endl;
 
+  pa.x = -0.0003922779898438; pa.y = 0.1603560581152343;
+  pb.x = -0.0002011321564974; pb.y = 0.2376256472348480;
+  pc.x = -0.0004140803492565; pc.y = 0.1464613835869469;
+  pd.x = -0.0002011321556713; pd.y = 0.2376256472341352;
 
+  p1.set(-0.0003922779898438,  0.1603560581152343);
+  p2.set(-0.0002011321564974,  0.2376256472348480);
+  p3.set(-0.0004140803492565,  0.1464613835869469);
+  p4.set(-0.0002011321556713,   0.2376256472341352);
+  e1.set(p1,p2);
+  e2.set(p3,p4);
+
+  std::cerr << "pa.x: " << pa.x << ", pa.y: " << pa.y << std::endl;
+  std::cerr << "pb.x: " << pb.x << ", pb.y: " << pb.y << std::endl;
+  std::cerr << "pc.x: " << pc.x << ", pc.y: " << pc.y << std::endl;
+  std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
+
+  std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+
+  std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
+  std::cerr << "det(e1, p4)       : " << det(e1, p4) << std::endl;
+  std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
+
+  std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
+  std::cerr << "det(e2, p1)       : " << det(e2, p1) << std::endl;
+  std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
+
+  std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
+  std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
+  std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
+
+  // test the time difference between det and orient2d
+  //for (unsigned int i = 0; i < 100000000 ; ++i) orient2d(pa,pb,pc);
+/*
+  std::cerr << "=========== Heap's alg. test ================" << std::endl;
+
+  std::vector<unsigned int> a = {1, 2, 3, 4, 5};
+  heap(a, a.size());
+*/
 
 }
