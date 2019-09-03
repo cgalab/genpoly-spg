@@ -115,6 +115,43 @@ private:
 public:
 	
 	/*
+		LIST OF PUBLIC MEMBER FUNCTIONS
+
+		CONSTRUCTORS:
+
+		Triangle(TEdge *E0, TEdge *E1, TEdge *E2, Vertex *V0, Vertex *V1, Vertex *V2)
+		Triangle(Vertex *V0, Vertex *V1, Vertex *V2)
+
+		GETTER:
+
+		unsigned long long 		getID()
+		Vertex* 				getVertex(int index)
+		TEdge* 					getEdge(int index)
+		Vertex* 				getOtherVertex(TEdge *e)
+		TEdge* 					getEdgeNotContaining(Vertex *v)
+		TEdge* 					getEdgeContaining(Vertex *v)
+		TEdge* 					getOtherEdgeContaining(Vertex *v, TEdge *e)
+		std::vector<TEdge*> 	getOtherEdges(TEdge* e)
+		TEdge* 					getLongestEdge(int epsilon)
+		TEdge* 					getLongestEdgeAlt()
+		double 					getRange(Vertex *v, double alpha)
+
+		PRINTER:
+
+		void 					print()
+
+		OTHERS:
+
+		bool 					contains(Vertex *v)
+		void 					enqueue()
+		void 					dequeue()
+		bool 					isEnqueued()
+		double 					calculateCollapseTime(Vertex* moving, double dx, double dy)
+		double 					signedArea()
+	*/
+
+
+	/*
 		C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
 	*/
 

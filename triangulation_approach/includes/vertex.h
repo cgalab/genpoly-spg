@@ -126,6 +126,65 @@ private:
 public:
 
 	/*
+		LIST OF PUBLIC MEMBER FUNCTIONS
+
+		CONSTRUCTORS:
+
+								Vertex(double X, double Y)
+								Vertex(double X, double Y, bool RV)
+		Vertex* 				getTranslated(double dx, double dy)
+		
+		SETTER:
+
+		void 					setTriangulation(Triangulation *t)
+		void 					setPosition(double X, double Y)
+		void 					addEdge(TEdge *e)
+		void 					addTriangle(Triangle *t)
+		void 					setToPrev(TEdge *e)
+		void 					setToNext(TEdge *e)
+
+		GETTER:
+
+		double 					getX()
+		double 					getY()
+		std::list<Triangle*> 	getTriangles()
+		unsigned long long 		getID()
+		unsigned long long 		getRID()
+		TEdge* 					getEdgeTo(Vertex *toV)
+		std::vector<TEdge*> 	getSurroundingEdges()
+		std::list<TEdge*> 		getPolygonEdges()
+		bool 					isRectangleVertex()
+		double 					getMediumEdgeLength()
+		double 					getDirectedEdgeLength(double alpha)
+		TEdge* 					getToPrev()
+		TEdge* 					getToNext()
+		Vertex* 				getPrev()
+		Vertex* 				getNext()
+		Triangulation* 			getTriangulation()
+		Triangle* 				getTriangleWith(Vertex *v0, Vertex *v1)
+
+		REMOVER:
+
+		void 					removeEdge(TEdge *e)
+		void 					removeTriangle(Triangle *t)
+
+		PRINTER:
+
+		void 					print(FILE *f, double factor)
+		void 					print()
+		void 					printEnvironment(int depth, const char *filename)
+		void 					printSurroundingTriangulation(const char *filename)
+		void 					printStats()
+
+		OTHERS:
+
+		bool 					check()
+		void 					stretch(double factor)
+		bool 					checkSurroundingPolygon()
+	*/
+
+
+	/*
 		C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
 	*/
 

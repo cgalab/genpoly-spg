@@ -56,6 +56,42 @@ private:
 public:
 	
 	/*
+		LIST OF PUBLIC MEMBER FUNCTIONS
+
+		CONSTRUCTORS:
+
+					Triangulation(int n)
+
+		SETTER:
+
+		void 		addVertex(Vertex *v)
+		void 		addEdge(TEdge *e)
+		void 		setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3)
+
+		GETTER:
+
+		int 		getTargetNumberOfVertices()
+		int 		getActualNumberOfVertices()
+		Vertex*		getVertex(int i)
+
+		REMOVER:
+
+		void 		removeVertex(int index)
+		void 		removeEdge(TEdge *e)
+
+		PRINTER:
+
+		void 		print(const char *filename)
+		void 		printPolygon(const char *filename)
+
+		OTHERS:
+
+		bool 		check()
+		void 		stretch(double factor)
+	*/
+
+
+	/*
 		C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
 	*/
 

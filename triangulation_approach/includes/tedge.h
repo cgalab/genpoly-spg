@@ -89,7 +89,53 @@ private:
 	static unsigned long long n;
 
 public:
-	
+
+	/*
+		LIST OF PUBLIC MEMBER FUNCTIONS
+
+		CONSTRUCTORS:
+		
+							TEdge(Vertex *V0, Vertex *V1)
+							TEdge(Vertex *V0, Vertex *V1, EdgeType tp)
+
+		SETTER:
+
+		void 				setTriangulation(Triangulation *t)
+		void 				setEdgeType(EdgeType tp)
+		void 				setTriangle(Triangle *t)
+
+		GETTER:
+
+		unsigned long long 	getID()
+		EdgeType 			getEdgeType()
+		Vertex* 			getV0()
+		Vertex* 			getV1()
+		Triangle* 			getT0()
+		Triangle* 			getT1()
+		Triangle* 			getTriangleNotContaining(Vertex *v)
+		Triangle* 			getTriangleContaining(Vertex *v)
+		Triangle* 			getOtherTriangle(Triangle *t)
+		Vertex* 			getOtherVertex(Vertex *v)
+
+		REMOVER:
+
+		void 				removeTriangle(Triangle *t)
+
+		PRINTER:
+
+		void 				print(FILE *f)
+		void 				print()
+
+		OTHERS:
+
+		double 				length()
+		bool 				contains()
+		int 				nrAssignedTriangles()
+		double 				getAngle()
+		bool 				isBetween()
+	*/
+
+
 	/*
 		C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
 	*/
