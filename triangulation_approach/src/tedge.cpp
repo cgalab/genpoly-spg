@@ -437,19 +437,25 @@ TEdge::~TEdge(){
 				different signs
 		- NONE: Otherwise, the two edges do not intersect
 
-	@param 	e0 	First edge
-	@param 	e1 	Second edge
-	@reaturn 	The tpye of intersection
+	@param 	e0 		First edge
+	@param 	e1 		Second edge
+	@param 	precise If false the function uses Settings::epsInt instead of zero for the VERTEX
+					intersections
+	@return 		The tpye of intersection
 
 	Note:
 		For numerical stability a vertex is considered to lay exactly at an edge if the corresponding
 		determinantent's absolute value is less than Settings::EpsInt. This also keeps vertices a bit
 		away from edges.
 */
-enum IntersectionType checkIntersection(TEdge *e0, TEdge *e1){
+enum IntersectionType checkIntersection(TEdge *e0, TEdge *e1, bool precise){
 	Vertex *v00, *v01, *v10, *v11;
 	double area00, area01, area10, area11;
 	Triangle *t;
+	double epsilon = 0;
+
+	if(!precise)
+		epsilon = Settings::epsInt;
 
 	// Get vertices
 	v00 = (*e0).getV0();
@@ -473,28 +479,28 @@ enum IntersectionType checkIntersection(TEdge *e0, TEdge *e1){
 	delete t;
 
 	// Check whether v10 lays on e0
-	if(fabs(area00) <= Settings::epsInt){
+	if(fabs(area00) <= epsilon){
 		// Check whether v10 lays between the vertices of e0
 		if((*e0).isBetween(v10))
 			return IntersectionType::VERTEX;
 	}
 
 	// Check whether v11 lays on e0
-	if(fabs(area01) <= Settings::epsInt){
+	if(fabs(area01) <= epsilon){
 		// Check whether v10 lays between the vertices of e0
 		if((*e0).isBetween(v11))
 			return IntersectionType::VERTEX;
 	}
 
 	// Check whether v00 lays on e1
-	if(fabs(area10) <= Settings::epsInt){
+	if(fabs(area10) <= epsilon){
 		// Check whether v10 lays between the vertices of e0
 		if((*e1).isBetween(v00))
 			return IntersectionType::VERTEX;
 	}
 
 	// Check whether v01 lays on e1
-	if(fabs(area11) <= Settings::epsInt){
+	if(fabs(area11) <= epsilon){
 		// Check whether v10 lays between the vertices of e0
 		if((*e1).isBetween(v01))
 			return IntersectionType::VERTEX;

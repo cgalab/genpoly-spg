@@ -304,6 +304,9 @@ bool Triangulation::check(){
 		}
 	}
 
+	// Check the simplicity of the polygon
+	checkSimplicity();
+
 	return ok;
 }
 
@@ -325,5 +328,72 @@ void Triangulation::stretch(double factor){
 
 	for(auto const& i : vertices){
 		(*i).stretch(factor);
+	}
+}
+
+/*
+	The function checkSimplicity() checks whether a polygon is simple by checking for self-
+	intersections. So it basically compares each edge with each other edge. To do so it uses
+	two nested for-loops: The outer one loops over all edges, whereas the inner one just loops
+	over the edges which have not been compared yet with the edge of the outer one. If it finds
+	any intersection it errors with exit code 11.
+
+	Note:
+		This function does not consider edges of other polygons!
+*/
+void Triangulation::checkSimplicity(){
+	Vertex *v, *u, *w;
+	TEdge *toCheck; // The edge which is compared to all others at the moment
+	TEdge *otherEdge;
+	int n; // Number of following edges toCheck has to be compared with
+	int i;
+	IntersectionType type;
+
+	// Get the first edge to be compared with all others
+	v = vertices[0];
+	toCheck = (*v).getToNext();
+
+	// Get the next vertex
+	u = (*v).getNext();
+
+	// Get the number of following edges the first edge has to be compared with,
+	// which is the actual number of vertices in the polygon minus 3 (the edge itself and
+	// its two neighbors)
+	n = getActualNumberOfVertices() - 3;
+
+	// Iterate over all edges
+	// Take into account that the first and the second edge have to be compared with the same
+	// number of edges
+	n++;
+	i = 1;
+	while(n > 0){
+		// The first edge to compare with is the next but one
+		u = (*u).getNext();
+		otherEdge = (*u).getToNext();
+		w = u;
+
+		// Compare against the other edges
+		while(i < n){
+			
+			type = checkIntersection(toCheck, otherEdge, true);
+
+			if(type != IntersectionType::NONE)
+				exit(11);
+
+			// Get the next edge to check with
+			w = (*w).getNext();
+			otherEdge = (*w).getToNext();
+
+			i++;
+		}
+		i = 0;
+
+		// The next edge has to be checked against one other edge less
+		n--;
+		printf("n: %d\n", n);
+
+		// Get the next edge
+		v = (*v).getNext();
+		toCheck = (*v).getToNext();
 	}
 }

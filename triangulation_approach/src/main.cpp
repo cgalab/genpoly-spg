@@ -23,6 +23,7 @@ code 	name						meaning
 9		Triangulation error			Some vertex has left its surrouding polygon but it hasn't been recognized
 									during the translation
 10		Vertex at PE end 			The surrounding polygon check recognizes a vertex exactly laying on a PE
+11 		Not simple					The check for simplicity found an intersection
 */
 
 

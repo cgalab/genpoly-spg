@@ -6,7 +6,7 @@ double Settings::boxSize = 3.0;
 int Settings::initialTranslationFactor = 1000;
 int Settings::initialTranslationNumber = -1;
 Arithmetics Settings::arithmetics = Arithmetics::DOUBLE;
-int Settings::targetSize = 1000000;
+int Settings::targetSize = 100000;
 int Settings::insertionTries = 100;
 double Settings::minLength = 0.0000001;
 Timer* Settings::timer = NULL;
@@ -16,14 +16,11 @@ RandomGenerator* Settings::generator = NULL;
 FeedbackMode Settings::feedback = FeedbackMode::EXECUTION;
 
 void Settings::initSettings(){
-
-	
-
-	// generate and start Timer
+	// Generate and start Timer
 	timer = new Timer();
 	(*timer).start();
 
-	// compute the number of translations for the initial polygon
+	// Compute the number of translations for the initial polygon
 	if(initialSize < targetSize){
 		initialTranslationNumber = initialTranslationFactor * initialSize;
 	}else{
@@ -31,9 +28,10 @@ void Settings::initSettings(){
 		initialSize = targetSize;
 	}
 
-	// initialise the RandomGenerator
+	// Initialize the RandomGenerator
 	generator = new RandomGenerator(fixedSeed, seed);
 
-	// initialise the exact arithmetic
-	exactinit();
+	// Initialise the exact arithmetic
+	if(arithmetics == Arithmetics::EXACT)
+		exactinit();
 }

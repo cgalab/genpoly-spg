@@ -377,16 +377,18 @@ public:
 				different signs
 		- NONE: Otherwise, the two edges do not intersect
 
-	@param 	e0 	First edge
-	@param 	e1 	Second edge
-	@reaturn 	The tpye of intersection
+	@param 	e0 		First edge
+	@param 	e1 		Second edge
+	@param 	precise If false the function uses Settings::epsInt instead of zero for the VERTEX
+					intersections
+	@return 		The tpye of intersection
 
 	Note:
 		For numerical stability a vertex is considered to lay exactly at an edge if the corresponding
 		determinantent's absolute value is less than Settings::EpsInt. This also keeps vertices a bit
 		away from edges.
 */
-enum IntersectionType checkIntersection(TEdge *e0, TEdge *e1);
+enum IntersectionType checkIntersection(TEdge *e0, TEdge *e1, bool precise);
 
 
 // TODO:

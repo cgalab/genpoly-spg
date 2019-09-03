@@ -25,6 +25,7 @@ class Triangle;
 class Triangulation{
 
 private:
+	
 	/*
 		A vector of all polygon vertices contained by the triangulation
 	*/
@@ -38,6 +39,8 @@ private:
 			- An unordered map with a hashtable could be faster, but I do not know how efficient 
 				the deletion of elements is implemented their
 	*/
+	// TODO:
+	// Create something to disable this
 	std::map<int, TEdge*> edges;
 
 	/*
@@ -88,6 +91,7 @@ public:
 
 		bool 		check()
 		void 		stretch(double factor)
+		void		checkSimplicity()
 	*/
 
 
@@ -245,6 +249,18 @@ public:
 			- It is not used anywhere at the moment
 	*/
 	void stretch(double factor);
+
+	/*
+	The function checkSimplicity() checks whether a polygon is simple by checking for self-
+	intersections. So it basically compares each edge with each other edge. To do so it uses
+	two nested for-loops: The outer one loops over all edges, whereas the inner one just loops
+	over the edges which have not been compared yet with the edge of the outer one. If it finds
+	any intersection it errors with exit code 11.
+
+	Note:
+		This function does not consider edges of other polygons!
+*/
+	void checkSimplicity();
 };
 
 #endif

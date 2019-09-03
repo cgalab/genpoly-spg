@@ -172,16 +172,16 @@ bool Translation::insideQuadrilateral(Vertex *v){
 	// Count the intersection
 	// TODO:
 	// Maybe using an epsilon here in checkIntersection makes no sense
-	intersection = checkIntersection(dummyEdge, prevOldE);
+	intersection = checkIntersection(dummyEdge, prevOldE, false);
 	if(intersection != IntersectionType::NONE)
 		count++;
-	intersection = checkIntersection(dummyEdge, nextOldE);
+	intersection = checkIntersection(dummyEdge, nextOldE, false);
 	if(intersection != IntersectionType::NONE)
 		count++;
-	intersection = checkIntersection(dummyEdge, prevNewE);
+	intersection = checkIntersection(dummyEdge, prevNewE, false);
 	if(intersection != IntersectionType::NONE)
 		count++;
-	intersection = checkIntersection(dummyEdge, nextNewE);
+	intersection = checkIntersection(dummyEdge, nextNewE, false);
 	if(intersection != IntersectionType::NONE)
 		count++;
 
@@ -230,7 +230,7 @@ bool Translation::checkEdge(Vertex *fromV, TEdge *newE){
 
 	// Iterate over all edges of the surrounding polygon
 	for(auto& i : surEdges){
-		iType = checkIntersection(newE, i);
+		iType = checkIntersection(newE, i, false);
 
 		// New edge hits vertex of surrounding polygon
 		if(iType == IntersectionType::VERTEX)
@@ -268,8 +268,8 @@ bool Translation::checkEdge(Vertex *fromV, TEdge *newE){
 	// Iterate over the adjacent triangles if there was an intersection with a triangulation edge
 	// Here surEdges always have the length 2
 	while(true){
-		iType0 = checkIntersection(newE, surEdges[0]);
-		iType1 = checkIntersection(newE, surEdges[1]);
+		iType0 = checkIntersection(newE, surEdges[0], false);
+		iType1 = checkIntersection(newE, surEdges[1], false);
 
 		// The new edge does not interesect any further edges
 		if(iType0 == IntersectionType::NONE && iType1 == IntersectionType::NONE)
@@ -350,7 +350,7 @@ void Translation::repairEnd(){
 			edge = (*i).getLongestEdgeAlt();
 
 			if(type == TranslationType::DEFAULT)
-				printf("intersectiontype: %d\n", (int)checkIntersection(transPath, edge));
+				printf("intersectiontype: %d\n", (int)checkIntersection(transPath, edge, false));
 
 			// Try to do a security flip
 			if((*edge).getEdgeType() != EdgeType::POLYGON)
@@ -449,7 +449,7 @@ bool Translation::checkOverroll(){
 
 	// Check whether the quadrilateral of the choosen Vertex P, its translated version P' and the
 	// two neighbors M and N is simple, otherwise there can not be any overroll
-	overroll = !(checkIntersection(prevOldE, nextNewE) != IntersectionType::NONE || checkIntersection(nextOldE, prevNewE) != IntersectionType::NONE);
+	overroll = !(checkIntersection(prevOldE, nextNewE, false) != IntersectionType::NONE || checkIntersection(nextOldE, prevNewE, false) != IntersectionType::NONE);
 
 	if(!overroll)
 		return false;
