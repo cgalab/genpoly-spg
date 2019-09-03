@@ -48,6 +48,21 @@ private:
 
 public:
 
+		/*
+		LIST OF PUBLIC MEMBER FUNCTIONS
+
+		CONSTRUCTORS:
+		
+				Insertion(Triangulation *t, int index)
+
+		OTHERS:
+
+		bool 	checkStability()
+		void 	execute()
+		void 	translate()
+	*/
+
+
 	/*
 		C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
 	*/

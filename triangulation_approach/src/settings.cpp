@@ -14,6 +14,7 @@ bool Settings::fixedSeed = false;
 unsigned int Settings::seed = 0;
 RandomGenerator* Settings::generator = NULL;
 FeedbackMode Settings::feedback = FeedbackMode::EXECUTION;
+bool Settings::simplicityCheck = false;
 
 void Settings::initSettings(){
 	// Generate and start Timer

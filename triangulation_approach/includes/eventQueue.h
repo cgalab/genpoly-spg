@@ -134,6 +134,24 @@ private:
 public:
 
 	/*
+		LIST OF PUBLIC MEMBER FUNCTIONS
+
+		CONSTRUCTORS:
+		
+										EventQueue(Vertex *orig, Vertex *oV, Vertex *nV) 
+
+		OTHERS:
+
+		void 							insertWithoutCheck(double time, Triangle *t)
+		bool 							makeStable(bool initial)
+		std::pair<double, Triangle*> 	pop()
+		int 							size()
+		void 							remove(Triangle *t)
+		void 							print()
+	*/
+
+
+	/*
 		C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
 	*/
 

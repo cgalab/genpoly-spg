@@ -630,6 +630,7 @@ enum Executed Translation::execute(){
 */
 // TODO:
 // It is definitelly necessary to split this function into multiple functions!
+// The flip() function could also be private
 bool Translation::flip(Triangle *t0, bool singleFlip){
 	TEdge *e, *e1, *e2;
 	Triangle *t1;

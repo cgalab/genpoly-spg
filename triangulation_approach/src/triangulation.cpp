@@ -305,7 +305,8 @@ bool Triangulation::check(){
 	}
 
 	// Check the simplicity of the polygon
-	checkSimplicity();
+	if(Settings::simplicityCheck)
+		checkSimplicity();
 
 	return ok;
 }
@@ -390,7 +391,6 @@ void Triangulation::checkSimplicity(){
 
 		// The next edge has to be checked against one other edge less
 		n--;
-		printf("n: %d\n", n);
 
 		// Get the next edge
 		v = (*v).getNext();

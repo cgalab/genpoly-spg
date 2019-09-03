@@ -99,6 +99,12 @@ public:
 	// Function for initialising the settings
 	static void initSettings();
 
+	/*
+		Check
+	*/
+
+	// Enable simplicity check
+	static bool simplicityCheck;
 };
 
 #endif

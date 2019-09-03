@@ -207,6 +207,23 @@ private:
 	void repairEnd();
 
 public:
+
+		/*
+		LIST OF PUBLIC MEMBER FUNCTIONS
+
+		CONSTRUCTORS:
+		
+						Translation(Triangulation *Tr, int i, double dX, double dY)
+
+		OTHERS:
+
+		bool 			checkOverroll()
+		enum Executed 	execute()
+		bool 			flip(Triangle *t0, bool singleFlip)
+		bool 			checkSimplicityOfTranslation()
+		void 			checkSplit()
+	*/
+
 	
 	/*
 		C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
