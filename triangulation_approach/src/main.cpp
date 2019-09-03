@@ -26,7 +26,6 @@ code 	name						meaning
 11 		Not simple					The check for simplicity found an intersection
 */
 
-// test comment
 int main(){
 	Triangulation* T;
 	int performed;
