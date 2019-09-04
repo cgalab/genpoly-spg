@@ -20,6 +20,7 @@ public:
   Point(double X, double Y, unsigned int I) {x=X;y=Y;i=I;v=0;l=0;}
   Point(double X, double Y, unsigned int I, unsigned int V) {x=X;y=Y;i=I;v=V;l=0;}
   Point(double X, double Y, unsigned int I, unsigned int V, unsigned int L) {x=X;y=Y;i=I;v=V;l=L;}
+  void set(Point p) {x=p.x; y=p.y; i=p.i; v=p.v;l=p.l;}
   void set(double X, double Y) {x=X; y=Y;}
   void set(double X, double Y, unsigned int I) {x=X; y=Y; i=I;}
   void set(double X, double Y, unsigned int I, unsigned int V) {x=X; y=Y; i=I; v=V;}
@@ -35,36 +36,51 @@ public:
 
   // function to compare 2 points based on y axis first, then x.
   bool lessY (const Point& s) const {
+/*
     if (fabs(y - s.y) < EPSILON) {
       if (fabs(x - s.x) < EPSILON) return false;
       else return (x < s.x);
     }
     else return (y < s.y);
+*/
+    if (y == s.y) return (x < s.x);
+    return (y < s.y);
   }
 
   // first priority is the x axis comparison, then y.
   bool operator < (const Point& s) const {
 //    std::cerr << "in < comparison" << std::endl;
-    if (fabs(x - s.x) < EPSILON) {
-      if (fabs(y - s.y) < EPSILON) return false;
-      else return (y < s.y);
-    }
-    else return (x < s.x);
+//    if (fabs(x - s.x) < EPSILON) {
+//      if (fabs(y - s.y) < EPSILON) return false;
+//      else return (y < s.y);
+//    }
+//    else return (x < s.x);
+    if (x == s.x) return (y < s.y);
+    return (x < s.x);
   }
 
   bool operator > (const Point& s) const {
+/*
     if (fabs(x - s.x) < EPSILON) {
       if (fabs(y - s.y) < EPSILON) return false;
       else return (y > s.y);
     }
     else return (x > s.x);
+*/
+    if (x == s.x) return (y > s.y);
+    return (x > s.x);
   }
 
   bool operator == (const Point& s) const {
 //    std::cerr << "x comp: abs(" << x << " - " << s.x << ") = " <<  fabs(x - s.x) << std::endl;
 //    std::cerr << "y comp: abs(" << y << " - " << s.y << ") = " <<  fabs(y - s.y) << std::endl;
+
+/*
     if ((fabs(x - s.x) < EPSILON) && (fabs(y - s.y)) < EPSILON) return true;
     else return false;
+*/
+    if ((x == s.x) && (y == s.y)) return true;
+    return false;
   }
 
 /*
@@ -74,8 +90,12 @@ public:
   }
 */
   friend bool operator!=(const Point & lhs, const Point & rhs) {
+/*
     if ((fabs(lhs.x - rhs.x) > EPSILON) || (fabs(lhs.y - rhs.y)) > EPSILON) return true;
     else return false;
+*/
+    if ((lhs.x == rhs.x) && (lhs.y == rhs.y)) return false;
+    return true;
   }
 
   friend std::ostream& operator<<(std::ostream& os, const Point& p) {

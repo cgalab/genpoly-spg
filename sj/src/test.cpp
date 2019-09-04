@@ -10,6 +10,7 @@
 #include "pol.h"
 #include "heap.h"
 #include "predicates.h"
+#include <bitset>
 
 
 /*
@@ -46,6 +47,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   Point p4 = Point(0,0,3,3);
   p4.l = 4;
 
+  std::cerr << std::setprecision(15);
   std::cerr << "=== Point comparison tests ===" << std::endl;
 
   p1.set(1,1);
@@ -64,6 +66,17 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << p1 << "  > " << p3 << ", should be false: " << ((p1 > p3) ? "true" : "false") << std::endl;
   std::cerr << p1 << " == " << p3 << ", should be false: " << ((p1 == p3) ? "true" : "false") << std::endl;
   std::cerr << p1 << " != " << p3 << ", should be true : " << ((p1 != p3) ? "true" : "false") << std::endl;
+
+  p1.set(-0.3623046875,0.21240234371874361);
+  p2.set(-0.36279296875,0.21240234371874361);
+  std::cerr << p1 << "  < " << p1 << ", should be false: " << ((p1 < p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  > " << p1 << ", should be false: " << ((p1 > p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " == " << p1 << ", should be true : " << ((p1 == p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " != " << p1 << ", should be false: " << ((p1 != p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  < " << p2 << ", should be false: " << ((p1 < p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  > " << p2 << ", should be true : " << ((p1 > p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " == " << p2 << ", should be false: " << ((p1 == p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " != " << p2 << ", should be true : " << ((p1 != p2) ? "true" : "false") << std::endl;
 
   std::cerr << std::endl;
 
@@ -88,7 +101,6 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   e1.set(p1, p2);
   e2.set(p3, p4);
 
-  std::cerr << std::setprecision(15);
   std::cerr << "e1: " << e1 << std::endl;
   std::cerr << "e2: " << e2 << std::endl;
   std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
@@ -485,7 +497,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 */
 
   std::cerr << std::endl;
-  std::cerr << "======= Shewchuks Predicates test ===============" << std::endl;
+  std::cerr << "======= Shewchuks Predicates test 1 ===============" << std::endl;
 
   point pa, pb, pc, pd;
   pa.x = -0.6034851544931661; pa.y = -0.0572553943219186; //-0.0572554;
@@ -538,8 +550,61 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
   std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
 
+  std::cerr << "======= Shewchuks Predicates test 2 ===============" << std::endl;
+
+  pa.x = -0.36279296875; pa.y = 0.21240234371874361;
+  pb.x = -0.3623046875;  pb.y = 0.21240234371874361;
+  pc.x = -0.36328125;    pc.y = 0.21240234371874361;
+  pd.x = -0.361328125;   pd.y = 0.21240234371874361;
+  p1.set(-0.36279296875, 0.21240234371874361);
+  p2.set(-0.3623046875,  0.21240234371874361);
+  p3.set(-0.36328125,    0.21240234371874361);
+  p4.set(-0.361328125,   0.21240234371874361);
+
+  e1.set(p1,p2);
+  e2.set(p3,p4);
+
+  std::cerr << "pa.x: " << pa.x << ", pa.y: " << pa.y << std::endl;
+  std::cerr << "pb.x: " << pb.x << ", pb.y: " << pb.y << std::endl;
+  std::cerr << "pc.x: " << pc.x << ", pc.y: " << pc.y << std::endl;
+  std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
+
+  std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+
+  std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
+  std::cerr << "det(e1, p4)       : " << det(e1, p4) << std::endl;
+  std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
+
+  std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
+  std::cerr << "det(e2, p1)       : " << det(e2, p1) << std::endl;
+  std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
+
+  std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
+  std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
+  std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
+
+  std::cerr << "reldist(e1, p3): " << reldist(e1, p3) << std::endl;
+  std::cerr << "reldist(e1, p4): " << reldist(e1, p4) << std::endl;
+  std::cerr << "reldist(e2, p1): " << reldist(e2, p1) << std::endl;
+  std::cerr << "reldist(e2, p2): " << reldist(e2, p2) << std::endl;
+
   // test the time difference between det and orient2d
   //for (unsigned int i = 0; i < 100000000 ; ++i) orient2d(pa,pb,pc);
+
+  std::cerr << std::endl;
+  std::cerr << "============== equality bit check =================" << std::endl;
+
+  double x,y;
+  x = -0.6321507964350201;
+  y = -0.6321507964348736;
+
+  //std::cerr.precision(24);
+  std::cerr << "x: " << x << ", y: " << y << std::endl;
+  std::cerr << "bitset version: " << std::endl;
+  std::cerr << "x: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&x))) << ", y: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&y))) << std::endl;
+
 /*
   std::cerr << "=========== Heap's alg. test ================" << std::endl;
 

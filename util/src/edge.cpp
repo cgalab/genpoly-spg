@@ -9,6 +9,7 @@
 #include "basicDefinitions.h"
 #include "edge.h"
 #include "point.h"
+#include "predicates.h"
 
 
 // function to remove edges from 'edgeS' up to and including value of 'index'
@@ -170,6 +171,88 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	//sig = frexp(det_d, &ex);
 	//std::cerr << "sig: " << sig << ", exp: " << ex << std::endl;
 	std::cerr.precision(17);
+//	std::cerr << "det_a: " << det_a << std::endl;
+//	std::cerr << "det_b: " << det_b << std::endl;
+//	std::cerr << "det_c: " << det_c << std::endl;
+//	std::cerr << "det_d: " << det_d << std::endl;
+
+	if (det_a*det_b*det_c*det_d == 0) {
+		bool col = false;
+
+		//quick check if the edges share a vertex
+		if (*(e1.p1) == *(e2.p1)) same11 = true;
+		if (*(e1.p1) == *(e2.p2)) same12 = true;
+		if (*(e1.p2) == *(e2.p1)) same21 = true;
+		if (*(e1.p2) == *(e2.p2)) same22 = true;
+
+		// is e1 and e2 the same edge?
+		if (e1 == e2) return IS_SAME_EDGE;
+
+		// some determinant was 0, need to check if it's inside an edge or outside.
+		dp_1 = reldist(e1, *e2.p1);
+		dp_2 = reldist(e1, *e2.p2);
+		dp_3 = reldist(e2, *e1.p1);
+		dp_4 = reldist(e2, *e1.p2);
+
+		//std::cerr.precision(17);
+//		std::cerr << "det_a: " << det_a << ", dp1: " << dp_1 << ", same11: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << std::endl;
+//		std::cerr << "det_b: " << det_b << ", dp2: " << dp_2 << ", same12: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << std::endl;
+//		std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << ", same21: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << std::endl;
+//		std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << ", same22: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << std::endl;
+
+				 if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) ) col = true;
+		else if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) ) col = true;
+		else if ( (det_c == 0) && (dp_3 > 0) && (dp_3 < 1) ) col = true;
+		else if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) ) col = true;
+
+		// 2opt function only cares about collinearity when it's 4 point and the points intercept in some way.
+		if ((fabs(det_a)+fabs(det_b)+fabs(det_c)+fabs(det_d) == 0) && col) return IS_4P_COLLINEAR;
+		else if (same11) return IS_VERTEX11;
+		else if (same12) return IS_VERTEX12;
+		else if (same21) return IS_VERTEX21;
+		else if (same22) return IS_VERTEX22;
+
+		else if (col) return IS_3P_COLLINEAR;
+		else return IS_FALSE;
+	}
+	else {
+		// none of the determinants were 0, so just need to check the sign for intersection.
+		if ( (signbit(det_a) ^ signbit(det_b)) && (signbit(det_c) ^ signbit(det_d)) ) {
+ 			return IS_TRUE;
+		}
+		else return IS_FALSE;
+	}
+}
+
+enum intersect_t checkIntersection2(const Edge e1, const Edge e2) {
+	double det_a, det_b, det_c, det_d;
+	double dp_1, dp_2, dp_3, dp_4;
+	point pa, pb, pc, pd;
+	bool same11 = false, same12 = false, same21 = false, same22 = false;
+
+//	std::cout << "e1.p1 == e2.p1: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << ", e1.p1: " << *e1.p1 << std::endl;
+//	std::cout << "e1.p1 == e2.p2: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << ", e1.p2: " << *e1.p2 << std::endl;
+//	std::cout << "e1.p2 == e2.p1: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << ", e2.p1: " << *e2.p1 << std::endl;
+//	std::cout << "e1.p2 == e2.p2: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << ", e2.p2: " << *e2.p2 << std::endl;
+
+	// converting to 'point' class from 'predicates'
+	pa.x = (*e1.p1).x; pa.y = (*e1.p1).y;
+	pb.x = (*e1.p2).x; pb.y = (*e1.p2).y;
+	pc.x = (*e2.p1).x; pc.y = (*e2.p1).y;
+	pd.x = (*e2.p2).x; pd.y = (*e2.p2).y;
+
+	// determinant between edge 1 and a point in edge 2
+	det_a = orient2d(pa, pb, pc);
+	det_b = orient2d(pa, pb, pd);
+	// determinant between edge 2 and a point in edge 1
+	det_c = orient2d(pc, pd, pa);
+	det_d = orient2d(pc, pd, pb);
+
+	//std::cerr.precision(24);
+	//int sig,ex;
+	//sig = frexp(det_d, &ex);
+	//std::cerr << "sig: " << sig << ", exp: " << ex << std::endl;
+//	std::cerr.precision(17);
 //	std::cerr << "det_a: " << det_a << std::endl;
 //	std::cerr << "det_b: " << det_b << std::endl;
 //	std::cerr << "det_c: " << det_c << std::endl;

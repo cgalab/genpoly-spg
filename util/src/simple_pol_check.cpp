@@ -214,7 +214,7 @@ enum error simple_pol_check(std::vector<unsigned int>& polygon, std::vector<Poin
     }
     else {
       // if the earlier edge was allowed, then the later edge is also allowed
-      if (fabs(val3) < EPSILON) {
+      if (fabs(val3) == 0) {
         std::cerr << "Intersection found: collinearity between: " << e1 << " and " << e2 << std::endl;
         retval = UNEXPECTED_ERROR; break;}
 //      std::cerr << std::endl << "processing e1: " << e1 << std::endl;

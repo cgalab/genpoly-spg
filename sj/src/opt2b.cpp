@@ -37,7 +37,8 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   std::set<Edge> edgeS; // a sweep-line-status object.
 
   do {
-    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
+    //(debug) ? std::cerr << "looping" << std::endl : std::cerr;
+    std::cerr << "looping" << std::endl;
     loop = false;
     revert = false;
     index = 0;
@@ -46,7 +47,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
   	while (index < points.size()) {
 
-      if (index > 18751 && index < 18756) {
+      if (index > 17 && index < 25) {
         debug = true;
         std::cerr << std::endl << "index: " << index << std::endl;
         std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
@@ -97,7 +98,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       }
       else {
         // if I am about to process 'e1' I can start by clearing it of any collinearity with 'e2'
-        if (fabs(val3) < EPSILON) {
+        if (fabs(val3) == 0) {
           // the 2 edges are collinear
           (debug) ? std::cerr << "collinear check found a possible match."  << std::endl : std::cerr;
           if ((*p2 < *p1) && (*p3 < *p1)) {

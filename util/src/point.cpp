@@ -22,6 +22,9 @@ enum error verify_point_set(std::vector<Point>& points) {
     if (prev == cur) {
       retval = COINCIDENTAL_POINTS;
       std::cerr << "Error: Found 2 points with same coordinates!" << std::endl;
+      std::cerr << std::setprecision(24);
+      std::cerr << "p1: " << points[lex[i-1]] << std::endl;
+      std::cerr << "p2: " << points[lex[i]] << std::endl;
       break;
     }
   }
@@ -210,7 +213,7 @@ void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& 
     }
   }
 }
-
+/*
 // check for if p1 is a 'left' vertex compared to p2
 bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
   unsigned int lo, hi, left, right;
@@ -235,6 +238,19 @@ bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
     if (p1_left) return true;
     else return false;
   }
+}
+*/
+
+// check for if p1 is the incidental 'left' vertex compared to p2
+bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
+  if ((*p1).v == 0) {
+    if ((*p2).v == 1) return true;
+  }
+  if ((*p2).v == 0) {
+    if ((*p1).v == cycle-1) return true;
+  }
+  if ((*p1).v < (*p2).v) return true;
+  return false;
 }
 
 // check for if p1 is the incidental 'left' vertex compared to p2
