@@ -40,8 +40,11 @@ public:
 	// Size of the initial polygon
 	static int initialSize;
 
-	// Radius of the initial polygon
-	static double radius;
+	// Radius of the initial outer polygon
+	static double radiusPolygon;
+
+	// Radius of the first initial hole
+	static double radiusHole;
 
 	// Size of the bounding box
 	static double boxSize;

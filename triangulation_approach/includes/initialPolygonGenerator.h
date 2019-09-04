@@ -36,13 +36,13 @@ Triangulation *generateRegularPolygon();
 	vertex 0 to the center of the circle and triangulates the inner of the
 	polygon by connecting each other vertex to the vertex in the center.
 
-	Note:
-	In principle this approach would work, but it gets very slow for larger
-	initial polygons as each vertex shares an edge with the one center vertex
-	so the edges list of the center vertex becomes very slow.
-
 	@param	T 	The triangulation containing the already generated but not
 				linked vertices of the start polygon
+
+	Note:
+		In principle this approach would work, but it gets very slow for larger
+		initial polygons as each vertex shares an edge with the one center
+		vertex so the edges list of the center vertex becomes very slow.
 */
 void initialTriangulationPseudoStar(Triangulation *T);
 
@@ -53,13 +53,26 @@ void initialTriangulationPseudoStar(Triangulation *T);
 	inner of the polygon in zig-zag style (for more information on the zig-zag
 	style take a look at my master thesis).
 
-	Note:
-	The suitable startindex for the box polygon function is 0!
-
 	@param	T 	The triangulation containing the already generated but not
 				linked vertices of the start polygon
+
+	Note:
+		The suitable startindex for the box polygon function is 0!
 */
 void initialTriangulationZigZag(Triangulation *T);
+
+
+/*
+	The function generateInitialHoleTriangle() generates a triangular shaped hole
+	in the middle of the start polygon and triangulates the start polygon with the
+	hole in it.
+
+	@param	T 	The triangulation already containing the vertices of the outer polygon
+
+	Note:
+		The suitable startindex for the boxPolygon function is 0!
+*/
+void generateInitialHoleTriangle(Triangulation *T);
 
 
 /*

@@ -35,7 +35,7 @@ int transformPolygonByMoves(Triangulation *T, int iterations){
 		// Chose a vertex randomly
 		index = (*Settings::generator).getRandomIndex(n);
 
-		v = (*T).getVertex(index);
+		v = (*T).getVertex(index, 0);
 
 		// Chose a direction randomly and get a suitable stddev for the distance
 		alpha = (*Settings::generator).getDoubleUniform(- M_PI, M_PI);

@@ -23,7 +23,7 @@
 Translation::Translation(Triangulation *Tr, int i, double dX, double dY, TranslationType tp) : 
 	T(Tr), index(i), dx(dX), dy(dY), split(false), type(tp), actualTime(0) {
 
-	original = (*T).getVertex(index);
+	original = (*T).getVertex(index, 0);
 
 	prevV = (*original).getPrev();
 	nextV = (*original).getNext();
@@ -406,7 +406,7 @@ void Translation::repairEnd(){
 Translation::Translation(Triangulation *Tr, int i, double dX, double dY) :
 	T(Tr), index(i), dx(dX), dy(dY), split(false), type(TranslationType::DEFAULT), actualTime(0) {
 
-	original = (*T).getVertex(index);
+	original = (*T).getVertex(index, 0);
 
 	prevV = (*original).getPrev();
 	nextV = (*original).getNext();
@@ -455,12 +455,12 @@ bool Translation::checkOverroll(){
 		return false;
 
 	// Check for the next vertex whether it is inside the quadrilateral
-	randomV = (*T).getVertex(index - 2);
+	randomV = (*T).getVertex(index - 2, 0);
 
 	overroll = insideQuadrilateral(randomV);
 
 	// Check also for a second vertex to increase the chance the reject non-simple translation
-	randomV = (*T).getVertex(index + 2);
+	randomV = (*T).getVertex(index + 2, 0);
 
 	overroll = overroll || insideQuadrilateral(randomV);
 

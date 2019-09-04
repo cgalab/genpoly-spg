@@ -82,6 +82,20 @@ public:
 		@return 	The id of the polygon
 	*/
 	unsigned int getID();
+
+	/*
+		@param	i 	Index of the vertex in the vertices vector
+		@return 	The vertex at index i in the vertices vector
+
+		Note:
+			- Be n the actual number of vertices in the vertex vector, then i < 0 
+				returns the vertex with index n + i and i >= n returns the vertex at index
+				i - n. This is helpful to get the previous and next vertex while generating
+				the initial polygon.
+			- This will not work after inserting additional vertices, as the vertices won't be 
+				in the same order in the vertices vector as they are in the polygon
+	*/
+	Vertex *getVertex(int i);
 };
 
 #endif

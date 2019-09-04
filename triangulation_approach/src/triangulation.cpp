@@ -110,8 +110,10 @@ int Triangulation::getActualNumberOfVertices(){
 }
 
 /*
-	@param	i 	Index of the vertex in the vertices vector
-	@return 	The vertex at index i in the vertices vector
+	@param	i 	Index of the vertex in the vertices vector of the polygon with pID
+	@param 	pID	The ID of the polygon of interest
+	@return 	The vertex at index i in the vertices vector, NULL if no polygon with pID
+				exists
 
 	Note:
 		- Be n the actual number of vertices in the vertex vector, then i < 0 
@@ -121,19 +123,14 @@ int Triangulation::getActualNumberOfVertices(){
 		- This will not work after inserting additional vertices, as the vertices won't be 
 			in the same order in the vertices vector as they are in the polygon
 */
-Vertex* Triangulation::getVertex(int i){ 	
-	int n;
-
-	n = vertices.size();
-
-	if(i < 0){
-		return vertices[n + i];
-	}else if(i >= n){
-		return vertices[i - n];
-	}else{
-		return vertices[i];
-	}
-	 return NULL;
+Vertex *Triangulation::getVertex(int i, int pID){ 	
+	
+	if(pID == 0)
+		return (*outerPolygon).getVertex(i);
+	else if(pID > 0 && pID <= Settings::nrInnerPolygons)
+		return (*innerPolygons[pID - 1]).getVertex(i);
+	else
+		return NULL;
 }
 
 
@@ -198,10 +195,12 @@ void Triangulation::print(const char *filename){
 	fprintf(f, "<nodes>\n");
 
 	// Start with the bounding box
-	(*Rectangle0).print(f, scale);
-	(*Rectangle1).print(f, scale);
-	(*Rectangle2).print(f, scale);
-	(*Rectangle3).print(f, scale);
+	if(Rectangle0 != NULL){
+		(*Rectangle0).print(f, scale);
+		(*Rectangle1).print(f, scale);
+		(*Rectangle2).print(f, scale);
+		(*Rectangle3).print(f, scale);
+	}
 
 	// Then all polygon vertices
 	for(auto const& i : vertices){

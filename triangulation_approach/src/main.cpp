@@ -39,8 +39,9 @@ int main(){
 	(*T).check();
 	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", Settings::initialSize, (*Settings::timer).elapsedTime());
 
+	(*T).print("triangulation.graphml");
 
-	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
+	/*performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
 	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, Settings::initialTranslationNumber, (*Settings::timer).elapsedTime());
 
 	if(!(*T).check()){
@@ -73,7 +74,7 @@ int main(){
 	
 	//(*T).print("triangulation.graphml");
 
-	(*T).printPolygon("polygon.graphml");
+	(*T).printPolygon("polygon.graphml");*/
 
 	exit(0);
 }

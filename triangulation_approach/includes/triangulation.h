@@ -168,8 +168,10 @@ public:
 	int getActualNumberOfVertices();
 
 	/*
-		@param	i 	Index of the vertex in the vertices vector
-		@return 	The vertex at index i in the vertices vector
+		@param	i 	Index of the vertex in the vertices vector of the polygon with pID
+		@param 	pID	The ID of the polygon of interest
+		@return 	The vertex at index i in the vertices vector, NULL if no polygon with pID
+					exists
 
 		Note:
 			- Be n the actual number of vertices in the vertex vector, then i < 0 
@@ -179,7 +181,7 @@ public:
 			- This will not work after inserting additional vertices, as the vertices won't be 
 				in the same order in the vertices vector as they are in the polygon
 	*/
-	Vertex *getVertex(int i);
+	Vertex *getVertex(int i, int pID);
 
 
 

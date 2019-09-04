@@ -15,7 +15,7 @@
 Insertion::Insertion(Triangulation *t, int index) :
 	T(t), i(index) {
 
-	v0 = (*T).getVertex(i);
+	v0 = (*T).getVertex(i, 0);
 	v1 = (*v0).getNext();
 	e = (*v0).getToNext();
 }
