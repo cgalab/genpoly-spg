@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "timer.h"
 #include "randomGenerator.h"
 #include "predicates.h"
@@ -9,10 +11,26 @@ enum class FeedbackMode {LACONIC, EXECUTION, VERBOSE};
 enum class Arithmetics {EXACT, DOUBLE};
 
 class Settings{
+
 public:
+	
 	/*
 		GLOBAL VARIABLES
 	*/
+
+
+	/*
+		Polygon parameters
+	*/
+
+	// The number of the inner polygons
+	static int nrInnerPolygons;
+
+	// Target size of the outer polygon
+	static int outerSize;
+
+	// Target sizes of the inner polygons
+	static std::vector<int> innerSizes;
 
 
 	/*
@@ -39,6 +57,9 @@ public:
 		Translation parameters
 	*/
 
+	// Type of used arithmetics
+	static Arithmetics arithmetics;
+
 	// Minimal time distance between events in the event queue
 	static constexpr double epsEventTime = 0.00001; //10^-5
 
@@ -51,20 +72,16 @@ public:
 	// out of its surrounding polygon (just with double arithmetics)
 	static constexpr double minDetInsertion = 0.000000000001; // 10⁻¹²
 
-	static Arithmetics arithmetics;
 
 	/*
-		Polygon growth
+		Insertion parameters
 	*/
-
-	// Target size of the polygon
-	static int targetSize;
 
 	// Number of tries to move an inserted vertex
 	static int insertionTries;
 
 	// Minimal allowed edge length for insertions
-	static double minLength;
+	static double minLength;	
 
 
 	/*
@@ -98,6 +115,7 @@ public:
 
 	// Function for initialising the settings
 	static void initSettings();
+
 
 	/*
 		Check

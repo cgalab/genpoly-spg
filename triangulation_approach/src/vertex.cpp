@@ -5,7 +5,7 @@
 */
 
 /*
-	The number of already generated edges
+	The number of already generated vertices
 */
 unsigned long long Vertex::n = 0;
 
@@ -119,6 +119,13 @@ Vertex *Vertex::getTranslated(double dx, double dy){
 */
 void Vertex::setTriangulation(Triangulation *t){
 	T = t;
+}
+
+/*
+	@param 	p 	The polygon the vertex belongs to
+*/
+void Vertex::setPolygon(TPolygon *p){
+	P = p;
 }
 
 /*
@@ -388,6 +395,13 @@ Triangle *Vertex::getTriangleWith(Vertex *v0, Vertex *v1){
 	}
 
 	return NULL;
+}
+
+/*
+	@return 	The id of the polygon the vertex belongs to
+*/
+unsigned int Vertex::getPID(){
+	return (*P).getID();
 }
 
 

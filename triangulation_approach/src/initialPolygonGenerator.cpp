@@ -17,14 +17,14 @@ Triangulation *generateRegularPolygon(){
 	double alpha; // The angular distance between the vertices
 	int i;
 	Vertex *v;
-	Triangulation* T = new Triangulation(Settings::targetSize);
+	Triangulation* T = new Triangulation();
 	
 	alpha = 2 * M_PI / Settings::initialSize;
 
 	// Distribute the vertices equally on a circle
 	for(i = 0; i < Settings::initialSize; i++){
 		v = new Vertex(Settings::radius * cos(i * alpha), Settings::radius * sin(i * alpha));
-		(*T).addVertex(v);
+		(*T).addVertex(v, 0);
 	}
 
 	// Triangulate the inner of the polygon in zig-zag style

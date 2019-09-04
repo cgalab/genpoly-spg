@@ -24,6 +24,8 @@ code 	name						meaning
 									during the translation
 10		Vertex at PE end 			The surrounding polygon check recognizes a vertex exactly laying on a PE
 11 		Not simple					The check for simplicity found an intersection
+12 		Vertex insertion error 		The pID passed to Triangulation::addVertex() exceeds the number of inner
+									polygons
 */
 
 int main(){
@@ -50,7 +52,7 @@ int main(){
 	(*T).printPolygon("polygon_int.graphml");
 
 	growPolygon(T);
-	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", Settings::targetSize, (*Settings::timer).elapsedTime());
+	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", Settings::outerSize, (*Settings::timer).elapsedTime());
 
 	if(!(*T).check()){
 		printf("Triangulation error: something is wrong in the triangulation at the end\n");

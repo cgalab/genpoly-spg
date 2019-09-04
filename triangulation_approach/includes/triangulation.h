@@ -6,6 +6,11 @@
 #include <map>
 
 /*
+	Include my headers	
+*/
+#include "settings.h"
+
+/*
 	Define the class Triangulation
 */
 #ifndef __TRIANGULATION_H_
@@ -17,14 +22,22 @@
 class Vertex;
 class TEdge;
 class Triangle;
+class TPolygon;
 
 #include "vertex.h"
 #include "tedge.h"
 #include "triangle.h"
+#include "tpolygon.h"
 
 class Triangulation{
 
 private:
+
+	/*
+		The polygons living in the triangulation
+	*/
+	TPolygon *outerPolygon;
+	std::vector<TPolygon*> innerPolygons;
 	
 	/*
 		A vector of all polygon vertices contained by the triangulation
@@ -63,7 +76,7 @@ public:
 
 		CONSTRUCTORS:
 
-					Triangulation(int n)
+					Triangulation()
 
 		SETTER:
 
@@ -101,12 +114,10 @@ public:
 
 	/*
 		Constructor:
-		Already allocates memory for the vector of vertices
-
-		@param 	n 	Final number of vertices (including the vertices of inner polygons)
+		Already allocates memory for the vector of vertices and generates the TPolygon
+		instances.
 	*/
-	Triangulation(int n);
-
+	Triangulation();
 
 
 	/*
@@ -114,9 +125,15 @@ public:
 	*/
 
 	/*
-		@param	v 	Vertex to be added to the vertices vector
+		The function addVertex() inserts a vertex into the vertices list of the triangulation
+		and also calls the addVertex() function of the polygon the vertex belongs to. It errors
+		with exit code 12 if pID is greater then the number of inner polygons.
+
+		@param	v 		Vertex to be added to the vertices vector
+		@param 	pID 	The polygon the vertex belongs to (pID = 0 outer polygon, else inner
+						polygon)
 	*/
-	void addVertex(Vertex *v);
+	void addVertex(Vertex *v, int pID);
 
 	/*
 		@param	e 	Edge to be added to the edge map

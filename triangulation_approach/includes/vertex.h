@@ -26,10 +26,12 @@
 class Triangulation;
 class TEdge;
 class Triangle;
+class TPolygon;
 
 #include "triangulation.h"
 #include "tedge.h"
 #include "triangle.h"
+#include "tpolygon.h"
 
 class Vertex{
 
@@ -38,7 +40,12 @@ private:
 	/*
 		The triangulation the vertex lives in
 	*/
-	Triangulation* T;
+	Triangulation *T;
+
+	/*
+		The polygon the vertex belongs to
+	*/
+	TPolygon *P;
 
 	/*
 		The coordinates of the vertex
@@ -137,6 +144,7 @@ public:
 		SETTER:
 
 		void 					setTriangulation(Triangulation *t)
+		void 					setPolygon(TPolygon *p)
 		void 					setPosition(double X, double Y)
 		void 					addEdge(TEdge *e)
 		void 					addTriangle(Triangle *t)
@@ -162,6 +170,7 @@ public:
 		Vertex* 				getNext()
 		Triangulation* 			getTriangulation()
 		Triangle* 				getTriangleWith(Vertex *v0, Vertex *v1)
+		unsigned int 			getPID()
 
 		REMOVER:
 
@@ -234,6 +243,11 @@ public:
 		@param 	t 	The triangulation the vertex lives in
 	*/
 	void setTriangulation(Triangulation *t);
+
+	/*
+		@param 	p 	The polygon the vertex belongs to
+	*/
+	void setPolygon(TPolygon *p);
 
 	/*
 		@param 	X 	The new x-coordinate of the vertex
@@ -409,6 +423,11 @@ public:
 		@return 	The searched triangle if it exists, otherwise NULL
 	*/
 	Triangle *getTriangleWith(Vertex *v0, Vertex *v1);
+
+	/*
+		@return 	The id of the polygon the vertex belongs to
+	*/
+	unsigned int getPID();
 
 
 	/*

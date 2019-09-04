@@ -75,7 +75,7 @@ void Insertion::execute(){
 
 	// Generate the new vertex
 	newV = new Vertex(x, y);
-	(*T).addVertex(newV);
+	(*T).addVertex(newV, (*v0).getPID());
 
 	t0 = (*e).getT0();
 	t1 = (*e).getT1();

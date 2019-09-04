@@ -6,14 +6,26 @@
 
 /*
 	Constructor:
-	Already allocates memory for the vector of vertices
-
-	@param 	n 	Final number of vertices (including the vertices of inner polygons)
+	Already allocates memory for the vector of vertices and generates the TPolygon
+	instances.
 */
-Triangulation::Triangulation(int n) :
-	Rectangle0(NULL), Rectangle1(NULL), Rectangle2(NULL), Rectangle3(NULL), N(n) { 
-	
+Triangulation::Triangulation() :
+	Rectangle0(NULL), Rectangle1(NULL), Rectangle2(NULL), Rectangle3(NULL), N(0) { 
+	int i;
+
+	// Calculate the total number of vertices
+	N = Settings::outerSize;
+	for(auto const& i : Settings::innerSizes)
+		N = N + i;
+
 	vertices.reserve(N);
+
+	// Generate outer polygon instance
+	outerPolygon = new TPolygon(this, Settings::outerSize);
+
+	// Generate inner polygon instances
+	for(i = 0; i < Settings::nrInnerPolygons; i++)
+		innerPolygons.push_back(new TPolygon(this, Settings::innerSizes[i]));
 }
 
 
@@ -23,12 +35,25 @@ Triangulation::Triangulation(int n) :
 */
 
 /*
-	@param	v 	Vertex to be added to the vertices vector
+	The function addVertex() inserts a vertex into the vertices list of the triangulation
+	and also calls the addVertex() function of the polygon the vertex belongs to. It errors
+	with exit code 12 if pID is greater then the number of inner polygons.
+
+	@param	v 		Vertex to be added to the vertices vector
+	@param 	pID 	The polygon the vertex belongs to (pID = 0 outer polygon, else inner
+					polygon)
 */
-void Triangulation::addVertex(Vertex *v){
+void Triangulation::addVertex(Vertex *v, int pID){
 	vertices.push_back(v);
 
-	// Do not forget the register the triangulation at the vertex
+	if(pID == 0)
+		(*outerPolygon).addVertex(v);
+	else if(pID > 0 && pID <= Settings::nrInnerPolygons)
+		(*innerPolygons[pID - 1]).addVertex(v);
+	else
+		exit(12);
+
+	// Do not forget to register the triangulation at the vertex
 	(*v).setTriangulation(this);
 }
 

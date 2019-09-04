@@ -80,7 +80,7 @@ int transformPolygonByMoves(Triangulation *T, int iterations){
 }
 
 /*
-	The function growPolygon() grows the polygon by insertions to Settings::targetSize.
+	The function growPolygon() grows the polygon by insertions to Settings::outerSize.
 
 	@param 	T 	The triangulation the polygon lives in
 
@@ -95,7 +95,7 @@ void growPolygon(Triangulation *T){
 	int counter = 0;
 
 	// Compute the number of insertion to do
-	n = Settings::targetSize - (*T).getActualNumberOfVertices();
+	n = Settings::outerSize - (*T).getActualNumberOfVertices();
 	div = 0.01 * n;
 
 	for(i = 0; i < n;){
