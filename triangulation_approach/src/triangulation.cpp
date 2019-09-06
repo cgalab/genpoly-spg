@@ -11,7 +11,7 @@
 */
 Triangulation::Triangulation() :
 	Rectangle0(NULL), Rectangle1(NULL), Rectangle2(NULL), Rectangle3(NULL), N(0) { 
-	int i;
+	unsigned int k;
 
 	// Calculate the total number of vertices
 	N = Settings::outerSize;
@@ -24,8 +24,8 @@ Triangulation::Triangulation() :
 	outerPolygon = new TPolygon(this, Settings::outerSize);
 
 	// Generate inner polygon instances
-	for(i = 0; i < Settings::nrInnerPolygons; i++)
-		innerPolygons.push_back(new TPolygon(this, Settings::innerSizes[i]));
+	for(k = 0; k < Settings::nrInnerPolygons; k++)
+		innerPolygons.push_back(new TPolygon(this, Settings::innerSizes[k]));
 }
 
 
@@ -43,7 +43,7 @@ Triangulation::Triangulation() :
 	@param 	pID 	The polygon the vertex belongs to (pID = 0 outer polygon, else inner
 					polygon)
 */
-void Triangulation::addVertex(Vertex *v, int pID){
+void Triangulation::addVertex(Vertex *v, unsigned int pID){
 	vertices.push_back(v);
 
 	if(pID == 0)
@@ -123,7 +123,7 @@ int Triangulation::getActualNumberOfVertices(){
 		- This will not work after inserting additional vertices, as the vertices won't be 
 			in the same order in the vertices vector as they are in the polygon
 */
-Vertex *Triangulation::getVertex(int i, int pID){ 	
+Vertex *Triangulation::getVertex(int i, unsigned int pID){ 	
 	
 	if(pID == 0)
 		return (*outerPolygon).getVertex(i);
@@ -133,6 +133,13 @@ Vertex *Triangulation::getVertex(int i, int pID){
 		return NULL;
 }
 
+/*
+	@param 	i 	The index of the vertex in the vertices vector
+	@return 	The vertex at index i in the vertices vector
+*/
+Vertex *Triangulation::getVertex(int i){
+	return vertices[i];
+}
 
 
 /*
@@ -182,7 +189,7 @@ void Triangulation::removeEdge(TEdge *e){
 void Triangulation::print(const char *filename){
 	FILE *f;
 	TEdge *e;
-	int scale = 5000;
+	int scale = 1000;
 
 	f = fopen(filename, "w");
 
@@ -234,6 +241,7 @@ void Triangulation::print(const char *filename){
 void Triangulation::printPolygon(const char *filename){
 	FILE *f;
 	TEdge *e;
+	int scale = 1000;
 
 	f = fopen(filename, "w");
 
@@ -245,7 +253,8 @@ void Triangulation::printPolygon(const char *filename){
 	// Print all polygon nodes
 	fprintf(f, "<nodes>\n");
 	for(auto const& i : vertices){
-		if(i != NULL && !(*i).isRectangleVertex()) (*i).print(f, 0);
+		if(i != NULL && !(*i).isRectangleVertex())
+			(*i).print(f, scale);
 	}
 	fprintf(f, "</nodes>\n");
 

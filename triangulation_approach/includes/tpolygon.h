@@ -96,6 +96,11 @@ public:
 				in the same order in the vertices vector as they are in the polygon
 	*/
 	Vertex *getVertex(int i);
+
+	/*
+		@return 	The actual size of the polygon
+	*/
+	int getActualPolygonSize();
 };
 
 #endif

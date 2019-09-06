@@ -404,6 +404,13 @@ unsigned int Vertex::getPID(){
 	return (*P).getID();
 }
 
+/*
+	@return 	The actual size of the polygon the vertex belongs to
+*/
+int Vertex::getActualPolygonSize(){
+	return (*P).getActualPolygonSize();
+}
+
 
 /*
 	R ~ E ~ M ~ O ~ V ~ E ~ R

@@ -80,7 +80,7 @@ public:
 
 		SETTER:
 
-		void 		addVertex(Vertex *v)
+		void 		addVertex(Vertex *v, unsigned int pID)
 		void 		addEdge(TEdge *e)
 		void 		setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3)
 
@@ -88,7 +88,8 @@ public:
 
 		int 		getTargetNumberOfVertices()
 		int 		getActualNumberOfVertices()
-		Vertex*		getVertex(int i)
+		Vertex*		getVertex(int i, unsigned int pID)
+		Vertex* 	getVertex(int i)
 
 		REMOVER:
 
@@ -133,7 +134,7 @@ public:
 		@param 	pID 	The polygon the vertex belongs to (pID = 0 outer polygon, else inner
 						polygon)
 	*/
-	void addVertex(Vertex *v, int pID);
+	void addVertex(Vertex *v, unsigned int pID);
 
 	/*
 		@param	e 	Edge to be added to the edge map
@@ -148,7 +149,6 @@ public:
 								doesn't matter as the vertices are connected by their edges)
 	*/
 	void setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3);
-
 
 
 	/*
@@ -181,8 +181,13 @@ public:
 			- This will not work after inserting additional vertices, as the vertices won't be 
 				in the same order in the vertices vector as they are in the polygon
 	*/
-	Vertex *getVertex(int i, int pID);
+	Vertex *getVertex(int i, unsigned int pID);
 
+	/*
+		@param 	i 	The index of the vertex in the vertices vector
+		@return 	The vertex at index i in the vertices vector
+	*/
+	Vertex *getVertex(int i);
 
 
 	/*
@@ -207,7 +212,6 @@ public:
 		@param	e 	The edge to be removed
 	*/
 	void removeEdge(TEdge *e);
-
 
 	
 	/*
@@ -237,7 +241,6 @@ public:
 			- Works here: http://graphonline.ru/en/
 	*/
 	void printPolygon(const char *filename);
-
 
 
 	/*

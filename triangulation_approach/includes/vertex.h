@@ -171,6 +171,7 @@ public:
 		Triangulation* 			getTriangulation()
 		Triangle* 				getTriangleWith(Vertex *v0, Vertex *v1)
 		unsigned int 			getPID()
+		int 					getActualPolygonSize()
 
 		REMOVER:
 
@@ -428,6 +429,11 @@ public:
 		@return 	The id of the polygon the vertex belongs to
 	*/
 	unsigned int getPID();
+
+	/*
+		@return 	The actual size of the polygon the vertex belongs to
+	*/
+	int getActualPolygonSize();
 
 
 	/*

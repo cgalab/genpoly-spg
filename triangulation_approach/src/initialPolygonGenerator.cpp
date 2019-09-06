@@ -33,8 +33,6 @@ Triangulation *generateRegularPolygon(){
 	else
 		generateInitialHoleTriangle(T);
 
-	printf("reached end of inner triangulation\n");
-
 	// Box the polygon by a square and triangulate the area between the square and the polygon
 	boxPolygon(T, 0);
 
@@ -176,6 +174,8 @@ void initialTriangulationZigZag(Triangulation *T){
 	Note:
 		The suitable startindex for the boxPolygon function is 0!
 */
+// TODO:
+// Comment a bit
 void generateInitialHoleTriangle(Triangulation *T){
 	double alpha;
 	int i;
@@ -193,7 +193,8 @@ void generateInitialHoleTriangle(Triangulation *T){
 	(*T).addVertex(triangleV0, 1);
 	(*T).addVertex(triangleV1, 1);
 	(*T).addVertex(triangleV2, 1);
-		
+	
+	// Start with the range from 0 to 2*pi/3	
 	v0 = (*T).getVertex(0, 0);
 	v1 = (*T).getVertex(1, 0);
 
@@ -221,7 +222,8 @@ void generateInitialHoleTriangle(Triangulation *T){
 		new Triangle(e0, e1, e2, v0, v1, triangleV0);
 	}
 
-	e0 = new TEdge(triangleV0, triangleV1, EdgeType::POLYGON);
+	// Connect the first third with the second one
+	e0 = new TEdge(triangleV1, triangleV0, EdgeType::POLYGON);
 	e1 = e2;
 	e2 = new TEdge(v1, triangleV1);
 	(*T).addEdge(e0);
@@ -231,6 +233,7 @@ void generateInitialHoleTriangle(Triangulation *T){
 
 	triangleE0 = e0;
 
+	// Range 2*pi/3 to 4*pi/3 
 	for(; i <= 2 * Settings::initialSize / 3; i++){
 		v0 = v1;
 		v1 = (*T).getVertex(i, 0);
@@ -244,7 +247,8 @@ void generateInitialHoleTriangle(Triangulation *T){
 		new Triangle(e0, e1, e2, v0, v1, triangleV1);
 	}
 
-	e0 = new TEdge(triangleV1, triangleV2, EdgeType::POLYGON);
+	// Connect the second third with the third one
+	e0 = new TEdge(triangleV2, triangleV1, EdgeType::POLYGON);
 	e1 = e2;
 	e2 = new TEdge(v1, triangleV2);
 	(*T).addEdge(e0);
@@ -254,6 +258,7 @@ void generateInitialHoleTriangle(Triangulation *T){
 
 	triangleE1 = e0;
 
+	// Range 4*pi/3 to 2*pi 
 	for(; i <= Settings::initialSize - 1; i++){
 		v0 = v1;
 		v1 = (*T).getVertex(i, 0);
@@ -267,7 +272,8 @@ void generateInitialHoleTriangle(Triangulation *T){
 		new Triangle(e0, e1, e2, v0, v1, triangleV2);
 	}
 
-	e0 = new TEdge(triangleV2, triangleV0, EdgeType::POLYGON);
+	// Connect the third third with the first one and close the outer polygon
+	e0 = new TEdge(triangleV0, triangleV2, EdgeType::POLYGON);
 	e1 = e2;
 	e2 = new TEdge(v1, triangleV0);
 	(*T).addEdge(e0);

@@ -24,7 +24,7 @@ public:
 	*/
 
 	// The number of the inner polygons
-	static int nrInnerPolygons;
+	static unsigned int nrInnerPolygons;
 
 	// Target size of the outer polygon
 	static int outerSize;

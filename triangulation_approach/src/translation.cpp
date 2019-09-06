@@ -1,6 +1,16 @@
 #include "translation.h"
 
 /*
+	S ~ T ~ A ~ T ~ I ~ C 	V ~ A ~ R ~ I ~ A ~ B ~ L ~ E ~ S
+*/
+
+/*
+	The number of already generated vertices
+*/
+unsigned long long Translation::n = 0;
+
+
+/*
 	P ~ R ~ I ~ V ~ A ~ T ~ E 	M ~ E ~ M ~ B ~ E ~ R 	F ~ U ~ N ~ C ~ T ~ I ~ O ~ N ~ S
 */
 
@@ -21,9 +31,9 @@
 		must be split.
 */
 Translation::Translation(Triangulation *Tr, int i, double dX, double dY, TranslationType tp) : 
-	T(Tr), index(i), dx(dX), dy(dY), split(false), type(tp), actualTime(0) {
+	T(Tr), index(i), dx(dX), dy(dY), split(false), type(tp), actualTime(0), id(n){
 
-	original = (*T).getVertex(index, 0);
+	original = (*T).getVertex(index);
 
 	prevV = (*original).getPrev();
 	nextV = (*original).getNext();
@@ -40,6 +50,8 @@ Translation::Translation(Triangulation *Tr, int i, double dX, double dY, Transla
 	nextNewE = new TEdge(newV, nextV);
 
 	Q = new EventQueue(original, oldV, newV);
+
+	n++;
 }
 
 /*
@@ -129,16 +141,20 @@ bool Translation::generateInitialQueue(){
 	formed by the edge from oldV to its neighboring  vertices and from newV to its neighboring
 	vertices.
 	Therefore it generates a dummy vertex with the same y-coordinate as v and a x-coordinate which
-	is the maximum x-coordinate of all vertices of the triangle plus 10. So the dummy vertex lays
-	definitelly outside of the qudrilateral. Then it checks how often the the edge between v and
-	the dummy vertex intersects the edges of the quadrilateral. If the number of intersections is
-	odd, then v must lay inside of the quadrilateral.
+	is the maximum x-coordinate of all vertices of the quadrilateral plus 10. So the dummy vertex
+	lays definitelly lays outside of the qudrilateral. Then it checks how often the edge between v
+	and the dummy vertex intersects the edges of the quadrilateral. If the number of intersections
+	is odd, then v must lay inside of the quadrilateral.
 
 	@param 	v 	The vertex of interest
 	@return 	True if v is inside of the quadrilateral, otherwise false
 
 	Note:
-		Source: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+		- Source: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+		- If the dummy edge intersects exactly at a vertex, we will get intersections with two edges,
+			which makes the function think, that the vertex is outside of the quadrilateral.
+			Therefore the function automatically returns true, if it gets two or more vertex
+			intersection anywhere. This leads to rejecting the translation.
 */
 bool Translation::insideQuadrilateral(Vertex *v){
 	Vertex *dummyVertex;
@@ -146,6 +162,7 @@ bool Translation::insideQuadrilateral(Vertex *v){
 	double maxX, x;
 	int count = 0;
 	IntersectionType intersection;
+	int vertexIntersectionCount = 0;
 
 	// Find maximum x value
 	maxX = (*oldV).getX();
@@ -173,20 +190,152 @@ bool Translation::insideQuadrilateral(Vertex *v){
 	// TODO:
 	// Maybe using an epsilon here in checkIntersection makes no sense
 	intersection = checkIntersection(dummyEdge, prevOldE, false);
-	if(intersection != IntersectionType::NONE)
+	if(intersection != IntersectionType::NONE){
 		count++;
+
+		if(intersection == IntersectionType::VERTEX)
+			vertexIntersectionCount++;
+	}
+
 	intersection = checkIntersection(dummyEdge, nextOldE, false);
-	if(intersection != IntersectionType::NONE)
+	if(intersection != IntersectionType::NONE){
 		count++;
+
+		if(intersection == IntersectionType::VERTEX)
+			vertexIntersectionCount++;
+	}
+
 	intersection = checkIntersection(dummyEdge, prevNewE, false);
-	if(intersection != IntersectionType::NONE)
+	if(intersection != IntersectionType::NONE){
 		count++;
+
+		if(intersection == IntersectionType::VERTEX)
+			vertexIntersectionCount++;
+	}
+
 	intersection = checkIntersection(dummyEdge, nextNewE, false);
-	if(intersection != IntersectionType::NONE)
+	if(intersection != IntersectionType::NONE){
 		count++;
+
+		if(intersection == IntersectionType::VERTEX)
+			vertexIntersectionCount++;
+	}
 
 	delete dummyEdge;
 	delete dummyVertex;
+
+	if(vertexIntersectionCount > 1)
+		return true;
+
+	if(count % 2 == 1)
+		return true;
+	else
+		return false;
+}
+
+/*
+	The function insideQuadrilateral2() checks whether the vertex v lays inside of the simple
+	quadrilateral formed by prevV, nextV, oldV, newV.
+	Therefore it generates a dummy vertex with the same y-coordinate as v and a x-coordinate which
+	is the maximum x-coordinate of all vertices of the quadrilateral plus 10. So the dummy vertex
+	lays definitelly lays outside of the qudrilateral. Then it checks how often the edge between v
+	and the dummy vertex intersects the edges of the quadrilateral. If the number of intersections
+	is odd, then v must lay inside of the quadrilateral.
+	Quadrilateral edges:
+		- transPath
+		- Edge from prev to next
+		- Either: 	prevOldE and nextNewE
+		  Or: 		prevNewE and nextOldE
+		  (The pair which is not intersecting each other)
+
+	@param 	v 	The vertex of interest
+	@return 	True if v is inside of the quadrilateral, otherwise false
+
+	Note:
+		Source: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+*/
+// TODO:
+// Rename that shit
+bool Translation::insideQuadrilateral2(Vertex *v){
+	Vertex *testVertex;
+	TEdge *testEdge, *dummyEdge0, *dummyEdge1;
+	double maxX, x;
+	int count = 0;
+	IntersectionType intersection;
+	int vertexIntersectionCount = 0;
+
+	// Find maximum x value
+	maxX = (*oldV).getX();
+	x = (*newV).getX();
+	if(x > maxX)
+		maxX = x;
+	x = (*prevV).getX();
+	if(x > maxX)
+		maxX = x;
+	x = (*nextV).getX();
+	if(x > maxX)
+		maxX = x;
+
+	// If v has a greater x-coordinate then all quadrilateral vertices, it can not be inside
+	if((*v).getX() > maxX)
+		return false;
+
+	// Generate the dummy vertex outside of the quadrilateral
+	maxX = maxX + 10;
+	testVertex = new Vertex(maxX, (*v).getY());
+
+	testEdge = new TEdge(v, testVertex);
+
+	// Count the intersection
+	// TODO:
+	// Maybe using an epsilon here in checkIntersection makes no sense
+	dummyEdge0 = new TEdge(prevV, nextV);
+	intersection = checkIntersection(testEdge, dummyEdge0, false);
+	if(intersection != IntersectionType::NONE){
+		count++;
+
+		if(intersection == IntersectionType::VERTEX)
+			vertexIntersectionCount++;
+	}
+	delete dummyEdge0;
+
+	intersection = checkIntersection(testEdge, transPath, false);
+	if(intersection != IntersectionType::NONE){
+		count++;
+
+		if(intersection == IntersectionType::VERTEX)
+			vertexIntersectionCount++;
+	}
+
+	if(checkIntersection(prevOldE, nextNewE, true) == IntersectionType::NONE){
+		dummyEdge0 = prevOldE;
+		dummyEdge1 = nextNewE;
+	}else{
+		dummyEdge0 = prevNewE;
+		dummyEdge1 = nextOldE;
+	}
+
+	intersection = checkIntersection(testEdge, dummyEdge0, false);
+	if(intersection != IntersectionType::NONE){
+		count++;
+
+		if(intersection == IntersectionType::VERTEX)
+			vertexIntersectionCount++;
+	}
+
+	intersection = checkIntersection(testEdge, dummyEdge1, false);
+	if(intersection != IntersectionType::NONE){
+		count++;
+
+		if(intersection == IntersectionType::VERTEX)
+			vertexIntersectionCount++;
+	}
+
+	delete testEdge;
+	delete testVertex;
+
+	if(vertexIntersectionCount > 1)
+		return true;
 
 	if(count % 2 == 1)
 		return true;
@@ -404,9 +553,9 @@ void Translation::repairEnd(){
 		Translations of other types can just be generated by the translation class itself.
 */
 Translation::Translation(Triangulation *Tr, int i, double dX, double dY) :
-	T(Tr), index(i), dx(dX), dy(dY), split(false), type(TranslationType::DEFAULT), actualTime(0) {
+	T(Tr), index(i), dx(dX), dy(dY), split(false), type(TranslationType::DEFAULT), actualTime(0), id(n){
 
-	original = (*T).getVertex(index, 0);
+	original = (*T).getVertex(index);
 
 	prevV = (*original).getPrev();
 	nextV = (*original).getNext();
@@ -423,6 +572,8 @@ Translation::Translation(Triangulation *Tr, int i, double dX, double dY) :
 	nextNewE = new TEdge(newV, nextV);
 
 	Q = new EventQueue(original, oldV, newV);
+
+	n++;
 }
 
 
@@ -440,12 +591,41 @@ Translation::Translation(Triangulation *Tr, int i, double dX, double dY) :
 	one vertex is inside it follows all other vertices must be inside or at least one is outside
 	so it exist at least one edge intersecting the quadrilateral so the translation can not lead
 	to a simple polygon at all.
+	For polygons with holes it also checks whether the outer polygon rolls over an inner one or
+	an inner polygon rolls over another one. Additionally it checks whether a vertex passes one
+	of the inner polygons in a way, that one polygon edge would crash into the inner polygon.
 
-	@return 	True if the polygon would change its orientation, otherwise false
+	@return 	True if the polygon would change its orientation or rolls over another inner 
+				polygon, otherwise false
 */
+// TODO:
+// The pass by case could maybe be handled by split translations
 bool Translation::checkOverroll(){
 	bool overroll;
 	Vertex *randomV;
+	unsigned int i;
+	Triangle *dummy;
+	double areaOld, areaNew;
+
+	// At first we check whether the moving vertex passes by another polygon
+	// Note:
+	// It can just pass by an inner polygon
+	for(i = 1; i <= Settings::nrInnerPolygons; i++){
+
+		// Skip the changing polygon itself
+		if((*original).getPID() == i)
+			continue;
+
+		// Get a random vertex of the polygon
+		randomV = (*T).getVertex(0, i);
+
+		overroll = insideQuadrilateral2(randomV);
+
+		if(overroll)
+			return true;
+	}
+
+	// Now we check whether the polygon rolls over another polygon or itself
 
 	// Check whether the quadrilateral of the choosen Vertex P, its translated version P' and the
 	// two neighbors M and N is simple, otherwise there can not be any overroll
@@ -454,17 +634,65 @@ bool Translation::checkOverroll(){
 	if(!overroll)
 		return false;
 
-	// Check for the next vertex whether it is inside the quadrilateral
-	randomV = (*T).getVertex(index - 2, 0);
 
-	overroll = insideQuadrilateral(randomV);
+	// Now check for the polygon itself whether another random vertex of it lays inside the polygon,
+	// i.e. that its orientation would be changed by the translation
 
-	// Check also for a second vertex to increase the chance the reject non-simple translation
-	randomV = (*T).getVertex(index + 2, 0);
+	// Special Case:
+	// If the polygon has a size of 3, we have to check whether the moving vertex changes the
+	// side of the opposing edge
+	if((*original).getActualPolygonSize() == 3){
+		dummy = new Triangle(prevV, nextV, oldV);
+		areaOld = (*dummy).signedArea();
+		delete dummy;
 
-	overroll = overroll || insideQuadrilateral(randomV);
+		dummy = new Triangle(prevV, nextV, newV);
+		areaNew = (*dummy).signedArea();
+		delete dummy;
 
-	return overroll;
+		if(signbit(areaOld) != signbit(areaNew))
+			return true;
+
+	// Default Case:
+	}else{
+		// Check for vertex before the previous vertex whether it is inside the quadrilateral
+		randomV = (*prevV).getPrev();
+
+		overroll = insideQuadrilateral(randomV);
+
+		// Check also for a second vertex to increase the chance to reject non-simple translation
+		randomV = (*nextV).getNext();
+
+		overroll = overroll || insideQuadrilateral(randomV);
+
+		if(overroll)
+			return true;
+	}
+
+	
+	// Now we also have to check for all other polygons whether the polygon which is changing
+	// rolls over them
+
+	// Note:
+	// It is not possible that an inner polygon rolls over the outer one, so here we
+	// just have to check the inner ones
+
+	for(i = 1; i <= Settings::nrInnerPolygons; i++){
+
+		// Skip the changing polygon itself
+		if((*original).getPID() == i)
+			continue;
+
+		// Get a random vertex of the polygon
+		randomV = (*T).getVertex(0, i);
+
+		overroll = insideQuadrilateral(randomV);
+
+		if(overroll)
+			return true;
+	}
+
+	return false;
 }
 
 /*
@@ -654,9 +882,14 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 	e = (*t0).getLongestEdgeAlt();
 	if((*e).getEdgeType() == EdgeType::POLYGON){
 		printf("Flip: polygon edge gets deleted\n");
-		printf("id: %llu index: %d dx: %f dy: %f \n", (*original).getID(), index, dx, dy);
+		printf("id: %llu transID: %d dx: %f dy: %f \n", (*original).getID(), id, dx, dy);
 
-		(*T).check();
+		(*T).addVertex(newV, 0);
+		(*T).addVertex(oldV, 0);
+		(*T).addEdge(new TEdge(original, newV));
+
+		(*T).print("bug.graphml");
+
 		exit(3);
 	}
 

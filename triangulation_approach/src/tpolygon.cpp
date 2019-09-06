@@ -81,3 +81,10 @@ Vertex *TPolygon::getVertex(int i){
 	}
 	 return NULL;
 }
+
+/*
+	@return 	The actual size of the polygon
+*/
+int TPolygon::getActualPolygonSize(){
+	return vertices.size();
+}

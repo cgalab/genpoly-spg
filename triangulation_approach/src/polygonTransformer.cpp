@@ -27,6 +27,8 @@ int transformPolygonByMoves(Triangulation *T, int iterations){
 	enum Executed ex;
 	int div;
 
+	printf("n: %d\n", n);
+
 	div = 0.01 * iterations;
 
 	// Try the given number of moves
@@ -35,7 +37,7 @@ int transformPolygonByMoves(Triangulation *T, int iterations){
 		// Chose a vertex randomly
 		index = (*Settings::generator).getRandomIndex(n);
 
-		v = (*T).getVertex(index, 0);
+		v = (*T).getVertex(index);
 
 		// Chose a direction randomly and get a suitable stddev for the distance
 		alpha = (*Settings::generator).getDoubleUniform(- M_PI, M_PI);

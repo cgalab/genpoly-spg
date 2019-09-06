@@ -111,6 +111,17 @@ private:
 	double actualTime;
 
 	/*
+		The ID of the translation
+	*/
+	unsigned long long id;
+
+	/*
+		The number of already generated vertices
+	*/
+	static unsigned long long n;
+	
+
+	/*
 		P ~ R ~ I ~ V ~ A ~ T ~ E 	M ~ E ~ M ~ B ~ E ~ R 	F ~ U ~ N ~ C ~ T ~ I ~ O ~ N ~ S
 	*/
 
@@ -150,15 +161,41 @@ private:
 	bool generateInitialQueue();
 
 	/*
-		The function insideQuadrilateral() checks whether the vertex v lays inside of a
-		quadrilateral formed by the edge from oldV to its neighboring  vertices and from
-		newV to its neighboring vertices.
-		Therefore it generates a dummy vertex with the same y-coordinate as v and a
-		x-coordinate which is the maximum x-coordinate of all vertices of the triangle plus
-		10. So the dummy vertex lays definitelly outside of the qudrilateral. Then it
-		checks how often the the edge between v and the dummy vertex intersects the edges
-		of the quadrilateral. If the number of intersections is odd, then v must lay inside
-		of the quadrilateral.
+		The function insideQuadrilateral() checks whether the vertex v lays inside of a quadrilateral
+		formed by the edge from oldV to its neighboring  vertices and from newV to its neighboring
+		vertices.
+		Therefore it generates a dummy vertex with the same y-coordinate as v and a x-coordinate which
+		is the maximum x-coordinate of all vertices of the quadrilateral plus 10. So the dummy vertex
+		lays definitelly lays outside of the qudrilateral. Then it checks how often the edge between v
+		and the dummy vertex intersects the edges of the quadrilateral. If the number of intersections
+		is odd, then v must lay inside of the quadrilateral.
+
+		@param 	v 	The vertex of interest
+		@return 	True if v is inside of the quadrilateral, otherwise false
+
+		Note:
+			- Source: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+			- If the dummy edge intersects exactly at a vertex, we will get intersections with two edges,
+				which makes the function think, that the vertex is outside of the quadrilateral.
+				Therefore the function automatically returns true, if it gets two or more vertex
+				intersection anywhere. This leads to rejecting the translation.
+	*/
+	bool insideQuadrilateral(Vertex *v);
+
+	/*
+		The function insideQuadrilateral2() checks whether the vertex v lays inside of the simple
+		quadrilateral formed by prevV, nextV, oldV, newV.
+		Therefore it generates a dummy vertex with the same y-coordinate as v and a x-coordinate which
+		is the maximum x-coordinate of all vertices of the quadrilateral plus 10. So the dummy vertex
+		lays definitelly lays outside of the qudrilateral. Then it checks how often the edge between v
+		and the dummy vertex intersects the edges of the quadrilateral. If the number of intersections
+		is odd, then v must lay inside of the quadrilateral.
+		Quadrilateral edges:
+			- transPath
+			- Edge from prev to next
+			- Either: 	prevOldE and nextNewE
+			  Or: 		prevNewE and nextOldE
+			  (The pair which is not intersecting each other)
 
 		@param 	v 	The vertex of interest
 		@return 	True if v is inside of the quadrilateral, otherwise false
@@ -166,7 +203,7 @@ private:
 		Note:
 			Source: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
 	*/
-	bool insideQuadrilateral(Vertex *v);
+	bool insideQuadrilateral2(Vertex *v);
 
 	/*
 		The function checkEdge() checks whether the edge newE starting at vertex fromV
@@ -249,18 +286,21 @@ public:
 	*/
 
 	/*
-		The function checkOverroll() checks whether the polygon would change its orientation
-		by this translation. This basically means that the moving vertex is shifted across
-		the whole polygon which corresponds to all other vertices and edges being inside of
-		the qudrilateral formed by the oldV, the newV and their neighboring edges. Obviously
-		if the quadrilateral is not simple, this can not happen at all. If the quadrilateral
-		is simple then it corresponds to having one of the other vertices of the polygon
-		inside the qudrilateral, because if one vertex is inside it follows all other
-		vertices must be inside or at least one is outside so it exist at least one edge
-		intersecting the quadrilateral so the translation can not lead to a simple polygon
-		at all.
+		The function checkOverroll() checks whether the polygon would change its orientation by
+		this translation. This basically means that the moving vertex is shifted across the whole
+		polygon which corresponds to all other vertices and edges being inside of the qudrilateral
+		formed by the oldV, the newV and their neighboring edges. Obviously if the quadrilateral is
+		not simple, this can not happen at all. If the quadrilateral is simple then it corresponds
+		to having one of the other vertices of the polygon inside the qudrilateral, because if
+		one vertex is inside it follows all other vertices must be inside or at least one is outside
+		so it exist at least one edge intersecting the quadrilateral so the translation can not lead
+		to a simple polygon at all.
+		For polygons with holes it also checks whether the outer polygon rolls over an inner one or
+		an inner polygon rolls over another one. Additionally it checks whether a vertex passes one
+		of the inner polygons in a way, that one polygon edge would crash into the inner polygon.
 
-		@return 	True if the polygon would change its orientation, otherwise false
+		@return 	True if the polygon would change its orientation or rolls over another inner 
+					polygon, otherwise false
 	*/
 	bool checkOverroll();
 

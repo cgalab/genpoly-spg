@@ -3,8 +3,8 @@
 /*
 	Polygon parameters
 */
-int Settings::nrInnerPolygons = 1;
-int Settings::outerSize = 100000;
+unsigned int Settings::nrInnerPolygons = 1;
+int Settings::outerSize = 100;
 std::vector<int> Settings::innerSizes;
 
 
