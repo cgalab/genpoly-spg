@@ -71,31 +71,31 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         e2 = Edge(p1, p3, index);
 //        std::cerr << std::endl << "removing: " << e1 << ", and: " << e2 << std::endl;
         val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
-        if (val1.first == E_SKIP) {loop = true;}
+        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop = true;}
         if (val1.first == E_NOT_VALID) break;
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
-        if (val2.first == E_SKIP) {loop = true;}
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop = true;}
         if (val2.first == E_NOT_VALID) break;
 //        std::cerr << "skipping index" << std::endl;
       } else if ((*p1 < *p2) && (*p3 < *p1)) {
         e1 = Edge(p1, p2, index);
         e2 = Edge(p1, p3, index);
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
-        if (val2.first == E_SKIP) {loop = true;}
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop = true;}
         if (val2.first == E_NOT_VALID) break;
 //        std::cerr << std::endl << "removed p3: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
-  		  if (val1.first == E_SKIP) {loop = true;}
+  		  if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop = true;}
         if (val1.first == E_NOT_VALID) break;
       } else if ((*p2 < *p1) && (*p1 < *p3) ) {
         e1 = Edge(p1, p3, index);
         e2 = Edge(p1, p2, index);
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
-        if (val2.first == E_SKIP) {loop = true;}
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop = true;}
         if (val2.first == E_NOT_VALID) break;
 //        std::cerr << std::endl << "removed p2: " << e2 << ", processing: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
-  		  if (val1.first == E_SKIP) {loop = true;}
+  		  if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop = true;}
         if (val1.first == E_NOT_VALID) break;
       } else {
         // construct the edges
@@ -129,12 +129,12 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
   		  //std::cerr << std::endl << "processing e1: " << e1 << std::endl;
   		  val1 = processEdge(e1, edgeS, polygon, points);
-  		  if (val1.first == E_SKIP) loop = true;
+  		  if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) loop = true;
         if (val1.first == E_NOT_VALID) break;
 
   		  //std::cerr << std::endl << "processing e2: " << e2 << std::endl;
   		  val2 = processEdge(e2, edgeS, polygon, points);
-  		  if (val2.first == E_SKIP) loop = true;
+  		  if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) loop = true;
         if (val2.first == E_NOT_VALID) break;
       }
 

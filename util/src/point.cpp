@@ -243,14 +243,12 @@ bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
 
 // check for if p1 is the incidental 'left' vertex compared to p2
 bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
-  if ((*p1).v == 0) {
-    if ((*p2).v == 1) return true;
-  }
-  if ((*p2).v == 0) {
-    if ((*p1).v == cycle-1) return true;
-  }
-  if ((*p1).v < (*p2).v) return true;
-  return false;
+  int left, right;
+
+  left = (cycle + (*p2).v - (*p1).v) % cycle;
+  right = (cycle + (*p1).v - (*p2).v) % cycle;
+
+  return left < right;
 }
 
 // check for if p1 is the incidental 'left' vertex compared to p2

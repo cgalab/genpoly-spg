@@ -81,7 +81,7 @@ enum error opt2d(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       if ((revert && (*e1.p1 == *p1)) || (!revert && (*e1.p2 == *p1))) {
 //        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
         val1.first = removeEdgeFromSetd(e1, lowest_index, edgeS, polygon, points);
-        if (val1.first == E_SKIP) {
+        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if ((revert && (*e2.p1 == *p1)) || (!revert && (*e2.p2 == *p1))) {
             removeEdgeFromSetd(e2, lowest_index, edgeS, polygon, points);
@@ -108,7 +108,7 @@ enum error opt2d(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
 //        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
         val1 = processEdged(e1, lowest_index, edgeS, polygon, points);
-        if (val1.first == E_SKIP) {loop=true;revert=true;continue;}
+        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop=true;revert=true;continue;}
         if (val1.first == E_NOT_VALID) break;
       }
 
@@ -116,13 +116,13 @@ enum error opt2d(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       if ((revert && (*e2.p1 == *p1)) || (!revert && (*e2.p2 == *p1))) {
 //        std::cerr << std::endl << "removing e2: " << e2 << std::endl;
         val2.first = removeEdgeFromSetd(e2, lowest_index, edgeS, polygon, points);
-        if (val2.first == E_SKIP) {loop=true;revert=true;}
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop=true;revert=true;}
         if (val2.first == E_NOT_VALID) break;
       }
       else {
 //        std::cerr << std::endl << "processing e2: " << e2 << std::endl;
         val2 = processEdged(e2, lowest_index, edgeS, polygon, points);
-        if (val2.first == E_SKIP) {
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
           val1.first = removeEdgeFromSetd(e1, lowest_index, edgeS, polygon, points);
           if (val1.first == E_NOT_VALID) break;
           loop=true;revert=true;continue;

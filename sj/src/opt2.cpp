@@ -94,7 +94,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 //        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
         val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
         if (val1.first == E_NOT_VALID) break;
-        if (val1.first == E_SKIP) {
+        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if (*e2.p2 == *p1) {
             val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
@@ -107,7 +107,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 //        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
         val1 = processEdge(e1, edgeS, polygon, points);
         if (val1.first == E_NOT_VALID) break;
-        if (val1.first == E_SKIP) {loop=true;continue;}
+        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop=true;continue;}
       }
 
       // process second edge
@@ -115,13 +115,13 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 //        std::cerr << std::endl << "removing e2: " << e2 << std::endl;
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
-        if (val2.first == E_SKIP) {loop=true;continue;} // if this happens, e1 was guaranteed removed as e1 < e2 and e2.p2 > e2.p1 > e1.p1
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop=true;continue;} // if this happens, e1 was guaranteed removed as e1 < e2 and e2.p2 > e2.p1 > e1.p1
       }
       else {
 //        std::cerr << std::endl << "processing e2: " << e2 << std::endl;
         val2 = processEdge(e2, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
-        if (val2.first == E_SKIP) {
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
           val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
           if (val1.first == E_NOT_VALID) break;
           loop=true;continue;

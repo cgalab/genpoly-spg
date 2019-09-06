@@ -89,8 +89,15 @@ enum intersect_t {
 
 enum edge_t {
   E_VALID,
-  E_SKIP,
+  E_INTERSECTION,
+  E_COLLINEAR,
   E_NOT_VALID
+};
+
+enum planesweep_t {
+  P_CLEAN,
+  P_DIRTY_LEFT,
+  P_DIRTY_RIGHT
 };
 
 #endif

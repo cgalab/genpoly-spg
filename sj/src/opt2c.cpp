@@ -85,7 +85,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       if ((revert && (*e1.p1 == *p1)) || (!revert && (*e1.p2 == *p1))) {
 //        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
         val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
-        if (val1.first == E_SKIP) {
+        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if ((revert && (*e2.p1 == *p1)) || (!revert && (*e2.p2 == *p1))) {
             val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
@@ -115,7 +115,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
 //        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
         val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);
-        if (val1.first == E_SKIP) {
+        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
           if(revert)rev_found=true;
           else {edgeS_old = edgeS;rev_found=false;old_index=index;}
           loop=true;revert=true;continue;}
@@ -127,7 +127,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        std::cerr << std::endl << "removing e2: " << e2 << std::endl;
         val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
-        if (val2.first == E_SKIP) {
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
           if(revert)rev_found=true;
           else {edgeS_old = edgeS;rev_found=false;old_index=index;}
           loop=true;revert=true;}
@@ -136,7 +136,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        std::cerr << std::endl << "processing e2: " << e2 << std::endl;
         val2 = processEdgeb(e2, lowest_index, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
-        if (val2.first == E_SKIP) {
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
           val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
           if (val1.first == E_NOT_VALID) break;
           if(revert)rev_found=true;
