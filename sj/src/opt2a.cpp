@@ -48,10 +48,10 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     index = 0;
     decrementEdges(index, edgeS);
 
-    //std::cerr << "New loop" << std::endl;
+//    std::cerr << "New loop" << std::endl;
   	while (index < points.size()) {
 
-//      std::cerr << std::endl << "index: " << index << std::endl;
+//      std::cerr << "i: " << index << std::endl;
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];
