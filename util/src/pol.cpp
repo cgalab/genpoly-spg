@@ -300,19 +300,19 @@ bool coll4Swap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned 
   bool retval = false;
 
   if (*e1.p1 == *e2.p1) {
-    std::cerr << "same point: e1p1: " << *e1.p1 << " == e2p1: " << *e2.p1 << std::endl;
+//    std::cerr << "same point: e1p1: " << *e1.p1 << " == e2p1: " << *e2.p1 << std::endl;
     return coll3Swap(e1.p1, e1.p2, e2.p2, edgeS, polygon, points, lowest_index);
   }
   if (*e1.p1 == *e2.p2) {
-    std::cerr << "same point: e1p1: " << *e1.p1 << " == e2p2: " << *e2.p2 << std::endl;
+//    std::cerr << "same point: e1p1: " << *e1.p1 << " == e2p2: " << *e2.p2 << std::endl;
     return coll3Swap(e1.p1, e1.p2, e2.p1, edgeS, polygon, points, lowest_index);
   }
   if (*e1.p2 == *e2.p1) {
-    std::cerr << "same point: e1p2: " << *e1.p2 << " == e2p1: " << *e2.p1 << std::endl;
+//    std::cerr << "same point: e1p2: " << *e1.p2 << " == e2p1: " << *e2.p1 << std::endl;
     return coll3Swap(e1.p1, e1.p2, e2.p2, edgeS, polygon, points, lowest_index);
   }
   if (*e1.p2 == *e2.p2) {
-    std::cerr << "same point: e1p2: " << *e1.p2 << " == e2p2: " << *e2.p2 << std::endl;
+//    std::cerr << "same point: e1p2: " << *e1.p2 << " == e2p2: " << *e2.p2 << std::endl;
     return coll3Swap(e1.p1, e1.p2, e2.p1, edgeS, polygon, points, lowest_index);
   }
 

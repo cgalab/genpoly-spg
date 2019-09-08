@@ -49,6 +49,12 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsign
 
   if (it != edgeS.end()) {
 //    std::cerr << "*it: " << *it << std::endl;
+    if (*it != e) {
+      std::cerr << "edge to be removed: " << e << std::endl;
+      std::cerr << "it : " << *it << std::endl;
+      std::cout << "edges in 'edgeS':" << std::endl;
+      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+    }
     assert(e == *it);
 
     // get edges before and after
@@ -109,12 +115,12 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, std::set<Edg
   it = edgeS.find(e);
 
   if (it != edgeS.end()) {
-//    if (e != *it) {
-//      std::cerr << "edge to be removed: " << e << std::endl;
-//      std::cerr << "*it: " << *it << std::endl;
-//      std::cerr << "edges in 'edgeS':" << std::endl;
-//      for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) std::cerr << *it1 << std::endl;
-//    }
+    if (e != *it) {
+      std::cerr << "edge to be removed: " << e << std::endl;
+      std::cerr << "*it: " << *it << std::endl;
+      std::cerr << "edges in 'edgeS':" << std::endl;
+      for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) std::cerr << *it1 << std::endl;
+    }
     assert(e == *it);
 
     // get edges before and after
@@ -311,17 +317,17 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
   Edge before, after;
   std::pair<std::set<Edge>::iterator,bool> retval;
   std::pair<enum edge_t, std::set<Edge>::iterator> retval2;
-  //std::set<Edge, setComp>::key_compare mycomp = edgeS.key_comp();
 
   retval = edgeS.insert(e);
-/*
+
   if (*retval.first != e) {
+    std::cerr << "e : " << e << std::endl;
     std::cerr << "retval.first : " << *retval.first << std::endl;
-	   std::cerr << "retval.second: " << retval.second << std::endl;
-     std::cout << "edges in 'edgeS':" << std::endl;
-     for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+	  std::cerr << "retval.second: " << retval.second << std::endl;
+    std::cout << "edges in 'edgeS':" << std::endl;
+    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
    }
-*/
+
   assert(*retval.first == e);
 
   //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
@@ -348,6 +354,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
       else if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << e << " and bef: " << before << std::endl;
         if (coll4Swap(e, before, edgeS, polygon, points)) {
+          eraseEdgeFromSet(e, edgeS); // there is a chance that only the 'before' edge needs sorting, so 'e' is never removed from 'edgeS'
 //          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
           valid = E_COLLINEAR;
         }
@@ -370,12 +377,13 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
       else if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << e << " and aft: " << after << std::endl;
         if (coll4Swap(e, after, edgeS, polygon, points)) {
+          eraseEdgeFromSet(e, edgeS); // there is a chance that only the 'after' edge needs sorting, so 'e' is never removed from 'edgeS'
 //          std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
           valid = E_COLLINEAR;
         }
       }
       else {
-        //std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
+//        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
         edgeS.erase(retval.first);
         eraseEdgeFromSet(after, edgeS);
         //removeEdgeFromSet(e, edgeS, polygon, points);
@@ -408,14 +416,14 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
   std::pair<enum edge_t, std::set<Edge>::iterator> retval2;
 
   retval = edgeS.insert(e);
-/*
+
   if (*retval.first != e) {
     std::cerr << "retval.first : " << *retval.first << std::endl;
 	   std::cerr << "retval.second: " << retval.second << std::endl;
      std::cout << "edges in 'edgeS':" << std::endl;
      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
    }
-*/
+
   assert(*retval.first == e);
 
   //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
@@ -447,7 +455,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
         }
       }
       else {
-        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+//        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
         edgeS.erase(retval.first);
         eraseEdgeFromSet(before, edgeS);
         flip(e, before, polygon, points);

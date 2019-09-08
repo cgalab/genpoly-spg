@@ -39,18 +39,27 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
   bool loop;
-	//std::set<Edge, setComp> edgeS(comp); // a set of edges.
+//  bool debug=false;
   std::set<Edge> edgeS; // a set of edges.
 
   do {
+//    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     loop = false;
     index = 0;
     decrementEdges(index, edgeS);
 
-    //std::cerr << "New loop" << std::endl;
   	while (index < points.size()) {
+/*
+      if (index > 56270 && index < 56275) {
+        debug = true;
+        std::cerr << std::endl << "edges in 'edgeS':" << std::endl;
+        for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+      }
+      else {debug = false;}
+*/
 
-//      std::cerr << std::endl << "index: " << index << std::endl;
+      //loop ? std::cerr << "i: " << index << std::endl : std::cerr;
+//      std::cerr << "i: " << index << std::endl;
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];
@@ -63,7 +72,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   		p3 = &points[polygon[after]];
 
       // construct the edges
-//      std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
+//      (debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
       if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
         e1 = Edge (p1, p2, index);
         e2 = Edge (p1, p3, index);
@@ -75,23 +84,9 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
         val3 = det(e1, *p2);
       }
 
-      // start by clearing edges of any collinearity
-      if (fabs(val3) < EPSILON) {
-        // the 2 edges are collinear
-//          std::cerr << "collinear check found a possible match."  << std::endl;
-        if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) {
-//            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-          if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
-//              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-            loop = true;
-            continue;
-          }
-        } //else std::cerr << "false alarm." << std::endl;
-      }
-
       //process first edge
       if (*e1.p2 == *p1) {
-//        std::cerr << std::endl << "removing e1: " << e1 << std::endl;
+//        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
         val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
@@ -104,7 +99,17 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
         }
       }
       else {
-//        std::cerr << std::endl << "processing e1: " << e1 << std::endl;
+        // Only if the first edge has to be added do we have to check for collinearity, as then both edges have to be added.
+        if (fabs(val3) == 0) {
+//          (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+          if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
+//            (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+            loop = true;
+            continue;
+          }
+        }
+
+//        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
         val1 = processEdge(e1, edgeS, polygon, points);
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop=true;continue;}
@@ -112,13 +117,13 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 
       // process second edge
       if (*e2.p2 == *p1) {
-//        std::cerr << std::endl << "removing e2: " << e2 << std::endl;
+//        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
         if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop=true;continue;} // if this happens, e1 was guaranteed removed as e1 < e2 and e2.p2 > e2.p1 > e1.p1
       }
       else {
-//        std::cerr << std::endl << "processing e2: " << e2 << std::endl;
+//        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
         val2 = processEdge(e2, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
         if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
@@ -128,8 +133,6 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
         }
       }
 
-      //std::cout << "edges in 'edgeS':" << std::endl;
-      //for (std::set<Edge, setComp>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
   		++index;
   	}
     if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
