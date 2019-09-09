@@ -26,6 +26,11 @@ private:
 	Triangulation *T;
 
 	/*
+
+	*/
+	unsigned int pID;
+
+	/*
 		The index of the vertex in the vertices vector of the triangulation
 	*/
 	int i;
@@ -73,9 +78,10 @@ public:
 		edge between the vertex and its successor in the polygon
 
 		@param 	t 		The triagnulation the polygon lives in
+		@param 	pid 	The id of the polygon to insert in
 		@param 	index 	The index of the vertex
 	*/
-	Insertion(Triangulation *t, int index);
+	Insertion(Triangulation *t, unsigned int pid, int index);
 
 
 	/*

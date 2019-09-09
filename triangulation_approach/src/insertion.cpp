@@ -10,12 +10,13 @@
 	edge between the vertex and its successor in the polygon
 
 	@param 	t 		The triagnulation the polygon lives in
+	@param 	pid 	The id of the polygon to insert in
 	@param 	index 	The index of the vertex
 */
-Insertion::Insertion(Triangulation *t, int index) :
-	T(t), i(index) {
+Insertion::Insertion(Triangulation *t, unsigned int pid, int index) :
+	T(t), pID(pid), i(index) {
 
-	v0 = (*T).getVertex(i, 0);
+	v0 = (*T).getVertex(i, pID);
 	v1 = (*v0).getNext();
 	e = (*v0).getToNext();
 }

@@ -50,7 +50,8 @@ int main(){
 	(*T).print("triangulation_init.graphml");
 	(*T).printPolygon("polygon_int.graphml");
 
-	/*growPolygon(T);
+	growPolygonBy(T, 1, Settings::innerSizes[0] - 3);
+	growPolygonBy(T, 0, Settings::outerSize - Settings::initialSize);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", Settings::outerSize, (*Settings::timer).elapsedTime());
 
 	if(!(*T).check()){
@@ -58,7 +59,7 @@ int main(){
 		exit(9);
 	}
 
-	performed = transformPolygonByMoves(T, 1000000);
+	performed = transformPolygonByMoves(T, 1000);
 	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed, 1000000, (*Settings::timer).elapsedTime());
 	printf("number of vertices: %d \n", (*T).getActualNumberOfVertices());
 	
@@ -72,7 +73,7 @@ int main(){
 	
 	(*T).print("triangulation.graphml");
 
-	(*T).printPolygon("polygon.graphml");*/
+	(*T).printPolygon("polygon.graphml");
 
 	exit(0);
 }

@@ -110,6 +110,20 @@ int Triangulation::getActualNumberOfVertices(){
 }
 
 /*
+	@param 	pID The polygon of interest
+	@return		The number of vertices the polygon with pID does contain now
+*/
+int Triangulation::getActualNumberOfVertices(unsigned int pID){
+	
+	if(pID == 0)
+		return (*outerPolygon).getActualPolygonSize();
+	else if(pID > 0 && pID <= Settings::nrInnerPolygons)
+		return (*innerPolygons[pID - 1]).getActualPolygonSize();
+	else
+		return -1;
+}
+
+/*
 	@param	i 	Index of the vertex in the vertices vector of the polygon with pID
 	@param 	pID	The ID of the polygon of interest
 	@return 	The vertex at index i in the vertices vector, NULL if no polygon with pID

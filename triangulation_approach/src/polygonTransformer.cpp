@@ -82,32 +82,34 @@ int transformPolygonByMoves(Triangulation *T, int iterations){
 }
 
 /*
-	The function growPolygon() grows the polygon by insertions to Settings::outerSize.
+	The function growPolygon() grows a polygon by n insertions.
 
-	@param 	T 	The triangulation the polygon lives in
+	@param 	T 		The triangulation the polygon lives in
+	@param	pID 	The ID of the polygon
+	@param 	n 		The number of vertices to insert
 
 	Note:
 		This function works just for polygons without holes!
 */
-void growPolygon(Triangulation *T){
-	int n, index, actualN, i;
+void growPolygonBy(Triangulation *T, unsigned int pID, int n){
+	int index, actualN, i;
 	Insertion *in;
 	bool ok;
 	int div;
 	int counter = 0;
 
-	// Compute the number of insertion to do
-	n = Settings::outerSize - (*T).getActualNumberOfVertices();
 	div = 0.01 * n;
+	if(div == 0)
+		div = 1;
 
 	for(i = 0; i < n;){
 		
-		actualN = (*T).getActualNumberOfVertices();
+		actualN = (*T).getActualNumberOfVertices(pID);
 
 		// Chose randomly an edge to insert in
 		index = (*Settings::generator).getRandomIndex(actualN);
 
-		in = new Insertion(T, index);
+		in = new Insertion(T, pID, index);
 
 		// Check whether the choosen edge fulfills the stability criteria for insertions
 		ok = (*in).checkStability();
@@ -131,6 +133,7 @@ void growPolygon(Triangulation *T){
 
 		delete in;
 
+		// Just increase the iteration count if a vertex has really been inserted
 		i++;
 
 		if(i % div == 0 && Settings::feedback != FeedbackMode::LACONIC)

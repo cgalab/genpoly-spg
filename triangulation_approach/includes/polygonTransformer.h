@@ -37,11 +37,13 @@
 int transformPolygonByMoves(Triangulation *T, int iterations);
 
 /*
-	The function growPolygon() grows the polygon by insertions to Settings::targetSize.
+	The function growPolygon() grows a polygon by n insertions.
 
-	@param 	T 	The triangulation the polygon lives in
+	@param 	T 		The triangulation the polygon lives in
+	@param	pID 	The ID of the polygon
+	@param 	n 		The number of vertices to insert
 
 	Note:
 		This function works just for polygons without holes!
 */
-void growPolygon(Triangulation *T);
+void growPolygonBy(Triangulation *T, unsigned int pID, int n);
