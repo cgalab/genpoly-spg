@@ -467,6 +467,13 @@ void Vertex::print(FILE *f, double factor){
 }
 
 /*
+
+*/
+void Vertex::printToDat(FILE *f){
+	fprintf(f, "%f %f\n", x, y);
+}
+
+/*
 	The function print() prints the basic information of a vertex to standard out.
 	It prints the ID and both coordinates in a precision of 15 decimal digits.
 */

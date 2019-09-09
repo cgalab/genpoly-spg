@@ -181,6 +181,7 @@ public:
 		PRINTER:
 
 		void 					print(FILE *f, double factor)
+		void 					printToDat(FILE *f)
 		void 					print()
 		void 					printEnvironment(int depth, const char *filename)
 		void 					printSurroundingTriangulation(const char *filename)
@@ -470,6 +471,14 @@ public:
 			triangulation use the print functions of the Triangulation class
 	*/
 	void print(FILE *f, double factor);
+
+	/*
+		The function printToDat() writes the coordinates of a vertex to a .dat file such that it
+		can be interpreted by gnuplot.
+
+		@param 	f 	A handle for the .dat file
+	*/
+	void printToDat(FILE *f);
 
 	/*
 		The function print() prints the basic information of a vertex to standard out.

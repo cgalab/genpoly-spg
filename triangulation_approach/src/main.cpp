@@ -48,7 +48,7 @@ int main(){
 	}
 
 	(*T).print("triangulation_init.graphml");
-	(*T).printPolygon("polygon_int.graphml");
+	(*T).printPolygonToDat("polygon_int.dat");
 
 	growPolygonBy(T, 1, Settings::innerSizes[0] - 3);
 	growPolygonBy(T, 0, Settings::outerSize - Settings::initialSize);
@@ -73,7 +73,7 @@ int main(){
 	
 	(*T).print("triangulation.graphml");
 
-	(*T).printPolygon("polygon.graphml");
+	(*T).printPolygonToDat("polygon.dat");
 
 	exit(0);
 }

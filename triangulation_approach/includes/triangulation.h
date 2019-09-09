@@ -248,6 +248,14 @@ public:
 	*/
 	void printPolygon(const char *filename);
 
+	/*
+		The function printPolygonToDat() prints all polygons to a .dat file which can be
+		interpreted by gnuplot.
+
+		@param 	filename 	The name of the .dat file
+	*/
+	void printPolygonToDat(const char *filename);
+
 
 	/*
 		O ~ T ~ H ~ E ~ R ~ S

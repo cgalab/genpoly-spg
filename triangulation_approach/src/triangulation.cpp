@@ -288,6 +288,46 @@ void Triangulation::printPolygon(const char *filename){
 	fclose(f);
 }
 
+/*
+
+*/
+void Triangulation::printPolygonToDat(const char *filename){
+	Vertex *start, *other;
+	FILE *f;
+	int id = 0;
+
+	f = fopen(filename, "w");
+
+	fprintf(f, "\"outer polygon\"\n");
+
+	start = (*outerPolygon).getVertex(0);
+	(*start).printToDat(f);
+
+	other = (*start).getNext();
+	while((*start).getID() != (*other).getID()){
+		(*other).printToDat(f);
+
+		other = (*other).getNext();
+	}
+	(*start).printToDat(f);
+
+	for(auto const& i : innerPolygons){
+		fprintf(f, "\n\n\"inner polygon %d\"\n", id);
+
+		start = (*i).getVertex(0);
+		(*start).printToDat(f);
+
+		other = (*start).getNext();
+		while((*start).getID() != (*other).getID()){
+			(*other).printToDat(f);
+
+			other = (*other).getNext();
+		}
+		(*start).printToDat(f);
+
+		id++;
+	}
+}
 
 
 /*
