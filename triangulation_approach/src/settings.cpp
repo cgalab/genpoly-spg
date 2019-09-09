@@ -42,7 +42,7 @@ Timer* Settings::timer = NULL;
 	Random generator
 */
 bool Settings::fixedSeed = false;
-unsigned int Settings::seed = 0;
+unsigned int Settings::seed = 1423031642;
 RandomGenerator* Settings::generator = NULL;
 
 

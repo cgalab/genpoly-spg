@@ -234,113 +234,39 @@ bool Translation::insideQuadrilateral(Vertex *v){
 }
 
 /*
-	The function insideQuadrilateral2() checks whether the vertex v lays inside of the simple
-	quadrilateral formed by prevV, nextV, oldV, newV.
-	Therefore it generates a dummy vertex with the same y-coordinate as v and a x-coordinate which
-	is the maximum x-coordinate of all vertices of the quadrilateral plus 10. So the dummy vertex
-	lays definitelly lays outside of the qudrilateral. Then it checks how often the edge between v
-	and the dummy vertex intersects the edges of the quadrilateral. If the number of intersections
-	is odd, then v must lay inside of the quadrilateral.
-	Quadrilateral edges:
-		- transPath
-		- Edge from prev to next
-		- Either: 	prevOldE and nextNewE
-		  Or: 		prevNewE and nextOldE
-		  (The pair which is not intersecting each other)
+	The function insideTriangle() checks whether the vertex toCheck is inside the triangle
+	formed by the vertices v0, v1 and v2.
 
-	@param 	v 	The vertex of interest
-	@return 	True if v is inside of the quadrilateral, otherwise false
-
-	Note:
-		Source: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+	@param	v0 			First veretx of the triangle
+	@param 	v1 			Second vertex of the triangle
+	@param 	v2 			Third vertex of the triangle
+	@param 	toCheck 	The vertex for which should be checked whether it lays inside the
+						triangle or not
+	@return 			True if toCheck lays inside the triangle, otherwise false
 */
-// TODO:
-// Rename that shit
-bool Translation::insideQuadrilateral2(Vertex *v){
-	Vertex *testVertex;
-	TEdge *testEdge, *dummyEdge0, *dummyEdge1;
-	double maxX, x;
-	int count = 0;
-	IntersectionType intersection;
-	int vertexIntersectionCount = 0;
+bool Translation::insideTriangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *toCheck){
+	double area0, area1;
+	Triangle *t;
 
-	// Find maximum x value
-	maxX = (*oldV).getX();
-	x = (*newV).getX();
-	if(x > maxX)
-		maxX = x;
-	x = (*prevV).getX();
-	if(x > maxX)
-		maxX = x;
-	x = (*nextV).getX();
-	if(x > maxX)
-		maxX = x;
+	t = new Triangle(v0, v1, toCheck);
+	area0 = (*t).signedArea();
+	delete t;
 
-	// If v has a greater x-coordinate then all quadrilateral vertices, it can not be inside
-	if((*v).getX() > maxX)
+	t = new Triangle(v1, v2, toCheck);
+	area1 = (*t).signedArea();
+	delete t;
+
+	if(signbit(area0) != signbit(area1))
 		return false;
 
-	// Generate the dummy vertex outside of the quadrilateral
-	maxX = maxX + 10;
-	testVertex = new Vertex(maxX, (*v).getY());
+	t = new Triangle(v2, v0, toCheck);
+	area1 = (*t).signedArea();
+	delete t;
 
-	testEdge = new TEdge(v, testVertex);
-
-	// Count the intersection
-	// TODO:
-	// Maybe using an epsilon here in checkIntersection makes no sense
-	dummyEdge0 = new TEdge(prevV, nextV);
-	intersection = checkIntersection(testEdge, dummyEdge0, false);
-	if(intersection != IntersectionType::NONE){
-		count++;
-
-		if(intersection == IntersectionType::VERTEX)
-			vertexIntersectionCount++;
-	}
-	delete dummyEdge0;
-
-	intersection = checkIntersection(testEdge, transPath, false);
-	if(intersection != IntersectionType::NONE){
-		count++;
-
-		if(intersection == IntersectionType::VERTEX)
-			vertexIntersectionCount++;
-	}
-
-	if(checkIntersection(prevOldE, nextNewE, true) == IntersectionType::NONE){
-		dummyEdge0 = prevOldE;
-		dummyEdge1 = nextNewE;
-	}else{
-		dummyEdge0 = prevNewE;
-		dummyEdge1 = nextOldE;
-	}
-
-	intersection = checkIntersection(testEdge, dummyEdge0, false);
-	if(intersection != IntersectionType::NONE){
-		count++;
-
-		if(intersection == IntersectionType::VERTEX)
-			vertexIntersectionCount++;
-	}
-
-	intersection = checkIntersection(testEdge, dummyEdge1, false);
-	if(intersection != IntersectionType::NONE){
-		count++;
-
-		if(intersection == IntersectionType::VERTEX)
-			vertexIntersectionCount++;
-	}
-
-	delete testEdge;
-	delete testVertex;
-
-	if(vertexIntersectionCount > 1)
-		return true;
-
-	if(count % 2 == 1)
-		return true;
-	else
+	if(signbit(area0) != signbit(area1))
 		return false;
+
+	return true;
 }
 
 /*
@@ -594,18 +520,23 @@ Translation::Translation(Triangulation *Tr, int i, double dX, double dY) :
 	For polygons with holes it also checks whether the outer polygon rolls over an inner one or
 	an inner polygon rolls over another one. Additionally it checks whether a vertex passes one
 	of the inner polygons in a way, that one polygon edge would crash into the inner polygon.
+	For some of these cases it is possible to solve it by splitting the translation. For these
+	cases it sets the split flag of the translation.
 
 	@return 	True if the polygon would change its orientation or rolls over another inner 
 				polygon, otherwise false
+
+	Note:
+		For more information on how to check which cases can be solved by splitted translations
+		take a look at my Master Thesis
 */
-// TODO:
-// The pass by case could maybe be handled by split translations
 bool Translation::checkOverroll(){
 	bool overroll;
 	Vertex *randomV;
 	unsigned int i;
 	Triangle *dummy;
 	double areaOld, areaNew;
+	bool inside0, inside1;
 
 	// At first we check whether the moving vertex passes by another polygon
 	// Note:
@@ -619,9 +550,15 @@ bool Translation::checkOverroll(){
 		// Get a random vertex of the polygon
 		randomV = (*T).getVertex(0, i);
 
-		overroll = insideQuadrilateral2(randomV);
+		inside0 = insideTriangle(oldV, newV, prevV, randomV);
+		inside1 = insideTriangle(oldV, newV, nextV, randomV);
 
-		if(overroll)
+		if(inside0 && inside1){
+			split = true;
+			continue;
+		}
+
+		if(inside0 || inside1)
 			return true;
 	}
 
@@ -1150,9 +1087,14 @@ bool Translation::checkSimplicityOfTranslation(){
 	The function checkSplit() determines whether a translation can be executed directly or must
 	be split into two translation. This corresponds to the question whether the translation path
 	intersects any polygon edge or not. If the translation must be split the function sets the
-	internal split flag.
+	internal split flag. If the split flag was already set by the function checkOverroll() it 
+	does nothing.
 */
 void Translation::checkSplit(){
+	// In case the checkOverroll() has already demanded a split
+	if(split)
+		return;
+
 	split = !checkEdge(original, transPath);
 }
 
