@@ -30,8 +30,12 @@ Triangulation *generateRegularPolygon(){
 	// Triangulate the inner of the polygon in zig-zag style
 	if(Settings::nrInnerPolygons == 0)
 		initialTriangulationZigZag(T);
-	else
+	else{
 		generateInitialHoleTriangle(T);
+
+		if(Settings::nrInnerPolygons > 1)
+			splitHoleTriangle(T);
+	}
 
 	// Box the polygon by a square and triangulate the area between the square and the polygon
 	boxPolygon(T, 0);
@@ -174,8 +178,6 @@ void initialTriangulationZigZag(Triangulation *T){
 	Note:
 		The suitable startindex for the boxPolygon function is 0!
 */
-// TODO:
-// Comment a bit
 void generateInitialHoleTriangle(Triangulation *T){
 	double alpha;
 	int i;
@@ -183,6 +185,9 @@ void generateInitialHoleTriangle(Triangulation *T){
 	Vertex *v0, *v1;
 	TEdge *e0, *e1, *e2;
 	TEdge *start, *triangleE0, *triangleE1, *triangleE2;
+
+	// Add an inner polygon to the triangulation
+	(*T).addInnerPolygon(new TPolygon(T, Settings::innerSizes[0]));
 
 	alpha = 2 * M_PI / 3;
 
@@ -289,6 +294,130 @@ void generateInitialHoleTriangle(Triangulation *T){
 	(*T).addEdge(e0);
 
 	new Triangle(e0, e2, start, v1, (*T).getVertex(0, 0), triangleV0);
+}
+
+
+void splitHoleTriangle(Triangulation *T){
+	int n;
+	double x0, x1, x2, y0, y1, y2;
+	Vertex *v0, *v1, *v2;
+	TEdge *e0, *e1, *e2;
+	Vertex *n0, *n1, *n2;
+	Triangle *t, *t0, *t1;
+	Vertex *store0, *store1;
+	TEdge *p1e0, *p1e1;
+	TEdge *p2e0, *p2e1, *p2e2;
+	TEdge *h0, *h1, *h2;
+
+	// Get the actual number of inner polygons; we want to split the last one
+	n = (*T).getActualNrInnerPolygons();
+
+	// Get all vertices and edges of the choosen polygon
+	v0 = (*T).getVertex(0, n);
+	v1 = (*T).getVertex(1, n);
+	v2 = (*T).getVertex(2, n);
+	e0 = (*v0).getEdgeTo(v1);
+	e1 = (*v1).getEdgeTo(v2);
+	e2 = (*v2).getEdgeTo(v0);
+
+	// Get the inner triangle of the polygon
+	t = (*v0).getTriangleWith(v1, v2);
+
+	// Get the other triangles incident to the edges which get deleted
+	t0 = (*e0).getOtherTriangle(t);
+	t1 = (*e2).getOtherTriangle(t);
+
+	// Get the vertices we will need later of triangles
+	store0 = (*t0).getOtherVertex(e0);
+	store1 = (*t1).getOtherVertex(e2);
+
+	// Delete the edges containing v0
+	delete e0;
+	delete e2;
+
+	// Get the coordinates of the triangle's vertices
+	x0 = (*v0).getX();
+	y0 = (*v0).getY();
+	x1 = (*v1).getX();
+	y1 = (*v1).getY();
+	x2 = (*v2).getX();
+	y2 = (*v2).getY();
+
+	// Add a new inner polygon
+	(*T).addInnerPolygon(new TPolygon(T, Settings::innerSizes[n]));
+
+
+	/*
+		REBUILD THE OLD POLYGON
+	*/
+
+	// Generate the third vertex for the first polygon
+	n2 = new Vertex((x0 - x1) / 12, (x1 - x2) / 2);
+	(*T).addVertex(n2, n);
+
+	// Generate the edges and the triangle of the first polygon
+	p1e0 = new TEdge(v1, n2, EdgeType::POLYGON);
+	p1e1 = new TEdge(n2, v2, EdgeType::POLYGON);
+	(*T).addEdge(p1e0);
+	(*T).addEdge(p1e1);
+	new Triangle(p1e0, p1e1, e1, v1, v2, n2);
+
+
+	/*
+		GENERATE THE NEW POLYGON
+	*/
+
+	// Generate the new vertices for the second polygon
+	n0 = new Vertex((x0 - x1) / 3, (y0 - y1) / 3);
+	n1 = new Vertex((x0 - x2) / 3, (y0 - y2) / 3);
+	(*T).addVertex(n0, n + 1);
+	(*T).addVertex(n1, n + 1);
+
+	// Change the first vertex to this polygon
+	(*T).changeVertex(0, n, n + 1);
+
+	// Generate the edges and the triangle of the second polygon
+	// TODO:
+	// Check orientation of the new polygon
+	p2e0 = new TEdge(v0, n0, EdgeType::POLYGON);
+	p2e1 = new TEdge(n0, n1, EdgeType::POLYGON);
+	p2e2 = new TEdge(n1, v0, EdgeType::POLYGON);
+	(*T).addEdge(p2e0);
+	(*T).addEdge(p2e1);
+	(*T).addEdge(p2e2);
+	new Triangle(p2e0, p2e1, p2e2, v0, n0, n1);
+
+	// Add triangles to the outside
+	h0 = new TEdge(store1, n0);
+	h1 = (*v0).getEdgeTo(store1);
+	(*T).addEdge(h0);
+	new Triangle(h0, h1, p2e0, v0, store1, n0);
+
+	h1 = new TEdge(n0, v2);
+	h2 = (*store1).getEdgeTo(v2);
+	(*T).addEdge(h1);
+	new Triangle(h0, h1, h2, store1, n0, v2);
+
+	h0 = new TEdge(store0, n1);
+	h1 = (*v0).getEdgeTo(store0);
+	(*T).addEdge(h0);
+	new Triangle(h0, h1, p2e2, v0, store0, n1);
+
+	h1 = new TEdge(n1, v1);
+	h2 = (*store0).getEdgeTo(v1);
+	(*T).addEdge(h1);
+	new Triangle(h0, h1, h2, store0, n1, v1);
+
+	// Add triangles between the polygons
+	h0 = new TEdge(n0, n2);
+	h1 = new TEdge(n1, n2);
+	(*T).addEdge(h0);
+	(*T).addEdge(h1);
+	new Triangle(h0, h1, p2e1, n0, n1, n2);
+
+	new Triangle(h0, (*n0).getEdgeTo(v2), (*n2).getEdgeTo(v2), n0, n2, v2);
+	new Triangle(h1, (*n1).getEdgeTo(v1), (*n2).getEdgeTo(v1), n1, n2, v1);
+	// n2 = 23
 }
 
 

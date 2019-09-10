@@ -70,7 +70,7 @@ void Vertex::getEnvironment(std::map<int, TEdge*> &es, std::map<int, Vertex*> &v
 	@param 	Y 	The y coordinate of the vertex
 */
 Vertex::Vertex(double X, double Y) :
-	T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(false), id(n), reserveID(2 * n) {
+	T(NULL), P(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(false), id(n), reserveID(2 * n) {
 	n++;
 }
 
@@ -84,7 +84,7 @@ Vertex::Vertex(double X, double Y) :
 	@param 	RV 	Determines whether the new vertex is part of the bounding box
 */
 Vertex::Vertex(double X, double Y, bool RV) :
-	T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(RV), id(n), reserveID(2 * n) {
+	T(NULL), P(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(RV), id(n), reserveID(2 * n) {
 	n++;
 }
 
@@ -450,7 +450,8 @@ void Vertex::removeTriangle(Triangle *t){
 		triangulation use the print functions of the Triangulation class
 */
 void Vertex::print(FILE *f, double factor){
-	int n; 
+	int n;
+	int text;
 
 	if(factor == 0){
 		n = (*T).getActualNumberOfVertices();
@@ -461,13 +462,22 @@ void Vertex::print(FILE *f, double factor){
 		else
 			factor = 20;
 	}
-	
 
-	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%llu\" mainText=\"%llu\"></node>\n", x * factor, y * factor, id, id);
+
+	/*if(P == NULL)
+		text = -1;
+	else
+		text = getPID();*/
+	text = id;
+
+	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%llu\" mainText=\"%llu\"></node>\n", x * factor, y * factor, id, text);
 }
 
 /*
+	The function printToDat() writes the coordinates of a vertex to a .dat file such that it
+	can be interpreted by gnuplot.
 
+	@param 	f 	A handle for the .dat file
 */
 void Vertex::printToDat(FILE *f){
 	fprintf(f, "%f %f\n", x, y);

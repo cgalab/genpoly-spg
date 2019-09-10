@@ -39,6 +39,9 @@ int main(){
 	(*T).check();
 	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", Settings::initialSize, (*Settings::timer).elapsedTime());
 
+	(*T).print("triangulation_init.graphml");
+	growPolygonBy(T, 1, Settings::innerSizes[0] - 3);
+	growPolygonBy(T, 2, Settings::innerSizes[1] - 3);
 	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
 	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, Settings::initialTranslationNumber, (*Settings::timer).elapsedTime());
 
@@ -48,9 +51,9 @@ int main(){
 	}
 
 	(*T).print("triangulation_init.graphml");
-	(*T).printPolygonToDat("polygon_int.dat");
+	(*T).printPolygonToDat("polygon_init.dat");
 
-	growPolygonBy(T, 1, Settings::innerSizes[0] - 3);
+	
 	growPolygonBy(T, 0, Settings::outerSize - Settings::initialSize);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", Settings::outerSize, (*Settings::timer).elapsedTime());
 
@@ -74,6 +77,6 @@ int main(){
 	(*T).print("triangulation.graphml");
 
 	(*T).printPolygonToDat("polygon.dat");
-
+	
 	exit(0);
 }

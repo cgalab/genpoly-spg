@@ -79,13 +79,16 @@ public:
 					Triangulation()
 
 		SETTER:
-
+		
+		void 		addInnerPolygon(TPolygon *p)
 		void 		addVertex(Vertex *v, unsigned int pID)
+		void 		changeVertex(int i, unsigned int fromP, unsigned int toP)
 		void 		addEdge(TEdge *e)
 		void 		setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3)
 
 		GETTER:
 
+		int 		getActualNrInnerPolygons()
 		int 		getTargetNumberOfVertices()
 		int 		getActualNumberOfVertices()
 		Vertex*		getVertex(int i, unsigned int pID)
@@ -116,7 +119,7 @@ public:
 	/*
 		Constructor:
 		Already allocates memory for the vector of vertices and generates the TPolygon
-		instances.
+		instances for the outer polygon.
 	*/
 	Triangulation();
 
@@ -124,6 +127,11 @@ public:
 	/*
 		S ~ E ~ T ~ T ~ E ~ R ~ S
 	*/
+
+	/*
+		@param 	p 	The new inner polygon
+	*/
+	void addInnerPolygon(TPolygon *p);
 
 	/*
 		The function addVertex() inserts a vertex into the vertices list of the triangulation
@@ -135,6 +143,16 @@ public:
 						polygon)
 	*/
 	void addVertex(Vertex *v, unsigned int pID);
+
+	/*
+		The function changeVertex() removes the vertex at index i from the polygon with ID
+		fromP and adds it to the polygon with ID toP.
+
+		@param	i 		The index of the vertex to be moved in the polygon with ID fromP
+		@param 	fromP 	The ID of the polygon the vertex lives in originally
+		@param 	toP 	The ID of the polygon the vertex should be moved to
+	*/
+	void changeVertex(int i, unsigned int fromP, unsigned int toP);
 
 	/*
 		@param	e 	Edge to be added to the edge map
@@ -154,6 +172,11 @@ public:
 	/*
 		G ~ E ~ T ~ T ~ E ~ R ~ S
 	*/
+
+	/*
+		@return 	The actual number of inner polygons
+	*/
+	int getActualNrInnerPolygons();
 
 	/*
 		@return		Final number of vertices the polygon will contain (including the vertices

@@ -75,6 +75,9 @@ void initialTriangulationZigZag(Triangulation *T);
 void generateInitialHoleTriangle(Triangulation *T);
 
 
+void splitHoleTriangle(Triangulation *T);
+
+
 /*
 	The function boxPolygon generates a square around the polygon and
 	triangulates the area between the polygon and the square.

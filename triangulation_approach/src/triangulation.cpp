@@ -7,11 +7,10 @@
 /*
 	Constructor:
 	Already allocates memory for the vector of vertices and generates the TPolygon
-	instances.
+	instances for the outer polygon.
 */
 Triangulation::Triangulation() :
 	Rectangle0(NULL), Rectangle1(NULL), Rectangle2(NULL), Rectangle3(NULL), N(0) { 
-	unsigned int k;
 
 	// Calculate the total number of vertices
 	N = Settings::outerSize;
@@ -23,9 +22,7 @@ Triangulation::Triangulation() :
 	// Generate outer polygon instance
 	outerPolygon = new TPolygon(this, Settings::outerSize);
 
-	// Generate inner polygon instances
-	for(k = 0; k < Settings::nrInnerPolygons; k++)
-		innerPolygons.push_back(new TPolygon(this, Settings::innerSizes[k]));
+	innerPolygons.reserve(Settings::nrInnerPolygons);
 }
 
 
@@ -33,6 +30,13 @@ Triangulation::Triangulation() :
 /*
 	S ~ E ~ T ~ T ~ E ~ R ~ S
 */
+
+/*
+	@param 	p 	The new inner polygon
+*/
+void Triangulation::addInnerPolygon(TPolygon *p){
+	innerPolygons.push_back(p);
+}
 
 /*
 	The function addVertex() inserts a vertex into the vertices list of the triangulation
@@ -48,13 +52,39 @@ void Triangulation::addVertex(Vertex *v, unsigned int pID){
 
 	if(pID == 0)
 		(*outerPolygon).addVertex(v);
-	else if(pID > 0 && pID <= Settings::nrInnerPolygons)
+	else if(pID > 0 && pID <= getActualNrInnerPolygons())
 		(*innerPolygons[pID - 1]).addVertex(v);
 	else
 		exit(12);
 
 	// Do not forget to register the triangulation at the vertex
 	(*v).setTriangulation(this);
+}
+
+/*
+	The function changeVertex() removes the vertex at index i from the polygon with ID
+	fromP and adds it to the polygon with ID toP.
+
+	@param	i 		The index of the vertex to be moved in the polygon with ID fromP
+	@param 	fromP 	The ID of the polygon the vertex lives in originally
+	@param 	toP 	The ID of the polygon the vertex should be moved to
+*/
+void Triangulation::changeVertex(int i, unsigned int fromP, unsigned int toP){
+	Vertex *v;
+
+	if(fromP == 0)
+		v = (*outerPolygon).removeVertex(i);
+	else if(fromP > 0 && fromP <= getActualNrInnerPolygons())
+		v = (*innerPolygons[fromP - 1]).removeVertex(i);
+	else
+		exit(12);
+
+	if(toP == 0)
+		(*outerPolygon).addVertex(v);
+	else if(toP > 0 && toP <= getActualNrInnerPolygons())
+		(*innerPolygons[toP - 1]).addVertex(v);
+	else
+		exit(12);
 }
 
 /*
@@ -92,6 +122,13 @@ void Triangulation::setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3)
 /*
 	G ~ E ~ T ~ T ~ E ~ R ~ S
 */
+
+/*
+	@return 	The actual number of inner polygons
+*/
+int Triangulation::getActualNrInnerPolygons(){
+	return innerPolygons.size();
+}
 
 /*
 	@return		Final number of vertices the polygon will contain (including the vertices
@@ -203,7 +240,7 @@ void Triangulation::removeEdge(TEdge *e){
 void Triangulation::print(const char *filename){
 	FILE *f;
 	TEdge *e;
-	int scale = 1000;
+	int scale = 2000;
 
 	f = fopen(filename, "w");
 
@@ -289,7 +326,10 @@ void Triangulation::printPolygon(const char *filename){
 }
 
 /*
+	The function printPolygonToDat() prints all polygons to a .dat file which can be
+	interpreted by gnuplot.
 
+	@param 	filename 	The name of the .dat file
 */
 void Triangulation::printPolygonToDat(const char *filename){
 	Vertex *start, *other;
@@ -298,6 +338,7 @@ void Triangulation::printPolygonToDat(const char *filename){
 
 	f = fopen(filename, "w");
 
+	// Start with the outer polygon
 	fprintf(f, "\"outer polygon\"\n");
 
 	start = (*outerPolygon).getVertex(0);
@@ -312,6 +353,7 @@ void Triangulation::printPolygonToDat(const char *filename){
 	(*start).printToDat(f);
 
 	for(auto const& i : innerPolygons){
+		// Add all inner polygons
 		fprintf(f, "\n\n\"inner polygon %d\"\n", id);
 
 		start = (*i).getVertex(0);

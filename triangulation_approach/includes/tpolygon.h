@@ -101,6 +101,17 @@ public:
 		@return 	The actual size of the polygon
 	*/
 	int getActualPolygonSize();
+
+
+	/*
+		R ~ E ~ M ~ O ~ V ~ E ~ R
+	*/
+
+	/*
+		@param 	i 	The index of the vertex to be removed in the vertices list
+		@return 	The vertex to be removed
+	*/
+	Vertex *removeVertex(int i);
 };
 
 #endif

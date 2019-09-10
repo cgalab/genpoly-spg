@@ -88,3 +88,22 @@ Vertex *TPolygon::getVertex(int i){
 int TPolygon::getActualPolygonSize(){
 	return vertices.size();
 }
+
+
+/*
+	R ~ E ~ M ~ O ~ V ~ E ~ R
+*/
+
+/*
+	@param 	i 	The index of the vertex to be removed in the vertices list
+	@return 	The vertex to be removed
+*/
+Vertex *TPolygon::removeVertex(int i){
+	Vertex *v;
+
+	v = vertices[i];
+
+	vertices.erase(vertices.begin() + i);
+
+	return v;
+}
