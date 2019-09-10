@@ -74,7 +74,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsign
       //std::cerr << "before: " << before << ", after: " << after << std::endl;
       isval = checkIntersection(before, after);
       if (isval == IS_4P_COLLINEAR) {
-        //std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
+//        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
         if (coll4Swap(before, after, edgeS, polygon, points)) {
           //std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
           valid = E_COLLINEAR;
@@ -352,7 +352,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {
-//        std::cerr << "4P collinearity between:" << e << " and bef: " << before << std::endl;
+//        std::cerr << "4P collinearity between e:" << e << " and bef: " << before << std::endl;
         if (coll4Swap(e, before, edgeS, polygon, points)) {
           eraseEdgeFromSet(e, edgeS); // there is a chance that only the 'before' edge needs sorting, so 'e' is never removed from 'edgeS'
 //          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
