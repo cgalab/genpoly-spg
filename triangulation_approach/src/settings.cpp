@@ -3,7 +3,7 @@
 /*
 	Polygon parameters
 */
-unsigned int Settings::nrInnerPolygons = 2;
+unsigned int Settings::nrInnerPolygons = 3;
 int Settings::outerSize = 100;
 std::vector<int> Settings::innerSizes;
 
@@ -42,7 +42,7 @@ Timer* Settings::timer = NULL;
 	Random generator
 */
 bool Settings::fixedSeed = false;
-unsigned int Settings::seed = 1423031642;
+unsigned int Settings::seed = 2051178898;
 RandomGenerator* Settings::generator = NULL;
 
 
@@ -59,7 +59,8 @@ void Settings::initSettings(){
 
 	// Generate the vector of sizes of the inner polygons
 	innerSizes.push_back(50);
-	innerSizes.push_back(50);
+	innerSizes.push_back(20);
+	innerSizes.push_back(30);
 
 	// Compute the number of translations for the initial polygon
 	if(initialSize < outerSize){

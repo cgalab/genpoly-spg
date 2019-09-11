@@ -5,7 +5,8 @@
 	with the vertices of the start polygon in regular shape, i.e. all vertices 
 	lay on a circle.
 	Afterwards the the start polygon is triangulated, i.e. the polygon edges are
-	added and the inner of the polygon is triangulated, then the polygon is boxed
+	added and the inner of the polygon is either just triangulated or filed with
+	the requested number of holes, then the polygon is boxed
 	by a square with a triangulation between the polygon and the square.
 
 	The radius of the start polygon, the number of vertices and the size of the
@@ -33,7 +34,7 @@ Triangulation *generateRegularPolygon(){
 	else{
 		generateInitialHoleTriangle(T);
 
-		if(Settings::nrInnerPolygons > 1)
+		for(i = 1; i < (int)Settings::nrInnerPolygons; i++)
 			splitHoleTriangle(T);
 	}
 
@@ -297,9 +298,19 @@ void generateInitialHoleTriangle(Triangulation *T){
 }
 
 
+/*
+	The function splitHoleTriangle() splits the latest generated triangular hole into
+	two triangular holes and places them as the latest holes in the vector of inner
+	polygons. It can be applied successively.
+
+	@param 	T 	The triangulation the polygons live in
+
+	Note:
+		For more information take a look at my Master Thesis
+*/
 void splitHoleTriangle(Triangulation *T){
 	int n;
-	double x0, x1, x2, y0, y1, y2;
+	double x0, x1, x2, y1, y2;
 	Vertex *v0, *v1, *v2;
 	TEdge *e0, *e1, *e2;
 	Vertex *n0, *n1, *n2;
@@ -337,7 +348,6 @@ void splitHoleTriangle(Triangulation *T){
 
 	// Get the coordinates of the triangle's vertices
 	x0 = (*v0).getX();
-	y0 = (*v0).getY();
 	x1 = (*v1).getX();
 	y1 = (*v1).getY();
 	x2 = (*v2).getX();
@@ -352,7 +362,7 @@ void splitHoleTriangle(Triangulation *T){
 	*/
 
 	// Generate the third vertex for the first polygon
-	n2 = new Vertex((x0 - x1) / 12, (x1 - x2) / 2);
+	n2 = new Vertex(fabs(x0 - x1) / 4 + x1, (y1 + y2) / 2);
 	(*T).addVertex(n2, n);
 
 	// Generate the edges and the triangle of the first polygon
@@ -367,57 +377,54 @@ void splitHoleTriangle(Triangulation *T){
 		GENERATE THE NEW POLYGON
 	*/
 
+	// Change the first vertex to the second polygon
+	(*T).changeVertex(0, n, n + 1);
+
 	// Generate the new vertices for the second polygon
-	n0 = new Vertex((x0 - x1) / 3, (y0 - y1) / 3);
-	n1 = new Vertex((x0 - x2) / 3, (y0 - y2) / 3);
+	n0 = new Vertex(2 * fabs(x0 - x1) / 3 + x1, y1 / 3);
+	n1 = new Vertex(2 * fabs(x0 - x2) / 3 + x2, y2 / 3);
 	(*T).addVertex(n0, n + 1);
 	(*T).addVertex(n1, n + 1);
 
-	// Change the first vertex to this polygon
-	(*T).changeVertex(0, n, n + 1);
-
 	// Generate the edges and the triangle of the second polygon
-	// TODO:
-	// Check orientation of the new polygon
-	p2e0 = new TEdge(v0, n0, EdgeType::POLYGON);
-	p2e1 = new TEdge(n0, n1, EdgeType::POLYGON);
-	p2e2 = new TEdge(n1, v0, EdgeType::POLYGON);
+	p2e0 = new TEdge(n0, v0, EdgeType::POLYGON);
+	p2e1 = new TEdge(n1, n0, EdgeType::POLYGON);
+	p2e2 = new TEdge(v0, n1, EdgeType::POLYGON);
 	(*T).addEdge(p2e0);
 	(*T).addEdge(p2e1);
 	(*T).addEdge(p2e2);
 	new Triangle(p2e0, p2e1, p2e2, v0, n0, n1);
 
 	// Add triangles to the outside
-	h0 = new TEdge(store1, n0);
+	h0 = new TEdge(store1, n1);
 	h1 = (*v0).getEdgeTo(store1);
 	(*T).addEdge(h0);
-	new Triangle(h0, h1, p2e0, v0, store1, n0);
+	new Triangle(h0, h1, p2e2, v0, store1, n1);
 
-	h1 = new TEdge(n0, v2);
+	h1 = new TEdge(n1, v2);
 	h2 = (*store1).getEdgeTo(v2);
 	(*T).addEdge(h1);
-	new Triangle(h0, h1, h2, store1, n0, v2);
+	new Triangle(h0, h1, h2, store1, n1, v2);
 
-	h0 = new TEdge(store0, n1);
+	h0 = new TEdge(store0, n0);
 	h1 = (*v0).getEdgeTo(store0);
 	(*T).addEdge(h0);
-	new Triangle(h0, h1, p2e2, v0, store0, n1);
+	new Triangle(h0, h1, p2e0, v0, store0, n0);
 
-	h1 = new TEdge(n1, v1);
+	h1 = new TEdge(n0, v1);
 	h2 = (*store0).getEdgeTo(v1);
 	(*T).addEdge(h1);
-	new Triangle(h0, h1, h2, store0, n1, v1);
+	new Triangle(h0, h1, h2, store0, n0, v1);
 
 	// Add triangles between the polygons
-	h0 = new TEdge(n0, n2);
-	h1 = new TEdge(n1, n2);
+	h0 = new TEdge(n1, n2);
+	h1 = new TEdge(n0, n2);
 	(*T).addEdge(h0);
 	(*T).addEdge(h1);
 	new Triangle(h0, h1, p2e1, n0, n1, n2);
 
-	new Triangle(h0, (*n0).getEdgeTo(v2), (*n2).getEdgeTo(v2), n0, n2, v2);
-	new Triangle(h1, (*n1).getEdgeTo(v1), (*n2).getEdgeTo(v1), n1, n2, v1);
-	// n2 = 23
+	new Triangle(h0, (*n1).getEdgeTo(v2), (*n2).getEdgeTo(v2), n1, n2, v2);
+	new Triangle(h1, (*n0).getEdgeTo(v1), (*n2).getEdgeTo(v1), n0, n2, v1);
 }
 
 

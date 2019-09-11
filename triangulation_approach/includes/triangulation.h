@@ -80,35 +80,35 @@ public:
 
 		SETTER:
 		
-		void 		addInnerPolygon(TPolygon *p)
-		void 		addVertex(Vertex *v, unsigned int pID)
-		void 		changeVertex(int i, unsigned int fromP, unsigned int toP)
-		void 		addEdge(TEdge *e)
-		void 		setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3)
+		void 			addInnerPolygon(TPolygon *p)
+		void 			addVertex(Vertex *v, unsigned int pID)
+		void 			changeVertex(int i, unsigned int fromP, unsigned int toP)
+		void 			addEdge(TEdge *e)
+		void 			setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3)
 
 		GETTER:
 
-		int 		getActualNrInnerPolygons()
-		int 		getTargetNumberOfVertices()
-		int 		getActualNumberOfVertices()
-		Vertex*		getVertex(int i, unsigned int pID)
-		Vertex* 	getVertex(int i)
+		unsgined int 	getActualNrInnerPolygons()
+		int 			getTargetNumberOfVertices()
+		int 			getActualNumberOfVertices()
+		Vertex*			getVertex(int i, unsigned int pID)
+		Vertex* 		getVertex(int i)
 
 		REMOVER:
 
-		void 		removeVertex(int index)
-		void 		removeEdge(TEdge *e)
+		void 			removeVertex(int index)
+		void 			removeEdge(TEdge *e)
 
 		PRINTER:
 
-		void 		print(const char *filename)
-		void 		printPolygon(const char *filename)
+		void 			print(const char *filename)
+		void 			printPolygon(const char *filename)
 
 		OTHERS:
 
-		bool 		check()
-		void 		stretch(double factor)
-		void		checkSimplicity()
+		bool 			check()
+		void 			stretch(double factor)
+		void			checkSimplicity()
 	*/
 
 
@@ -176,7 +176,7 @@ public:
 	/*
 		@return 	The actual number of inner polygons
 	*/
-	int getActualNrInnerPolygons();
+	unsigned int getActualNrInnerPolygons();
 
 	/*
 		@return		Final number of vertices the polygon will contain (including the vertices

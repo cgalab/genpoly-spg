@@ -103,7 +103,7 @@ void growPolygonBy(Triangulation *T, unsigned int pID, int n){
 		div = 1;
 
 	for(i = 0; i < n;){
-		
+
 		actualN = (*T).getActualNumberOfVertices(pID);
 
 		// Chose randomly an edge to insert in
@@ -113,7 +113,7 @@ void growPolygonBy(Triangulation *T, unsigned int pID, int n){
 
 		// Check whether the choosen edge fulfills the stability criteria for insertions
 		ok = (*in).checkStability();
-
+;
 		// Recognized when it is hard to find a suitable edge to insert in
 		if(!ok){
 			delete in;
@@ -128,7 +128,8 @@ void growPolygonBy(Triangulation *T, unsigned int pID, int n){
 		counter = 0;
 
 		// Execute the insertion and try to move the new vertex away from the edge
-		(*in).execute();		
+		(*in).execute();
+
 		(*in).translate();
 
 		delete in;

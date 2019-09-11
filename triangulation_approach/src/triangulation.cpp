@@ -126,7 +126,7 @@ void Triangulation::setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3)
 /*
 	@return 	The actual number of inner polygons
 */
-int Triangulation::getActualNrInnerPolygons(){
+unsigned int Triangulation::getActualNrInnerPolygons(){
 	return innerPolygons.size();
 }
 
@@ -240,7 +240,7 @@ void Triangulation::removeEdge(TEdge *e){
 void Triangulation::print(const char *filename){
 	FILE *f;
 	TEdge *e;
-	int scale = 2000;
+	int scale = 4000;
 
 	f = fopen(filename, "w");
 

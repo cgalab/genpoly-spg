@@ -39,9 +39,12 @@ int main(){
 	(*T).check();
 	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", Settings::initialSize, (*Settings::timer).elapsedTime());
 
-	(*T).print("triangulation_init.graphml");
 	growPolygonBy(T, 1, Settings::innerSizes[0] - 3);
+	printf("Grew first hole\n");
 	growPolygonBy(T, 2, Settings::innerSizes[1] - 3);
+	printf("Grew second hole\n");
+	growPolygonBy(T, 3, Settings::innerSizes[2] - 3);
+	printf("Grew third hole\n");
 	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
 	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, Settings::initialTranslationNumber, (*Settings::timer).elapsedTime());
 

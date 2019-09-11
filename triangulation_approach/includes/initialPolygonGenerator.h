@@ -19,7 +19,8 @@
 	with the vertices of the start polygon in regular shape, i.e. all vertices 
 	lay on a circle.
 	Afterwards the the start polygon is triangulated, i.e. the polygon edges are
-	added and the inner of the polygon is triangulated, then the polygon is boxed
+	added and the inner of the polygon is either just triangulated or filed with
+	the requested number of holes, then the polygon is boxed
 	by a square with a triangulation between the polygon and the square.
 
 	The radius of the start polygon, the number of vertices and the size of the
@@ -75,6 +76,16 @@ void initialTriangulationZigZag(Triangulation *T);
 void generateInitialHoleTriangle(Triangulation *T);
 
 
+/*
+	The function splitHoleTriangle() splits the latest generated triangular hole into
+	two triangular holes and places them as the latest holes in the vector of inner
+	polygons. It can be applied successively.
+
+	@param 	T 	The triangulation the polygons live in
+
+	Note:
+		For more information take a look at my Master Thesis
+*/
 void splitHoleTriangle(Triangulation *T);
 
 
