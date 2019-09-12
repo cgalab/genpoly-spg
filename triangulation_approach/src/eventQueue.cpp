@@ -377,10 +377,14 @@ bool EventQueue::makeStable(bool initial){
 			// Check first whether there is a third concurrent event
 			dif = fabs(time1 - e1 -> collapseTime);
 			if(dif < Settings::epsEventTime){
-				if(initial)
-					printf("Eventqueue: More than two events at the same time -> refused translation\n");
-				else
-					printf("Eventqueue: More than two events at the same time -> aborted translation\n");
+				if(Settings::feedback == FeedbackMode::VERBOSE){
+					if(initial)
+						printf("Eventqueue: More than two events at the same time -> \
+							refused translation\n");
+					else
+						printf("Eventqueue: More than two events at the same time -> \
+							aborted translation\n");
+				}
 				return false;
 			}
 

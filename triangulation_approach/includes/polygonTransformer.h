@@ -18,6 +18,7 @@
 #include "insertion.h"
 #include "settings.h"
 
+
 /*
 	The function transformPolygonByMoves() transforms a polygon by randomly chosing a
 	vertex and a direction to move and then randomly computing a distance to shift in
@@ -36,6 +37,7 @@
 */
 int transformPolygonByMoves(Triangulation *T, int iterations);
 
+
 /*
 	The function growPolygon() grows a polygon by n insertions.
 
@@ -47,3 +49,15 @@ int transformPolygonByMoves(Triangulation *T, int iterations);
 		This function works just for polygons without holes!
 */
 void growPolygonBy(Triangulation *T, unsigned int pID, int n);
+
+
+/*
+
+*/
+void strategyNoHoles0(Triangulation *T);
+
+
+/*
+
+*/
+void strategyWithHoles0(Triangulation *T);

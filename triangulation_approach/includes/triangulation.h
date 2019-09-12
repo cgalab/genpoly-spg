@@ -91,6 +91,7 @@ public:
 		unsgined int 	getActualNrInnerPolygons()
 		int 			getTargetNumberOfVertices()
 		int 			getActualNumberOfVertices()
+		int 			getActualNumberOfVertices(unsigned int pID)
 		Vertex*			getVertex(int i, unsigned int pID)
 		Vertex* 		getVertex(int i)
 

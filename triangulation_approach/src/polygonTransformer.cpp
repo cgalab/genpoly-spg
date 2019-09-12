@@ -1,5 +1,6 @@
 #include "polygonTransformer.h"
 
+
 /*
 	The function transformPolygonByMoves() transforms a polygon by randomly chosing a
 	vertex and a direction to move and then randomly computing a distance to shift in
@@ -81,6 +82,7 @@ int transformPolygonByMoves(Triangulation *T, int iterations){
 	return performedTranslations;
 }
 
+
 /*
 	The function growPolygon() grows a polygon by n insertions.
 
@@ -138,6 +140,125 @@ void growPolygonBy(Triangulation *T, unsigned int pID, int n){
 		i++;
 
 		if(i % div == 0 && Settings::feedback != FeedbackMode::LACONIC)
-			printf("%f%% of %d insertions performed after %f seconds \n", (double)i / (double)n * 100, n, (*Settings::timer).elapsedTime());
+			printf("%f%% of %d insertions performed after %f seconds \n", (double)i / (double)n * 100,
+				n, (*Settings::timer).elapsedTime());
 	}
+}
+
+
+/*
+
+*/
+void strategyNoHoles0(Triangulation *T){
+	int performed;
+
+	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
+	printf("Transformed initial polygon with %d of %d translations in %f \
+		seconds\n\n", performed, Settings::initialTranslationNumber,
+		(*Settings::timer).elapsedTime());
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation at the \
+			end of transforming the initial polygon\n");
+		exit(9);
+	}
+
+	(*T).print("triangulation_init.graphml");
+	(*T).printPolygonToDat("polygon_init.dat");
+
+	growPolygonBy(T, 0, Settings::outerSize - Settings::initialSize);
+	printf("Grew initial polygon to %d vertices afters %f seconds \n\n",
+		Settings::outerSize, (*Settings::timer).elapsedTime());
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation after growing the \
+			polygon\n");
+		exit(9);
+	}
+
+	performed = transformPolygonByMoves(T, Settings::outerSize * 10);
+	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed,
+		Settings::outerSize * 10, (*Settings::timer).elapsedTime());
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation at the end\n");
+		exit(9);
+	}
+
+	(*T).printPolygonToDat("polygon.dat");
+}
+
+
+/*
+
+*/
+void strategyWithHoles0(Triangulation *T){
+	int performed;
+	int nrInsertions;
+	int i, k;
+	int actualN;
+
+	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
+	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n",
+		performed, Settings::initialTranslationNumber, (*Settings::timer).elapsedTime());
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation at the \
+			end of transforming the initial polygon\n");
+		exit(9);
+	}
+
+	performed = 1;
+	k = 0;
+	while(performed != 0 && k < 20){
+		performed = 0;
+
+		// Double up the sizes of the inner polygons (if still possible)
+		for(i = 1; i <= Settings::nrInnerPolygons; i++){
+			
+			actualN = (*T).getActualNumberOfVertices(i);
+
+			if(Settings::innerSizes[i - 1] >= 2 * actualN)
+				nrInsertions = actualN;
+			else
+				nrInsertions = Settings::innerSizes[i - 1] - actualN;
+
+			growPolygonBy(T, i, nrInsertions);
+
+			performed = performed + nrInsertions;
+
+			if(nrInsertions != 0)
+				printf("Grew the inner polygon with ID %d by %d vertices to %d vertices\n\n",
+					i, nrInsertions, nrInsertions + actualN);
+		}
+
+		// Double up the size of the outer polygon
+		actualN = (*T).getActualNumberOfVertices(0);
+
+		if(Settings::outerSize >= 2 * actualN)
+			nrInsertions = actualN;
+		else
+			nrInsertions = Settings::outerSize - actualN;
+
+		growPolygonBy(T, 0, nrInsertions);
+
+		performed = performed + nrInsertions;
+
+		if(nrInsertions != 0)
+			printf("Grew outer polygon by %d vertices to %d vertices\n\n", nrInsertions,
+				nrInsertions + actualN);
+
+		k++;
+	}
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation after \
+			growing the initial polygon\n");
+		exit(9);
+	}
+
+	(*T).print("triangulation_init.graphml");
+	(*T).printPolygonToDat("polygon_init.dat");
+
+	(*T).printPolygonToDat("polygon.dat");
 }

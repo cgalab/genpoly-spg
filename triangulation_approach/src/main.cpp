@@ -4,8 +4,6 @@
 #include "triangulation.h"
 #include "polygonTransformer.h"
 #include "settings.h"
-#include "randomGenerator.h"
-#include "predicates.h"
 
 /*
 list of exit codes:
@@ -37,49 +35,15 @@ int main(){
 	T = generateRegularPolygon();
 
 	(*T).check();
-	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", Settings::initialSize, (*Settings::timer).elapsedTime());
+	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n",
+		Settings::initialSize, (*Settings::timer).elapsedTime());
 
-	growPolygonBy(T, 1, Settings::innerSizes[0] - 3);
-	printf("Grew first hole\n");
-	growPolygonBy(T, 2, Settings::innerSizes[1] - 3);
-	printf("Grew second hole\n");
-	growPolygonBy(T, 3, Settings::innerSizes[2] - 3);
-	printf("Grew third hole\n");
-	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
-	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, Settings::initialTranslationNumber, (*Settings::timer).elapsedTime());
-
-	if(!(*T).check()){
-		printf("Triangulation error: something is wrong in the triangulation at the end\n");
-		exit(9);
-	}
-
-	(*T).print("triangulation_init.graphml");
-	(*T).printPolygonToDat("polygon_init.dat");
-
-	
-	growPolygonBy(T, 0, Settings::outerSize - Settings::initialSize);
-	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", Settings::outerSize, (*Settings::timer).elapsedTime());
-
-	if(!(*T).check()){
-		printf("Triangulation error: something is wrong in the triangulation at the end\n");
-		exit(9);
-	}
-
-	performed = transformPolygonByMoves(T, 1000);
-	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed, 1000000, (*Settings::timer).elapsedTime());
-	printf("number of vertices: %d \n", (*T).getActualNumberOfVertices());
-	
-
-	if(!(*T).check()){
-		printf("Triangulation error: something is wrong in the triangulation at the end\n");
-		exit(9);
-	}
-
-	Vertex::printStats();
-	
-	(*T).print("triangulation.graphml");
-
-	(*T).printPolygonToDat("polygon.dat");
+	if(Settings::nrInnerPolygons == 0)
+		strategyNoHoles0(T);
+	else if(Settings::nrInnerPolygons == 1)
+		strategyWithHoles0(T);
+	else
+		strategyWithHoles0(T);
 	
 	exit(0);
 }

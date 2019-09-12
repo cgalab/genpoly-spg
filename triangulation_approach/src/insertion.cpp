@@ -104,15 +104,12 @@ void Insertion::execute(){
 	fromNewToOther1 = new TEdge(newV, other1);
 	(*T).addEdge(fromNewToOther0);
 	(*T).addEdge(fromNewToOther1);
-	printf("here 16\n");
-	(*other0).print();
-	(*other1).print();
+
 	// Generate the new triangles
 	new Triangle(fromV0ToNew, fromV0ToOther0, fromNewToOther0, v0, newV, other0);
 	new Triangle(fromV0ToNew, fromV0ToOther1, fromNewToOther1, v0, newV, other1);
 	new Triangle(fromV1ToNew, fromV1ToOther0, fromNewToOther0, v1, newV, other0);
 	new Triangle(fromV1ToNew, fromV1ToOther1, fromNewToOther1, v1, newV, other1);
-	printf("here 17\n");
 }
 
 /*
