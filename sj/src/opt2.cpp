@@ -39,28 +39,50 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   double val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
-  bool loop;
+  bool loop = false;
 //  bool debug=false;
   std::set<Edge> edgeS; // a set of edges.
+  unsigned int c_count_up=0, c_count_down=0, c_counter=0;
+  double circumference, c_last, c_comparison;
+  c_last = pol_calc_circumference(polygon, points);
+  c_comparison = c_last;
 
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
+    if (c_counter > 3) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
+    circumference = pol_calc_circumference(polygon, points);
+    if (circumference < c_last) {
+      if (c_count_up > 0 && c_last < c_comparison) c_comparison = c_last;
+      c_last = circumference;
+      ++c_count_down;
+      c_count_up = 0;
+    }
+    else {
+      ++c_count_up;
+      if (circumference == c_comparison) ++c_counter;
+      c_count_down = 0;
+    }
+    c_last = circumference;
+//    std::cerr << "c: " << circumference << ", c_counter: " << c_counter << ", c_c_u: " << c_count_up << ", c_c_d: " << c_count_down;
+//    std::cerr << ", c_l: " << c_last << ", c_comp: " << c_comparison << std::endl;
+
     loop = false;
     index = 0;
     decrementEdges(index, edgeS);
 
   	while (index < points.size()) {
 /*
-      if (index > 56270 && index < 56275) {
+      if (index > 40 || index < 47) {
         debug = true;
         std::cerr << std::endl << "edges in 'edgeS':" << std::endl;
         for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
       }
       else {debug = false;}
 */
-
+      //std::cerr << "polygon:" << std::endl;
+      //pdisplay(polygon, points);
       //loop ? std::cerr << "i: " << index << std::endl : std::cerr;
-      std::cerr << "i: " << index << std::endl;
+//      std::cerr << "i: " << index << std::endl;
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];
@@ -73,7 +95,8 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   		p3 = &points[polygon[after]];
 
       // construct the edges
-//      (debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
+      //(debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
+//      std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
       if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
         e1 = Edge (p1, p2, index);
         e2 = Edge (p1, p3, index);
@@ -86,11 +109,13 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
       }
 
       if (fabs(val3) == 0) {
-//        (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-        if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
-//          (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-          loop = true;
-          continue;
+        if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) { // no idea why but this is very important for solving collinearities
+//          (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+          if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
+//            (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+            loop = true;
+            continue;
+          }
         }
       }
 

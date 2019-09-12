@@ -30,9 +30,9 @@ public:
   void setI(unsigned int I) {i=I;}
   void setV(unsigned int V) {v=V;}
   void setL(unsigned int L) {l=L;}
-  void printCoord(){
-    printf("x=%f y=%f \n", x, y);
-  }
+  //void printCoord(){
+  //  printf("x=%f y=%f \n", x, y);
+  //}
 
   // function to compare 2 points based on y axis first, then x.
   bool lessY (const Point& s) const {

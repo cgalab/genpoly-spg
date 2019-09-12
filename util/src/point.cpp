@@ -4,6 +4,7 @@
 #include <assert.h> // for assert
 #include <math.h>
 #include <cmath> // for fabs()
+#include <iterator>     // std::next
 #include "point.h" // for Point class
 #include "pol.h" // for doFlip
 #include "edge.h"
@@ -95,7 +96,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
       double y_j = y_i - points[upper[j]].y;
       double a_j;
 
-      if (fabs(x_j) < EPSILON) a_j = (1 + signbit(y_j)*(-2))*INFINITY;
+      if (fabs(x_j) < EPSILON) a_j = (1 + std::signbit(y_j)*(-2))*INFINITY;
       else a_j = y_j/x_j;
 //      std::cerr << "j: " << j << ", p: " << points[upper[j]] << ", x_j: " << x_j << ", y_j: " << y_j << ", a_j: " << a_j << std::endl;
 
@@ -105,7 +106,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
         double y_next = points[upper[j+1]].y - points[upper[j]].y;
         double a_next;
 
-        if (fabs(x_next) < EPSILON) a_next = (1 + signbit(y_next)*(-2))*INFINITY ;
+        if (fabs(x_next) < EPSILON) a_next = (1 + std::signbit(y_next)*(-2))*INFINITY ;
         else a_next = y_next/x_next;
 //        std::cerr << "upper: next point: " << points[upper[j+1]] << ", x_next: " << x_next << ", y_next: " << y_next << ", a_next: " << a_next << std::endl;
 
@@ -135,7 +136,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
       double y_j = y_i - points[lower[j]].y;
       double a_j;
 
-      if (fabs(x_j) < EPSILON) a_j = (1 + signbit(y_j)*(-2))*INFINITY;
+      if (fabs(x_j) < EPSILON) a_j = (1 + std::signbit(y_j)*(-2))*INFINITY;
       else a_j = y_j/x_j;
 
 //      std::cerr << "j: " << j << ", p: " << points[upper[j]] << ", x_j: " << x_j << ", y_j: " << y_j << ", a_j: " << a_j << std::endl;
@@ -146,7 +147,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
         double y_next = points[lower[j+1]].y - points[lower[j]].y;
         double a_next;
 
-        if (fabs(x_next) < EPSILON) a_next = (1 + signbit(y_next)*(-2))*INFINITY;
+        if (fabs(x_next) < EPSILON) a_next = (1 + std::signbit(y_next)*(-2))*INFINITY;
         else a_next = y_next/x_next;
 //        std::cerr << "lower: next point: " << points[upper[j+1]] << ", x_next: " << x_next << ", y_next: " << y_next << ", a_next: " << a_next << std::endl;
 
@@ -181,7 +182,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
   // 'upper' and 'lower' both have the same start point, to return a CCW c.h.,
   // first add 'lower' to 'ch' then 'upper' minus the start
   ch.insert(ch.end(), lower.begin(), lower.end());
-  ch.insert(ch.end(), std::next(upper.rbegin()), std::prev(upper.rend()));
+  ch.insert(ch.end(), --upper.rbegin(), ++upper.rend());
 
   // make sure of the ordering
 	if (enforceCCWOrder) {
@@ -213,7 +214,7 @@ void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& 
     }
   }
 }
-/*
+
 // check for if p1 is a 'left' vertex compared to p2
 bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
   unsigned int lo, hi, left, right;
@@ -227,8 +228,10 @@ bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
     hi = (*p1).v;
     p1_left = false;
   }
+  //std::cerr << "lo: " << lo << ", hi: " << hi << ", p1_left: " << ((p1_left) ? "true" : "false") << std::endl;
   left = lo;
   right = lo + cycle;
+  //std::cerr << "left: " << left << ", right: " << right << std::endl;
 
   if (hi - left < right - hi) {
     if (p1_left) return false;
@@ -239,7 +242,7 @@ bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
     else return false;
   }
 }
-*/
+
 
 // check for if p1 is the incidental 'left' vertex compared to p2
 /*
@@ -252,7 +255,7 @@ bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
   return left < right;
 }
 */
-
+/*
 bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
   if ((*p1).v == 0) {
     if ((*p2).v == 1) return true;
@@ -263,7 +266,7 @@ bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
   if ((*p1).v < (*p2).v) return true;
   return false;
 }
-
+*/
 // check for if p1 is the incidental 'left' vertex compared to p2
 bool isPol1Left(Point *p1, Point *p2, unsigned int cycle) {
   if ((*p1).v == 0) {

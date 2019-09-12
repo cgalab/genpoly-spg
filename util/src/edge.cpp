@@ -16,7 +16,7 @@
 void decrementEdges(unsigned int index, std::set<Edge>& edgeS) {
 	std::set<Edge>::iterator it = edgeS.begin();
 	while (it != edgeS.end()) {
-		if ((*it).l_idx >= index) it = edgeS.erase(it);
+		if ((*it).l_idx >= index) edgeS.erase(it);
 		else ++it;
 	}
 }
@@ -217,7 +217,7 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	}
 	else {
 		// none of the determinants were 0, so just need to check the sign for intersection.
-		if ( (signbit(det_a) ^ signbit(det_b)) && (signbit(det_c) ^ signbit(det_d)) ) {
+		if ( (std::signbit(det_a) ^ std::signbit(det_b)) && (std::signbit(det_c) ^ std::signbit(det_d)) ) {
  			return IS_TRUE;
 		}
 		else return IS_FALSE;
@@ -299,7 +299,7 @@ enum intersect_t checkIntersection2(const Edge e1, const Edge e2) {
 	}
 	else {
 		// none of the determinants were 0, so just need to check the sign for intersection.
-		if ( (signbit(det_a) ^ signbit(det_b)) && (signbit(det_c) ^ signbit(det_d)) ) {
+		if ( (std::signbit(det_a) ^ std::signbit(det_b)) && (std::signbit(det_c) ^ std::signbit(det_d)) ) {
  			return IS_TRUE;
 		}
 		else return IS_FALSE;

@@ -52,7 +52,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsign
     if (*it != e) {
       std::cerr << "edge to be removed: " << e << std::endl;
       std::cerr << "it : " << *it << std::endl;
-      std::cout << "edges in 'edgeS':" << std::endl;
+      std::cerr << "edges in 'edgeS':" << std::endl;
       for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
     }
     assert(e == *it);
@@ -324,7 +324,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
     std::cerr << "e : " << e << std::endl;
     std::cerr << "retval.first : " << *retval.first << std::endl;
 	  std::cerr << "retval.second: " << retval.second << std::endl;
-    std::cout << "edges in 'edgeS':" << std::endl;
+    std::cerr << "edges in 'edgeS':" << std::endl;
     for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
    }
 
@@ -420,7 +420,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
   if (*retval.first != e) {
     std::cerr << "retval.first : " << *retval.first << std::endl;
 	   std::cerr << "retval.second: " << retval.second << std::endl;
-     std::cout << "edges in 'edgeS':" << std::endl;
+     std::cerr << "edges in 'edgeS':" << std::endl;
      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
    }
 
@@ -495,7 +495,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     // but if it's reversing and it hits an edge already in, earlier code should have caught it and removed it.
     std::cerr << "Error: Edge already exists in set!" << std::endl;
     std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
-//    std::cout << "edges in 'edgeS':" << std::endl;
+//    std::cerr << "edges in 'edgeS':" << std::endl;
 //    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
     valid = E_NOT_VALID;
   }
@@ -521,7 +521,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
   if (*retval.first != e) {
     std::cerr << "retval.first : " << *retval.first << std::endl;
 	   std::cerr << "retval.second: " << retval.second << std::endl;
-     std::cout << "edges in 'edgeS':" << std::endl;
+     std::cerr << "edges in 'edgeS':" << std::endl;
      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
    }
 */
@@ -596,7 +596,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     // but if it's reversing and it hits an edge already in, earlier code should have caught it and removed it.
     std::cerr << "Error: Edge already exists in set!" << std::endl;
     std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
-//    std::cout << "edges in 'edgeS':" << std::endl;
+//    std::cerr << "edges in 'edgeS':" << std::endl;
 //    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
     valid = E_NOT_VALID;
   }
@@ -622,7 +622,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, unsigned 
   if (*retval.first != e) {
     std::cerr << "retval.first : " << *retval.first << std::endl;
 	   std::cerr << "retval.second: " << retval.second << std::endl;
-     std::cout << "edges in 'edgeS':" << std::endl;
+     std::cerr << "edges in 'edgeS':" << std::endl;
      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
    }
 */
@@ -699,7 +699,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, unsigned 
     // but if it's reversing and it hits an edge already in, earlier code should have caught it and removed it.
     std::cerr << "Error: Edge already exists in set!" << std::endl;
     std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
-//    std::cout << "edges in 'edgeS':" << std::endl;
+//    std::cerr << "edges in 'edgeS':" << std::endl;
 //    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
     valid = E_NOT_VALID;
   }

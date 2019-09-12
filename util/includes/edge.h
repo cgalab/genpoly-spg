@@ -278,16 +278,16 @@ public:
       // 3P coll.
       else {
         // when one determinant is 0, the other (so to speak) completely describes the relationship between the edges
-        if (fabs(det1) == 0) return !signbit(det2);
-        if (fabs(det2) == 0) return !signbit(det1);
-        if (fabs(det3) == 0) return  signbit(det4);
-        if (fabs(det4) == 0) return  signbit(det3);
+        if (fabs(det1) == 0) return !std::signbit(det2);
+        if (fabs(det2) == 0) return !std::signbit(det1);
+        if (fabs(det3) == 0) return  std::signbit(det4);
+        if (fabs(det4) == 0) return  std::signbit(det3);
         // if yl == yr, but no determinants are 0, but a pair of determinants for one edge has the same sign.
-        if (!(signbit(det1) ^ signbit(det2))) return !(signbit(det1));
-        if (!(signbit(det3) ^ signbit(det4))) return  (signbit(det3));
+        if (!(std::signbit(det1) ^ std::signbit(det2))) return !(std::signbit(det1));
+        if (!(std::signbit(det3) ^ std::signbit(det4))) return  (std::signbit(det3));
         // if yl == yr, but the edges intersect
-        if (*p1 < *e.p1) return !signbit(det1);
-        else return signbit(det3);
+        if (*p1 < *e.p1) return !std::signbit(det1);
+        else return std::signbit(det3);
 
         std::cerr << "ERROR: Unexpected fallthrough in comparison!  yl == yr, this: " << *this << ", e: " << e << std::endl;
         std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;

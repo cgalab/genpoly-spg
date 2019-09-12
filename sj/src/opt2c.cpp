@@ -196,8 +196,29 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   bool loop, revert, rev_found;
 //  bool debug=false;
   std::set<Edge> edgeS, edgeS_old; // a sweep-line-status object.
+  unsigned int c_count_up=0, c_count_down=0, c_counter=0;
+  double circumference, c_last, c_comparison;
+  c_last = pol_calc_circumference(polygon, points);
+  c_comparison = c_last;
 
   do {
+  //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
+    if (c_counter > 3) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
+    circumference = pol_calc_circumference(polygon, points);
+    if (circumference < c_last) {
+      if (c_count_up > 0 && c_last < c_comparison) c_comparison = c_last;
+      c_last = circumference;
+      ++c_count_down;
+      c_count_up = 0;
+    }
+    else {
+      ++c_count_up;
+      if (circumference == c_comparison) ++c_counter;
+      c_count_down = 0;
+    }
+    c_last = circumference;
+  //    std::cerr << "c: " << circumference << ", c_counter: " << c_counter << ", c_c_u: " << c_count_up << ", c_c_d: " << c_count_down;
+  //    std::cerr << ", c_l: " << c_last << ", c_comp: " << c_comparison << std::endl;
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
 //    std::cerr << "looping" << std::endl;
     loop = false;

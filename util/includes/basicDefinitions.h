@@ -30,7 +30,8 @@ enum error {
   RUN_SIMPLE_CHECK = 18,
   CONVERT_FORMAT = 19,
   COINCIDENTAL_POINTS = 20,
-  COLLINEAR_POINTS = 21
+  COLLINEAR_POINTS = 21,
+  INFINITE_LOOP = 22
 };
 
 // the algorithms that should be selectable.
