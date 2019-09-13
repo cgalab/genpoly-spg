@@ -7,6 +7,7 @@
 #include <algorithm>    // std::sort
 #include <iterator> // for std:prev and std::next
 #include <assert.h>
+#include <map>
 #include "basicDefinitions.h"
 #include "basicFunctions.h"
 #include "point.h"
@@ -42,29 +43,22 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   bool loop;
 	//std::set<Edge, setComp> edgeS(comp); // a set of edges.
   std::set<Edge> edgeS; // a set of edges.
-  unsigned int c_count_up=0, c_count_down=0, c_counter=0;
-  double circumference, c_last, c_comparison;
-  c_last = pol_calc_circumference(polygon, points);
-  c_comparison = c_last;
+  double circumference;
+  std::map<double, unsigned int> circ, c_counter;
+  std::map<double, unsigned int>::iterator c_it;
 
   do {
-  //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
-    if (c_counter > 3) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
+//    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     circumference = pol_calc_circumference(polygon, points);
-    if (circumference < c_last) {
-      if (c_count_up > 0 && c_last < c_comparison) c_comparison = c_last;
-      c_last = circumference;
-      ++c_count_down;
-      c_count_up = 0;
+    c_it = circ.find(circumference);
+    if (c_it != circ.end()) {
+//      std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
+      if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
+      circ[circumference] = (*c_it).second +1;
     }
     else {
-      ++c_count_up;
-      if (circumference == c_comparison) ++c_counter;
-      c_count_down = 0;
+      circ[circumference] = 1;
     }
-    c_last = circumference;
-  //    std::cerr << "c: " << circumference << ", c_counter: " << c_counter << ", c_c_u: " << c_count_up << ", c_c_d: " << c_count_down;
-  //    std::cerr << ", c_l: " << c_last << ", c_comp: " << c_comparison << std::endl;
 
     loop = false;
     index = 0;
