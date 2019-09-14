@@ -15,7 +15,7 @@
 #include "pol.h"
 #include "opt2base.h"
 
-
+/*
 void print_enum(enum planesweep_t val) {
   switch (val) {
     case P_CLEAN:
@@ -31,7 +31,7 @@ void print_enum(enum planesweep_t val) {
       break;
   }
 }
-
+*/
 
 // 2opt version that reverses if an intersection is found, but continues if a collinearity is found as that cannot be solved locally.
 // i.e. the 'local' space of all collinearities isn't caught in one dimension by a planesweep.
@@ -89,7 +89,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     loop = false;
     revert = false;
     index = 0;
-    lowest_index = polygon.size();
+    lowest_index = points.size();
     //collinear_index = polygon.size();
     decrementEdges(edgeS);
 
