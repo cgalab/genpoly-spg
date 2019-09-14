@@ -215,7 +215,7 @@ bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   // sort the points into lo/mid/hi polygon order.
   std::vector<Point*> vert {a, b, c};
   sort(vert.begin(), vert.end(),
-    [&](Point * p1, Point * p2) -> bool {return isPolLeft(p1, p2, polygon.size());});
+    [&](Point * p1, Point * p2) -> bool {return isPol1Left(p1, p2, polygon.size());});
 
   unsigned int arr[] = {(*vert[0]).v, (*vert[1]).v, (*vert[2]).v};
 /*
@@ -258,7 +258,7 @@ bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   // sort the points into lo/mid/hi polygon order.
   std::vector<Point*> vert {a, b, c};
   sort(vert.begin(), vert.end(),
-    [&](Point * p1, Point * p2) -> bool {return isPolLeft(p1, p2, polygon.size());});
+    [&](Point * p1, Point * p2) -> bool {return isPol1Left(p1, p2, polygon.size());});
 
   unsigned int arr[] = {(*vert[0]).v, (*vert[1]).v, (*vert[2]).v};
 /*
@@ -373,20 +373,20 @@ bool coll4Swap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned 
 //  for (unsigned int i = 0; i < lex.size();++i) std::cerr << "lex[" << i << "]: " << *lex[i] << std::endl;
 
   // sort the points into polygon order.
-  std::vector<Point*> vert {e1.p1, e1.p2, e2.p1, e2.p2};
-  sort(vert.begin(), vert.end(),
-    [&](Point * p1, Point * p2) -> bool {return isPolLeft(p1, p2, polygon.size());});
-
-  unsigned int arr[] = {(*vert[0]).v, (*vert[1]).v, (*vert[2]).v, (*vert[3]).v};
-
-//  for (unsigned int i = 0; i < lex.size();++i) std::cerr << "arr[" << i << "]: " << arr[i] << std::endl;
+  std::vector<unsigned int> vert {(*e1.p1).v, (*e1.p2).v, (*e2.p1).v, (*e2.p2).v};
+  sort(vert.begin(), vert.end());//,
+    //[&](Point * p1, Point * p2) -> bool {return isPolLeft(p1, p2, polygon.size());});
+  if ((vert[0] == 0) && vert[vert.size()-1] == points.size()-1) {
+    vert.pop_back();
+    vert.insert(vert.begin(), points.size()-1);
+  }
 
   // then assign the proper 'vert' order to the 'lex' ordered points
   for (unsigned int i = 0; i < lex.size(); ++i) {
-    if (*lex[i] != *vert[i]) {
+    if ((*lex[i]).v != vert[i]) {
       eraseVertexFromSet(lex[i], edgeS, polygon, points);
-      eraseVertexFromSet(vert[i], edgeS, polygon, points);
-      (*lex[i]).v = arr[i];
+      eraseVertexFromSet(&points[polygon[vert[i]]], edgeS, polygon, points);
+      (*lex[i]).v = vert[i];
       polygon[(*lex[i]).v] = (*lex[i]).i;
       retval = true;
     }
@@ -515,25 +515,23 @@ bool coll4Swap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned 
   }
 */
   // sort the points into polygon order.
-  std::vector<Point*> vert {e1.p1, e1.p2, e2.p1, e2.p2};
-  sort(vert.begin(), vert.end(),
-    [&](Point * p1, Point * p2) -> bool {return isPolLeft(p1, p2, polygon.size());});
-
-  unsigned int arr[] = {(*vert[0]).v, (*vert[1]).v, (*vert[2]).v, (*vert[3]).v};
-/*
-  for (unsigned int i = 0; i < lex.size();++i) {
-    std::cerr << "arr[" << i << "]: " << arr[i] << std::endl;
+  std::vector<unsigned int> vert {(*e1.p1).v, (*e1.p2).v, (*e2.p1).v, (*e2.p2).v};
+  sort(vert.begin(), vert.end());//,
+  //[&](Point * p1, Point * p2) -> bool {return isPolLeft(p1, p2, polygon.size());});
+  if ((vert[0] == 0) && vert[vert.size()-1] == points.size()-1) {
+    vert.pop_back();
+    vert.insert(vert.begin(), points.size()-1);
   }
-*/
+
   // then assign the proper 'vert' order to the 'lex' ordered points
   for (unsigned int i = 0; i < lex.size(); ++i) {
-    if (lex[i].v != arr[i]) {
+    if (lex[i].v != vert[i]) {
       eraseVertexFromSet(&points[lex[i].i], edgeS, polygon, points);
       update_lowest_index(&points[lex[i].i], lowest_index, polygon, points);
-      eraseVertexFromSet(&points[polygon[arr[i]]], edgeS, polygon, points);
-      update_lowest_index(&points[polygon[arr[i]]], lowest_index, polygon, points);
-      points[lex[i].i].v = arr[i];
-      polygon[arr[i]] = lex[i].i;
+      eraseVertexFromSet(&points[polygon[vert[i]]], edgeS, polygon, points);
+      update_lowest_index(&points[polygon[vert[i]]], lowest_index, polygon, points);
+      points[lex[i].i].v = vert[i];
+      polygon[vert[i]] = lex[i].i;
       retval = true;
     }
   }
@@ -580,27 +578,25 @@ bool coll4Swap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned 
   }
 */
   // sort the points into polygon order.
-  std::vector<Point*> vert {e1.p1, e1.p2, e2.p1, e2.p2};
-  sort(vert.begin(), vert.end(),
-    [&](Point * p1, Point * p2) -> bool {return isPolLeft(p1, p2, polygon.size());});
-
-  unsigned int arr[] = {(*vert[0]).v, (*vert[1]).v, (*vert[2]).v, (*vert[3]).v};
-/*
-  for (unsigned int i = 0; i < lex.size();++i) {
-    std::cerr << "arr[" << i << "]: " << arr[i] << std::endl;
+  std::vector<unsigned int> vert {(*e1.p1).v, (*e1.p2).v, (*e2.p1).v, (*e2.p2).v};
+  sort(vert.begin(), vert.end());//,
+  //[&](Point * p1, Point * p2) -> bool {return isPolLeft(p1, p2, polygon.size());});
+  if ((vert[0] == 0) && vert[vert.size()-1] == points.size()-1) {
+    vert.pop_back();
+    vert.insert(vert.begin(), points.size()-1);
   }
-*/
+
   // then assign the proper 'vert' order to the 'lex' ordered points
   for (unsigned int i = 0; i < lex.size(); ++i) {
-    if (lex[i].v != arr[i]) {
+    if (lex[i].v != vert[i]) {
       eraseVertexFromSet(&points[lex[i].i], edgeS, polygon, points);
       update_lowest_index(&points[lex[i].i], lowest_index, polygon, points);
       update_highest_index(&points[lex[i].i], highest_index, polygon, points);
-      eraseVertexFromSet(&points[polygon[arr[i]]], edgeS, polygon, points);
-      update_lowest_index(&points[polygon[arr[i]]], lowest_index, polygon, points);
-      update_highest_index(&points[polygon[arr[i]]], highest_index, polygon, points);
-      points[lex[i].i].v = arr[i];
-      polygon[arr[i]] = lex[i].i;
+      eraseVertexFromSet(&points[polygon[vert[i]]], edgeS, polygon, points);
+      update_lowest_index(&points[polygon[vert[i]]], lowest_index, polygon, points);
+      update_highest_index(&points[polygon[vert[i]]], highest_index, polygon, points);
+      points[lex[i].i].v = vert[i];
+      polygon[vert[i]] = lex[i].i;
       retval = true;
     }
   }

@@ -217,30 +217,31 @@ void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& 
 
 // check for if p1 is a 'left' vertex compared to p2
 bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
-  unsigned int lo, hi, left, right;
-  bool p1_left;
+  unsigned int lo, hi, left, right, dist_left, dist_right;
+  bool p1_hi;
   if ((*p1).v < (*p2).v) {
     lo = (*p1).v;
-    hi = (*p2).v;
-    p1_left = true;
+    hi = (*p2).v; // 'hi' is the center with distance to 'lo' calculated on 'left' and 'right' side
+    p1_hi = false;
   } else {
     lo = (*p2).v;
     hi = (*p1).v;
-    p1_left = false;
+    p1_hi = true;
   }
-  //std::cerr << "lo: " << lo << ", hi: " << hi << ", p1_left: " << ((p1_left) ? "true" : "false") << std::endl;
-  left = lo;
-  right = lo + cycle;
-  //std::cerr << "left: " << left << ", right: " << right << std::endl;
+//  std::cerr << "lo: " << lo << ", hi: " << hi << ", p1_hi: " << ((p1_hi) ? "true" : "false") << std::endl;
+  left = lo;  // value of 'lo' to the left of 'hi'
+  right = lo + cycle; // value of 'lo' to the right of 'hi'
+  dist_left = hi - left;
+  dist_right = right - hi;
+//  std::cerr << "left: " << left << ", right: " << right << std::endl;
+//  std::cerr << "dist_left: " << dist_left << ", dist_right: " << dist_right << std::endl;
 
-  if (hi - left < right - hi) {
-    if (p1_left) return false;
-    else return true;
+  if (dist_left < dist_right) {  // if 'hi' has a shorter distance to the left
+    if (p1_hi) return true;      // if p1 is the 'hi' point
+    return false;
   }
-  else {
-    if (p1_left) return true;
-    else return false;
-  }
+  if (p1_hi) return false;      // you only get here if shorter distance is to the right.
+  return false;
 }
 
 
