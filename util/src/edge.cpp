@@ -13,12 +13,8 @@
 
 
 // function to remove edges from 'edgeS' up to and including value of 'index'
-void decrementEdges(unsigned int index, std::set<Edge>& edgeS) {
-	std::set<Edge>::iterator it = edgeS.begin();
-	while (it != edgeS.end()) {
-		if ((*it).l_idx >= index) edgeS.erase(it);
-		else ++it;
-	}
+void decrementEdges(std::set<Edge>& edgeS) {
+	edgeS.clear();
 }
 
 // this function should be used to guarantee removal of an edge from the 'edgeS' set.

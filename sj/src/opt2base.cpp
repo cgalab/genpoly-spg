@@ -76,7 +76,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsign
       if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
         if (coll4Swap(before, after, edgeS, polygon, points)) {
-          //std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
+//          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
           valid = E_COLLINEAR;
         }
       }
@@ -397,7 +397,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
   else {
     // edge already existed in set.
     // this can happen if an index was reset when inserting 'e2' and we're dealing with insertion of e1 again.
-    std::cerr << "Error: Edge already exists in set! : " << *retval.first << std::endl;
+//    std::cerr << "Error: Edge already exists in set! : " << *retval.first << std::endl;
     valid = E_NOT_VALID;
   }
   retval2.first = valid;

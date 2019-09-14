@@ -64,11 +64,13 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
   bool loop, revert;
-//  bool debug=false;
+//  bool debug=true;
   std::set<Edge> edgeS; // a sweep-line-status object.
   double circumference;
   std::map<double, unsigned int> circ, c_counter;
   std::map<double, unsigned int>::iterator c_it;
+
+  collinear_index = points.size();
 
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
@@ -88,8 +90,8 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     revert = false;
     index = 0;
     lowest_index = polygon.size();
-    collinear_index = polygon.size();
-    decrementEdges(index, edgeS);
+    //collinear_index = polygon.size();
+    decrementEdges(edgeS);
 
   	while (index < points.size()) {
 /*

@@ -57,7 +57,7 @@ enum error opt2d(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     revert = false;
     index = 0;
     lowest_index = polygon.size();
-    decrementEdges(index, edgeS);
+    decrementEdges(edgeS);
 
 //    std::cerr << "New loop" << std::endl;
   	while (index < points.size()) {

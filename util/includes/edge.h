@@ -250,12 +250,10 @@ public:
 
     if (yl == yr) {
 //      std::cerr << "yl == yr" << std::endl;
-      double det1, det2, det3, det4;
+      double det1, det2;
       det1 = (*this).det(*e.p1);
       det2 = (*this).det(*e.p2);
-      det3 = e.det(*p1);
-      det4 = e.det(*p2);
-//      std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
+//      std::cerr << "det1: " << det1 << ", det2: " << det2 << std::endl;
 /*
       // Shewchuks predicates
       point pa, pb, pc, pd;
@@ -277,6 +275,9 @@ public:
       }
       // 3P coll.
       else {
+        double det3, det4;
+        det3 = e.det(*p1);
+        det4 = e.det(*p2);
         // when one determinant is 0, the other (so to speak) completely describes the relationship between the edges
         if (fabs(det1) == 0) return !std::signbit(det2);
         if (fabs(det2) == 0) return !std::signbit(det1);
@@ -441,7 +442,7 @@ public:
 	}
 };
 
-void decrementEdges(unsigned int index, std::set<Edge>& edgeS);
+void decrementEdges(std::set<Edge>& edgeS);
 bool eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS);
 void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 //void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points, unsigned int randseed);

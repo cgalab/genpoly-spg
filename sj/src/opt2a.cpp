@@ -62,7 +62,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
     loop = false;
     index = 0;
-    decrementEdges(index, edgeS);
+    decrementEdges(edgeS);
 
 //    std::cerr << "New loop" << std::endl;
   	while (index < points.size()) {
