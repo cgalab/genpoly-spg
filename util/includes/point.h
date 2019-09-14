@@ -113,8 +113,8 @@ public:
 
     bool operator()(int i, int j)
     {
-      if (fabs(value_vector[i].x - value_vector[j].x) < EPSILON) {
-        if (fabs(value_vector[i].y - value_vector[j].y) < EPSILON) return false;
+      if (fabs(value_vector[i].x - value_vector[j].x) == 0) {
+        if (fabs(value_vector[i].y - value_vector[j].y) == 0) return false;
         else return (value_vector[i].y < value_vector[j].y);
       }
       else return (value_vector[i].x < value_vector[j].x);
