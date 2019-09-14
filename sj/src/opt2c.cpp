@@ -201,6 +201,8 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   std::map<double, unsigned int> circ, c_counter;
   std::map<double, unsigned int>::iterator c_it;
 
+  collinear_index = points.size();
+
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     circumference = pol_calc_circumference(polygon, points);
@@ -220,9 +222,9 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     rev_found = false;
     index = 0;
     lowest_index = points.size();
-    collinear_index = points.size();
+    //collinear_index = points.size();
     old_index = points.size();
-    decrementEdges(index, edgeS);
+    decrementEdges(edgeS);
 
   	while (index < points.size()) {
 /*

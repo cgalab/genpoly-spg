@@ -47,7 +47,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   Point p4 = Point(0,0,3,3);
   p4.l = 4;
 
-  std::cerr << std::setprecision(15);
+  std::cerr << std::setprecision(17);
   std::cerr << "=== Point comparison tests ===" << std::endl;
 
   p1.set(1,1);
@@ -78,8 +78,23 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << p1 << " == " << p2 << ", should be false: " << ((p1 == p2) ? "true" : "false") << std::endl;
   std::cerr << p1 << " != " << p2 << ", should be true : " << ((p1 != p2) ? "true" : "false") << std::endl;
 
-  std::cerr << std::endl;
+  p1.set(-0.5864844941069559,  -0.5519586413083573);
+  p2.set(-0.5864844941069558,  -0.6199163586916429);
+  std::cerr << p1 << "  < " << p2 << ", should be true: " << ((p1 < p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  > " << p2 << ", should be false: " << ((p1 > p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " == " << p2 << ", should be false : " << ((p1 == p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " != " << p2 << ", should be true: " << ((p1 != p2) ? "true" : "false") << std::endl;
+  std::cerr << p2 << "  < " << p1 << ", should be false: " << ((p2 < p1) ? "true" : "false") << std::endl;
+  std::cerr << p2 << "  > " << p1 << ", should be true : " << ((p2 > p1) ? "true" : "false") << std::endl;
+  std::cerr << p2 << " == " << p1 << ", should be false: " << ((p2 == p1) ? "true" : "false") << std::endl;
+  std::cerr << p2 << " != " << p1 << ", should be true : " << ((p2 != p1) ? "true" : "false") << std::endl;
 
+  std::cerr << std::endl;
+  std::cerr << "=== Double Comparisons ===" << std::endl;
+
+  std::cerr << p1.x << " < " << p2.x << ", should be true: " << ((p1.x < p2.x) ? "true" : "false") << std::endl;
+
+  std::cerr << std::endl;
   std::cerr << "=== Edge comparisons ===" << std::endl;
 
   p1.set(118532,919572,32577,48380,32577);
