@@ -176,10 +176,9 @@ public:
   	}
   	else {
   		double slope = (P2.y-P1.y) / (P2.x-P1.x);
-  		double bias = P1.y - slope*P1.x;
+  		double bias = P2.y - slope*P2.x;
   		double val = slope * x + bias;
-  		if (fabs(val) == 0) y.set(0);
-  		else y.set(val);
+  		y.set(val);
   		y.setX(x);
   	}
   	return y;
@@ -246,6 +245,7 @@ public:
     else {s = (*p1).x;}
     yl = (*this).getYatX(s);
     yr = e.getYatX(s);
+//    std::cerr << "this: " << *this << ", e: " << e << std::endl;
 //    std::cerr << "s: " << s << ", yl: " << yl << ", yr: " << yr << std::endl;
 
     if (yl == yr) {
