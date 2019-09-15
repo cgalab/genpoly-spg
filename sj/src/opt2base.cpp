@@ -137,7 +137,7 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, std::set<Edg
     edgeS.erase(it);
 
     if (bef && af) {
-      //std::cerr << "before: " << before << ", after: " << after << std::endl;
+//      std::cerr << "before: " << before << ", after: " << after << std::endl;
       isval = checkIntersection(before, after);
       if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
@@ -471,7 +471,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {
-//        std::cerr << "collinearity between:" << e << " and after: " << after << std::endl;
+//        std::cerr << "4P collinearity between:" << e << " and after: " << after << std::endl;
         if (coll4Swap(e, after, edgeS, polygon, points, lowest_index)) {
 //          std::cerr << "coll. after swap: " << e << " and " << after << std::endl;
           valid = E_COLLINEAR;
@@ -556,7 +556,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
         }
       }
       else {
-//        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
         edgeS.erase(retval.first);
         eraseEdgeFromSet(before, edgeS);
         flip(e, before, polygon, points);
@@ -579,7 +579,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
         }
       }
       else {
-//        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
+        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
         edgeS.erase(retval.first);
         eraseEdgeFromSet(after, edgeS);
         //removeEdgeFromSetb(e, edgeS, polygon, points);

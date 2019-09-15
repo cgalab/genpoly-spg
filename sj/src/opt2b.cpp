@@ -31,6 +31,25 @@ void print_enum(enum planesweep_t val) {
       break;
   }
 }
+
+void print_enum(enum edge_t val) {
+  switch (val) {
+    case E_VALID:
+      std::cerr << "E_VALID";
+      break;
+    case E_INTERSECTION:
+      std::cerr << "E_INTERSECTION";
+      break;
+    case E_COLLINEAR:
+      std::cerr << "E_COLLINEAR";
+      break;
+    case E_NOT_VALID:
+      std::cerr << "E_NOT_VALID";
+      break;
+    default:
+      break;
+  }
+}
 */
 
 // 2opt version that reverses if an intersection is found, but continues if a collinearity is found as that cannot be solved locally.
@@ -64,7 +83,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
   bool loop, revert;
-//  bool debug=true;
+//  bool debug=false;
   std::set<Edge> edgeS; // a sweep-line-status object.
   double circumference;
   std::map<double, unsigned int> circ, c_counter;
@@ -94,15 +113,15 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     decrementEdges(edgeS);
 
   	while (index < points.size()) {
-/*
-      if (index > 105 && index < 110) {
-        debug = true;
-        std::cerr << std::endl << "edges in 'edgeS':" << std::endl;
-        for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
-      }
-      else debug = false;
-*/
-//      std::cerr << "i: " << index << ", l_i: " << lowest_index << ", c_i: " << collinear_index << ", loop: " << loop << ", rev: " << ((revert) ? "T" : "F") << ", p_status: ";print_enum(p_status); std::cerr << std::endl;
+
+  //    if (index > 3437 && index < 3503) {
+  //      debug = true;
+  //      std::cerr << std::endl << "edges in 'edgeS':" << std::endl;
+  //      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+  //    }
+  //    else debug = false;
+
+  //    if (debug) {std::cerr << "i: " << index << ", l_i: " << lowest_index << ", c_i: " << collinear_index << ", loop: " << loop << ", rev: " << ((revert) ? "T" : "F") << ", p_status: ";print_enum(p_status); std::cerr << std::endl;}
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];
@@ -114,7 +133,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   		p3 = &points[polygon[after]];
 
       // construct the edges
-//      (debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
+  //    (debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
       // collinearity was found, force advancing right.
       if (p_status == P_DIRTY_RIGHT) {
         if (*p2 < *p3) {
@@ -161,16 +180,16 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       {
 //        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
         val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
+//        (debug) ? std::cerr << "val1: " << val1.first << std::endl : std::cerr;
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) { // intersection found in the removal, skip the rest and restart.
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
-          //if ((revert && (*e2.p1 == *p1)) || (!revert && (*e2.p2 == *p1)))
-          //if (!(revert ^ (*p1 == *e2.p1)))
           if ( ((p_status == P_CLEAN) && !(revert ^ (*p1 == *e2.p1)))
             || ((p_status == P_DIRTY_RIGHT) && (*p1 == *e2.p2))
             || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e2.p1)) )
           {
             val1_2 = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+//            (debug) ? std::cerr << "val1_2: " << val1_2 << std::endl : std::cerr;
             if (val1_2 == E_NOT_VALID) break; // the other conditions would be handled when handling 'e2' properly.  This error though has priority.
           }
           if (val1.first == E_COLLINEAR) {
@@ -202,6 +221,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
 //        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
         val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);
+//        (debug) ? std::cerr << "val1: " << val1.first << std::endl : std::cerr;
         if (val1.first == E_NOT_VALID) break;
         if (val1.first == E_COLLINEAR) {
           loop=true;
@@ -224,6 +244,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       {
 //        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
         val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+//        (debug) ? std::cerr << "val2: " << val2.first << std::endl : std::cerr;
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_COLLINEAR) {
           loop=true;
@@ -240,6 +261,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       else {
 //        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
         val2 = processEdgeb(e2, lowest_index, edgeS, polygon, points);
+//        (debug) ? std::cerr << "val2: " << val2.first << std::endl : std::cerr;
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_INTERSECTION) {
           // if e1 was inserted "in front of" the index, it needs to be removed.
@@ -249,6 +271,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
           //{
           //std::cerr << "removing e1: " << e1 << std::endl;
           val2_1 = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
+//          (debug) ? std::cerr << "val2_1: " << val2_1 << std::endl : std::cerr;
           if (val2_1 == E_NOT_VALID) break;
           //}
           loop=true;

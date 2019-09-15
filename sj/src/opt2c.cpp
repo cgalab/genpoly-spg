@@ -62,7 +62,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
   bool loop, revert, rev_found;
-//  bool debug=false;
+//  bool debug=true;
   std::set<Edge> edgeS, edgeS_old; // a sweep-line-status object.
   double circumference;
   std::map<double, unsigned int> circ, c_counter;
@@ -102,7 +102,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       }
       else debug = false;
 */
-      std::cerr << "i: " << index << ", l_i: " << lowest_index << ", c_i: " << collinear_index << ", o_i:" << old_index << ", loop: " << loop << ", rev: " << ((revert) ? "T" : "F") << ", rev_found: " << ((rev_found) ? "T" : "F") << ", p_status: ";print_enum(p_status); std::cerr << std::endl;
+//      std::cerr << "i: " << index << ", l_i: " << lowest_index << ", c_i: " << collinear_index << ", o_i:" << old_index << ", loop: " << loop << ", rev: " << ((revert) ? "T" : "F") << ", rev_found: " << ((rev_found) ? "T" : "F") << ", p_status: ";print_enum(p_status); std::cerr << std::endl;
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];

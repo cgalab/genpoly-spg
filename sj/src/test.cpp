@@ -206,6 +206,28 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
   std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
 
+  p1.set(0.1624848962148917, -0.4609824302726415, 89,0,0);
+  p2.set(0.1630934538786164, -0.4615909879363671, 91,0,0);
+  p3.set(0.1618763385511670, -0.4603738726089159, 85,0,0);
+  p4.set(0.1630934538786164, -0.4615909879363671, 91,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(0.1618763385511670, -0.4603738726089159, 85,0,0);
+  p2.set(0.1630934538786164, -0.4615909879363671, 91,0,0);
+  p3.set(0.1624848962148917, -0.4609824302726415, 89,0,0);
+  p4.set(0.1637020115423411, -0.4981044477599457, 97,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
   std::cerr << std::endl;
   std::cerr << "=== checkIntersection tests ===" << std::endl;
   std::cerr << "=== 'should be true' is a comparison 'itest >= IS_TRUE' : true when intersection exists ===" << std::endl;
