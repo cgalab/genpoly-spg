@@ -250,10 +250,12 @@ public:
 
     if (yl == yr) {
 //      std::cerr << "yl == yr" << std::endl;
-      double det1, det2;
+      double det1, det2, det3, det4;
       det1 = (*this).det(*e.p1);
       det2 = (*this).det(*e.p2);
-//      std::cerr << "det1: " << det1 << ", det2: " << det2 << std::endl;
+      det3 = e.det(*p1);
+      det4 = e.det(*p2);
+//      std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
 /*
       // Shewchuks predicates
       point pa, pb, pc, pd;
@@ -267,18 +269,23 @@ public:
 */
 
       // 4P coll.
-      if ((fabs(det1) == 0) && (fabs(det2) == 0)) {
+      if (fabs(det1)+fabs(det2)+fabs(det3)+fabs(det4) == 0) {
 //        std::cerr << "4Pc: " << std::endl;
         if (*p1 == *e.p1) return *p2 < *e.p2;
 //        std::cerr << *p1 << " < " << *e.p1 << " : " << ((*p1 < *e.p1) ? "true" : "false") << std::endl;
         return *p1 < *e.p1;
       }
-      // 3P coll.
+      // 3P coll.  Some determinant wasn't 0
       else {
-        double det3, det4;
-        det3 = e.det(*p1);
-        det4 = e.det(*p2);
         // when one determinant is 0, the other (so to speak) completely describes the relationship between the edges
+        if (fabs(det1) + fabs(det2) == 0) {
+          if (fabs(det3) == 0) return  std::signbit(det4);
+          if (fabs(det4) == 0) return  std::signbit(det3);
+        }
+        if (fabs(det3) + fabs(det4) == 0) {
+          if (fabs(det1) == 0) return !std::signbit(det2);
+          if (fabs(det2) == 0) return !std::signbit(det1);
+        }
         if (fabs(det1) == 0) return !std::signbit(det2);
         if (fabs(det2) == 0) return !std::signbit(det1);
         if (fabs(det3) == 0) return  std::signbit(det4);
