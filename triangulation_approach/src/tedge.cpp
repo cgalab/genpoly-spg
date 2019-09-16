@@ -271,6 +271,8 @@ void TEdge::print(){
 	else tp = "TRIANGULATION";
 
 	printf("Edge %llu from vertex %llu to vertex %llu of type %s \n", id, (*v0).getID(), (*v1).getID(), tp.c_str());
+	(*v0).print();
+	(*v1).print();
 }
 
 

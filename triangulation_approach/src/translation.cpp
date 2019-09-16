@@ -146,6 +146,7 @@ bool Translation::insideQuadrilateral(Vertex *v){
 	double maxX, x;
 	int count = 0;
 	IntersectionType intersection;
+	bool vertexInt = false;
 
 	// Find maximum x value
 	maxX = (*oldV).getX();
@@ -170,23 +171,38 @@ bool Translation::insideQuadrilateral(Vertex *v){
 	dummyEdge = new TEdge(v, dummyVertex);
 
 	// Count the intersection
-	// TODO:
-	// Maybe using an epsilon here in checkIntersection makes no sense
 	intersection = checkIntersection(dummyEdge, prevOldE, false);
+	if(intersection == IntersectionType::VERTEX)
+		vertexInt = true;
 	if(intersection != IntersectionType::NONE)
 		count++;
+
 	intersection = checkIntersection(dummyEdge, nextOldE, false);
+	if(intersection == IntersectionType::VERTEX)
+		vertexInt = true;
 	if(intersection != IntersectionType::NONE)
 		count++;
+
 	intersection = checkIntersection(dummyEdge, prevNewE, false);
+	if(intersection == IntersectionType::VERTEX)
+		vertexInt = true;
 	if(intersection != IntersectionType::NONE)
 		count++;
+
 	intersection = checkIntersection(dummyEdge, nextNewE, false);
+	if(intersection == IntersectionType::VERTEX)
+		vertexInt = true;
 	if(intersection != IntersectionType::NONE)
 		count++;
 
 	delete dummyEdge;
 	delete dummyVertex;
+
+	// If there was any intersection of type vertex return false, so the translation gets
+	// refused. The point is, for an vertex intersection we can not say anything for sure
+	// espacially as the dummeEdge could just intersect with any point of the quadrilateral.
+	if(vertexInt)
+		return false;
 
 	if(count % 2 == 1)
 		return true;

@@ -342,6 +342,9 @@ void Triangulation::stretch(double factor){
 	Note:
 		This function does not consider edges of other polygons!
 */
+// TODO:
+// This function finds maybe non-simplicities that do not really exist. We should check again
+// whether maybe we get better results by setting the epsInt to 0.
 void Triangulation::checkSimplicity(){
 	Vertex *v, *u, *w;
 	TEdge *toCheck; // The edge which is compared to all others at the moment
@@ -378,8 +381,12 @@ void Triangulation::checkSimplicity(){
 			
 			type = checkIntersection(toCheck, otherEdge, true);
 
-			if(type != IntersectionType::NONE)
+			if(type != IntersectionType::NONE){
+				printf("Found intersection of type: %d \n", (int)type);
+				(*toCheck).print();
+				(*otherEdge).print();
 				exit(11);
+			}
 
 			// Get the next edge to check with
 			w = (*w).getNext();
