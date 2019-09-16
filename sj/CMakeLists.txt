@@ -1,5 +1,5 @@
 # manually inserted..
-add_definitions(-O2 -DNDEBUG)
+add_definitions(-O3 -DNDEBUG)
 
 #set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall" )
 
@@ -27,6 +27,8 @@ add_executable(spg
                     src/opt2b.cpp
                     src/opt2c.cpp
                     src/opt2d.cpp
+                    src/opt2e.cpp
+                    src/opt2f.cpp
                     src/star.cpp
                     src/test.cpp
                     )

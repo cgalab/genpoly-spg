@@ -754,7 +754,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   // test the time difference between det and orient2d
   //for (unsigned int i = 0; i < 100000000 ; ++i) orient2d(pa,pb,pc);
-
+/*
   std::cerr << std::endl;
   std::cerr << "============== equality bit check =================" << std::endl;
 
@@ -766,7 +766,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "x: " << x << ", y: " << y << std::endl;
   std::cerr << "bitset version: " << std::endl;
   std::cerr << "x: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&x))) << ", y: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&y))) << std::endl;
-
+*/
 /*
   std::cerr << "=========== Heap's alg. test ================" << std::endl;
 
