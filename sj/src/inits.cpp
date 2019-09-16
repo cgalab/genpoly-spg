@@ -65,6 +65,12 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	else if(strcmp(optarg,"3") == 0) {
 		*alg = A_2OPT_D;
 	}
+	else if(strcmp(optarg,"4") == 0) {
+		*alg = A_2OPT_E;
+	}
+	else if(strcmp(optarg,"5") == 0) {
+		*alg = A_2OPT_F;
+	}
 	else if(strcmp(optarg,"curve") == 0) {
 		*alg = A_CURVE;
 	}

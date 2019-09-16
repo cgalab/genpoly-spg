@@ -44,6 +44,8 @@ enum alg_t {
   A_2OPT_B,
   A_2OPT_C,
   A_2OPT_D,
+  A_2OPT_E,
+  A_2OPT_F,
   A_CURVE,
   A_HOLE,
   A_STAR
