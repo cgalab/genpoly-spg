@@ -206,6 +206,42 @@ private:
 	*/
 	void repairEnd();
 
+	/*
+		The function executeSplitRetainSide() decomposes one translation, which can not be
+		executed directly and where the moving vertex stays at the same side of the edge
+		connecting the neighboring vertices, and executes the resulting translations. The
+		decomposition is done in the following way:
+		1. The vertex is moved to the position where the edge from the previous vertex to the
+			old position intersects the edge from the next vertex to the new position resp.
+			the edge from the next vertex to the old position intersects the edge from the
+			previous vertex to the new position (exactly one of the two pairs of edges
+			intersects!)
+		2. The vertex is moved from the intersection position of the first part to the final
+			position.
+
+		@return 	Indicates whether the execution was rejected, aborted or fully processed
+
+		Note:
+			For detailed information why we can do that take a look at my Master Thesis
+	*/
+	enum Executed executeSplitRetainSide();
+
+	/*
+		The function executeSplitChangeSide() decomposes one translation, which can not be
+		executed directly and where the moving vertex changes the side of the edge connecting
+		the neighboring vertices, and executes the resulting translations. The decomposition
+		is done in the following way:
+		1. The vertex is moved exactly at the middle between the two neighboring vertices.
+		2. The vertex is moved from the position between the two neighboring vertices to its
+			final position.
+
+		@return 	Indicates whether the execution was rejected, aborted or fully processed
+
+		Note:
+			For detailed information why we can do that take a look at my Master Thesis
+	*/
+	enum Executed executeSplitChangeSide();
+
 public:
 
 		/*
@@ -265,13 +301,13 @@ public:
 	bool checkOverroll();
 
 	/*
-		The function execute() processes a translation. If the flag split is set, it splits
-		the translation into two translations (depending on the geometric case) and executes
-		them, otherwise it executes the translation by successively working through the
-		events in the event queue.
+		The function execute() processes a translation. If the flag split is set, it calls the
+		functions which split the translation into two translations (depending on the geometric
+		case) and executes them, otherwise execute() executes the translation by successively
+		working through the events in the event queue.
 
 		@return 	Indicates whether the execution was rejected, aborted or fully processed
-	
+
 		Note:
 			For more information on the splits see my Master Thesis
 	*/

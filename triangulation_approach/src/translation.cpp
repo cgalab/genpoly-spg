@@ -373,17 +373,6 @@ void Translation::repairEnd(){
 				flip(i, true);
 			// Otherwise try to move the vertex back a bit
 			else{
-				/*printf("\nTriangle area = 0 after translation: PE can not be fliped\n");
-				printf("index: %d id: %llu dx: %f dy: %f\n", index, (*original).getID(), dx, dy);
-				(*i).print();
-				(*(*i).getVertex(0)).print();
-				(*(*i).getVertex(1)).print();
-				(*(*i).getVertex(2)).print();
-				printf("oldv\n");
-				(*oldV).print();
-				printf("newV\n");
-				(*newV).print();
-				exit(2);*/
 
 				trans = new Translation(T, index, - dx * 0.1, - dy * 0.1);
 				ex = (*trans).execute();
@@ -399,6 +388,129 @@ void Translation::repairEnd(){
 				printf("corrected! \n");
 		}
 	}
+}
+
+/*
+	The function executeSplitRetainSide() decomposes one translation, which can not be executed
+	directly and where the moving vertex stays at the same side of the edge connecting the
+	neighboring vertices, and executes the resulting translations. The decomposition is done
+	in the following way:
+	1. The vertex is moved to the position where the edge from the previous vertex to the old
+		position intersects the edge from the next vertex to the new position resp. the edge
+		from the next vertex to the old position intersects the edge from the previous vertex
+		to the new position (exactly one of the two pairs of edges intersects!)
+	2. The vertex is moved from the intersection position of the first part to the final
+		position.
+
+	@return 	Indicates whether the execution was rejected, aborted or fully processed
+
+	Note:
+		For detailed information why we can do that take a look at my Master Thesis
+*/
+enum Executed Translation::executeSplitRetainSide(){
+	Vertex *intersectionPoint;
+	double transX, transY;
+	Translation *trans;
+	enum Executed ex;
+
+	// Compute the intersection point to split the translation
+	intersectionPoint = getIntersectionPoint(prevV, oldV, nextV, newV);
+	if(intersectionPoint == NULL)
+		intersectionPoint = getIntersectionPoint(nextV, oldV, prevV, newV);
+	if(intersectionPoint == NULL){
+		return Executed::REJECTED;
+	}
+
+	// First part of the translation to the intersection point
+	transX = (*intersectionPoint).getX() - (*oldV).getX();
+	transY = (*intersectionPoint).getY() - (*oldV).getY();
+
+	trans = new Translation(T, index, transX, transY, TranslationType::SPLIT_PART_1);
+	ex = (*trans).execute();
+
+	delete intersectionPoint;
+	delete trans;
+
+	if(ex != Executed::FULL)
+		return ex;
+
+	// Second part of the translation from the intersection point to the target point
+	transX = (*newV).getX() - (*original).getX();
+	transY = (*newV).getY() - (*original).getY();
+
+	trans = new Translation(T, index, transX, transY, TranslationType::SPLIT_PART_2);
+	ex = (*trans).execute();
+
+	delete trans;
+
+	if(ex == Executed::FULL)
+		return ex;
+	else
+		return Executed::PARTIAL;
+}
+
+/*
+	The function executeSplitChangeSide() decomposes one translation, which can not be
+	executed directly and where the moving vertex changes the side of the edge connecting
+	the neighboring vertices, and executes the resulting translations. The decomposition
+	is done in the following way:
+	1. The vertex is moved exactly at the middle between the two neighboring vertices.
+	2. The vertex is moved from the position between the two neighboring vertices to its
+		final position.
+
+	@return 	Indicates whether the execution was rejected, aborted or fully processed
+
+	Note:
+		For detailed information why we can do that take a look at my Master Thesis
+*/
+enum Executed Translation::executeSplitChangeSide(){
+	double middleX, middleY;
+	double transX, transY;
+	Translation *trans;
+	enum Executed ex;
+	TEdge *edge;
+	Triangle *t;
+
+	// Get translation to end position of the first part which is the middle between the
+	// neighboring vertices
+	middleX = ((*prevV).getX() + (*nextV).getX()) / 2;
+	middleY = ((*prevV).getY() + (*nextV).getY()) / 2;
+
+	// Compute translation vector
+	transX = middleX - (*oldV).getX();
+	transY = middleY - (*oldV).getY();
+
+	trans = new Translation(T, index, transX, transY, TranslationType::SPLIT_PART_1);
+	ex = (*trans).execute();
+
+	delete trans;
+
+	if(ex != Executed::FULL)
+		return ex;
+
+	// For numerical reasons it is possible that the triangle of the old vertex and the
+	// neighboring vertices doesn't vanish at the time when the vertex arrives between its
+	// neighbors, therefore this must be checked and corrected before starting the second
+	// translation
+	edge = (*prevV).getEdgeTo(nextV);
+	if(edge != NULL){
+		t = (*edge).getTriangleContaining(original);
+		flip(t, true);
+	}
+
+	// Get translation from middle to the target position
+	transX = (*newV).getX() - (*original).getX();
+	transY = (*newV).getY() - (*original).getY();
+
+	trans = new Translation(T, index, transX, transY, TranslationType::SPLIT_PART_2);
+	ex = (*trans).execute();
+
+	delete trans;
+
+	if(ex == Executed::FULL)
+		return ex;
+	else
+		return Executed::PARTIAL;
 }
 
 
@@ -484,26 +596,20 @@ bool Translation::checkOverroll(){
 }
 
 /*
-	The function execute() processes a translation. If the flag split is set, it splits the
-	translation into two translations (depending on the geometric case) and executes them,
-	otherwise it executes the translation by successively working through the events in the
-	event queue.
+	The function execute() processes a translation. If the flag split is set, it calls the
+	functions which split the translation into two translations (depending on the geometric
+	case) and executes them, otherwise execute() executes the translation by successively
+	working through the events in the event queue.
 
 	@return 	Indicates whether the execution was rejected, aborted or fully processed
 
 	Note:
 		For more information on the splits see my Master Thesis
 */
-// TODO:
-// Think of splitting this function in multiple functions for each case
 enum Executed Translation::execute(){
 	Triangle *t = NULL;
 	std::pair<double, Triangle*> e;
-	Translation *trans;
-	double middleX, middleY, transX, transY, oldArea, newArea;
-	TEdge *edge;
-	Vertex *intersectionPoint;
-	enum Executed ex;
+	double oldArea, newArea;
 
 	// The translation must be split into two translations
 	if(split){
@@ -516,88 +622,12 @@ enum Executed Translation::execute(){
 		delete t;
 
 		// Vertex stays on the same side of the edge between the neighboring vertices
-		if(signbit(oldArea) == signbit(newArea)){
-
-			// Compute the intersection point to split the translation
-			intersectionPoint = getIntersectionPoint(prevV, oldV, nextV, newV);
-			if(intersectionPoint == NULL)
-				intersectionPoint = getIntersectionPoint(nextV, oldV, prevV, newV);
-			if(intersectionPoint == NULL){
-				return Executed::REJECTED;
-			}
-
-			// First part of the translation to the intersection point
-			transX = (*intersectionPoint).getX() - (*oldV).getX();
-			transY = (*intersectionPoint).getY() - (*oldV).getY();
-
-			trans = new Translation(T, index, transX, transY, TranslationType::SPLIT_PART_1);
-			ex = (*trans).execute();
-
-			delete intersectionPoint;
-			delete trans;
-
-			if(ex != Executed::FULL)
-				return ex;
-
-			// Second part of the translation from the intersection point to the target point
-			transX = (*newV).getX() - (*original).getX();
-			transY = (*newV).getY() - (*original).getY();
-
-			trans = new Translation(T, index, transX, transY, TranslationType::SPLIT_PART_2);
-			ex = (*trans).execute();
-
-			delete trans;
-
-			if(ex == Executed::FULL)
-				return ex;
-			else
-				return Executed::PARTIAL;
-
+		if(signbit(oldArea) == signbit(newArea))
+			return executeSplitRetainSide();
 		// Vertex changes side
-		}else{
-			
-			// Get translation to end position of the first part which is the middle between the
-			// neighboring vertices
-			middleX = ((*prevV).getX() + (*nextV).getX()) / 2;
-			middleY = ((*prevV).getY() + (*nextV).getY()) / 2;
-
-			// Compute translation vector
-			transX = middleX - (*oldV).getX();
-			transY = middleY - (*oldV).getY();
-
-			trans = new Translation(T, index, transX, transY, TranslationType::SPLIT_PART_1);
-			ex = (*trans).execute();
-
-			delete trans;
-
-			if(ex != Executed::FULL)
-				return ex;
-
-			// For numerical reasons it is possible that the triangle of the old vertex and the
-			// neighboring vertices doesn't vanish at the time when the vertex arrives between its
-			// neighbors, therefore this must be checked and corrected before starting the second
-			// translation
-			edge = (*prevV).getEdgeTo(nextV);
-			if(edge != NULL){
-				t = (*edge).getTriangleContaining(original);
-				flip(t, true);
-			}
-
-			// Get translation from middle to the target position
-			transX = (*newV).getX() - (*original).getX();
-			transY = (*newV).getY() - (*original).getY();
-
-			trans = new Translation(T, index, transX, transY, TranslationType::SPLIT_PART_2);
-			ex = (*trans).execute();
-
-			delete trans;
-
-			if(ex == Executed::FULL)
-				return ex;
-			else
-				return Executed::PARTIAL;
-		}
-
+		else
+			return executeSplitChangeSide();
+	
 	// Default translation
 	}else{
 		
@@ -612,7 +642,6 @@ enum Executed Translation::execute(){
 
 			// Abort if the event queue becomes unstable
 			if(!flip(t, false)){
-				printf("aborted\n");
 				return Executed::PARTIAL;
 			}
 		}
