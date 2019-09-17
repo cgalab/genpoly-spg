@@ -228,11 +228,11 @@ bool Translation::insideQuadrilateral(Vertex *v){
 		- As we had the case that a new edge numerically intersected all three edges of the same
 			triangle or multiple edges of the surrounding polygon we do not stopp at the first 
 			intersection we find, but we count all intersections. If we find more then one, the
-			function returns false.
+			function returns false. But this should now really happen nowhere as the epsilon
+			in checkIntersection() should lead to getting all these cases as intersections of
+			type VERTEX.
 		- Edges of the bounding box are treated as polygon edges
 */
-// TODO:
-// Check whether it can still appear, that a new edge interesect all edges of a triangle.
 bool Translation::checkEdge(Vertex *fromV, TEdge *newE){
 	std::vector<TEdge*> surEdges;
 	enum IntersectionType iType = IntersectionType::NONE;
@@ -304,7 +304,7 @@ bool Translation::checkEdge(Vertex *fromV, TEdge *newE){
 			return false;
 		}
 
-		// Chose the intersected edge
+		// Choose the intersected edge
 		if(iType0 != IntersectionType::NONE){
 			iType = iType0;
 			intersectedE = surEdges[0];
