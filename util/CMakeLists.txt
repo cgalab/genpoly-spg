@@ -7,6 +7,7 @@ add_library(util
     src/point.cpp
     src/pol.cpp
     src/predicates.cpp
+    src/elapsed.cpp
     src/simple_pol_check.cpp
     )
 

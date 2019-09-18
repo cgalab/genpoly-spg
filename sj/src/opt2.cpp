@@ -14,10 +14,12 @@
 #include "edge.h"
 #include "pol.h"
 #include "opt2base.h"
+#include "elapsed.h"
 
 // 2opt that was used for the competition.
 enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
   enum error retval = SUCCESS;
+  double duration = 0;
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points, randseed);
   //createCHRandPol(polygon, points, randseed);
@@ -46,6 +48,8 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   double circumference;
   std::map<double, unsigned int> circ, c_counter;
   std::map<double, unsigned int>::iterator c_it;
+
+  duration = elapsed();
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     circumference = pol_calc_circumference(polygon, points);
@@ -66,11 +70,11 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 
   	while (index < points.size()) {
 //      std::cerr << "i: " << index << std::endl;
-//      if ((index > 0 && index < 280) ||  (index > 2896 && index < 2969)) {
-//        std::cerr << "i: " << index << std::endl;
+//      if (index > 489 && index < 506) {
+//        std::cerr << std::endl << "i: " << index << std::endl;
 //        debug = true;
 //        std::cerr << "edges in 'edgeS':" << std::endl;
-//        for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl << std::endl;
+//        for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
 //      }
 //      else {debug = false;}
 
@@ -159,6 +163,8 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   	}
     if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
   } while (loop);
+  duration = elapsed();
+  std::cout << "Time elapsed: " << duration << std::endl;
 
 	return retval;
 }

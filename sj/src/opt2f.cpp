@@ -14,6 +14,7 @@
 #include "edge.h"
 #include "pol.h"
 #include "opt2base.h"
+#include "elapsed.h"
 
 /*
 void print_enum(enum planesweep_t val) {
@@ -55,6 +56,7 @@ void print_enum(enum edge_t val) {
 // 2opt version that reverses if an intersection is found.  changes nothing for collinearities.
 enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
   enum error retval = SUCCESS;
+  double duration = 0;
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points, randseed);
 
@@ -238,6 +240,8 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   	}
     if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
   } while (loop);
+  duration = elapsed();
+  std::cout << "Time elapsed: " << duration << std::endl;
 
 	return retval;
 }

@@ -1,5 +1,5 @@
 PP = g++
-WFLAGS = -Wall -Werror -Wextra -g -O2
+WFLAGS = -Wall -Werror -Wextra -g -O2 -DNDEBUG
 
 SDIR = src
 ODIR = obj

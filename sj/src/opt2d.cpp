@@ -14,10 +14,12 @@
 #include "edge.h"
 #include "pol.h"
 #include "opt2base.h"
+#include "elapsed.h"
 
 // Version of BO-2opt that only flips the edges and not the whole chain.
 enum error opt2d(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
   enum error retval = SUCCESS;
+  double duration = 0;
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points, randseed);
 
@@ -158,6 +160,8 @@ enum error opt2d(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   	}
     if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
   } while (loop);
+  duration = elapsed();
+  std::cout << "Time elapsed: " << duration << std::endl;
 
 	return retval;
 }

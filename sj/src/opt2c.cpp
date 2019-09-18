@@ -14,6 +14,7 @@
 #include "edge.h"
 #include "pol.h"
 #include "opt2base.h"
+#include "elapsed.h"
 
 void print_enum(enum planesweep_t val) {
   switch (val) {
@@ -35,6 +36,7 @@ void print_enum(enum planesweep_t val) {
 
 enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
   enum error retval = SUCCESS;
+  double duration = 0;
   enum planesweep_t p_status = P_CLEAN;
 	// initialise and create a random permutation for the polygon
 	createRandPol(polygon, points, randseed);
@@ -313,6 +315,8 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   	}
     if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
   } while (loop);
+  duration = elapsed();
+  std::cout << "Time elapsed: " << duration << std::endl;
 
 	return retval;
 }
