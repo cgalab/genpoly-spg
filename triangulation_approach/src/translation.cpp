@@ -338,8 +338,6 @@ bool Translation::checkEdge(Vertex *fromV, TEdge *newE){
 		be the case besides such splitted translation where the vertex is moved exactly to a
 		triangulation edge on purpose.
 */
-// TODO:
-// Check whether this function does anything
 void Translation::repairEnd(){
 	std::list<Triangle*> triangles;
 	double area;
@@ -359,7 +357,7 @@ void Translation::repairEnd(){
 				(*oldV).print();
 				printf("target position\n");
 				(*newV).print();
-				printf("acutal end position\n");
+				printf("actual end position\n");
 				(*original).print();
 			}
 
