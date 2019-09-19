@@ -158,8 +158,10 @@ public:
 
 	/*
 		Constructor:
-		Builds a triangle by their vertices and edges. It automatically registers the new
-		triangle at their vertices and edges and sets the property enqueued to false.
+		Builds a triangle by their vertices and edges. It automatically registers the new triangle
+		at their vertices and edges and sets the property enqueued to false. Additionally it checks
+		whether a triangle built of the same edges already exists and in case errors with exit
+		code 5.
 
 		@param 	E0 	The first edge of the triangle
 		@param 	E1 	The second edge of the triangle
