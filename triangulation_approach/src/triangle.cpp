@@ -140,8 +140,8 @@ double Triangle::det(Vertex *V0, Vertex *V1, Vertex *V2){
 Triangle::Triangle(TEdge *E0, TEdge *E1, TEdge *E2, Vertex *V0, Vertex *V1, Vertex *V2) :
 	e0(E0), e1(E1), e2(E2), v0(V0), v1(V1), v2(V2), enqueued(false), id(n) {
 
-	// TODO:
-	// Find a new way to check whether a triangle with the same edges already exists
+	Triangle *t;
+
 	(*e0).setTriangle(this);
 	(*e1).setTriangle(this);
 	(*e2).setTriangle(this);
@@ -149,6 +149,14 @@ Triangle::Triangle(TEdge *E0, TEdge *E1, TEdge *E2, Vertex *V0, Vertex *V1, Vert
 	(*v0).addTriangle(this);
 	(*v1).addTriangle(this);
 	(*v2).addTriangle(this);
+
+	// Check whether a triangle with the same edges already exists
+	t = (*e0).getOtherTriangle(this);
+	if(t != NULL && (*t).contains(e1) && (*t).contains(e2)){
+		printf("The same triangle already exists\n");
+		exit(5);
+	}
+
 
 	n++;
 }
@@ -517,6 +525,21 @@ bool Triangle::contains(Vertex *v){
 	if((*v0).getID() == id) return true;
 	if((*v1).getID() == id) return true;
 	if((*v2).getID() == id) return true;
+	return false;
+}
+
+/*
+	The function contains() checks whether the triangle contains the edge e.
+
+	@param 	e 	The edge of interest
+	@return 	True if the triangle contains e, otherwise false
+*/
+bool Triangle::contains(TEdge *e){
+	unsigned long long id = (*e).getID();
+
+	if((*e0).getID() == id) return true;
+	if((*e1).getID() == id) return true;
+	if((*e2).getID() == id) return true;
 	return false;
 }
 

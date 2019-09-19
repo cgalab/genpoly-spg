@@ -143,6 +143,7 @@ public:
 		OTHERS:
 
 		bool 					contains(Vertex *v)
+		bool 					contains(TEdge *e)
 		void 					enqueue()
 		void 					dequeue()
 		bool 					isEnqueued()
@@ -337,6 +338,14 @@ public:
 		@return 	True if the triangle contains v, otherwise false
 	*/
 	bool contains(Vertex *v);
+
+	/*
+		The function contains() checks whether the triangle contains the edge e.
+
+		@param 	e 	The edge of interest
+		@return 	True if the triangle contains e, otherwise false
+	*/
+	bool contains(TEdge *e);
 
 	/*
 		The function enqueue() sets the triangle's enqueued flag.
