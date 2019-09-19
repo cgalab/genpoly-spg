@@ -1013,7 +1013,6 @@ void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& 
 // really slow version to check whether a polygon has an intersection.
 // Better to use a form of the line-sweep to check.
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points) {
-  std::cerr << "intersections: ";
   unsigned int count = 0;
   bool ret = false;
   Point *previ, *pi, *prevj, *pj;
@@ -1031,8 +1030,7 @@ bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Poin
       retval = checkIntersection(ei, ej);
 
       if ((retval == IS_TRUE) || (retval == IS_4P_COLLINEAR) || (retval == IS_3P_COLLINEAR)) {
-        std::cerr << "retval: ";
-        printEnum(retval);
+        std::cerr << "Intersection: "; printEnum(retval);
         std::cerr << ", ei: " << ei << ", ej: " << ej << std::endl;
 
         ++count;
@@ -1042,6 +1040,6 @@ bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Poin
     }
     previ = pi;
   }
-  std::cerr << count << std::endl;
+  std::cerr << "Number of intersections: "<< count << std::endl;
   return ret;
 }

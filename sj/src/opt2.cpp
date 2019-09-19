@@ -24,7 +24,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 	createRandPol(polygon, points, randseed);
   //createCHRandPol(polygon, points, randseed);
   //pdisplay(polygon, points);
-  //assert(1 == 0);
+  //assert(0);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'
@@ -70,7 +70,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 
   	while (index < points.size()) {
 //      std::cerr << "i: " << index << std::endl;
-//      if (index > 489 && index < 506) {
+//      if (index > 884 && index < 915) {
 //        std::cerr << std::endl << "i: " << index << std::endl;
 //        debug = true;
 //        std::cerr << "edges in 'edgeS':" << std::endl;
@@ -122,11 +122,13 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
       if (*e1.p2 == *p1) {
 //        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
         val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
+//        (debug) ? std::cerr << "val1.first: " : std::cerr; if (debug) print_enum(val1.first);
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if (*e2.p2 == *p1) {
             val1_2 = removeEdgeFromSet(e2, edgeS, polygon, points);
+//            (debug) ? std::cerr << "val1_2: " : std::cerr; if (debug) print_enum(val1_2);
             if (val1_2 == E_NOT_VALID) break;
           }
           loop=true;continue;
@@ -137,6 +139,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
 
 //        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
         val1 = processEdge(e1, edgeS, polygon, points);
+//        (debug) ? std::cerr << "val1.first: " : std::cerr; if (debug) print_enum(val1.first);
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop=true;continue;}
       }
@@ -145,15 +148,18 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
       if (*e2.p2 == *p1) {
 //        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
         val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
+//        (debug) ? std::cerr << "val2.first: " : std::cerr; if (debug) print_enum(val2.first);
         if (val2.first == E_NOT_VALID) break;
         if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop=true;continue;} // if this happens, e1 was guaranteed removed as e1 < e2 and e2.p2 > e2.p1 > e1.p1
       }
       else {
 //        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
         val2 = processEdge(e2, edgeS, polygon, points);
+//        (debug) ? std::cerr << "val2.first: " : std::cerr; if (debug) print_enum(val2.first);
         if (val2.first == E_NOT_VALID) break;
         if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
           val2_1 = removeEdgeFromSet(e1, edgeS, polygon, points);
+//          (debug) ? std::cerr << "val2_1: " : std::cerr; if (debug) print_enum(val2_1);
           if (val2_1 == E_NOT_VALID) break;
           loop=true;continue;
         }

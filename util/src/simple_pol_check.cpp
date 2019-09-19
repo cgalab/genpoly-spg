@@ -34,7 +34,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
       edgeS.erase(it);
 
       if (bef && af) {
-        //std::cerr << "before: " << before << ", after: " << after << std::endl;
+//        std::cerr << "before: " << before << ", after: " << after << std::endl;
         isval = checkIntersection(before, after);
         if (isval >= IS_TRUE) {
 //          std::cerr << "Removing: Intersection between: before: " << before << " and after: " << after << std::endl;
@@ -75,7 +75,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
         edgeS.erase(it1);
 
         if (bef && af) {
-          //std::cerr << "before: " << before << ", after: " << after << std::endl;
+//          std::cerr << "before: " << before << ", after: " << after << std::endl;
           isval = checkIntersection(before, after);
           if (isval >= IS_TRUE) {
             std::cerr << "Removing: " << e << std::endl;
@@ -113,13 +113,13 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
     //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
     if (retval.first != edgeS.begin()) {
       before = *(std::prev(retval.first));
-      //std::cerr << "before: " << before << std::endl;
+//      std::cerr << "before: " << before << std::endl;
       bef = true;
     }
     //std::cerr << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
     if (retval.first != std::prev(edgeS.end())) {
       after = *(std::next(retval.first));
-      //std::cerr << "after : " << after << std::endl;
+//      std::cerr << "after : " << after << std::endl;
       af = true;
     }
 
@@ -154,6 +154,7 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
     std::cerr << "Error: Iterator did not return same edge." << std::endl;
     std::cerr << "Edge: " << e << std::endl;
     std::cerr << "*it" << *retval.first << std::endl;
+    valid = E_NOT_VALID;
   }
 
 
@@ -177,11 +178,9 @@ enum error simple_pol_check(std::vector<unsigned int>& polygon, std::vector<Poin
   std::set<Edge> edgeS; // a sweep-line-status object.
 
   while (index < points.size()) {
-      //std::cerr << "index: " << index << std::endl;
-      //std::cout << "edges in 'edgeS':" << std::endl;
-      //for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
-
-//      std::cerr << std::endl << "index: " << index << std::endl;
+//      std::cerr << std::endl << "i: " << index << std::endl;
+//      std::cout << "edges in 'edgeS':" << std::endl;
+//      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
 
     // get the current point at 'index'
     p1 = &points[lex[index]];
@@ -216,7 +215,7 @@ enum error simple_pol_check(std::vector<unsigned int>& polygon, std::vector<Poin
     else {
       // if the earlier edge was allowed, then the later edge is also allowed
       if (fabs(val3) == 0) {
-        std::cerr << "Intersection found: collinearity between: " << e1 << " and " << e2 << std::endl;
+//        std::cerr << "Intersection found: collinearity between: " << e1 << " and " << e2 << std::endl;
         retval = UNEXPECTED_ERROR; break;}
 //      std::cerr << std::endl << "processing e1: " << e1 << std::endl;
       val1 = processEdge(e1, edgeS);
