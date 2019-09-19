@@ -17,7 +17,6 @@ private:
   double max, min;
   double x;
 public:
-
   Yval() {max=0;min=0;x=0;}
   Yval(double val) {max=val;min=val;x=0;}
   Yval(double a, double b) {
@@ -36,10 +35,14 @@ public:
     if (a<b) {min=a;max=b;}
     else {min=b;max=a;}
   }
-  void setX(double X) {x=X;}
+  void setX(const double X) {x=X;}
   double getX() const {return x;}
   double getMin() const {return min;}
   double getMax() const {return max;}
+  bool isIn(double s) {
+    if ((min < s) && (s < max)) return true;
+    else return false;
+  }
 
   bool operator< (const double s) const {
     return (min < s);
@@ -83,10 +86,10 @@ public:
 	}
 
   friend std::ostream& operator<<(std::ostream& os, const Yval& y) {
-    if (fabs(y.getMin() - y.getMax()) < EPSILON)
-      os << std::setprecision(15) << "x:" << y.getX() << ", (" << y.min << "," << y.max << ")";
+    if (fabs(y.getMin() - y.getMax()) == 0)
+      os << "x:" << y.getX() << ", (" << y.min << "," << y.max << ")";
     else
-      os << std::setprecision(15) << "x:" << y.getX() << ", [" << y.min << "," << y.max << "]";
+      os << "x:" << y.getX() << ", [" << y.min << "," << y.max << "]";
     return os;
   }
 };
@@ -161,7 +164,7 @@ public:
     if ((*p1).l < (*p2).l) return (*p1).l;
     else return (*p2).l;
   }
-  Yval getYatX(const double x) const {
+  Yval getYatX(const double s) const {
   	Yval y;
   	// calculate the y-axis order of the 2 edges at idx
   	// use Yval in case of x1-x2 = 0
@@ -174,12 +177,23 @@ public:
   		y.set(P1.y, P2.y);
   		y.setX(P1.x);
   	}
+    else if (s == P1.x) {y.set(P1.y); y.setX(s);}
+    else if (s == P2.x) {y.set(P2.y); y.setX(s);}
   	else {
+      // there's a problem with how I create the 'bias' and thus the 'value'
+      // when the slope is really steep, the bias is very sensitive.
+      y.set(P1.y, P2.y);
   		double slope = (P2.y-P1.y) / (P2.x-P1.x);
-  		double bias = P2.y - slope*P2.x;
-  		double val = slope * x + bias;
-  		y.set(val);
-  		y.setX(x);
+      double bias, val;
+      bias = P1.y - slope*P1.x;
+      val = slope * s + bias;
+
+      if (!y.isIn(val)) {
+        bias = P2.y - slope*P2.x;
+        val = slope * s + bias;
+      }
+      y.set(val);
+  		y.setX(s);
   	}
   	return y;
   }
