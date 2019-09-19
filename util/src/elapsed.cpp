@@ -27,6 +27,7 @@
 
 //Declared in elapsed.h
 #include "elapsed.h"
+#include <iostream> // for cout, cerr, endl
 
 #ifdef NO_CPUTIME
 
@@ -63,10 +64,10 @@ double elapsed()
 /* consumption in the form milliseconds.microseconds. (I.e., 12345 microsecs */
 /* are returned as 12.345 millisecs.)                                        */
 /*                                                                           */
-double elapsed()
+double elapsed() // used when CPUTIME_IN_MILLISECONDS is defined in makefile/cmakelists
 {
    double cpu_time;
-   unsigned long new_secs, secs, new_usecs, usecs, new_add_secs;
+   unsigned long new_secs, secs, new_usecs, usecs; //, new_add_secs;
    static unsigned long total_secs = 0, total_usecs = 0;
    int getrusage(int who, struct rusage *rusage);
    struct rusage rusage_self, rusage_children;
@@ -74,21 +75,21 @@ double elapsed()
    getrusage(RUSAGE_SELF, &rusage_self);
    getrusage(RUSAGE_CHILDREN, &rusage_children);
 
-   new_secs  = rusage_self.ru_utime.tv_sec +
-               rusage_self.ru_stime.tv_sec +
-               rusage_children.ru_utime.tv_sec +
-               rusage_children.ru_stime.tv_sec;
-   new_usecs = rusage_self.ru_utime.tv_usec +
-               rusage_self.ru_stime.tv_usec +
-               rusage_children.ru_utime.tv_usec +
-               rusage_children.ru_stime.tv_usec;
-
+   new_secs  = rusage_self.ru_utime.tv_sec;// +
+               //rusage_self.ru_stime.tv_sec +
+               //rusage_children.ru_utime.tv_sec +
+               //rusage_children.ru_stime.tv_sec;
+   new_usecs = rusage_self.ru_utime.tv_usec;// +
+               //rusage_self.ru_stime.tv_usec +
+               //rusage_children.ru_utime.tv_usec +
+               //rusage_children.ru_stime.tv_usec;
+/*
    if (new_usecs >= 1000000) {
       new_add_secs = new_usecs / 1000000;
       new_usecs -= new_add_secs * 1000000;
       new_secs  += new_add_secs;
    }
-
+*/
    if (total_usecs > new_usecs) {
       secs  = new_secs - total_secs - 1;
       usecs = new_usecs - total_usecs + 1000000;
@@ -166,7 +167,7 @@ double elapsed()
 /* returned can be ignored, and the second value gives the actual CPU        */
 /* consumption (in milliseconds).                                            */
 /*                                                                           */
-double elapsed()
+double elapsed() // used with no definition of CPUTIME_IN_MILLISECONDS in makefile/cmakelists
 {
    static long total = 0;
    long dummy;
@@ -177,8 +178,8 @@ double elapsed()
    if (HZ == 0)  HZ = sysconf(_SC_CLK_TCK);
 
    times(&buffer);
-   dummy    = buffer.tms_utime  + buffer.tms_stime +
-              buffer.tms_cutime + buffer.tms_cstime;
+   dummy    = buffer.tms_utime;  //+ buffer.tms_stime +
+              //buffer.tms_cutime + buffer.tms_cstime;
    cpu_time = (double) ((dummy - total) * 1000.0) / HZ;
    total    = dummy;
 

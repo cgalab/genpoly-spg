@@ -1,5 +1,5 @@
 PP = g++
-WFLAGS = -Wall -Werror -Wextra -g -O2 -DNDEBUG
+WFLAGS = -Wall -Werror -Wextra -g -O3 -DNDEBUG -std=c++11 -DCPUTIME_IN_MILLISECONDS
 
 SDIR = src
 ODIR = obj

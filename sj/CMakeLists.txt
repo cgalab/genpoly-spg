@@ -1,5 +1,5 @@
 # manually inserted..
-add_definitions(-O2 -DNDEBUG)
+add_definitions(-O3 -DNDEBUG -std=c++11 -DCPUTIME_IN_MILLISECONDS)
 
 #set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall" )
 
