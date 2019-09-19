@@ -1,6 +1,8 @@
 #ifndef __2OPT_BASE_H_
 #define __2OPT_BASE_H_
 
+void print_enum(enum planesweep_t val);
+void print_enum(enum edge_t val);
 void update_lowest_index(Edge e1, Edge e2, unsigned int& lowest_index);
 void update_lowest_index(Point *a, Point *b, Point *c, unsigned int& lowest_index);
 enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);

@@ -13,6 +13,77 @@
 #include "edge.h"
 #include "pol.h"
 
+void print_enum(enum planesweep_t val) {
+  switch (val) {
+    case P_CLEAN:
+      std::cerr << "P_CLEAN";
+      break;
+    case P_DIRTY_LEFT:
+      std::cerr << "P_DIRTY_LEFT";
+      break;
+    case P_DIRTY_RIGHT:
+      std::cerr << "P_DIRTY_RIGHT";
+      break;
+    default:
+      break;
+  }
+  std::cerr << std::endl;
+}
+
+void print_enum(enum edge_t val) {
+  switch (val) {
+    case E_VALID:
+      std::cerr << "E_VALID";
+      break;
+    case E_INTERSECTION:
+      std::cerr << "E_INTERSECTION";
+      break;
+    case E_COLLINEAR:
+      std::cerr << "E_COLLINEAR";
+      break;
+    case E_NOT_VALID:
+      std::cerr << "E_NOT_VALID";
+      break;
+    default:
+      break;
+  }
+  std::cerr << std::endl;
+}
+
+void print_enum(enum intersect_t val) {
+  switch (val) {
+    case IS_FALSE:
+      std::cerr << "IS_FALSE";
+      break;
+    case IS_VERTEX11:
+      std::cerr << "IS_VERTEX11";
+      break;
+    case IS_VERTEX12:
+      std::cerr << "IS_VERTEX12";
+      break;
+    case IS_VERTEX21:
+      std::cerr << "IS_VERTEX21";
+      break;
+    case IS_VERTEX22:
+      std::cerr << "IS_VERTEX22";
+      break;
+    case IS_TRUE:
+      std::cerr << "IS_TRUE";
+      break;
+    case IS_4P_COLLINEAR:
+      std::cerr << "IS_4P_COLLINEAR";
+      break;
+    case IS_3P_COLLINEAR:
+      std::cerr << "IS_3P_COLLINEAR";
+      break;
+    case IS_SAME_EDGE:
+      std::cerr << "IS_SAME_EDGE";
+      break;
+  }
+  std::cerr << std::endl;
+}
+
+
 //used by: opt2b, opt2c, opt2d
 // function to update the 'lowest_index' variable if one of the points in either 'e1' or 'e1'
 // is lex. lower than current value in 'lowest_index'
@@ -54,6 +125,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsign
       std::cerr << "it : " << *it << std::endl;
       std::cerr << "edges in 'edgeS':" << std::endl;
       for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+      valid = E_NOT_VALID;
     }
     assert(e == *it);
 
@@ -71,7 +143,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsign
     edgeS.erase(it);
 
     if (bef && af) {
-      //std::cerr << "before: " << before << ", after: " << after << std::endl;
+//      std::cerr << "before: " << before << ", after: " << after << std::endl;
       isval = checkIntersection(before, after);
       if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
@@ -85,9 +157,10 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsign
         eraseEdgeFromSet(before, edgeS);
         eraseEdgeFromSet(after, edgeS);
         flip(before, after, polygon, points);
-        valid = E_COLLINEAR;
+        valid = E_INTERSECTION;
       } else if (isval >= IS_TRUE) {
         std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+        std::cerr << "isval: "; print_enum(isval);
       }
     }
   } else {
@@ -95,7 +168,40 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsign
     // this is technically a crutch because there's a problem with the comparator function.
     for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
       if (*it1 == e) {
+        // get edges before and after
+        if (it1 != edgeS.begin()) {
+          before = *(std::prev(it1));
+          bef = true;
+        }
+        if (it1 != std::prev(edgeS.end())) {
+          after  = *(std::next(it1));
+          af = true;
+        }
+
         edgeS.erase(it1);
+
+        if (bef && af) {
+//          std::cerr << "before: " << before << ", after: " << after << std::endl;
+          isval = checkIntersection(before, after);
+          if (isval == IS_4P_COLLINEAR) {
+    //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
+            if (coll4Swap(before, after, edgeS, polygon, points)) {
+    //          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
+              valid = E_COLLINEAR;
+            }
+          }
+          else if ((isval == IS_TRUE) || (isval == IS_3P_COLLINEAR)) {
+//            std::cerr << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
+            eraseEdgeFromSet(before, edgeS);
+            eraseEdgeFromSet(after, edgeS);
+            flip(before, after, polygon, points);
+            valid = E_INTERSECTION;
+          } else if (isval >= IS_TRUE) {
+            std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+            std::cerr << "isval: "; print_enum(isval);
+          }
+        }
+
         break;
       }
     }
@@ -120,6 +226,7 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, std::set<Edg
       std::cerr << "*it: " << *it << std::endl;
       std::cerr << "edges in 'edgeS':" << std::endl;
       for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) std::cerr << *it1 << std::endl;
+      valid = E_NOT_VALID;
     }
     assert(e == *it);
 
@@ -155,6 +262,8 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, std::set<Edg
         update_lowest_index(before, after, lowest_index);
       } else if (isval >= IS_TRUE) {
         std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+        std::cerr << "isval: "; print_enum(isval);
+        valid = E_NOT_VALID;
       }
     }
   } else {
@@ -162,7 +271,41 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, std::set<Edg
     // this is technically a crutch because there's a problem with the comparator function.
     for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
       if (*it1 == e) {
+        // get edges before and after
+        if (it1 != edgeS.begin()) {
+          before = *(std::prev(it1));
+          bef = true;
+        }
+        if (it1 != std::prev(edgeS.end())) {
+          after  = *(std::next(it1));
+          af = true;
+        }
+
         edgeS.erase(it1);
+
+        if (bef && af) {
+//          std::cerr << "before: " << before << ", after: " << after << std::endl;
+          isval = checkIntersection(before, after);
+          if (isval == IS_4P_COLLINEAR) {
+    //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
+            if (coll4Swap(before, after, edgeS, polygon, points)) {
+    //          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
+              valid = E_COLLINEAR;
+            }
+          }
+          else if ((isval == IS_TRUE) || (isval == IS_3P_COLLINEAR)) {
+//            std::cerr << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
+            eraseEdgeFromSet(before, edgeS);
+            eraseEdgeFromSet(after, edgeS);
+            flip(before, after, polygon, points);
+            valid = E_INTERSECTION;
+          } else if (isval >= IS_TRUE) {
+            std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+            std::cerr << "isval: "; print_enum(isval);
+            valid = E_NOT_VALID;
+          }
+        }
+
         break;
       }
     }
@@ -191,6 +334,7 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, unsigned int
       std::cerr << "*it: " << *it << std::endl;
       std::cerr << "edges in 'edgeS':" << std::endl;
       for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) std::cerr << *it1 << std::endl;
+      valid = E_NOT_VALID;
     }
 */
     assert(e == *it);
@@ -227,6 +371,8 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, unsigned int
         update_lowest_index(before, after, lowest_index);
       } else if (isval >= IS_TRUE) {
         std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+        std::cerr << "isval: "; print_enum(isval);
+        valid = E_NOT_VALID;
       }
     }
   } else {
@@ -234,7 +380,41 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, unsigned int
     // this is technically a crutch because there's a problem with the comparator function.
     for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
       if (*it1 == e) {
+        // get edges before and after
+        if (it1 != edgeS.begin()) {
+          before = *(std::prev(it1));
+          bef = true;
+        }
+        if (it1 != std::prev(edgeS.end())) {
+          after  = *(std::next(it1));
+          af = true;
+        }
+
         edgeS.erase(it1);
+
+        if (bef && af) {
+//          std::cerr << "before: " << before << ", after: " << after << std::endl;
+          isval = checkIntersection(before, after);
+          if (isval == IS_4P_COLLINEAR) {
+    //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
+            if (coll4Swap(before, after, edgeS, polygon, points)) {
+    //          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
+              valid = E_COLLINEAR;
+            }
+          }
+          else if ((isval == IS_TRUE) || (isval == IS_3P_COLLINEAR)) {
+//            std::cerr << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
+            eraseEdgeFromSet(before, edgeS);
+            eraseEdgeFromSet(after, edgeS);
+            flip(before, after, polygon, points);
+            valid = E_INTERSECTION;
+          } else if (isval >= IS_TRUE) {
+            std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+            std::cerr << "isval: "; print_enum(isval);
+            valid = E_NOT_VALID;
+          }
+        }
+
         break;
       }
     }
@@ -291,6 +471,8 @@ enum edge_t removeEdgeFromSetd(Edge& e, unsigned int& lowest_index, std::set<Edg
         update_lowest_index(before, after, lowest_index);
       } else if (isval >= IS_TRUE) {
         std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+        std::cerr << "isval: "; print_enum(isval);
+        valid = E_NOT_VALID;
       }
     }
   } else {
@@ -298,7 +480,41 @@ enum edge_t removeEdgeFromSetd(Edge& e, unsigned int& lowest_index, std::set<Edg
     // this is technically a crutch because there's a problem with the comparator function.
     for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
       if (*it1 == e) {
+        // get edges before and after
+        if (it1 != edgeS.begin()) {
+          before = *(std::prev(it1));
+          bef = true;
+        }
+        if (it1 != std::prev(edgeS.end())) {
+          after  = *(std::next(it1));
+          af = true;
+        }
+
         edgeS.erase(it1);
+
+        if (bef && af) {
+//          std::cerr << "before: " << before << ", after: " << after << std::endl;
+          isval = checkIntersection(before, after);
+          if (isval == IS_4P_COLLINEAR) {
+    //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
+            if (coll4Swap(before, after, edgeS, polygon, points)) {
+    //          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
+              valid = E_COLLINEAR;
+            }
+          }
+          else if ((isval == IS_TRUE) || (isval == IS_3P_COLLINEAR)) {
+//            std::cerr << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
+            eraseEdgeFromSet(before, edgeS);
+            eraseEdgeFromSet(after, edgeS);
+            flip(before, after, polygon, points);
+            valid = E_INTERSECTION;
+          } else if (isval >= IS_TRUE) {
+            std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+            std::cerr << "isval: "; print_enum(isval);
+            valid = E_NOT_VALID;
+          }
+        }
+
         break;
       }
     }
@@ -326,24 +542,28 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
 	  std::cerr << "retval.second: " << retval.second << std::endl;
     std::cerr << "edges in 'edgeS':" << std::endl;
     for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+    valid = E_NOT_VALID;
+    retval2.first = valid;
+    retval2.second = retval.first;
+    return retval2;
    }
 
   assert(*retval.first == e);
 
-  //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
-  if (retval.first != edgeS.begin()) {
-    before = *(std::prev(retval.first));
-    //std::cerr << "before: " << before << std::endl;
-    bef = true;
-  }
-  //std::cerr << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
-  if (retval.first != --edgeS.end()) {
-    after  = *(std::next(retval.first));
-    //std::cerr << "after : " << after << std::endl;
-    af = true;
-  }
-
   if (retval.second) {  // successfully inserted edge.
+    //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
+    if (retval.first != edgeS.begin()) {
+      before = *(std::prev(retval.first));
+      //std::cerr << "before: " << before << std::endl;
+      bef = true;
+    }
+    //std::cerr << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
+    if (retval.first != --edgeS.end()) {
+      after  = *(std::next(retval.first));
+      //std::cerr << "after : " << after << std::endl;
+      af = true;
+    }
+
     // check incidental edge 'before' if it intersects with 'e'
     if (bef) {
       isval = checkIntersection(e, before);
@@ -382,7 +602,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
           valid = E_COLLINEAR;
         }
       }
-      else {
+      else if ((isval == IS_TRUE) || (isval == IS_3P_COLLINEAR)){
 //        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
         edgeS.erase(retval.first);
         eraseEdgeFromSet(after, edgeS);
@@ -391,6 +611,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
         flip(e, after, polygon, points);
         valid = E_INTERSECTION;
       }
+      else valid = E_NOT_VALID;
     }
 
   }
@@ -422,6 +643,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
 	   std::cerr << "retval.second: " << retval.second << std::endl;
      std::cerr << "edges in 'edgeS':" << std::endl;
      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+     valid = E_NOT_VALID;
    }
 
   assert(*retval.first == e);

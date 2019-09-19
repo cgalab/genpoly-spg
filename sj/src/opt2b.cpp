@@ -16,43 +16,6 @@
 #include "opt2base.h"
 #include "elapsed.h"
 
-/*
-void print_enum(enum planesweep_t val) {
-  switch (val) {
-    case P_CLEAN:
-      std::cerr << "P_CLEAN";
-      break;
-    case P_DIRTY_LEFT:
-      std::cerr << "P_DIRTY_LEFT";
-      break;
-    case P_DIRTY_RIGHT:
-      std::cerr << "P_DIRTY_RIGHT";
-      break;
-    default:
-      break;
-  }
-}
-
-void print_enum(enum edge_t val) {
-  switch (val) {
-    case E_VALID:
-      std::cerr << "E_VALID";
-      break;
-    case E_INTERSECTION:
-      std::cerr << "E_INTERSECTION";
-      break;
-    case E_COLLINEAR:
-      std::cerr << "E_COLLINEAR";
-      break;
-    case E_NOT_VALID:
-      std::cerr << "E_NOT_VALID";
-      break;
-    default:
-      break;
-  }
-}
-*/
-
 // 2opt version that reverses if an intersection is found, but continues if a collinearity is found as that cannot be solved locally.
 // i.e. the 'local' space of all collinearities isn't caught in one dimension by a planesweep.
 enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
@@ -92,7 +55,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   std::map<double, unsigned int>::iterator c_it;
 
   collinear_index = points.size();
-
+  duration = elapsed();
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     circumference = pol_calc_circumference(polygon, points);

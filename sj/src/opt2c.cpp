@@ -16,22 +16,6 @@
 #include "opt2base.h"
 #include "elapsed.h"
 
-void print_enum(enum planesweep_t val) {
-  switch (val) {
-    case P_CLEAN:
-      std::cerr << "P_CLEAN";
-      break;
-    case P_DIRTY_LEFT:
-      std::cerr << "P_DIRTY_LEFT";
-      break;
-    case P_DIRTY_RIGHT:
-      std::cerr << "P_DIRTY_RIGHT";
-      break;
-    default:
-      break;
-  }
-}
-
 // Version of BO-2opt that reverses to a lower index as well as saves the sweep-line status in case no intersections occurred going back.
 
 enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
@@ -71,7 +55,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   std::map<double, unsigned int>::iterator c_it;
 
   collinear_index = points.size();
-
+  duration = elapsed();
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     circumference = pol_calc_circumference(polygon, points);
