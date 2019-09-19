@@ -27,7 +27,8 @@
 #include "predicates.h"
 
 int main(int argc, char *argv[]) {
-
+  std::cout << std::setprecision(20);
+  std::cerr << std::setprecision(20);
   // final return value
   enum error returnValue = SUCCESS;
   // time measurement variables
@@ -106,10 +107,10 @@ int main(int argc, char *argv[]) {
             if(area < 0) {
               doFlip(0, polygon.size()-1, polygon, points);
               area = pol_calc_area(polygon, points);
-              std::cout << std::setprecision(15) << area << std::endl;
+              std::cout << std::setprecision(17) << area << std::endl;
             }
             else if (((areaMin >= 0) && (area > areaMin)) || ((areaMax > 0) && (area < areaMax)))
-              std::cout << std::setprecision(15) << area << std::endl;
+              std::cout << std::setprecision(17) << area << std::endl;
             else
               returnValue = ERR_AREA_NOT_BETTER;
           }
@@ -199,6 +200,28 @@ int main(int argc, char *argv[]) {
         if (points.size() == polygon.size()) {
 //          std::cerr << "Nr. of points in both files match." << std::endl;
           returnValue = simple_pol_check(polygon, points);
+        }
+        else std::cerr << "Error: Number of points mismatch between points file and polygon file." << std::endl;
+      }
+      else std::cerr << "Error reading polygon indices file." << std::endl;
+    }
+    else std::cerr << "Error reading points input file." << std::endl;
+  }
+  else if (returnValue == RUN_LONG_CHECK) {
+//    std::cerr << "running verify check" << std::endl;
+    std::vector<Point> points;
+    std::vector<unsigned int> polygon;
+    returnValue = readInFile(inFile, inFormat, points);
+    if (returnValue == SUCCESS) {
+//      std::cerr << "points found in file:" << std::endl;
+//      pdisplay(points);
+      returnValue = readvFile(vFile, polygon, points);
+      if (returnValue == SUCCESS) {
+//        std::cerr << "indices found in file: " << std::endl;
+//        pdisplay(polygon, points);
+        if (points.size() == polygon.size()) {
+//          std::cerr << "Nr. of points in both files match." << std::endl;
+          if(checkAllIntersections(polygon, points)) returnValue = INTERSECTING_POINTS;
         }
         else std::cerr << "Error: Number of points mismatch between points file and polygon file." << std::endl;
       }

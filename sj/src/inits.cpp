@@ -150,6 +150,7 @@ enum error argInit(	int argc, char *argv[],
 		{"informat", required_argument, NULL, 'b'},
 		{"outformat", required_argument, NULL, 'c'},
 		{"verify", required_argument, NULL, 'v'},
+		{"verifylong", required_argument, NULL, 'l'},
 		{"areamin", optional_argument, NULL, 'n'},
 		{"areamax", optional_argument, NULL, 'x'},
 		{"randseed", required_argument, NULL, 'r'},
@@ -161,7 +162,7 @@ enum error argInit(	int argc, char *argv[],
 		{0, 0, 0, 0}
 	};
 
-	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:v:h:r:w?kstn::x::", long_options, NULL)) != -1) && returnValue == SUCCESS) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:v:l:h:r:w?kstn::x::", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -210,7 +211,12 @@ enum error argInit(	int argc, char *argv[],
 				if (returnValue == SUCCESS) {
 					returnValue = RUN_SIMPLE_CHECK;
 				}
-//				std::cerr << "verify returnValue: " << returnValue << std::endl;
+				break;
+			case 'l':
+				returnValue = vFileInit(vFile, optarg);
+				if (returnValue == SUCCESS) {
+					returnValue = RUN_LONG_CHECK;
+				}
 				break;
 			case 'w':
 				writeNew = true;
