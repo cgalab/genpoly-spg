@@ -86,7 +86,7 @@ private:
 		The function signedAreaDouble() computes an estimate of the signed area of the triangle
 		with standard floating-point arithmetics. To provide stability it orders the vertices by
 		reserveID before computing the determinant, such that the vertices in the determinant
-		alwayshave the same order independent of the ordering of the vertices in the triangle
+		always have the same order independent of the ordering of the vertices in the triangle
 		class. The correct sign therefore is ensured by the case distinctions here.
 
 		@return 	The estimate for the signed area

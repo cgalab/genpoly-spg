@@ -26,8 +26,6 @@ unsigned long long Triangle::n = 0;
 	Note:
 		In fact this functions computes 2 times the signed area of the triangle.
 */
-// TODO:
-// Would it make sense to also move a vertex to the origin here?
 double Triangle::signedAreaExact(){
 	point p0, p1, p2;
 
@@ -597,10 +595,6 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 
 	dx = cx + dx;
 	dy = cy + dy;
-
-	// TODO:
-	// Maybe it would make sense to use here also the exact arithmetics
-	// Maybe even the signedArea function
 
 	areaOld = cx * by - cy * bx;
 	areaNew = bx * dy - by * dx;
