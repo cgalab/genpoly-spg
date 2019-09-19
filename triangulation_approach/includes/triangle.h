@@ -32,21 +32,19 @@ class Triangle{
 
 private:
 	
-	// TODO:
-	// As the edges and vertices are fixed, they can maybe be const
 	/*
 		The edges building the triangle
 	*/
-	TEdge *e0;
-	TEdge *e1;
-	TEdge *e2;
+	TEdge * const e0;
+	TEdge * const e1;
+	TEdge * const e2;
 
 	/*
 		The corresponding vertices
 	*/
-	Vertex *v0;
-	Vertex *v1;
-	Vertex *v2;
+	Vertex * const v0;
+	Vertex * const v1;
+	Vertex * const v2;
 
 	/*
 		Indicates whether the triangle is element of the actual event queue
@@ -56,7 +54,7 @@ private:
 	/*
 		The unique ID of the triangle
 	*/
-	unsigned long long id;
+	const unsigned long long id;
 
 	/*
 		The number of already generated triangles
@@ -80,7 +78,7 @@ private:
 		Note:
 			In fact this functions computes 2 times the signed area of the triangle.
 	*/
-	double signedAreaExact();
+	double signedAreaExact() const;
 
 	/*
 		The function signedAreaDouble() computes an estimate of the signed area of the triangle
@@ -94,7 +92,7 @@ private:
 		Note:
 			In fact this functions computes 2 times the signed area of the triangle.
 	*/
-	double signedAreaDouble();
+	double signedAreaDouble() const;
 
 	/*
 		The function det() computes the determinant of three 2D vertices. It asserts that the
@@ -110,7 +108,7 @@ private:
 		Note:
 			This is just default floating-point arithmetic!
 	*/
-	double det(Vertex *V0, Vertex *V1, Vertex *V2);
+	double det(Vertex * const V0, Vertex * const V1, Vertex * const V2) const;
 
 public:
 	
@@ -124,31 +122,32 @@ public:
 
 		GETTER:
 
-		unsigned long long 		getID()
-		Vertex* 				getVertex(int index)
-		TEdge* 					getEdge(int index)
-		Vertex* 				getOtherVertex(TEdge *e)
-		TEdge* 					getEdgeNotContaining(Vertex *v)
-		TEdge* 					getEdgeContaining(Vertex *v)
-		TEdge* 					getOtherEdgeContaining(Vertex *v, TEdge *e)
-		std::vector<TEdge*> 	getOtherEdges(TEdge* e)
-		TEdge* 					getLongestEdge(int epsilon)
-		TEdge* 					getLongestEdgeAlt()
-		double 					getRange(Vertex *v, double alpha)
+		unsigned long long 		getID() const
+		Vertex* 				getVertex(const int index) const
+		TEdge* 					getEdge(const int index) const
+		Vertex* 				getOtherVertex(TEdge * const e) const
+		TEdge* 					getEdgeNotContaining(Vertex * const v) const
+		TEdge* 					getEdgeContaining(Vertex * const v) const
+		TEdge* 					getOtherEdgeContaining(Vertex * const v, TEdge * const e) const
+		std::vector<TEdge*> 	getOtherEdges(TEdge * const e) const
+		TEdge* 					getLongestEdge(const double epsilon) const
+		TEdge* 					getLongestEdgeAlt() const
+		double 					getRange(Vertex * const v, const double alpha) const
 
 		PRINTER:
 
-		void 					print()
+		void 					print() const
 
 		OTHERS:
 
-		bool 					contains(Vertex *v)
-		bool 					contains(TEdge *e)
+		bool 					contains(Vertex * const v) const
+		bool 					contains(TEdge * const e) const
 		void 					enqueue()
 		void 					dequeue()
-		bool 					isEnqueued()
-		double 					calculateCollapseTime(Vertex* moving, double dx, double dy)
-		double 					signedArea()
+		bool 					isEnqueued() const
+		double 					calculateCollapseTime(Vertex * const moving, const double dx,
+								const double dy) const
+		double 					signedArea() const
 	*/
 
 
@@ -201,7 +200,7 @@ public:
 	/*
 		@return 	The ID of the vertex
 	*/
-	unsigned long long getID();
+	unsigned long long getID() const;
 
 	/*
 		The function getVertex() returns the vertex which is assigned to the position index which
@@ -215,7 +214,7 @@ public:
 			This function is basically just useful if you want to enumarate all vertices of the
 			triangle.
 	*/
-	Vertex *getVertex(int index);
+	Vertex *getVertex(const int index) const;
 
 	/*
 		The function getEdge() returns the edge which is assigned to the position index which
@@ -229,13 +228,13 @@ public:
 			This function is basically just useful if you want to enumarate all edges of the
 			triangle.
 	*/
-	TEdge *getEdge(int index);
+	TEdge *getEdge(const int index) const;
 
 	/*
 		@param 	e 	One of the triangle's edges
 		@return 	The vertex which is contained by the triangle, but not by the edge e
 	*/
-	Vertex *getOtherVertex(TEdge *e);
+	Vertex *getOtherVertex(TEdge * const e) const;
 
 	/*
 		@param 	v 	One of the triangle's vertices
@@ -244,7 +243,7 @@ public:
 		Note:
 			If all edges contain v, the function returns NULL, but then anything is wrong anyway
 	*/
-	TEdge *getEdgeNotContaining(Vertex *v);
+	TEdge *getEdgeNotContaining(Vertex * const v) const;
 
 	/*
 		The function getEdgeContaining() gets one of the two edges of the triangle which contains
@@ -255,7 +254,7 @@ public:
 		@return 	Any edge contained by the triangle which contains v (NULL of v is not part of
 					the triangle)
 	*/
-	TEdge *getEdgeContaining(Vertex *v);
+	TEdge *getEdgeContaining(Vertex * const v)const;
 
 	/*
 		The function getOtherEdgeContaining() gets you the edge of the triangle which is not e
@@ -266,13 +265,13 @@ public:
 		@return 	The edge you search for or NULL if such an edge does not exist (then something
 					is wrong)
 	*/
-	TEdge *getOtherEdgeContaining(Vertex *v, TEdge *e);
+	TEdge *getOtherEdgeContaining(Vertex * const v, TEdge * const e) const;
 
 	/*
 		@param 	e 	One edge which should be part of the triangle
 		@return 	A vector of all other edges part of the triangle
 	*/
-	std::vector<TEdge*> getOtherEdges(TEdge *e);
+	std::vector<TEdge*> getOtherEdges(TEdge * const e) const;
 
 	/*
 		The function getLongestEdge() computes the euclidean length of all edges and returns
@@ -287,7 +286,7 @@ public:
 			root this function could be very faulty, therefore it is by default replaced by
 			getLongestEdgeAlt() 
 	*/
-	TEdge *getLongestEdge(int epsilon);
+	TEdge *getLongestEdge(const double epsilon) const;
 
 	/*
 		The function getLongestEdgeAlt() finds the longest edge of the triangle not by computing
@@ -303,7 +302,7 @@ public:
 			This function works just if all vertices lay very close to one line which should be the
 			case at each flip event!
 	*/
-	TEdge *getLongestEdgeAlt();
+	TEdge *getLongestEdgeAlt() const;
 
 	/*
 		The function getRange() checks whether the triangle lays in direction alpha seen from
@@ -316,7 +315,7 @@ public:
 		@return 		Estimate for the distance v can move in direction alpha till it crashes
 						into an edge
 	*/
-	double getRange(Vertex *v, double alpha);
+	double getRange(Vertex * const v, const double alpha) const;
 
 
 	/*
@@ -326,7 +325,7 @@ public:
 	/*
 		The function print() prints all three vertices of the triangle
 	*/
-	void print();
+	void print() const;
 
 	
 	/*
@@ -339,7 +338,7 @@ public:
 		@param 	v 	The vertex of interest
 		@return 	True if the triangle contains v, otherwise false
 	*/
-	bool contains(Vertex *v);
+	bool contains(Vertex * const v) const;
 
 	/*
 		The function contains() checks whether the triangle contains the edge e.
@@ -347,7 +346,7 @@ public:
 		@param 	e 	The edge of interest
 		@return 	True if the triangle contains e, otherwise false
 	*/
-	bool contains(TEdge *e);
+	bool contains(TEdge * const e) const;
 
 	/*
 		The function enqueue() sets the triangle's enqueued flag.
@@ -363,7 +362,7 @@ public:
 		@return 	True if the triangle is enqueued in the event queue at the moment, otherwise
 					false
 	*/
-	bool isEnqueued();
+	bool isEnqueued() const;
 
 	/*
 		The function calculateCollapseTime() computes at which time of a translation of the vertex
@@ -382,7 +381,7 @@ public:
 			This function also can give you collapse times not between 0 and 1! This means that
 			the triangle will not become zero during this translation.
 	*/
-	double calculateCollapseTime(Vertex* moving, double dx, double dy);
+	double calculateCollapseTime(Vertex * const moving, const double dx, const double dy) const;
 
 	/*
 		The function signedArea() computes an estimate of the signed area of the triangle.
@@ -392,7 +391,7 @@ public:
 		Note:
 			In fact, it computes two times the signed area of the triangle.
 	*/
-	double signedArea();
+	double signedArea() const;
 	
 	
 	/*

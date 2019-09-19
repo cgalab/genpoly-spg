@@ -26,7 +26,7 @@ unsigned long long Triangle::n = 0;
 	Note:
 		In fact this functions computes 2 times the signed area of the triangle.
 */
-double Triangle::signedAreaExact(){
+double Triangle::signedAreaExact() const{
 	point p0, p1, p2;
 
 	p0.x = (*v0).getX();
@@ -53,7 +53,7 @@ double Triangle::signedAreaExact(){
 	Note:
 		- In fact this functions computes 2 times the signed area of the triangle.
 */
-double Triangle::signedAreaDouble(){
+double Triangle::signedAreaDouble() const{
 	unsigned long long id0, id1, id2;
 	double area;
 
@@ -97,7 +97,7 @@ double Triangle::signedAreaDouble(){
 	Note:
 		This is just default floating-point arithmetic!
 */
-double Triangle::det(Vertex *V0, Vertex *V1, Vertex *V2){
+double Triangle::det(Vertex * const V0, Vertex * const V1, Vertex * const V2) const{
 	double area;
 	double ax, ay, bx, by, cx, cy;
 
@@ -195,7 +195,7 @@ Triangle::Triangle(Vertex *V0, Vertex *V1, Vertex *V2) :
 /*
 	@return 	The ID of the vertex
 */
-unsigned long long Triangle::getID(){
+unsigned long long Triangle::getID() const{
 	return id;
 }
 
@@ -211,7 +211,7 @@ unsigned long long Triangle::getID(){
 		This function is basically just useful if you want to enumarate all vertices of the
 		triangle.
 */
-Vertex *Triangle::getVertex(int index){
+Vertex *Triangle::getVertex(const int index) const{
 	if(index == 0)
 		return v0;
 	if(index == 1)
@@ -234,7 +234,7 @@ Vertex *Triangle::getVertex(int index){
 		This function is basically just useful if you want to enumarate all edges of the
 		triangle.
 */
-TEdge *Triangle::getEdge(int index){
+TEdge *Triangle::getEdge(const int index) const{
 	if(index == 0)
 		return e0;
 	if(index == 1)
@@ -249,7 +249,7 @@ TEdge *Triangle::getEdge(int index){
 	@param 	e 	One of the triangle's edges
 	@return 	The vertex which is contained by the triangle, but not by the edge e
 */
-Vertex *Triangle::getOtherVertex(TEdge *e){
+Vertex *Triangle::getOtherVertex(TEdge * const e) const{
 	if(!(*e).contains(v0))
 		return v0;
 	else if(!(*e).contains(v1))
@@ -265,7 +265,7 @@ Vertex *Triangle::getOtherVertex(TEdge *e){
 	Note:
 		If all edges contain v, the function returns NULL, but then anything is wrong anyway
 */
-TEdge *Triangle::getEdgeNotContaining(Vertex *v){
+TEdge *Triangle::getEdgeNotContaining(Vertex * const v) const{
 	if(!(*e0).contains(v)) return e0;
 	if(!(*e1).contains(v)) return e1;
 	if(!(*e2).contains(v)) return e2;
@@ -283,7 +283,7 @@ TEdge *Triangle::getEdgeNotContaining(Vertex *v){
 	@return 	Any edge contained by the triangle which contains v (NULL of v is not part of
 				the triangle)
 */
-TEdge *Triangle::getEdgeContaining(Vertex *v){
+TEdge *Triangle::getEdgeContaining(Vertex * const v) const{
 	if((*e0).contains(v)) return e0;
 	if((*e1).contains(v)) return e1;
 	if((*e2).contains(v)) return e2;
@@ -302,7 +302,7 @@ TEdge *Triangle::getEdgeContaining(Vertex *v){
 	@return 	The edge you search for or NULL if such an edge does not exist (then something
 				is wrong)
 */
-TEdge *Triangle::getOtherEdgeContaining(Vertex *v, TEdge *e){
+TEdge *Triangle::getOtherEdgeContaining(Vertex * const v, TEdge * const e) const{
 	if((*e).getID() != (*e0).getID() && (*e0).contains(v)) return e0;
 	if((*e).getID() != (*e1).getID() && (*e1).contains(v)) return e1;
 	if((*e).getID() != (*e2).getID() && (*e2).contains(v)) return e2;
@@ -315,7 +315,7 @@ TEdge *Triangle::getOtherEdgeContaining(Vertex *v, TEdge *e){
 	@param 	e 	One edge which should be part of the triangle
 	@return 	A vector of all other edges part of the triangle
 */
-std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
+std::vector<TEdge*> Triangle::getOtherEdges(TEdge * const e) const{
 	std::vector<TEdge*> out(2);
 	int index = 0;
 
@@ -348,7 +348,7 @@ std::vector<TEdge*> Triangle::getOtherEdges(TEdge* e){
 		root this function could be very faulty, therefore it is by default replaced by
 		getLongestEdgeAlt() 
 */
-TEdge *Triangle::getLongestEdge(int epsilon){
+TEdge *Triangle::getLongestEdge(const double epsilon) const{
 	double l0 = (*e0).length();
 	double l1 = (*e1).length();
 	double l2 = (*e2).length();
@@ -413,7 +413,7 @@ TEdge *Triangle::getLongestEdge(int epsilon){
 		This function works just if all vertices lay very close to one line which should be the
 		case at each flip event!
 */
-TEdge *Triangle::getLongestEdgeAlt(){
+TEdge *Triangle::getLongestEdgeAlt() const{
 	Vertex *v;
 
 	v = getOtherVertex(e0);
@@ -450,7 +450,7 @@ TEdge *Triangle::getLongestEdgeAlt(){
 	@return 		Estimate for the distance v can move in direction alpha till it crashes
 					into an edge
 */
-double Triangle::getRange(Vertex *v, double alpha){
+double Triangle::getRange(Vertex * const v, const double alpha) const{
 	TEdge *e, *f, *g;
 	double alpha1, alpha2, l;
 
@@ -502,7 +502,7 @@ double Triangle::getRange(Vertex *v, double alpha){
 /*
 	The function print() prints all three vertices of the triangle
 */
-void Triangle::print(){
+void Triangle::print() const{
 	printf("Triangle %llu:\n", id);
 	(*v0).print();
 	(*v1).print();
@@ -520,7 +520,7 @@ void Triangle::print(){
 	@param 	v 	The vertex of interest
 	@return 	True if the triangle contains v, otherwise false
 */
-bool Triangle::contains(Vertex *v){
+bool Triangle::contains(Vertex * const v) const{
 	unsigned long long id = (*v).getID();
 
 	if((*v0).getID() == id) return true;
@@ -535,7 +535,7 @@ bool Triangle::contains(Vertex *v){
 	@param 	e 	The edge of interest
 	@return 	True if the triangle contains e, otherwise false
 */
-bool Triangle::contains(TEdge *e){
+bool Triangle::contains(TEdge * const e) const{
 	unsigned long long id = (*e).getID();
 
 	if((*e0).getID() == id) return true;
@@ -562,7 +562,7 @@ void Triangle::dequeue(){
 	@return 	True if the triangle is enqueued in the event queue at the moment, otherwise
 				false
 */
-bool Triangle::isEnqueued(){
+bool Triangle::isEnqueued() const{
 	return enqueued;
 }
 
@@ -583,8 +583,8 @@ bool Triangle::isEnqueued(){
 		This function also can give you collapse times not between 0 and 1! This means that
 		the triangle will not become zero during this translation.
 */
-double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
-	double ax, ay, bx, by, cx, cy;
+double Triangle::calculateCollapseTime(Vertex * const moving, const double dx, const double dy) const{
+	double ax, ay, bx, by, cx, cy, ex, ey;
 	double areaOld, areaNew, portion;
 
 	if(!contains(moving))
@@ -617,11 +617,11 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	cx = cx - ax;
 	cy = cy - ay;
 
-	dx = cx + dx;
-	dy = cy + dy;
+	ex = cx + dx;
+	ey = cy + dy;
 
 	areaOld = cx * by - cy * bx;
-	areaNew = bx * dy - by * dx;
+	areaNew = bx * ey - by * ex;
 
 	portion = areaNew / areaOld;
 
@@ -636,7 +636,7 @@ double Triangle::calculateCollapseTime(Vertex* moving, double dx, double dy){
 	Note:
 		In fact, it computes two times the signed area of the triangle.
 */
-double Triangle::signedArea(){
+double Triangle::signedArea() const{
 	if(Settings::arithmetics == Arithmetics::EXACT)
 		return signedAreaExact();
 	else
