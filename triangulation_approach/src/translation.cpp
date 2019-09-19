@@ -84,13 +84,11 @@ bool Translation::generateInitialQueue(){
 				exit(7);
 			}
 
-			// TODO:
-			// Probably the iterator won't work correct after this security flip
-
-			// Otherwise we can do a flip
+			// Otherwise we can do a flip, but will reject the translation because this flip will
+			// crash the iterator of this loop
 			printf("The moving vertex lays exactly on an edge before the translation -> security flip\n");
 			flip(i, true);
-			continue;
+			return false;
 		}
 
 		tr = new Triangle(v0, v1, newV);

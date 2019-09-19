@@ -228,6 +228,7 @@ void Triangulation::printPolygon(const char *filename){
 	// Print all polygon edges
 	// TODO:
 	// Make this more efficient by using the function Vertex::getToNext()
+	// But wait till we merge in the polygon class
 	fprintf(f, "<edges>\n");
 	for(auto const& i : edges){
 		e = i.second;
