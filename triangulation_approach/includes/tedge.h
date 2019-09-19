@@ -391,23 +391,19 @@ public:
 enum IntersectionType checkIntersection(TEdge *e0, TEdge *e1, bool precise);
 
 
-// TODO:
-// Maybe rework this function in a way that it takes edges as input instead of vertices
 /*
-	The function getIntersectionPoint() computes the intersection point between the edges defined by
-	the vertices s0 and e0 and the vertices s1 and e1. This algorithm is taken from the article
-	"Intersection of two lines in three-space" by Ronald Goldman, published in Graphics Gems, page 304.
+	The function getIntersectionPoint() computes the intersection point between the edges e0 and e1.
+	This algorithm is taken from the article "Intersection of two lines in three-space" by Ronald
+	Goldman, published in Graphics Gems, page 304.
 
-	@param 	s0 	The start vertex of the first edge
-	@param 	e0 	The end vertex of the first edge
-	@param 	s1 	The start vertex of the second edge
-	@param 	e1 	The end vertex if the second edge
+	@param 	e0 	The first edge
+	@param 	e1 	The second edge
 	@return 	The intersection point if both edges do intersect, otherwise NULL
 
 	Note:
 		https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 */
-Vertex *getIntersectionPoint(Vertex *s0, Vertex *e0, Vertex *s1, Vertex *e1);
+Vertex *getIntersectionPoint(TEdge *e0, TEdge *e1);
 
 /*
 	The function crossProduct2D() computes a 2D-version of the cross product of two vectors which is

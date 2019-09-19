@@ -410,9 +410,9 @@ enum Executed Translation::executeSplitRetainSide(){
 	enum Executed ex;
 
 	// Compute the intersection point to split the translation
-	intersectionPoint = getIntersectionPoint(prevV, oldV, nextV, newV);
+	intersectionPoint = getIntersectionPoint(prevOldE, nextNewE);
 	if(intersectionPoint == NULL)
-		intersectionPoint = getIntersectionPoint(nextV, oldV, prevV, newV);
+		intersectionPoint = getIntersectionPoint(nextOldE, prevNewE);
 	if(intersectionPoint == NULL){
 		return Executed::REJECTED;
 	}
