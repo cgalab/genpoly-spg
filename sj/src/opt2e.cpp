@@ -36,12 +36,14 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   double val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
-  bool loop = false;
+  bool loop = false, e1_found;
 //  bool debug=false;
   std::set<Edge> edgeS; // a set of edges.
   double circumference;
   std::map<double, unsigned int> circ, c_counter;
   std::map<double, unsigned int>::iterator c_it;
+
+  duration = elapsed();
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     circumference = pol_calc_circumference(polygon, points);
@@ -97,19 +99,10 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         val3 = det(e1, *p2);
       }
 
-      if (fabs(val3 == 0)) {
-        if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) {
-//          (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-          if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
-//            (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-            loop = true;
-          }
-        }
-      }
-
 //      (debug) ? std::cerr << "*e1.p2: " << *e1.p2 << ", *p1: " << *p1 << ", same: " << ((*e1.p2 == *p1) ? "true" : "false") << std::endl : std::cerr;
 
       //process first edge
+      e1_found=false;
       if (*e1.p2 == *p1) {
 //        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
         val1.first = removeEdgeFromSet(e1, edgeS, polygon, points);
@@ -121,32 +114,45 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points,
             if (val1_2 == E_NOT_VALID) break;
           }
           loop=true;
+          e1_found=true;
         }
       }
       else {
         // Only if the first edge has to be added do we have to check for collinearity, as then both edges have to be added.
+        if (fabs(val3 == 0)) {
+          if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) {
+//          (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+            if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
+//            (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+              loop = true;
+              e1_found=true;
+            }
+          }
+        }
 
 //        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
         val1 = processEdge(e1, edgeS, polygon, points);
         if (val1.first == E_NOT_VALID) break;
-        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop=true;}
+        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop=true;e1_found=true;}
       }
 
-      // process second edge
-      if (*e2.p2 == *p1) {
-//        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
-        val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
-        if (val2.first == E_NOT_VALID) break;
-        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop=true;} // if this happens, e1 was guaranteed removed as e1 < e2 and e2.p2 > e2.p1 > e1.p1
-      }
-      else {
-//        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
-        val2 = processEdge(e2, edgeS, polygon, points);
-        if (val2.first == E_NOT_VALID) break;
-        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
-          val2_1 = removeEdgeFromSet(e1, edgeS, polygon, points);
-          if (val2_1 == E_NOT_VALID) break;
-          loop=true;
+      if(!e1_found) {
+        // process second edge
+        if (*e2.p2 == *p1) {
+  //        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
+          val2.first = removeEdgeFromSet(e2, edgeS, polygon, points);
+          if (val2.first == E_NOT_VALID) break;
+          if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop=true;} // if this happens, e1 was guaranteed removed as e1 < e2 and e2.p2 > e2.p1 > e1.p1
+        }
+        else {
+  //        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
+          val2 = processEdge(e2, edgeS, polygon, points);
+          if (val2.first == E_NOT_VALID) break;
+          if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
+            val2_1 = removeEdgeFromSet(e1, edgeS, polygon, points);
+            if (val2_1 == E_NOT_VALID) break;
+            loop=true;
+          }
         }
       }
 
