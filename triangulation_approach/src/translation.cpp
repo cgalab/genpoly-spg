@@ -56,7 +56,7 @@ Translation::Translation(Triangulation *Tr, int i, double dX, double dY, Transla
 		This function also checks whether any of the triangles is zero and tries to repair it. If
 		it finds something not repairable it erros with exit code 7.
 */
-bool Translation::generateInitialQueue(){
+bool Translation::generateInitialQueue() const{
 	double t;
 	std::list<Triangle*> triangles = (*original).getTriangles();
 	TEdge *opposite;
@@ -138,7 +138,7 @@ bool Translation::generateInitialQueue(){
 	Note:
 		Source: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
 */
-bool Translation::insideQuadrilateral(Vertex *v){
+bool Translation::insideQuadrilateral(Vertex * const v) const{
 	Vertex *dummyVertex;
 	TEdge *dummyEdge;
 	double maxX, x;
@@ -231,7 +231,7 @@ bool Translation::insideQuadrilateral(Vertex *v){
 			type VERTEX.
 		- Edges of the bounding box are treated as polygon edges
 */
-bool Translation::checkEdge(Vertex *fromV, TEdge *newE){
+bool Translation::checkEdge(Vertex *fromV, TEdge *newE) const{
 	std::vector<TEdge*> surEdges;
 	enum IntersectionType iType = IntersectionType::NONE;
 	enum IntersectionType iType0, iType1;
@@ -336,7 +336,7 @@ bool Translation::checkEdge(Vertex *fromV, TEdge *newE){
 		be the case besides such splitted translation where the vertex is moved exactly to a
 		triangulation edge on purpose.
 */
-void Translation::repairEnd(){
+void Translation::repairEnd() const{
 	std::list<Triangle*> triangles;
 	double area;
 	TEdge *edge;
@@ -403,7 +403,7 @@ void Translation::repairEnd(){
 	Note:
 		For detailed information why we can do that take a look at my Master Thesis
 */
-enum Executed Translation::executeSplitRetainSide(){
+enum Executed Translation::executeSplitRetainSide() const{
 	Vertex *intersectionPoint;
 	double transX, transY;
 	Translation *trans;
@@ -459,7 +459,7 @@ enum Executed Translation::executeSplitRetainSide(){
 	Note:
 		For detailed information why we can do that take a look at my Master Thesis
 */
-enum Executed Translation::executeSplitChangeSide(){
+enum Executed Translation::executeSplitChangeSide() const{
 	double middleX, middleY;
 	double transX, transY;
 	Translation *trans;
@@ -567,7 +567,7 @@ Translation::Translation(Triangulation *Tr, int i, double dX, double dY) :
 
 	@return 	True if the polygon would change its orientation, otherwise false
 */
-bool Translation::checkOverroll(){
+bool Translation::checkOverroll() const{
 	bool overroll;
 	Vertex *randomV;
 
@@ -672,7 +672,7 @@ enum Executed Translation::execute(){
 // TODO:
 // It is definitelly necessary to split this function into multiple functions!
 // The flip() function could also be private
-bool Translation::flip(Triangle *t0, bool singleFlip){
+bool Translation::flip(Triangle *t0, const bool singleFlip) const{
 	TEdge *e, *e1, *e2;
 	Triangle *t1;
 	Vertex *vj0, *vj1; // joint vertices
@@ -939,7 +939,7 @@ bool Translation::flip(Triangle *t0, bool singleFlip){
 
 	@return 	True if the resulting polygon is still simple, otherwise false
 */
-bool Translation::checkSimplicityOfTranslation(){
+bool Translation::checkSimplicityOfTranslation() const{
 	bool simple;
 
 	(*prevOldE).setEdgeType(EdgeType::TRIANGULATION);

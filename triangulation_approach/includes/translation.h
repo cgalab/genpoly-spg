@@ -46,20 +46,20 @@ private:
 	/*
 		The triangulation the vertex to be translated lives in
 	*/
-	Triangulation *T;
+	Triangulation * const T;
 
 	/*
 		The index of the vertex in the triangulation's vertex vector
 	*/
-	int index;
+	const int index;
 
 	/*
 		The vertex to be translated, a copy at the start position and a copy at the
 		target position
 	*/
-	Vertex *original;
-	Vertex *oldV;
-	Vertex *newV;
+	Vertex * original;
+	Vertex * oldV;
+	Vertex * newV;
 
 	/*
 		The neighboring vertices in the polygon
@@ -87,7 +87,7 @@ private:
 	/*
 		The components of the translation vector
 	*/
-	double dx, dy;
+	const double dx, dy;
 
 	/*
 		Indicates whether the translation must be split to be processed or can be processed
@@ -98,7 +98,7 @@ private:
 	/*
 		The type of the translation
 	*/
-	TranslationType type;
+	const TranslationType type;
 
 	/*
 		The event queue for this translation
@@ -147,7 +147,7 @@ private:
 			This function also checks whether any of the triangles is zero and tries to repair
 			it. If it finds something not repairable it erros with exit code 7.
 	*/
-	bool generateInitialQueue();
+	bool generateInitialQueue() const;
 
 	/*
 		The function insideQuadrilateral() checks whether the vertex v lays inside of a
@@ -166,7 +166,7 @@ private:
 		Note:
 			Source: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
 	*/
-	bool insideQuadrilateral(Vertex *v);
+	bool insideQuadrilateral(Vertex * const v) const;
 
 	/*
 		The function checkEdge() checks whether the edge newE starting at vertex fromV
@@ -191,7 +191,7 @@ private:
 				If we find more then one, the function returns false.
 			- Edges of the bounding box are treated as polygon edges
 	*/
-	bool checkEdge(Vertex *fromV, TEdge *newE);
+	bool checkEdge(Vertex * const fromV, TEdge * const newE) const;
 
 	/*
 		The function repairEnd() checks at the end of a translation whether there exist any
@@ -204,7 +204,7 @@ private:
 			should never be the case besides such splitted translation where the vertex is
 			moved exactly to a triangulation edge on purpose.
 	*/
-	void repairEnd();
+	void repairEnd() const;
 
 	/*
 		The function executeSplitRetainSide() decomposes one translation, which can not be
@@ -224,7 +224,7 @@ private:
 		Note:
 			For detailed information why we can do that take a look at my Master Thesis
 	*/
-	enum Executed executeSplitRetainSide();
+	enum Executed executeSplitRetainSide() const;
 
 	/*
 		The function executeSplitChangeSide() decomposes one translation, which can not be
@@ -240,7 +240,7 @@ private:
 		Note:
 			For detailed information why we can do that take a look at my Master Thesis
 	*/
-	enum Executed executeSplitChangeSide();
+	enum Executed executeSplitChangeSide() const;
 
 public:
 
@@ -298,7 +298,7 @@ public:
 
 		@return 	True if the polygon would change its orientation, otherwise false
 	*/
-	bool checkOverroll();
+	bool checkOverroll() const;
 
 	/*
 		The function execute() processes a translation. If the flag split is set, it calls the
@@ -334,7 +334,7 @@ public:
 				to wrong decisions
 			- For more information on the method of deciding take a look into my Master Thesis
 	*/
-	bool flip(Triangle *t0, bool singleFlip);
+	bool flip(Triangle *t0, const bool singleFlip) const;
 
 	/*
 		The function checkSimplicityOfTranslation() determines whether the result of a
@@ -343,7 +343,7 @@ public:
 
 		@return 	True if the resulting polygon is still simple, otherwise false
 	*/
-	bool checkSimplicityOfTranslation();
+	bool checkSimplicityOfTranslation() const;
 
 	/*
 		The function checkSplit() determines whether a translation can be executed directly
