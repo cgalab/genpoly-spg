@@ -48,10 +48,10 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     circumference = pol_calc_circumference(polygon, points);
     c_it = circ.find(circumference);
-//    std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
+    std::cerr << "c: " << circumference << ", circ[c]: " << (*c_it).second << std::endl;
     if (c_it != circ.end()) {
 //      std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
-      if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
+      //if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
       circ[circumference] = (*c_it).second +1;
     }
     else {

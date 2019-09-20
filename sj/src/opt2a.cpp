@@ -42,7 +42,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   double val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
-  bool loop = false;
+  bool loop = false, finished_loop = false;
 //  bool debug=false;
   std::set<Edge> edgeS; // a set of edges.
   double circumference;
@@ -52,24 +52,27 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   duration = elapsed();
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
-    circumference = pol_calc_circumference(polygon, points);
-    c_it = circ.find(circumference);
-//    std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
-    if (c_it != circ.end()) {
-//      std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
-      if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
-      circ[circumference] = (*c_it).second +1;
-    }
-    else {
-      circ[circumference] = 1;
+    if (finished_loop) {
+      circumference = pol_calc_circumference(polygon, points);
+      c_it = circ.find(circumference);
+  //    std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
+      if (c_it != circ.end()) {
+  //      std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
+        if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
+        circ[circumference] = (*c_it).second +1;
+      }
+      else {
+        circ[circumference] = 1;
+      }
     }
 
     loop = false;
+    finished_loop = false;
     index = 0;
     decrementEdges(edgeS);
 
   	while (index < points.size()) {
-//      std::cerr << "i: " << index << std::endl;
+      std::cerr << "i: " << index << std::endl;
 //      if (index > 489 && index < 506) {
 //        std::cerr << std::endl << "i: " << index << std::endl;
 //        debug = true;
@@ -160,6 +163,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       }
 
   		++index;
+      if (index == points.size()) finished_loop = true;
   	}
     if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
   } while (loop);
