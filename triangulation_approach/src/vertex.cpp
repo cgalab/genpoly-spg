@@ -27,7 +27,7 @@ unsigned long long Vertex::deleted = 0;
 	Note:
 		By default the reserveID is set to 2 * ID
 */
-void Vertex::setRID(unsigned long long rid){
+void Vertex::setRID(const unsigned long long rid){
 	reserveID = rid;
 }
 
@@ -40,14 +40,16 @@ void Vertex::setRID(unsigned long long rid){
 	@param 	depth 	The number of recursive steps to be done, basically a depth of n means
 					that all vertices with distance less then an to this vertex are included
 */
-void Vertex::getEnvironment(std::map<int, TEdge*> &es, std::map<int, Vertex*> &vs, int depth){
-	Vertex* v;
+void Vertex::getEnvironment(std::map<const unsigned long long, const TEdge*> &es,
+	std::map<const unsigned long long, const Vertex*> &vs, const int depth) const{
+	
+	Vertex *v;
 
-	vs.insert(std::pair<int, Vertex*>(id, this));
+	vs.insert(std::make_pair(id, this));
 
 	if(depth > 0){
 		for(auto const& i : edges){
-			es.insert(std::pair<int, TEdge*>((*i).getID(), i));
+			es.insert(std::make_pair((*i).getID(), i));
 			v = (*i).getOtherVertex(this);
 			(*v).getEnvironment(es, vs, depth - 1);
 		}
@@ -69,7 +71,7 @@ void Vertex::getEnvironment(std::map<int, TEdge*> &es, std::map<int, Vertex*> &v
 	@param 	X 	The x coordinate of the vertex
 	@param 	Y 	The y coordinate of the vertex
 */
-Vertex::Vertex(double X, double Y) :
+Vertex::Vertex(const double X, const double Y) :
 	T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(false), id(n), reserveID(2 * n) {
 	n++;
 }
@@ -83,7 +85,7 @@ Vertex::Vertex(double X, double Y) :
 	@param 	Y 	The y coordinate of the vertex
 	@param 	RV 	Determines whether the new vertex is part of the bounding box
 */
-Vertex::Vertex(double X, double Y, bool RV) :
+Vertex::Vertex(const double X, const double Y, const bool RV) :
 	T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(RV), id(n), reserveID(2 * n) {
 	n++;
 }
@@ -100,7 +102,7 @@ Vertex::Vertex(double X, double Y, bool RV) :
 	@param 	dy 	Y-component of the translation vector
 	@return		The translated vertex
 */
-Vertex *Vertex::getTranslated(double dx, double dy){
+Vertex *Vertex::getTranslated(const double dx, const double dy) const{
 	Vertex *v = new Vertex(x + dx, y + dy);
 
 	if(dx != 0 || dy != 0)
@@ -117,7 +119,7 @@ Vertex *Vertex::getTranslated(double dx, double dy){
 /*
 	@param 	t 	The triangulation the vertex lives in
 */
-void Vertex::setTriangulation(Triangulation *t){
+void Vertex::setTriangulation(Triangulation * const t){
 	T = t;
 }
 
@@ -125,7 +127,7 @@ void Vertex::setTriangulation(Triangulation *t){
 	@param 	X 	The new x-coordinate of the vertex
 	@param 	Y 	The new y-coordinate of the vertex
 */
-void Vertex::setPosition(double X, double Y){
+void Vertex::setPosition(const double X, const double Y){
 	x = X;
 	y = Y;
 }
@@ -140,7 +142,7 @@ void Vertex::setPosition(double X, double Y){
 		- While constructing an edge this function is automatically called to add the
 			edge to the edges lists of its vertices
 */
-void Vertex::addEdge(TEdge *e){
+void Vertex::addEdge(TEdge * const e){
 	edges.push_back(e);
 }
 
@@ -154,7 +156,7 @@ void Vertex::addEdge(TEdge *e){
 		- While constructing a triangle this function is automatically called to add the
 			triangle to the triangles lists of its vertices
 */
-void Vertex::addTriangle(Triangle *t){
+void Vertex::addTriangle(Triangle * const t){
 	triangles.push_back(t);
 }
 
@@ -167,7 +169,7 @@ void Vertex::addTriangle(Triangle *t){
 	Note:
 		This function is automatically called when a new polygon edge is constructed.
 */
-void Vertex::setToPrev(TEdge *e){
+void Vertex::setToPrev(TEdge * const e){
 	toPrev = e;
 }
 
@@ -180,7 +182,7 @@ void Vertex::setToPrev(TEdge *e){
 	Note:
 		This function is automatically called when a new polygon edge is constructed.
 */
-void Vertex::setToNext(TEdge *e){
+void Vertex::setToNext(TEdge * const e){
 	toNext = e;
 }
 
@@ -192,35 +194,35 @@ void Vertex::setToNext(TEdge *e){
 /*
 	@return 	The x-coordinate of the vertex's position
 */
-double Vertex::getX(){
+double Vertex::getX() const{
 	return x;
 }
 
 /*
 	@return 	The y-coordinate of the vertex's position
 */
-double Vertex::getY(){
+double Vertex::getY() const{
 	return y;
 }
 
 /*
 	@return 	The triangles list of the vertex
 */
-std::list<Triangle*> Vertex::getTriangles(){ 
+std::list<Triangle*> Vertex::getTriangles() const{ 
 	return triangles;
 }
 
 /*
 	@return 	The ID of the vertex
 */
-unsigned long long Vertex::getID(){
+unsigned long long Vertex::getID() const{
 	return id;
 }
 
 /*
 	@return 	The reserve ID of the vertex
 */
-unsigned long long Vertex::getRID(){
+unsigned long long Vertex::getRID() const{
 	return reserveID;
 }
 
@@ -232,7 +234,7 @@ unsigned long long Vertex::getRID(){
 	@return 		The edge from the vertex to the vertex toV if existing, otherwise
 					NULL
 */
-TEdge *Vertex::getEdgeTo(Vertex *toV){
+TEdge *Vertex::getEdgeTo(Vertex * const toV) const{
 	unsigned long long toID = (*toV).getID();
 	Vertex *v;
 
@@ -253,7 +255,7 @@ TEdge *Vertex::getEdgeTo(Vertex *toV){
 
 	@return 	A list of all surrounding edges
 */
-std::vector<TEdge*> Vertex::getSurroundingEdges(){
+std::vector<TEdge*> Vertex::getSurroundingEdges() const{
 	std::vector<TEdge*> out(triangles.size());
 	int n = 0;
 
@@ -268,7 +270,7 @@ std::vector<TEdge*> Vertex::getSurroundingEdges(){
 /*
 	@return 	A list of all (2) polygon edges incident to the vertex
 */
-std::list<TEdge*> Vertex::getPolygonEdges(){
+std::list<TEdge*> Vertex::getPolygonEdges() const{
 	std::list<TEdge*> out;
 
 	out.push_back(toPrev);
@@ -280,7 +282,7 @@ std::list<TEdge*> Vertex::getPolygonEdges(){
 /*
 	@return 	True if the vertex is part of the bounding box, otherwise false
 */
-bool Vertex::isRectangleVertex(){
+bool Vertex::isRectangleVertex() const{
 	return rectangleVertex;
 }
 
@@ -291,7 +293,7 @@ bool Vertex::isRectangleVertex(){
 
 	@return 	The mean of the lengths of all incident edges
 */
-double Vertex::getMediumEdgeLength(){
+double Vertex::getMediumEdgeLength() const{
 	int n = edges.size();
 	double sum = 0;
 
@@ -318,7 +320,7 @@ double Vertex::getMediumEdgeLength(){
 		This gives a better estimate then getMediumEdgeLength(), but is more
 		expensive to compute
 */
-double Vertex::getDirectedEdgeLength(double alpha){
+double Vertex::getDirectedEdgeLength(const double alpha) const{
 	double length;
 
 	for(auto const& i : triangles){
@@ -339,35 +341,35 @@ double Vertex::getDirectedEdgeLength(double alpha){
 /*
 	@return 	The edge to the predecessor of the vertex in the polygon
 */
-TEdge *Vertex::getToPrev(){
+TEdge *Vertex::getToPrev() const{
 	return toPrev;
 }
 
 /*
 	@return 	The edge to the successor of the vertex in the polygon
 */
-TEdge *Vertex::getToNext(){
+TEdge *Vertex::getToNext() const{
 	return toNext;
 }
 
 /*
 	@return 	 The predecessor of the vertex in the polygon
 */
-Vertex *Vertex::getPrev(){
+Vertex *Vertex::getPrev() const{
 	return (*toPrev).getOtherVertex(this);
 }
 
 /*
 	@return 	The successor of the vertex in the polygon
 */
-Vertex *Vertex::getNext(){
+Vertex *Vertex::getNext() const{
 	return (*toNext).getOtherVertex(this);
 }
 
 /*
 	@return 	The triangulation the vertex lives in
 */
-Triangulation *Vertex::getTriangulation(){
+Triangulation *Vertex::getTriangulation() const{
 	return T;
 }
 
@@ -380,7 +382,7 @@ Triangulation *Vertex::getTriangulation(){
 	@param 	v1 	Third vertex vontained by the searched triangle
 	@return 	The searched triangle if it exists, otherwise NULL
 */
-Triangle *Vertex::getTriangleWith(Vertex *v0, Vertex *v1){
+Triangle *Vertex::getTriangleWith(Vertex const * const v0, Vertex const * const v1) const{
 
 	for(auto const& i : triangles){
 		if((*i).contains(v0) && (*i).contains(v1))
@@ -398,14 +400,14 @@ Triangle *Vertex::getTriangleWith(Vertex *v0, Vertex *v1){
 /*
 	@param 	e 	Edge to be removed from the edges list
 */
-void Vertex::removeEdge(TEdge *e){
+void Vertex::removeEdge(TEdge * const e){
 	edges.remove(e);
 }
 
 /*
 	@param 	t 	Triangle to be removed from the triangles list
 */
-void Vertex::removeTriangle(Triangle *t){
+void Vertex::removeTriangle(Triangle * const t){
 	triangles.remove(t);
 }
 
@@ -428,7 +430,7 @@ void Vertex::removeTriangle(Triangle *t){
 		This function just prints one node into a .graphml file, to print the hole
 		triangulation use the print functions of the Triangulation class
 */
-void Vertex::print(FILE *f, double factor){
+void Vertex::print(FILE * const f, double factor) const{
 	int n; 
 
 	if(factor == 0){
@@ -449,7 +451,7 @@ void Vertex::print(FILE *f, double factor){
 	The function print() prints the basic information of a vertex to standard out.
 	It prints the ID and both coordinates in a precision of 15 decimal digits.
 */
-void Vertex::print(){
+void Vertex::print() const{
 	printf("Vertex %llu at (%.15f, %.15f)\n", id, x, y);
 }
 
@@ -463,12 +465,12 @@ void Vertex::print(){
 						are included
 	@param 	filename 	The name of the file to write to
 */
-void Vertex::printEnvironment(int depth, const char *filename){
+void Vertex::printEnvironment(const int depth, const char *filename) const{
 	FILE *f;
-	std::map<int, TEdge*> es;
-	std::map<int, Vertex*> vs;
-	TEdge *e;
-	Vertex *v;
+	std::map<const unsigned long long, const TEdge*> es;
+	std::map<const unsigned long long, const Vertex*> vs;
+	TEdge const *e;
+	Vertex const *v;
 
 	f = fopen(filename, "w");
 
@@ -509,36 +511,36 @@ void Vertex::printEnvironment(int depth, const char *filename){
 
 	@param 	filename 	The name of the .graphml file
 */
-void Vertex::printSurroundingTriangulation(const char *filename){
+void Vertex::printSurroundingTriangulation(const char *filename) const{
 	FILE *f;
-	std::map<int, TEdge*> es;
-	std::map<int, Vertex*> vs;
-	TEdge *e;
-	Vertex *v;
+	std::map<const unsigned long long, const TEdge*> es;
+	std::map<const unsigned long long, const Vertex*> vs;
+	TEdge const *e;
+	Vertex const *v;
 
 	f = fopen(filename, "w");
 
-	// Collect all entitites
-	vs.insert(std::pair<int, Vertex*>(id, this));
+	// Collect all entities
+	vs.insert(std::make_pair(id, this));
 
 	for(auto const& i : triangles){
 		e = (*i).getEdge(0);
-		es.insert(std::pair<int, TEdge*>((*e).getID(), e));
+		es.insert(std::make_pair((*e).getID(), e));
 
 		e = (*i).getEdge(1);
-		es.insert(std::pair<int, TEdge*>((*e).getID(), e));
+		es.insert(std::make_pair((*e).getID(), e));
 
 		e = (*i).getEdge(2);
-		es.insert(std::pair<int, TEdge*>((*e).getID(), e));
+		es.insert(std::make_pair((*e).getID(), e));
 
 		v = (*i).getVertex(0);
-		vs.insert(std::pair<int, Vertex*>((*v).getID(), v));
+		vs.insert(std::make_pair((*v).getID(), v));
 
 		v = (*i).getVertex(1);
-		vs.insert(std::pair<int, Vertex*>((*v).getID(), v));
+		vs.insert(std::make_pair((*v).getID(), v));
 
 		v = (*i).getVertex(2);
-		vs.insert(std::pair<int, Vertex*>((*v).getID(), v));
+		vs.insert(std::make_pair((*v).getID(), v));
 	}
 
 	// Write graphml header
@@ -630,7 +632,7 @@ bool Vertex::check(){
 		- It is not checked that a simple polygon after stretching is still simple.
 			In theory it has to, but for numerical reasons this might fail
 */
-void Vertex::stretch(double factor){
+void Vertex::stretch(const double factor){
 	x = factor * x;
 	y = factor * y;
 }

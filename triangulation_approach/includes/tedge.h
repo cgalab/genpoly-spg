@@ -64,8 +64,8 @@ private:
 	/*
 		The two vertices defining the edge
 	*/
-	Vertex *v0;
-	Vertex *v1;
+	Vertex * const v0;
+	Vertex * const v1;
 
 	/*
 		The two triangles which contain the edge
@@ -81,7 +81,7 @@ private:
 	/*
 		The unique ID of the edge
 	*/
-	unsigned long long id;
+	const unsigned long long id;
 
 	/*
 		The number of already generated edges
@@ -95,44 +95,44 @@ public:
 
 		CONSTRUCTORS:
 		
-							TEdge(Vertex *V0, Vertex *V1)
-							TEdge(Vertex *V0, Vertex *V1, EdgeType tp)
+							TEdge(Vertex * const V0, Vertex * const V1)
+							TEdge(Vertex * const V0, Vertex * const V1, const EdgeType tp)
 
 		SETTER:
 
-		void 				setTriangulation(Triangulation *t)
-		void 				setEdgeType(EdgeType tp)
-		void 				setTriangle(Triangle *t)
+		void 				setTriangulation(Triangulation * const t)
+		void 				setEdgeType(const EdgeType tp)
+		void 				setTriangle(Triangle * const t)
 
 		GETTER:
 
-		unsigned long long 	getID()
-		EdgeType 			getEdgeType()
-		Vertex* 			getV0()
-		Vertex* 			getV1()
-		Triangle* 			getT0()
-		Triangle* 			getT1()
-		Triangle* 			getTriangleNotContaining(Vertex *v)
-		Triangle* 			getTriangleContaining(Vertex *v)
-		Triangle* 			getOtherTriangle(Triangle *t)
-		Vertex* 			getOtherVertex(Vertex *v)
+		unsigned long long 	getID() const
+		EdgeType 			getEdgeType() const
+		Vertex* 			getV0() const
+		Vertex* 			getV1() const
+		Triangle* 			getT0() const
+		Triangle* 			getT1() const
+		Triangle* 			getTriangleNotContaining(Vertex const * const v) const
+		Triangle* 			getTriangleContaining(Vertex const * const v) const
+		Triangle* 			getOtherTriangle(Triangle const * const t) const
+		Vertex* 			getOtherVertex(Vertex const * const v) const
 
 		REMOVER:
 
-		void 				removeTriangle(Triangle *t)
+		void 				removeTriangle(Triangle * const t)
 
 		PRINTER:
 
-		void 				print(FILE *f)
-		void 				print()
+		void 				print(FILE * const f) const
+		void 				print() const
 
 		OTHERS:
 
-		double 				length()
-		bool 				contains()
-		int 				nrAssignedTriangles()
-		double 				getAngle()
-		bool 				isBetween()
+		double 				length() const
+		bool 				contains(Vertex const * const v) const
+		int 				nrAssignedTriangles() const
+		double 				getAngle(Vertex const * const v) const
+		bool 				isBetween(Vertex const * const v) const
 	*/
 
 
@@ -148,7 +148,7 @@ public:
 		@param	V0 	First vertex defining the edge
 		@param 	V1 	Second vertex defining the edge
 	*/
-	TEdge(Vertex *V0, Vertex *V1);
+	TEdge(Vertex * const V0, Vertex * const V1);
 
 	/*
 		Constructor:
@@ -165,7 +165,7 @@ public:
 			For edges oft type POLYGON the ordering of the vertices as parameters is
 			important!
 	*/
-	TEdge(Vertex *V0, Vertex *V1, EdgeType tp);
+	TEdge(Vertex * const V0, Vertex * const V1, const EdgeType tp);
 
 
 	/*
@@ -175,12 +175,12 @@ public:
 	/*
 		@param 	t 	The triangulation the edge belongs to
 	*/
-	void setTriangulation(Triangulation *t);
+	void setTriangulation(Triangulation * const t);
 
 	/*
 		@param 	tp 	The new type of the edge
 	*/
-	void setEdgeType(EdgeType tp);
+	void setEdgeType(const EdgeType tp);
 
 	/*
 		The function setTriangle() registers a new triangle, which contains the edge, at the
@@ -191,7 +191,7 @@ public:
 
 		@param 	t 	The new triangle
 	*/
-	void setTriangle(Triangle *t);
+	void setTriangle(Triangle * const t);
 
 	
 	/*
@@ -201,32 +201,32 @@ public:
 	/*
 		@return 	The ID of the edge
 	*/
-	unsigned long long getID();
+	unsigned long long getID() const;
 
 	/*
 		@return 	The type of the edge
 	*/
-	EdgeType getEdgeType();
+	EdgeType getEdgeType() const;
 
 	/*
 		@return 	The vertex at v0
 	*/
-	Vertex *getV0();
+	Vertex *getV0() const;
 
 	/*
 		@return 	The vertex at v1
 	*/
-	Vertex *getV1();
+	Vertex *getV1() const;
 
 	/*
 		@return 	The triangle at t0
 	*/
-	Triangle *getT0();
+	Triangle *getT0() const;
 	
 	/*
 		@return 	The triangle at t1
 	*/
-	Triangle *getT1();
+	Triangle *getT1() const;
 
 	/*
 		The function getTriangleNotContaining() returns t0 if it does not contain the vertex v,
@@ -235,7 +235,7 @@ public:
 		@param	v 	The vertex which should not be contained by the triangle
 		@return 	The triangle not containing v
 	*/
-	Triangle *getTriangleNotContaining(Vertex *v);
+	Triangle *getTriangleNotContaining(Vertex const * const v) const;
 
 	/*
 		The function getTriangleContaining() returns t0 if it does contain the vertex v,
@@ -244,7 +244,7 @@ public:
 		@param	v 	The vertex which should be contained by the triangle
 		@return 	The triangle containing v
 	*/
-	Triangle *getTriangleContaining(Vertex *v);
+	Triangle *getTriangleContaining(Vertex const * const v) const;
 
 	/*
 		The function getOtherTriangle() returns t1 if t equals t0, otherwise it returns t0.
@@ -252,7 +252,7 @@ public:
 		@param 	t 	The triangle which should not be returned
 		@return 	Another triangle
 	*/
-	Triangle *getOtherTriangle(Triangle *t);
+	Triangle *getOtherTriangle(Triangle const * const t) const;
 
 	/*
 		The function getOtherVertex() returns v1 if v is equal to v0, otherwise it returns
@@ -261,7 +261,7 @@ public:
 		@param 	v 	The vertex which should not be returned
 		@return 	Another vertex
 	*/
-	Vertex *getOtherVertex(Vertex *v);
+	Vertex *getOtherVertex(Vertex const *  const v) const;
 
 
 
@@ -273,8 +273,11 @@ public:
 		The function removeTriangle() cancels the assignment of the triangle t at the edge.
 
 		@param 	t 	Triangle to be removed
+
+		Note:
+			This function does not remove the edge from the triangle
 	*/
-	void removeTriangle(Triangle *t);
+	void removeTriangle(Triangle * const t);
 
 	
 	/*
@@ -289,13 +292,13 @@ public:
 
 		@param 	f 	Pointer to the file to print in
 	*/
-	void print(FILE *f);
+	void print(FILE * const f) const;
 
 	/*
 		The function print() prints the the edge ID, the IDs of its vertices and its edge type
 		to stdout.
 	*/
-	void print();
+	void print() const;
 
 
 	/*
@@ -305,7 +308,7 @@ public:
 	/*
 		@return 	The euclidean length of the edge
 	*/
-	double length();
+	double length() const;
 
 	/*
 		The function contains() checks whether the edge contains the vertex v.
@@ -313,12 +316,12 @@ public:
 		@param 	v 	The vertex of interest
 		@return 	True if the edge contains v, otherwise false
 	*/
-	bool contains(Vertex *v);
+	bool contains(Vertex const * const v) const;
 
 	/*
 		@return 	The number of triangles which are assigned at the edge
 	*/
-	int nrAssignedTriangles();
+	int nrAssignedTriangles() const;
 
 	/*
 		The function getAngle() computes the angle between the edge and the x-axis with the vertex
@@ -327,7 +330,7 @@ public:
 		@param 	v 	The vertex where the edge and the x-axis meet
 		@return 	The angle between the edge and the x-axis with -pi < angle <= pi
 	*/
-	double getAngle(Vertex *v);
+	double getAngle(Vertex const *  const v) const;
 
 	/*
 		The function isBetween() checks whether the vertex v is between the two vertices of the
@@ -341,7 +344,7 @@ public:
 			It is assumed that v lays pretty close to the supporting line of the edge, so it is only
 			necessary to check whether v lays between the longer edge of the ractangle.
 	*/
-	bool isBetween(Vertex *v);
+	bool isBetween(Vertex const * const v) const;
 
 
 	/*
@@ -388,7 +391,8 @@ public:
 		determinantent's absolute value is less than Settings::EpsInt. This also keeps vertices a bit
 		away from edges.
 */
-enum IntersectionType checkIntersection(TEdge *e0, TEdge *e1, bool precise);
+enum IntersectionType checkIntersection(TEdge const * const e0, TEdge const * const e1,
+	const bool precise);
 
 
 /*
@@ -403,7 +407,7 @@ enum IntersectionType checkIntersection(TEdge *e0, TEdge *e1, bool precise);
 	Note:
 		https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 */
-Vertex *getIntersectionPoint(TEdge *e0, TEdge *e1);
+Vertex *getIntersectionPoint(TEdge const * const e0, TEdge const * const e1);
 
 /*
 	The function crossProduct2D() computes a 2D-version of the cross product of two vectors which is
@@ -415,4 +419,4 @@ Vertex *getIntersectionPoint(TEdge *e0, TEdge *e1);
 	@param 	y1 	y-component of the second vector
 	@returm 	The 2D cross product of the two vectors
 */
-double crossProduct2D(double x0, double y0, double x1, double y1);
+double crossProduct2D(const double x0, const double y0, const double x1, const double y1);

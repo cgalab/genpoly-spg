@@ -265,7 +265,7 @@ Vertex *Triangle::getOtherVertex(TEdge * const e) const{
 	Note:
 		If all edges contain v, the function returns NULL, but then anything is wrong anyway
 */
-TEdge *Triangle::getEdgeNotContaining(Vertex * const v) const{
+TEdge *Triangle::getEdgeNotContaining(Vertex const * const v) const{
 	if(!(*e0).contains(v)) return e0;
 	if(!(*e1).contains(v)) return e1;
 	if(!(*e2).contains(v)) return e2;
@@ -283,7 +283,7 @@ TEdge *Triangle::getEdgeNotContaining(Vertex * const v) const{
 	@return 	Any edge contained by the triangle which contains v (NULL of v is not part of
 				the triangle)
 */
-TEdge *Triangle::getEdgeContaining(Vertex * const v) const{
+TEdge *Triangle::getEdgeContaining(Vertex const * const v) const{
 	if((*e0).contains(v)) return e0;
 	if((*e1).contains(v)) return e1;
 	if((*e2).contains(v)) return e2;
@@ -302,7 +302,7 @@ TEdge *Triangle::getEdgeContaining(Vertex * const v) const{
 	@return 	The edge you search for or NULL if such an edge does not exist (then something
 				is wrong)
 */
-TEdge *Triangle::getOtherEdgeContaining(Vertex * const v, TEdge * const e) const{
+TEdge *Triangle::getOtherEdgeContaining(Vertex const * const v, TEdge const * const e) const{
 	if((*e).getID() != (*e0).getID() && (*e0).contains(v)) return e0;
 	if((*e).getID() != (*e1).getID() && (*e1).contains(v)) return e1;
 	if((*e).getID() != (*e2).getID() && (*e2).contains(v)) return e2;
@@ -450,7 +450,7 @@ TEdge *Triangle::getLongestEdgeAlt() const{
 	@return 		Estimate for the distance v can move in direction alpha till it crashes
 					into an edge
 */
-double Triangle::getRange(Vertex * const v, const double alpha) const{
+double Triangle::getRange(Vertex const * const v, const double alpha) const{
 	TEdge *e, *f, *g;
 	double alpha1, alpha2, l;
 
@@ -520,7 +520,7 @@ void Triangle::print() const{
 	@param 	v 	The vertex of interest
 	@return 	True if the triangle contains v, otherwise false
 */
-bool Triangle::contains(Vertex * const v) const{
+bool Triangle::contains(Vertex const * const v) const{
 	unsigned long long id = (*v).getID();
 
 	if((*v0).getID() == id) return true;
@@ -535,7 +535,7 @@ bool Triangle::contains(Vertex * const v) const{
 	@param 	e 	The edge of interest
 	@return 	True if the triangle contains e, otherwise false
 */
-bool Triangle::contains(TEdge * const e) const{
+bool Triangle::contains(TEdge const * const e) const{
 	unsigned long long id = (*e).getID();
 
 	if((*e0).getID() == id) return true;

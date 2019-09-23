@@ -126,13 +126,14 @@ public:
 		Vertex* 				getVertex(const int index) const
 		TEdge* 					getEdge(const int index) const
 		Vertex* 				getOtherVertex(TEdge * const e) const
-		TEdge* 					getEdgeNotContaining(Vertex * const v) const
-		TEdge* 					getEdgeContaining(Vertex * const v) const
-		TEdge* 					getOtherEdgeContaining(Vertex * const v, TEdge * const e) const
+		TEdge* 					getEdgeNotContaining(Vertex const * const v) const
+		TEdge* 					getEdgeContaining(Vertex const * const v) const
+		TEdge* 					getOtherEdgeContaining(Vertex const * const v, TEdge const *
+								const e) const
 		std::vector<TEdge*> 	getOtherEdges(TEdge * const e) const
 		TEdge* 					getLongestEdge(const double epsilon) const
 		TEdge* 					getLongestEdgeAlt() const
-		double 					getRange(Vertex * const v, const double alpha) const
+		double 					getRange(Vertex const * const v, const double alpha) const
 
 		PRINTER:
 
@@ -140,8 +141,8 @@ public:
 
 		OTHERS:
 
-		bool 					contains(Vertex * const v) const
-		bool 					contains(TEdge * const e) const
+		bool 					contains(Vertex const * const v) const
+		bool 					contains(TEdge const * const e) const
 		void 					enqueue()
 		void 					dequeue()
 		bool 					isEnqueued() const
@@ -243,7 +244,7 @@ public:
 		Note:
 			If all edges contain v, the function returns NULL, but then anything is wrong anyway
 	*/
-	TEdge *getEdgeNotContaining(Vertex * const v) const;
+	TEdge *getEdgeNotContaining(Vertex const * const v) const;
 
 	/*
 		The function getEdgeContaining() gets one of the two edges of the triangle which contains
@@ -254,7 +255,7 @@ public:
 		@return 	Any edge contained by the triangle which contains v (NULL of v is not part of
 					the triangle)
 	*/
-	TEdge *getEdgeContaining(Vertex * const v)const;
+	TEdge *getEdgeContaining(Vertex const * const v)const;
 
 	/*
 		The function getOtherEdgeContaining() gets you the edge of the triangle which is not e
@@ -265,7 +266,7 @@ public:
 		@return 	The edge you search for or NULL if such an edge does not exist (then something
 					is wrong)
 	*/
-	TEdge *getOtherEdgeContaining(Vertex * const v, TEdge * const e) const;
+	TEdge *getOtherEdgeContaining(Vertex const * const v, TEdge const * const e) const;
 
 	/*
 		@param 	e 	One edge which should be part of the triangle
@@ -315,7 +316,7 @@ public:
 		@return 		Estimate for the distance v can move in direction alpha till it crashes
 						into an edge
 	*/
-	double getRange(Vertex * const v, const double alpha) const;
+	double getRange(Vertex const * const v, const double alpha) const;
 
 
 	/*
@@ -338,7 +339,7 @@ public:
 		@param 	v 	The vertex of interest
 		@return 	True if the triangle contains v, otherwise false
 	*/
-	bool contains(Vertex * const v) const;
+	bool contains(Vertex const * const v) const;
 
 	/*
 		The function contains() checks whether the triangle contains the edge e.
@@ -346,7 +347,7 @@ public:
 		@param 	e 	The edge of interest
 		@return 	True if the triangle contains e, otherwise false
 	*/
-	bool contains(TEdge * const e) const;
+	bool contains(TEdge const * const e) const;
 
 	/*
 		The function enqueue() sets the triangle's enqueued flag.
