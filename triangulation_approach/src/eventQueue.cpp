@@ -269,7 +269,7 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 	@param 	oV 		A copy of the vertex at its start position
 	@param	nV 		A copy of the vertex at its target position
 */	
-EventQueue::EventQueue(Vertex *orig, Vertex *oV, Vertex *nV) : 
+EventQueue::EventQueue(Vertex * const orig, Vertex * const oV, Vertex * const nV) : 
 	first(NULL), n(0), original(orig), oldV(oV), newV(nV) {}
 
 
@@ -290,7 +290,7 @@ EventQueue::EventQueue(Vertex *orig, Vertex *oV, Vertex *nV) :
 */
 // TODO:
 // Maybe add a function for inserting elements with checking
-void EventQueue::insertWithoutCheck(double time, Triangle *t){
+void EventQueue::insertWithoutCheck(const double time, Triangle *t){
 	struct Event *e0;
 	struct Event *e1, *prev = NULL;
 	double time1;
@@ -357,7 +357,7 @@ void EventQueue::insertWithoutCheck(double time, Triangle *t){
 	@return 			True if there are not more than two neighboring concurrent
 						events, otherwise false
 */
-bool EventQueue::makeStable(bool initial){
+bool EventQueue::makeStable(const bool initial){
 	struct Event *e0, *e1;
 	double time0, time1, dif;
 
@@ -420,7 +420,7 @@ std::pair<double, Triangle*> EventQueue::pop(){
 /*
 	@return 	The actual number of events in the event queue
 */
-int EventQueue::size(){
+int EventQueue::size() const{
 	return n;
 }
 
@@ -431,7 +431,7 @@ int EventQueue::size(){
 
 	@param 	t 	The triangle to be deleted
 */
-void EventQueue::remove(Triangle *t){
+void EventQueue::remove(Triangle * const t){
 	unsigned long long id = (*t).getID();
 	struct Event *e, *prev = NULL;
 
@@ -457,7 +457,7 @@ void EventQueue::remove(Triangle *t){
 /*
 	The function print() prints all event times in an ordered way to stdout.
 */
-void EventQueue::print(){
+void EventQueue::print() const{
 	struct Event *e;
 	int i = 0;
 
