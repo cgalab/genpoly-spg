@@ -12,7 +12,7 @@
 	@param 	t 		The triagnulation the polygon lives in
 	@param 	index 	The index of the vertex
 */
-Insertion::Insertion(Triangulation *t, int index) :
+Insertion::Insertion(Triangulation * const t, const int index) :
 	T(t), i(index) {
 
 	v0 = (*T).getVertex(i);
@@ -33,7 +33,7 @@ Insertion::Insertion(Triangulation *t, int index) :
 
 	@return 	True if the chosen edge fulfils the criteria, otherwise false
 */
-bool Insertion::checkStability(){
+bool Insertion::checkStability() const{
 	double l = (*e).length();
 	Triangle *t;
 
@@ -117,7 +117,7 @@ void Insertion::execute(){
 	which leads to a simple polygon and execute it. If it has not found a suitable
 	translation till the limit is reached, the new vertex will just stay were it is.
 */
-void Insertion::translate(){
+void Insertion::translate() const{
 	int index;
 	bool overroll, simple = false;
 	double alpha, stddev, r, dx, dy;

@@ -16,7 +16,7 @@
 		- For polygons with holes the vertex also is reandomly choosen, i.e. it can be from
 			the outer polygon as well as of one of the inner polygons
 */
-int transformPolygonByMoves(Triangulation *T, int iterations){
+int transformPolygonByMoves(Triangulation * const T, const int iterations){
 	int index = 0;
 	double dx = 0, dy = 0, stddev, alpha, r;
 	bool simple, overroll;
