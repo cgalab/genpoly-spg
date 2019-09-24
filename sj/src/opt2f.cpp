@@ -108,7 +108,6 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     revert = false;
     index = 0;
     lowest_index = points.size();
-    //collinear_index = polygon.size();
     decrementEdges(edgeS);
 
   	while (index < points.size()) {
@@ -132,8 +131,7 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   		p3 = &points[polygon[after]];
 
       // construct the edges
-  //    (debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
-      // collinearity was found, force advancing right.
+//    (debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
       if ((!revert && (*p2 < *p3)) || (revert && (*p3 < *p2))) {  // make sure the earlier edge gets processed first.
         e1 = Edge (p1, p2, index);
         e2 = Edge (p1, p3, index);
@@ -146,16 +144,14 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       }
 
       //process first edge
-      if (!(revert ^ (*p1 == *e1.p1)))
-      {
+      if (!(revert ^ (*p1 == *e1.p1))) {
 //        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
         val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
 //        (debug) ? std::cerr << "val1: " << val1.first << std::endl : std::cerr;
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) { // intersection found in the removal, skip the rest and restart.
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
-          if (!(revert ^ (*p1 == *e2.p1)))
-          {
+          if (!(revert ^ (*p1 == *e2.p1))) {
             val1_2 = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
 //            (debug) ? std::cerr << "val1_2: " << val1_2 << std::endl : std::cerr;
             if (val1_2 == E_NOT_VALID) break; // the other conditions would be handled when handling 'e2' properly.  This error though has priority.
@@ -186,25 +182,16 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);
 //        (debug) ? std::cerr << "val1: " << val1.first << std::endl : std::cerr;
         if (val1.first == E_NOT_VALID) break;
-        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
-          loop=true;
-          revert=true;
-          continue;
-        }
+        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop=true;revert=true;continue;}
       }
 
       // process second edge
-      if (!(revert ^ (*p1 == *e2.p1)))
-      {
+      if (!(revert ^ (*p1 == *e2.p1))) {
 //        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
         val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
 //        (debug) ? std::cerr << "val2: " << val2.first << std::endl : std::cerr;
         if (val2.first == E_NOT_VALID) break;
-        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
-          loop=true;
-          revert=true;
-          continue;
-        }
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop=true;revert=true;continue;}
       }
       else {
 //        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
@@ -216,23 +203,19 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
           if (revert ^ (*p1 == *e1.p1)) {
             //std::cerr << "removing e1: " << e1 << std::endl;
             val2_1 = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
-  //          (debug) ? std::cerr << "val2_1: " << val2_1 << std::endl : std::cerr;
+//          (debug) ? std::cerr << "val2_1: " << val2_1 << std::endl : std::cerr;
             if (val2_1 == E_NOT_VALID) break;
           }
-          loop=true;
-          revert=true;
-          continue;
+          loop=true;revert=true;continue;
         }
       }
       // all cases where either val1 or val2 != E_VALID should be handled in somekind of a 'continue' in above code.
 
-      //if ((val1.first == E_VALID) && (val2.first == E_VALID)) p_status = P_CLEAN;
       if (lowest_index == index) {
         lowest_index = points.size();
         revert = false;
         continue;
       }
-      //else if (p_status == P_DIRTY_LEFT) index = (points.size() + index - 1) % points.size();
   		else if (revert) --index;
       else ++index;
 //      std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
