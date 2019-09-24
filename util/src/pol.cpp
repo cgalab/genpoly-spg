@@ -682,6 +682,25 @@ double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& poi
   return Area;
 }
 
+// function that calculates the sum of the edges from vertex 'start' to vertex 'stop'
+double pol_calc_chain_length(unsigned int start, unsigned int stop, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  double length = 0;
+
+
+  if (is_ascending(start, stop, points.size())) {
+    for (unsigned int i = (start+1)%points.size(); i != stop; i = (i+1)%points.size()) {
+      length = length + get_length(points[polygon[(i+points.size()-1)%points.size()]], points[polygon[i]]);
+    }
+  }
+  else {
+    for (unsigned int i = (start+points.size()-1)%points.size(); i != stop; i = (i+points.size()-1)%points.size()) {
+      length = length + get_length(points[polygon[(i+1)%points.size()]], points[polygon[i]]);
+    }
+  }
+
+  return length;
+}
+
 // function that checks if the points in 'points' given by indexes in 'polygon'
 // (can be a subset of 'points' of minimum size 3) is 2 dimensional.
 bool is_2D(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
@@ -727,21 +746,40 @@ bool is_ascending(I_Edge e) {
   assert(false);
 }
 
-// function to get the lower index distance from one index to another in a cyclic index, such as a polygon
-unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle) {
-  unsigned int diff1, diff2;
+// function that takes 2 vertex indices in 'polygon': 'start' and 'stop'.
+// as there are 2 paths from 'start' to 'stop', return if the shorter path is ascending from 'start' to 'stop',
+//  i.e. ++i%polygon.size() would work in a for loop.
+bool is_ascending(unsigned int start, unsigned int stop, unsigned int cycle) {
+  unsigned int left, right; // 'stop' is considered the center, and 'left' is the number of vertices to 'stop's left until you hit 'start' and v.v.
 
-  if (a < b) {
-    diff1 = b-a;
-    diff2 = a+cycle-b;
+  if (start < stop) {
+    left = stop-start;
+    right = start+cycle-stop;
   }
   else {
-    diff1 = a-b;
-    diff2 = b+cycle-a;
+    left = start-stop;
+    right = stop+cycle-start;
   }
 
-  if (diff1 < diff2) return diff1;
-  else return diff2;
+  if (left < right) return true; // ascending from 'start' to 'stop' is a shorter distance.
+  else return false;
+}
+
+// function to get the lower index distance from one index to another in a cyclic index, such as a polygon
+unsigned int get_lower_cyclic_difference(unsigned int start, unsigned int stop, unsigned int cycle) {
+  unsigned int left, right; // 'stop' is considered the center, and 'left' is the number of vertices to 'stop's left until you hit 'start' and v.v.
+
+  if (start < stop) {
+    left = stop-start;
+    right = start+cycle-stop;
+  }
+  else {
+    left = start-stop;
+    right = stop+cycle-start;
+  }
+
+  if (left < right) return left;
+  else return right;
 }
 
 // function to get a length of a chain in a cyclic index, such as a polygon

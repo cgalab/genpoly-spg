@@ -38,8 +38,10 @@ bool collSwap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned i
 double pol_calc_circumference(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool is_ascending(I_Edge e);
+bool is_ascending(unsigned int start, unsigned int stop, unsigned int cycle);
 unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle);
 unsigned int get_chain_length(Ends ends, unsigned int cycle);
+double pol_calc_chain_length(unsigned int start, unsigned int stop, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool is_2D(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& h_e, std::vector<unsigned int>& polygon, std::vector<Point>& points);
