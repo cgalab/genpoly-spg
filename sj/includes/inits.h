@@ -15,7 +15,7 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg);
 enum error argInit(	int argc, char *argv[],
 										char *inFile, char *outFile, enum alg_t *alg,
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
-										bool& writeNew, bool& area,	double& areaMin, double& areaMax,
+										bool& writeNew, bool& area,	bool& circumference,
 										unsigned int& randseed, bool& checkSimple, unsigned int& holes,
 										char *vFile);
 

@@ -136,7 +136,7 @@ enum error vFileInit(char *vFile, char *optarg) {
 enum error argInit(	int argc, char *argv[],
 										char *inFile, char *outFile, enum alg_t *alg,
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
-										bool& writeNew, bool& area,	double& areaMin, double& areaMax,
+										bool& writeNew, bool& area,	bool& circumference,
 										unsigned int& randseed, bool& checkSimple, unsigned int& holes,
 										char *vFile) {
 	enum error returnValue = SUCCESS;
@@ -151,8 +151,8 @@ enum error argInit(	int argc, char *argv[],
 		{"outformat", required_argument, NULL, 'c'},
 		{"verify", required_argument, NULL, 'v'},
 		{"verifylong", required_argument, NULL, 'l'},
-		{"areamin", optional_argument, NULL, 'n'},
-		{"areamax", optional_argument, NULL, 'x'},
+		{"area", no_argument, NULL, 'e'},
+		{"circumference", no_argument, NULL, 'f'},
 		{"randseed", required_argument, NULL, 'r'},
 		{"writenew", no_argument, NULL, 'w'},
 		{"simplecalc", no_argument, NULL, 's'},
@@ -162,7 +162,7 @@ enum error argInit(	int argc, char *argv[],
 		{0, 0, 0, 0}
 	};
 
-	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:v:l:h:r:w?kstn::x::", long_options, NULL)) != -1) && returnValue == SUCCESS) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:v:l:r:?efhkstw", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -189,10 +189,11 @@ enum error argInit(	int argc, char *argv[],
 				*alg = A_HOLE;
 //				std::cerr << "Nr. of holes: " << holes << std::endl;
 				break;
-			case 'n':
+			case 'e':
 				area = true;
-				if (optarg) areaMin = atof(optarg);
-				else areaMin = 0;
+				break;
+			case 'f':
+				circumference = true;
 				break;
 			case 'r':
 				randseed = atoi(optarg);
@@ -221,11 +222,6 @@ enum error argInit(	int argc, char *argv[],
 			case 'w':
 				writeNew = true;
 				break;
-			case 'x':
-				area = true;
-				if (optarg) areaMax = atof(optarg);
-				else areaMax = INFINITY;
-				break;
 			case '?':
 				returnValue = NO_ARGUMENTS;
 				std::cerr << "Command line arguments:" << std::endl;
@@ -253,18 +249,22 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << " -w, --writenew" << std::endl;
 				std::cerr << "             option to not overwrite the output file if it already exists," << std::endl;
 				std::cerr << "             a new file is created with an increment number added to the end." << std::endl << std::endl;
-				std::cerr << " -n, --areamin<arg>" << std::endl;
-				std::cerr << "              no space allowed between areamin and <arg> or n and <arg> as it's an optional argument" << std::endl;
-				std::cerr << "              the polygon is recalculated until returned area is above given minimum area" << std::endl;
-				std::cerr << "              if no argument is given, will simply calculate the area and output to cout" << std::endl << std::endl;
-				std::cerr << " -x, --areamax<arg>" << std::endl;
-				std::cerr << "              no space allowed between areamax and <arg> or x and <arg> as it's an optional argument" << std::endl;
-				std::cerr << "              the polygon is recalculated until returned area is below given maximum area" << std::endl;
-				std::cerr << "              if no argument is given, will simply calculate the area and output to cout" << std::endl << std::endl;
+				std::cerr << " -e, --area" << std::endl;
+				std::cerr << "             option to print the area of the polygon to cout." << std::endl;
+				std::cerr << " -f, --circumference" << std::endl;
+				std::cerr << "             option to print the circumference of the polygon to cout." << std::endl;
 				std::cerr << " -r, --randseed <arg>" << std::endl;
 				std::cerr << "                <arg> is an unsigned integer above 0." << std::endl << std::endl;
 				std::cerr << " -s, --simplecalc" << std::endl;
-				std::cerr << "              uses a really slow check to verify simplicity and count intersections (if any)" << std::endl;
+				std::cerr << "              option to use a really slow check to verify simplicity and count intersections (if any)" << std::endl;
+				std::cerr << " -v, --verify <arg>" << std::endl;
+				std::cerr << "              <arg> is a file with a polygonal permutation of the point set, similar to 'perm' above." << std::endl;
+				std::cerr << "                    Verifies that the permutation is simple with a Bentley-Ottman linesweep algorithm" << std::endl;
+				std::cerr << " -l, --verifylong <arg>" << std::endl;
+				std::cerr << "              <arg> is a file with a polygonal permutation of the point set, similar to 'perm' above." << std::endl;
+				std::cerr << "                    Verifies that the permutation is simple with a slow n^2 intersection check" << std::endl;
+				std::cerr << " -k, --convert" << std::endl;
+				std::cerr << "              option to convert the infile to the outfile format; must be the last option." << std::endl;
 				std::cerr << " -t" << std::endl;
 				std::cerr << "   ignores all other arguments and runs the test-bed." << std::endl;
 				break;
