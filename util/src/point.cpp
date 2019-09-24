@@ -358,6 +358,13 @@ double getYmax(const std::vector<Point>& p) {
   return ymax;
 }
 
+double get_length(const Point& p1, const Point& p2) {
+  double x = fabs(p1.x - p2.x);
+  double y = fabs(p1.y - p2.y);
+  double length = sqrt(x*x+y*y);
+  return length;
+}
+
 // comparison function for the sort algorithm in 'star'
 bool angleComparator (Point i,Point j) {
   double ai = i.y/i.x;
@@ -365,8 +372,8 @@ bool angleComparator (Point i,Point j) {
   double aj = j.y/j.x;
   double lj = sqrt(j.x*j.x + j.y*j.y);
 
-  if (fabs(ai - aj) < EPSILON) {
-    if (fabs(li - lj) < EPSILON) return false;
+  if (fabs(ai - aj) == 0) {
+    if (fabs(li - lj) == 0) return false;
     else return (li < lj);
   }
   else return (ai < aj);

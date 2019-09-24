@@ -135,6 +135,7 @@ double getXmin(const std::vector<Point>& p);
 double getXmax(const std::vector<Point>& p);
 double getYmin(const std::vector<Point>& p);
 double getYmax(const std::vector<Point>& p);
+double get_length(const Point& p1, const Point& p2);
 bool angleComparator (Point i,Point j);
 
 #endif
