@@ -45,26 +45,26 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   bool loop = false, finished_loop = false;
 //  bool debug=false;
   std::set<Edge> edgeS; // a set of edges.
-  double circumference;
+  //double circumference;
   std::map<double, unsigned int> circ, c_counter;
   std::map<double, unsigned int>::iterator c_it;
 
   duration = elapsed();
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
-    if (finished_loop) {
-      circumference = pol_calc_circumference(polygon, points);
-      c_it = circ.find(circumference);
+    //if (finished_loop) {
+      //circumference = pol_calc_circumference(polygon, points);
+      //c_it = circ.find(circumference);
   //    std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
-      if (c_it != circ.end()) {
+      //if (c_it != circ.end()) {
   //      std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
-        if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
-        circ[circumference] = (*c_it).second +1;
-      }
-      else {
-        circ[circumference] = 1;
-      }
-    }
+        //if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
+        //circ[circumference] = (*c_it).second +1;
+      //}
+      //else {
+      //  circ[circumference] = 1;
+      //}
+    //}
 
     loop = false;
     finished_loop = false;

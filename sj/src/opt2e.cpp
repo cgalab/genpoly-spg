@@ -39,24 +39,24 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   bool loop = false, e1_found;
 //  bool debug=false;
   std::set<Edge> edgeS; // a set of edges.
-  double circumference;
+  double len1, len2;
   std::map<double, unsigned int> circ, c_counter;
   std::map<double, unsigned int>::iterator c_it;
 
   duration = elapsed();
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
-    circumference = pol_calc_circumference(polygon, points);
-    c_it = circ.find(circumference);
-    std::cerr << "c: " << circumference << ", circ[c]: " << (*c_it).second << std::endl;
-    if (c_it != circ.end()) {
-//      std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
+    //circumference = pol_calc_circumference(polygon, points);
+    //c_it = circ.find(circumference);
+    //std::cerr << "c: " << circumference << std::endl;
+    //if (c_it != circ.end()) {
+      //std::cerr << "circ[c]: " << circ[circumference] << std::endl;
       //if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
-      circ[circumference] = (*c_it).second +1;
-    }
-    else {
-      circ[circumference] = 1;
-    }
+      //circ[circumference] = (*c_it).second +1;
+    //}
+    //else {
+      //circ[circumference] = 1;
+    //}
 
     loop = false;
     index = 0;
@@ -121,9 +121,16 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         // Only if the first edge has to be added do we have to check for collinearity, as then both edges have to be added.
         if (fabs(val3 == 0)) {
           if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) {
-//          (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+//            (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+            len1 = pol_calc_chain_length(e1.getPLow().v, e2.getPHigh().v, polygon, points);
             if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
 //            (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+              len2 = pol_calc_chain_length(e1.getPLow().v, e2.getPHigh().v, polygon, points);
+              if (len2 > len1) {
+                std::cerr << "Error!  coll3swap did not swap correctly!" << std::endl;
+                std::cerr << "*e1.p2: " << *e1.p2 << ", *p1: " << *p1 << ", same: " << ((*e1.p2 == *p1) ? "true" : "false") << std::endl;
+                std::cerr << "len1: " << len1 << ", len2: " << len2 << std::endl;
+              }
               loop = true;
               e1_found=true;
             }

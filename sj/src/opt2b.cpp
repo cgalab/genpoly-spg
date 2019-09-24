@@ -50,7 +50,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   bool loop, revert;
 //  bool debug=false;
   std::set<Edge> edgeS; // a sweep-line-status object.
-  double circumference;
+  //double circumference;
   std::map<double, unsigned int> circ, c_counter;
   std::map<double, unsigned int>::iterator c_it;
 
@@ -58,16 +58,16 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   duration = elapsed();
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
-    circumference = pol_calc_circumference(polygon, points);
-    c_it = circ.find(circumference);
-    if (c_it != circ.end()) {
+    //circumference = pol_calc_circumference(polygon, points);
+    //c_it = circ.find(circumference);
+    //if (c_it != circ.end()) {
 //      std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
-      if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
-      circ[circumference] = (*c_it).second +1;
-    }
-    else {
-      circ[circumference] = 1;
-    }
+      //if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
+      //circ[circumference] = (*c_it).second +1;
+    //}
+    //else {
+      //circ[circumference] = 1;
+    //}
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
 //    std::cerr << "looping" << std::endl;
     loop = false;
