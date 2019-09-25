@@ -42,7 +42,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   double val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
-  bool loop = false, finished_loop = false;
+  bool loop = false;//, finished_loop = false;
 //  bool debug=false;
   std::set<Edge> edgeS; // a set of edges.
   //double circumference;
@@ -67,7 +67,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     //}
 
     loop = false;
-    finished_loop = false;
+    //finished_loop = false;
     index = 0;
     decrementEdges(edgeS);
 
@@ -163,7 +163,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       }
 
   		++index;
-      if (index == points.size()) finished_loop = true;
+      //if (index == points.size()) finished_loop = true;
   	}
     if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
   } while (loop);
