@@ -376,6 +376,7 @@ bool EventQueue::makeStable(const bool initial){
 		if(dif < Settings::epsEventTime){
 			// Check first whether there is a third concurrent event
 
+			// TODO:
 			// BUG:
 			// Here I accidentially compared the same collapse time, so we always get
 			// that there is a third event at the same time, if two events are at the

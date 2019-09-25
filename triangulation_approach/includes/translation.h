@@ -242,9 +242,80 @@ private:
 	*/
 	enum Executed executeSplitChangeSide() const;
 
+	/*
+		The function flip() executes one event by removing the longest edge of the collapsing
+		triangle and inserting the other diagonal of the resulting quadrilateral. It errors
+		with exit code 3 if the longest edge is a polygon edge. If the flip is no singleFlip
+		it also computes whether the the two resulting triangles will also collapse during the
+		further translation and in case insert them into the event queue and check its stability.
+		This computation is outsourced to the functions insertAfterOppositeFlip() and
+		insertAfterNonOppositeFlip().
+
+		@param 	t0 			The collapsing triangle
+		@param 	singleFlip 	Indicates whether this flip is part of working off the event queue,
+							or it is just a single security flip
+		@return 			True if the event queue is still stable, otherwise false
+
+		Note:
+			- It is assumed that the area of the collapsing triangle is zero (or at least close
+				to 0), i.e. the moving vertex is already shifted to the event time
+			- Checking whether a resulting triangle will collapse during the further translation
+				is a highly sensible thing! It is not recommend to use the actual position of
+				the moving vertex therefore, because the small errors in its position can lead
+				to wrong decisions
+			- For more information on the method of deciding take a look into my Master Thesis
+	*/
+	bool flip(Triangle *t0, const bool singleFlip) const;
+
+	/*
+		The function insertAfterOppositeFlip() decides whether newly generated triangles after
+		an opposite flip (the edge not containing the moving vertex has been flipped) has to be
+		inserted into the event queue. Therefore it does not use the actual position of the 
+		moving vertex as this position may be corrupted by numerical inaccuracies. Instead just
+		all static vertices of the triangles are used.
+
+		@param 	leftT 	The left one of the new triangles
+		@param 	rightT 	The right one of the new triangles
+		@param 	leftV 	The vertex which is only contained by the left triangle
+		@param 	rightV 	The vertex which is only contained by the right triangle
+		@param 	common 	The vertex which is contained by both triangles, but is not the moving
+						vertex
+		@return 		True if one of the triangles has been inserted into the event queue,
+						otherwise false
+
+		Note:
+			- For detailed information on the decision criteria take a look into my Master Thesis
+			- Left and right may not be really left and right, but this does not matter as long
+				as leftV corresponds to leftT and rightV to rightT
+	*/
+	bool insertAfterOppositeFlip(Triangle * leftT, Triangle * rightT, Vertex *leftV, Vertex *
+		rightV, Vertex * common) const;
+
+	/*
+		The function insertAfterNonOppositeFlip() decides whether newly generated triangles after
+		a non-opposite flip (one of the edges containing the moving vertex has been flipped) has to
+		be inserted into the event queue. Therefore it does not use the actual position of the 
+		moving vertex as this position may be corrupted by numerical inaccuracies. Instead just
+		all static vertices of the triangles are used.
+
+		@param 	t 			The one new triangle which can potentially collapse during the further
+							translation
+		@param 	shared0 	One of the two vertices which are shared by the two new triangles
+		@param 	shared1 	The other of the two shared vertices
+		@param 	opposite 	The non-shared vertex of the triangle which does not contain the
+							moving vertex
+		@return 			True if the triangles has been inserted into the event queue,
+							otherwise false
+
+		Note:
+			- For detailed information on the decision criteria take a look into my Master Thesis
+	*/
+	bool insertAfterNonOppositeFlip(Triangle *t, Vertex * shared0, Vertex * shared1, Vertex *
+		opposite) const;
+
 public:
 
-		/*
+	/*
 		LIST OF PUBLIC MEMBER FUNCTIONS
 
 		CONSTRUCTORS:
@@ -255,7 +326,6 @@ public:
 
 		bool 			checkOverroll()
 		enum Executed 	execute()
-		bool 			flip(Triangle *t0, bool singleFlip)
 		bool 			checkSimplicityOfTranslation()
 		void 			checkSplit()
 	*/
@@ -280,6 +350,7 @@ public:
 	*/
 	Translation(Triangulation *Tr, int i, double dX, double dY);
 	
+
 	/*
 		O ~ T ~ H ~ E ~ R ~ S
 	*/
@@ -312,29 +383,6 @@ public:
 			For more information on the splits see my Master Thesis
 	*/
 	enum Executed execute();
-
-	/*
-		The function flip() executes one event by removing the longest edge of the collapsing
-		triangle and inserting the other diagonal of the resulting quadrilateral. It errors
-		with exit code 3 if the longest edge is a polygon edge. If the flip is no singleFlip
-		it also computes whether the the two resulting triangles will also collapse during the
-		further translation and in case insert them into the event queue and check its stability.
-
-		@param 	t0 			The collapsing triangle
-		@param 	singleFlip 	Indicates whether this flip is part of working off the event queue,
-							or it is just a single security flip
-		@return 			True if the event queue is still stable, otherwise false
-
-		Note:
-			- It is assumed that the area of the collapsing triangle is zero (or at least close
-				to 0), i.e. the moving vertex is already shifted to the event time
-			- Checking whether a resulting triangle will collapse during the further translation
-				is a highly sensible thing! It is not recommend to use the actual position of
-				the moving vertex therefore, because the small errors in its position can lead
-				to wrong decisions
-			- For more information on the method of deciding take a look into my Master Thesis
-	*/
-	bool flip(Triangle *t0, const bool singleFlip) const;
 
 	/*
 		The function checkSimplicityOfTranslation() determines whether the result of a

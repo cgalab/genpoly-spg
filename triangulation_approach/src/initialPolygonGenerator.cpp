@@ -185,7 +185,7 @@ void boxPolygon(Triangulation * const T, const int startIndex){
 	Vertex *v0, *v1;
 
 	/* 
-		Generate the rectangle int the following orientation:
+		Generate the rectangle in the following orientation:
 
 		1 - 0
 		|   |
