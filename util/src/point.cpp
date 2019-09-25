@@ -358,6 +358,18 @@ double getYmax(const std::vector<Point>& p) {
   return ymax;
 }
 
+unsigned int get_lowest_v(Point *a, Point *b, Point *c) {
+  std::vector<unsigned int> vec {(*a).v, (*b).v, (*c).v};
+  std::sort(vec.begin(), vec.end());
+  return vec[0];
+}
+
+unsigned int get_highest_v(Point *a, Point *b, Point *c) {
+  std::vector<unsigned int> vec {(*a).v, (*b).v, (*c).v};
+  std::sort(vec.begin(), vec.end());
+  return vec[2];
+}
+
 double get_length(const Point& p1, const Point& p2) {
   double x = fabs(p1.x - p2.x);
   double y = fabs(p1.y - p2.y);

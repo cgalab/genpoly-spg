@@ -109,6 +109,8 @@ bool collSwap (Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
 // older version.
 bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   bool retval = false;
+  double len1=0, len2=0;  // we want to make sure that the length of the polygonal chain defined by a, b and c decreases
+  len1 = pol_calc_chain_length(get_lowest_v(a, b, c), get_highest_v(a, b, c), polygon, points);
 
   // sort the points into lo/mid/hi lex order.
   std::vector<Point*> lex {a, b, c};
@@ -145,7 +147,19 @@ bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
     }
   }
 
-  //if (retval) for (unsigned int i = 0; i < lex.size();++i) std::cerr << "point at pol[arr[" << i << "]]: " << points[polygon[arr[i]]] << std::endl;
+  len2 = pol_calc_chain_length(get_lowest_v(a, b, c), get_highest_v(a, b, c), polygon, points);
+  if (len1 < len2) {
+//    std::cerr << "len1: " << len1 << ", len2: " << len2 << std::endl;
+    doFlip(get_lowest_v(a, b, c), get_highest_v(a, b, c), polygon, points);
+    len2 = pol_calc_chain_length(get_lowest_v(a, b, c), get_highest_v(a, b, c), polygon, points);
+//    std::cerr << "len1: " << len1 << ", new len2: " << len2 << std::endl;
+    retval = false;
+    for (unsigned int i = 0; i < lex.size(); ++i) {
+      if (*lex[i] != *vert[i]) {retval = true;break;}
+    }
+  }
+
+//  if (retval) for (unsigned int i = 0; i < lex.size();++i) std::cerr << "point at pol[arr[" << i << "]]: " << points[polygon[arr[i]]] << std::endl;
   return retval;
 }
 
@@ -686,14 +700,17 @@ double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 double pol_calc_chain_length(unsigned int start, unsigned int stop, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   double length = 0;
 
-
   if (is_ascending(start, stop, points.size())) {
-    for (unsigned int i = (start+1)%points.size(); i != stop; i = (i+1)%points.size()) {
+    //std::cerr << "asc." << std::endl;
+    for (unsigned int i = start; i != (stop+2)%points.size(); i = (i+1)%points.size()) {
+      //std::cerr << "i-1: " << (i+points.size()-1)%points.size() << ", i: " << i << ", length: " << get_length(points[polygon[(i+points.size()-1)%points.size()]], points[polygon[i]]) << std::endl;
       length = length + get_length(points[polygon[(i+points.size()-1)%points.size()]], points[polygon[i]]);
     }
   }
   else {
-    for (unsigned int i = (start+points.size()-1)%points.size(); i != stop; i = (i+points.size()-1)%points.size()) {
+//    std::cerr << "desc." << std::endl;
+    for (unsigned int i = start; i != (stop+points.size()-2)%points.size(); i = (i+points.size()-1)%points.size()) {
+//      std::cerr << "i+1: " << (i+points.size()+1)%points.size() << ", i: " << i << ", length: " << get_length(points[polygon[(i+1)%points.size()]], points[polygon[i]]) << std::endl;
       length = length + get_length(points[polygon[(i+1)%points.size()]], points[polygon[i]]);
     }
   }
