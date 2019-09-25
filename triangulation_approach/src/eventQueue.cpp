@@ -147,7 +147,7 @@ void EventQueue::stabilizeConvex(struct Event* e0, struct Event* e1, TEdge* comm
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff0: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 
 	// Transition line intersects one of the oppossing edges
@@ -164,7 +164,7 @@ void EventQueue::stabilizeConvex(struct Event* e0, struct Event* e1, TEdge* comm
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff1: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 	}
 }
@@ -235,7 +235,7 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff2: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 
 	// Transition line intersects one of the oppossing edges
@@ -252,7 +252,7 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff3: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 	}
 }
@@ -375,6 +375,13 @@ bool EventQueue::makeStable(const bool initial){
 		// Two events are concurrent
 		if(dif < Settings::epsEventTime){
 			// Check first whether there is a third concurrent event
+
+			// BUG:
+			// Here I accidentially compared the same collapse time, so we always get
+			// that there is a third event at the same time, if two events are at the
+			// same time.....that is the reason why an order change does never appear,
+			// because stabilize is never called
+			// If I correct this we get always errors after order change 0
 			dif = fabs(time1 - e1 -> collapseTime);
 			if(dif < Settings::epsEventTime){
 				if(initial)
