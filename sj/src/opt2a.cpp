@@ -72,7 +72,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
     decrementEdges(edgeS);
 
   	while (index < points.size()) {
-      std::cerr << "i: " << index << std::endl;
+//      std::cerr << "i: " << index << std::endl;
 //      if (index > 489 && index < 506) {
 //        std::cerr << std::endl << "i: " << index << std::endl;
 //        debug = true;

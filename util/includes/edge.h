@@ -180,7 +180,7 @@ public:
     else if (s == P1.x) {y.set(P1.y); y.setX(s);}
     else if (s == P2.x) {y.set(P2.y); y.setX(s);}
   	else {
-      // there's a problem with how I create the 'bias' and thus the 'value'
+      // there's a problem with how I create the 'bias' and thus the 'value' (solved with the 'else if' statements)
       // when the slope is really steep, the bias is very sensitive.
       y.set(P1.y, P2.y);
   		double slope = (P2.y-P1.y) / (P2.x-P1.x);
