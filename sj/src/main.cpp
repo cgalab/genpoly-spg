@@ -21,6 +21,7 @@
 #include "opt2d.h"
 #include "opt2e.h"
 #include "opt2f.h"
+#include "opt2g.h"
 #include "curve.h"
 #include "simple_pol_check.h"
 #include "star.h"
@@ -94,6 +95,9 @@ int main(int argc, char *argv[]) {
         else if (alg == A_2OPT_F) {
             returnValue = opt2f(polygon, points, randseed);
         }
+        else if (alg == A_2OPT_G) {
+            returnValue = opt2g(polygon, points, randseed);
+        }
         else if (alg == A_STAR) {
             returnValue = star(polygon, points, randseed);
         }
@@ -124,6 +128,7 @@ int main(int argc, char *argv[]) {
               case A_2OPT_D:
               case A_2OPT_E:
               case A_2OPT_F:
+              case A_2OPT_G:
               case A_STAR:
                 if (outFormat == OF_PURE_AND_PERM){
                   char tempFileName[255];

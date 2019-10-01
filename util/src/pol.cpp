@@ -103,7 +103,6 @@ bool collSwap (Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
   return retval;
 }
 
-// version that updates lover_index (opt2b)
 // function that takes 3 points: a, b, and c that are already assumed collinear and fixes the collinearity
 // by sorting them in the polygon such that they are no longer intersecting.
 // older version.
@@ -156,6 +155,51 @@ bool coll3Swap(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<
     retval = false;
     for (unsigned int i = 0; i < lex.size(); ++i) {
       if (*lex[i] != *vert[i]) {retval = true;break;}
+    }
+  }
+
+//  if (retval) for (unsigned int i = 0; i < lex.size();++i) std::cerr << "point at pol[arr[" << i << "]]: " << points[polygon[arr[i]]] << std::endl;
+  return retval;
+}
+
+// function that takes 3 points: a, b, and c that are already assumed collinear and fixes the collinearity
+// by sorting them in the polygon such that they are no longer intersecting.
+// older version.
+bool coll3SwapOld(Point *a, Point *b, Point *c, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  bool retval = false;
+
+  // sort the points into lo/mid/hi lex order.
+  std::vector<Point*> lex {a, b, c};
+  sort(lex.begin(), lex.end(),
+    [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
+/*
+  for (unsigned int i = 0; i < lex.size();++i) {
+    std::cerr << "lex[" << i << "]: " << *lex[i] << std::endl;
+  }
+*/
+  // sort the points into lo/mid/hi polygon order.
+  std::vector<Point*> vert {a, b, c};
+  sort(vert.begin(), vert.end(),
+    [&](Point * p1, Point * p2) -> bool {return isPol1Left(p1, p2, polygon.size());});
+
+  unsigned int arr[] = {(*vert[0]).v, (*vert[1]).v, (*vert[2]).v};
+/*
+  for (unsigned int i = 0; i < 3;++i) {
+    std::cerr << "arr[" << i << "]: " << arr[i] << std::endl;
+  }
+*/
+  // we can erase the edges connected to lower and upper vertices from 'edgeS' set.
+
+  eraseVertexFromSet(vert[2], edgeS, polygon, points);
+
+  // then assign the proper 'vert' order to the 'lex' ordered points
+  for (unsigned int i = 0; i < lex.size(); ++i) {
+    if (*lex[i] != *vert[i]) {
+      eraseVertexFromSet(lex[i], edgeS, polygon, points);
+      eraseVertexFromSet(vert[i], edgeS, polygon, points);
+      (*lex[i]).v = arr[i];
+      polygon[(*lex[i]).v] = (*lex[i]).i;
+      retval = true;
     }
   }
 
@@ -308,6 +352,51 @@ bool coll4Swap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned 
   if (*e1.p1 == *e2.p2) return coll3Swap(e1.p1, e1.p2, e2.p1, edgeS, polygon, points);
   if (*e1.p2 == *e2.p1) return coll3Swap(e1.p1, e1.p2, e2.p2, edgeS, polygon, points);
   if (*e1.p2 == *e2.p2) return coll3Swap(e1.p1, e1.p2, e2.p1, edgeS, polygon, points);
+
+  // sort the points into lex order.
+  std::vector<Point*> lex {e1.p1, e1.p2, e2.p1, e2.p2};
+  sort(lex.begin(), lex.end(),
+    [](Point* p1, Point* p2) -> bool {return *p1 < *p2;});
+
+//  for (unsigned int i = 0; i < lex.size();++i) std::cerr << "lex[" << i << "]: " << *lex[i] << std::endl;
+
+  // sort the points into polygon order.
+  std::vector<unsigned int> vert {(*e1.p1).v, (*e1.p2).v, (*e2.p1).v, (*e2.p2).v};
+  sort(vert.begin(), vert.end());
+
+  if ((e1.getPLow().v == 0 && e1.getPHigh().v == points.size()-1) || (e2.getPLow().v == 0 && e2.getPHigh().v == points.size()-1)) {
+    end_edge = true;
+  }
+  else end_edge = false;
+  if (end_edge) {
+    vert.pop_back();
+    vert.insert(vert.begin(), points.size()-1);
+  }
+
+  // then assign the proper 'vert' order to the 'lex' ordered points
+  for (unsigned int i = 0; i < lex.size(); ++i) {
+    if ((*lex[i]).v != vert[i]) {
+      eraseVertexFromSet(lex[i], edgeS, polygon, points);
+      eraseVertexFromSet(&points[polygon[vert[i]]], edgeS, polygon, points);
+      (*lex[i]).v = vert[i];
+      polygon[(*lex[i]).v] = (*lex[i]).i;
+      retval = true;
+    }
+  }
+
+//  if (retval) for (unsigned int i = 0; i < lex.size();++i) std::cerr << "point at pol[arr["<<i<<"]]: " << points[polygon[arr[i]]] << std::endl;
+
+  return retval;
+}
+
+bool coll4SwapOld(Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  bool retval = false;
+  bool end_edge;
+
+  if (*e1.p1 == *e2.p1) return coll3SwapOld(e1.p1, e1.p2, e2.p2, edgeS, polygon, points);
+  if (*e1.p1 == *e2.p2) return coll3SwapOld(e1.p1, e1.p2, e2.p1, edgeS, polygon, points);
+  if (*e1.p2 == *e2.p1) return coll3SwapOld(e1.p1, e1.p2, e2.p2, edgeS, polygon, points);
+  if (*e1.p2 == *e2.p2) return coll3SwapOld(e1.p1, e1.p2, e2.p1, edgeS, polygon, points);
 
   // sort the points into lex order.
   std::vector<Point*> lex {e1.p1, e1.p2, e2.p1, e2.p2};
@@ -696,7 +785,7 @@ double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& poi
   return Area;
 }
 
-// function that calculates the sum of the edges from vertex 'start' to vertex 'stop'
+// function that calculates the sum of the edges from the 2 edges connected to vertex 'start' to the 2 edges connected to vertex 'stop'
 double pol_calc_chain_length(unsigned int start, unsigned int stop, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   double length = 0;
 
