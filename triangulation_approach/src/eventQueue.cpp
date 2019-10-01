@@ -69,10 +69,13 @@ void EventQueue::stabilize(struct Event *e0, struct Event *e1){
 	area1 = (*t).signedArea();
 	delete t;
 
-	// We have convex shape if sign(area0) != sign(area1)
-	// or in the special case that area1 equals 0
+	if((*original).getID() == 2865905)
+		printf("area0: %.20f area1: %.20f  equals zero: %d \n", area0, area1, area1 == 0);
 
-	if(area1 == 0 || (signbit(area0) != signbit(area1)))
+	// We have convex shape if sign(area0) != sign(area1)
+	// The special case area1 = 0 counts as non-convex shape
+
+	if(area1 != 0 && (signbit(area0) != signbit(area1)))
 		stabilizeConvex(e0, e1, edge);
 
 	// 2. case:
@@ -212,6 +215,8 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 	area1 = (*t).signedArea();
 	delete t;
 
+	if((*original).getID() == 2865905)
+		printf("area0: %.20f area1: %.20f \n", area0, area1);
 	// Transition line doesn't intersect the opposing edges
 	if(signbit(area0) == signbit(area1)){
 		// Now we have to check on which side the transition line passes
@@ -240,9 +245,14 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 
 	// Transition line intersects one of the oppossing edges
 	}else{
+		
 		t = new Triangle(oldV, newV, common);
 		areaCommon = (*t).signedArea();
 		delete t;
+
+		if((*original).getID() == 2865905){
+			printf("areaCommon: %.20f \n", areaCommon);
+		}
 
 		// If the transition line intersects t1, then t0 has to collapse first
 		// so the ordering was right
@@ -377,21 +387,19 @@ bool EventQueue::makeStable(const bool initial){
 			// Check first whether there is a third concurrent event
 
 			// TODO:
-			// BUG:
-			// Here I accidentially compared the same collapse time, so we always get
-			// that there is a third event at the same time, if two events are at the
-			// same time.....that is the reason why an order change does never appear,
-			// because stabilize is never called
-			// If I correct this we get always errors after order change 0
-			dif = fabs(time1 - e1 -> collapseTime);
-			if(dif < Settings::epsEventTime){
-				if(initial)
-					printf("Eventqueue: More than two events at the same time -> refused translation\n");
-				else
-					printf("Eventqueue: More than two events at the same time -> aborted translation\n");
-				return false;
+			// Now it changes event orders, but not sure at the moment, wether this really works
+			// There could be a problem with event order change type 3
+			if(e1 -> next != NULL){
+				dif = fabs(time1 - e1 -> next -> collapseTime);
+				if(dif < Settings::epsEventTime){
+					if(initial)
+						printf("Eventqueue: More than two events at the same time -> refused translation\n");
+					else
+						printf("Eventqueue: More than two events at the same time -> aborted translation\n");
+					return false;
+				}
 			}
-
+			
 			// Attentione: do not change the ordering of e0 and e1 in stabilize, otherwise you would
 			// get an infinite loop here!
 			stabilize(e0, e1);

@@ -11,7 +11,7 @@ int Settings::insertionTries = 100;
 double Settings::minLength = 0.0000001;
 Timer* Settings::timer = NULL;
 bool Settings::fixedSeed = false;
-unsigned int Settings::seed = 3520409430;
+unsigned int Settings::seed = 2983747647;
 RandomGenerator* Settings::generator = NULL;
 FeedbackMode Settings::feedback = FeedbackMode::EXECUTION;
 bool Settings::simplicityCheck = false;
@@ -32,7 +32,7 @@ void Settings::initSettings(){
 	// Initialize the RandomGenerator
 	generator = new RandomGenerator(fixedSeed, seed);
 
-	// Initialise the exact arithmetic
+	// Initialize the exact arithmetic
 	if(arithmetics == Arithmetics::EXACT)
 		exactinit();
 }
