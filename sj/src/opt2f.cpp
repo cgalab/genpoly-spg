@@ -16,43 +16,6 @@
 #include "opt2base.h"
 #include "elapsed.h"
 
-/*
-void print_enum(enum planesweep_t val) {
-  switch (val) {
-    case P_CLEAN:
-      std::cerr << "P_CLEAN";
-      break;
-    case P_DIRTY_LEFT:
-      std::cerr << "P_DIRTY_LEFT";
-      break;
-    case P_DIRTY_RIGHT:
-      std::cerr << "P_DIRTY_RIGHT";
-      break;
-    default:
-      break;
-  }
-}
-
-void print_enum(enum edge_t val) {
-  switch (val) {
-    case E_VALID:
-      std::cerr << "E_VALID";
-      break;
-    case E_INTERSECTION:
-      std::cerr << "E_INTERSECTION";
-      break;
-    case E_COLLINEAR:
-      std::cerr << "E_COLLINEAR";
-      break;
-    case E_NOT_VALID:
-      std::cerr << "E_NOT_VALID";
-      break;
-    default:
-      break;
-  }
-}
-*/
-
 // 2opt version that reverses if an intersection is found.  changes nothing for collinearities.
 enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
   enum error retval = SUCCESS;
@@ -82,29 +45,30 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   double val3;
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
-  bool loop, revert;
+  bool loop, revert, reverse_flag;
 //  bool debug=false;
   std::set<Edge> edgeS; // a sweep-line-status object.
-  double circumference;
+  //double circumference;
   std::map<double, unsigned int> circ, c_counter;
   std::map<double, unsigned int>::iterator c_it;
 
   duration = elapsed();
   do {
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
-    circumference = pol_calc_circumference(polygon, points);
-    c_it = circ.find(circumference);
-    if (c_it != circ.end()) {
+    //circumference = pol_calc_circumference(polygon, points);
+    //c_it = circ.find(circumference);
+    //if (c_it != circ.end()) {
 //      std::cerr << "c: " << circumference << ", circ[c]: " << circ[circumference] << std::endl;
-      if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
-      circ[circumference] = (*c_it).second +1;
-    }
-    else {
-      circ[circumference] = 1;
-    }
+      //if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
+      //circ[circumference] = (*c_it).second +1;
+    //}
+    //else {
+      //circ[circumference] = 1;
+    //}
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
 //    std::cerr << "looping" << std::endl;
     loop = false;
+    reverse_flag = false;
     revert = false;
     index = 0;
     lowest_index = points.size();
@@ -143,6 +107,23 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         val3 = det(e1, *p2);
       }
 
+      // clear the edges of any collinearity.  if they are collinear, and '>o' or 'o<', they need to be processed
+      // having this check after processing the first edge means '>o' would never be caught.
+      if (fabs(val3) == 0) {
+        // the 2 edges are collinear
+        if (((*p2 < *p1) && (*p3 < *p1)) || ((*p1 < *p2) && (*p1 < *p3))) {
+//            (debug) ? std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+//            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+          if (coll3Swap(p1, p2, p3, edgeS, polygon, points, lowest_index)) {
+//              (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+//              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+            loop = true;
+            reverse_flag = true;
+            continue;
+          }
+        } //else std::cerr << "no collinearity found." << std::endl;
+      }
+
       //process first edge
       if (!(revert ^ (*p1 == *e1.p1))) {
 //        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
@@ -157,32 +138,17 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
             if (val1_2 == E_NOT_VALID) break; // the other conditions would be handled when handling 'e2' properly.  This error though has priority.
           }
           loop=true;
-          revert=true;
+          reverse_flag=true;
           continue;
         }
       }
       else {
-        // if I am about to process 'e1' I can start by clearing it of any collinearity with 'e2'
-        if (fabs(val3) == 0) {
-          // the 2 edges are collinear
-          if (((*p2 < *p1) && (*p3 < *p1)) || ((*p1 < *p2) && (*p1 < *p3))) {
-//            (debug) ? std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-//            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-            if (coll3Swap(p1, p2, p3, edgeS, polygon, points, lowest_index)) {
-//              (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-//              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-              loop = true;
-              revert = true;
-              continue;
-            }
-          } //else std::cerr << "no collinearity found." << std::endl;
-        }
 
 //        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
         val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);
 //        (debug) ? std::cerr << "val1: " << val1.first << std::endl : std::cerr;
         if (val1.first == E_NOT_VALID) break;
-        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop=true;revert=true;continue;}
+        if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop=true;reverse_flag=true;continue;}
       }
 
       // process second edge
@@ -191,7 +157,7 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
 //        (debug) ? std::cerr << "val2: " << val2.first << std::endl : std::cerr;
         if (val2.first == E_NOT_VALID) break;
-        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop=true;revert=true;continue;}
+        if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop=true;reverse_flag=true;continue;}
       }
       else {
 //        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
@@ -206,17 +172,28 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //          (debug) ? std::cerr << "val2_1: " << val2_1 << std::endl : std::cerr;
             if (val2_1 == E_NOT_VALID) break;
           }
-          loop=true;revert=true;continue;
+          loop=true;reverse_flag=true;continue;
         }
       }
       // all cases where either val1 or val2 != E_VALID should be handled in somekind of a 'continue' in above code.
 
       if (lowest_index == index) {
         lowest_index = points.size();
-        revert = false;
+        // 3P collinearity could set the reverse flag, and lowest_index as current index,
+        // but not need to reverse, so it does not need to repeat the current index as it got here without any problems.
+        if (revert) {
+          reverse_flag = false;
+          revert = false;
+          continue;
+        }
+        else reverse_flag = false;
+      }
+      // the reverse_flag assures that sorting of the points in advancing direction finishes before the index is reversed.
+      if (reverse_flag) {
+        revert = true;
         continue;
       }
-  		else if (revert) --index;
+  		if (revert) --index;
       else ++index;
 //      std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
 //      std::cerr << "lowest_index: " << lowest_index << std::endl;
