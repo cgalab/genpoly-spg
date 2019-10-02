@@ -109,13 +109,13 @@ enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       if (!(revert ^ (*p1 == *e1.p1))) {
         (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
         val1.first = removeEdgeFromSetd(e1, lowest_index, edgeS, polygon, points);
-        (debug) ? std::cerr << "val1: " << val1.first << std::endl : std::cerr;
+        std::cerr << "val1: "; print_enum(val1.first);
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) { // intersection found in the removal, skip the rest and restart.
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if (!(revert ^ (*p1 == *e2.p1))) {
             val1_2 = removeEdgeFromSetd(e2, lowest_index, edgeS, polygon, points);
-            (debug) ? std::cerr << "val1_2: " << val1_2 << std::endl : std::cerr;
+            std::cerr << "val1_2: "; print_enum(val1_2);
             if (val1_2 == E_NOT_VALID) break; // the other conditions would be handled when handling 'e2' properly.  This error though has priority.
           }
           loop=true;
@@ -142,7 +142,7 @@ enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
         (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
         val1 = processEdged(e1, lowest_index, edgeS, polygon, points);
-        (debug) ? std::cerr << "val1: " << val1.first << std::endl : std::cerr;
+        std::cerr << "val1: "; print_enum(val1.first);
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {loop=true;revert=true;continue;}
       }
@@ -151,21 +151,21 @@ enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       if (!(revert ^ (*p1 == *e2.p1))) {
         (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
         val2.first = removeEdgeFromSetd(e2, lowest_index, edgeS, polygon, points);
-        (debug) ? std::cerr << "val2: " << val2.first << std::endl : std::cerr;
+        std::cerr << "val2: "; print_enum(val2.first);
         if (val2.first == E_NOT_VALID) break;
         if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {loop=true;revert=true;continue;}
       }
       else {
         (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
         val2 = processEdged(e2, lowest_index, edgeS, polygon, points);
-        (debug) ? std::cerr << "val2: " << val2.first << std::endl : std::cerr;
+        std::cerr << "val2: "; print_enum(val2.first);
         if (val2.first == E_NOT_VALID) break;
         if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
           // if e1 was inserted "in front of" the index, it needs to be removed.
           if (revert ^ (*p1 == *e1.p1)) {
             (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
             val2_1 = removeEdgeFromSetd(e1, lowest_index, edgeS, polygon, points);
-            (debug) ? std::cerr << "val2_1: " << val2_1 << std::endl : std::cerr;
+            std::cerr << "val2_1: "; print_enum(val2_1);
             if (val2_1 == E_NOT_VALID) break;
           }
           loop=true;revert=true;continue;

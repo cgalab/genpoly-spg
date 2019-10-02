@@ -136,6 +136,23 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         val3 = det(e1, *p2);
       }
 
+      // if I am about to process 'e1' I can start by clearing it of any collinearity with 'e2'
+      if (fabs(val3) == 0) {
+        // the 2 edges are collinear
+        if (((*p2 < *p1) && (*p3 < *p1)) || ((*p1 < *p2) && (*p1 < *p3))) {
+//            (debug) ? std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+//            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+          if (coll3Swap(p1, p2, p3, edgeS, polygon, points, lowest_index)) {
+//              (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+//              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
+            loop = true;
+            //if (p_status == P_CLEAN &&  revert) {p_status = P_DIRTY_LEFT;collinear_index=index;}
+            if (p_status == P_CLEAN) {p_status = P_DIRTY_RIGHT;collinear_index=index-1;}
+            continue;
+          }
+        } //else std::cerr << "no collinearity found." << std::endl;
+      }
+
       //process first edge
       //if ((revert && (*e1.p1 == *p1)) || !revert && (*e1.p2 == *p1)) {
       //if (!(revert ^ (*p1 == *e1.p1)))
@@ -167,22 +184,6 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         }
       }
       else {
-        // if I am about to process 'e1' I can start by clearing it of any collinearity with 'e2'
-        if (fabs(val3) == 0) {
-          // the 2 edges are collinear
-          if (((*p2 < *p1) && (*p3 < *p1)) || ((*p1 < *p2) && (*p1 < *p3))) {
-//            (debug) ? std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-//            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-            if (coll3Swap(p1, p2, p3, edgeS, polygon, points, lowest_index)) {
-//              (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-//              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-              loop = true;
-              //if (p_status == P_CLEAN &&  revert) {p_status = P_DIRTY_LEFT;collinear_index=index;}
-              if (p_status == P_CLEAN) {p_status = P_DIRTY_RIGHT;collinear_index=index-1;}
-              continue;
-            }
-          } //else std::cerr << "no collinearity found." << std::endl;
-        }
 
 //        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
         val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);

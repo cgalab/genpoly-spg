@@ -101,6 +101,18 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
 //      (debug) ? std::cerr << "*e1.p2: " << *e1.p2 << ", *p1: " << *p1 << ", same: " << ((*e1.p2 == *p1) ? "true" : "false") << std::endl : std::cerr;
 
+      // to catch collinearities when '>o' you need to check det before removing the first edge.
+      if (fabs(val3 == 0)) {
+        if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) {
+      //            (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+          if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
+      //            (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
+            loop = true;
+            continue;
+          }
+        }
+      }
+
       //process first edge
       e1_found=false;
       if (*e1.p2 == *p1) {
@@ -118,17 +130,6 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         }
       }
       else {
-        // Only if the first edge has to be added do we have to check for collinearity, as then both edges have to be added.
-        if (fabs(val3 == 0)) {
-          if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) {
-//            (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-            if (coll3Swap(p1, p2, p3, edgeS, polygon, points)) {
-//            (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-              loop = true;
-              e1_found=true;
-            }
-          }
-        }
 
 //        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
         val1 = processEdge(e1, edgeS, polygon, points);
