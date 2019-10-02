@@ -127,6 +127,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
 void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& ch, std::vector<Point>& points);
 bool isPolLeft(Point *p1, Point *p2, unsigned int cycle);
 bool isPol1Left(Point *p1, Point *p2, unsigned int cycle);
+bool isPol1Left(unsigned int p1, unsigned int p2, unsigned int cycle);
 void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points);
 void fill_lex(std::vector<unsigned int>& lex, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void pdisplay (const std::vector< Point >& vy);

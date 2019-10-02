@@ -389,7 +389,7 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, std::set<Edg
           isval = checkIntersection(before, after);
           if (isval == IS_4P_COLLINEAR) {
     //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
-            if (coll4Swap(before, after, edgeS, polygon, points)) {
+            if (coll4Swap(before, after, edgeS, polygon, points, lowest_index)) {
     //          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
               valid = E_COLLINEAR;
             }
@@ -400,6 +400,7 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, std::set<Edg
             eraseEdgeFromSet(after, edgeS);
             flip(before, after, polygon, points);
             valid = E_INTERSECTION;
+            update_lowest_index(before, after, lowest_index);
           } else if (isval >= IS_TRUE) {
             std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
             std::cerr << "isval: "; print_enum(isval);
@@ -410,10 +411,6 @@ enum edge_t removeEdgeFromSetb(Edge& e, unsigned int& lowest_index, std::set<Edg
         break;
       }
     }
-  }
-  if ((valid == E_INTERSECTION) || (valid == E_COLLINEAR)){
-    if (e.getLowerLexIdx() < before.getLowerLexIdx()) lowest_index = e.getLowerLexIdx();
-    else lowest_index = before.getLowerLexIdx();
   }
   return valid;
 }
@@ -872,7 +869,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
       }
       else if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << e << " and before: " << before << std::endl;
-    if (coll4Swap(e, before, edgeS, polygon, points, lowest_index)) {
+        if (coll4Swap(e, before, edgeS, polygon, points, lowest_index)) {
 //          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
           valid = E_COLLINEAR;
         }
@@ -890,7 +887,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     if (af && (valid == E_VALID)) {
       isval = checkIntersection2(e, after);
       if (isval < IS_TRUE) {
-//        std::cerr << "No intersection with after." << std::endl;
+//        std::cerr << "No intersection with before." << std::endl;
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {

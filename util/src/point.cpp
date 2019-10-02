@@ -9,6 +9,7 @@
 #include "pol.h" // for doFlip
 #include "edge.h"
 
+// function that verifies whether any points in the 'points' vector are collinear, or identical.
 enum error verify_point_set(std::vector<Point>& points) {
   enum error retval = SUCCESS;
 
@@ -277,6 +278,17 @@ bool isPol1Left(Point *p1, Point *p2, unsigned int cycle) {
     if ((*p1).v == cycle-1) return true;
   }
   if (((*p1).v < (*p2).v) && (abs((int)((*p1).v - (*p2).v)) == 1)) return true;
+  return false;
+}
+
+bool isPol1Left(unsigned int p1, unsigned int p2, unsigned int cycle) {
+  if (p1 == 0) {
+    if (p2 == 1) return true;
+  }
+  if (p2 == 0) {
+    if (p1 == cycle-1) return true;
+  }
+  if ((p1 < p2) && (abs((int)(p1 - p2)) == 1)) return true;
   return false;
 }
 
