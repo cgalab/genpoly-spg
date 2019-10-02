@@ -387,9 +387,8 @@ bool EventQueue::makeStable(const bool initial){
 			// Check first whether there is a third concurrent event
 
 			// TODO:
-			// Now it changes event orders, but not sure at the moment, wether this really works
-			// There could be a problem with event order change type 3
-			if(e1 -> next != NULL){
+			// Definitelly the changing of event orders is not stable at the moment
+			/*if(e1 -> next != NULL){
 				dif = fabs(time1 - e1 -> next -> collapseTime);
 				if(dif < Settings::epsEventTime){
 					if(initial)
@@ -398,7 +397,13 @@ bool EventQueue::makeStable(const bool initial){
 						printf("Eventqueue: More than two events at the same time -> aborted translation\n");
 					return false;
 				}
-			}
+			}*/
+
+			if(initial)
+				printf("Eventqueue: Two events at the same time -> refused translation\n");
+			else
+				printf("Eventqueue: Two events at the same time -> aborted translation\n");
+			return false;
 			
 			// Attentione: do not change the ordering of e0 and e1 in stabilize, otherwise you would
 			// get an infinite loop here!
