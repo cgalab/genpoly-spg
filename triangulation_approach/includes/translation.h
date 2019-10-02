@@ -2,6 +2,7 @@
 	Include standard libraries
 */
 #include <list>
+#include <stack>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -26,8 +27,10 @@
 					not simple or the event queue is unstable
 		PARTIAL: 	The translation has been started, but was aborted due to instability
 					of the event queue
+		UNDONE: 	The translation has been started, but was aborted due to instability
+					if the event queue and afterwards it was undone
 */
-enum class Executed {FULL, REJECTED, PARTIAL};
+enum class Executed {FULL, REJECTED, PARTIAL, UNDONE};
 
 /*
 	Define the different types of translations:
@@ -35,9 +38,26 @@ enum class Executed {FULL, REJECTED, PARTIAL};
 						translation class
 		SPLIT_PART_1: 	The first part of a splitted translation
 		SPLIT_PART_2: 	The second part of a splitted translation
-
 */
 enum class TranslationType {DEFAULT, SPLIT_PART_1, SPLIT_PART_2};
+
+/*
+	Remember the state change of a flip
+
+	oldDV0 	One vertex of the edge which was flipped
+	oldDV1 	The other vertex of the edge which was flipped
+	newDV0 	One vertex of the inserted edge
+	newDV1 	The other vertex of the inserted edge
+*/
+struct Flip{
+	Vertex * const oldDV0;
+	Vertex * const oldDV1;
+	Vertex * const newDV0;
+	Vertex * const newDV1;
+
+	Flip(Vertex * const old0, Vertex * const old1, Vertex * const new0, Vertex * const new1) :
+		oldDV0(old0), oldDV1(old1), newDV0(new0), newDV1(new1) {}
+};
 
 class Translation{
 
@@ -106,6 +126,11 @@ private:
 	EventQueue *Q;
 
 	/*
+		A stack containing information of all processed flips
+	*/
+	std::stack<Flip*> FlipStack;
+
+	/*
 		The event time of the last processed event
 	*/
 	double actualTime;
@@ -147,7 +172,7 @@ private:
 			This function also checks whether any of the triangles is zero and tries to repair
 			it. If it finds something not repairable it erros with exit code 7.
 	*/
-	bool generateInitialQueue() const;
+	bool generateInitialQueue();
 
 	/*
 		The function insideQuadrilateral() checks whether the vertex v lays inside of a
@@ -204,7 +229,7 @@ private:
 			should never be the case besides such splitted translation where the vertex is
 			moved exactly to a triangulation edge on purpose.
 	*/
-	void repairEnd() const;
+	void repairEnd();
 
 	/*
 		The function executeSplitRetainSide() decomposes one translation, which can not be
@@ -240,7 +265,7 @@ private:
 		Note:
 			For detailed information why we can do that take a look at my Master Thesis
 	*/
-	enum Executed executeSplitChangeSide() const;
+	enum Executed executeSplitChangeSide();
 
 	/*
 		The function flip() executes one event by removing the longest edge of the collapsing
@@ -265,7 +290,7 @@ private:
 				to wrong decisions
 			- For more information on the method of deciding take a look into my Master Thesis
 	*/
-	bool flip(Triangle *t0, const bool singleFlip) const;
+	bool flip(Triangle *t0, const bool singleFlip);
 
 	/*
 		The function insertAfterOppositeFlip() decides whether newly generated triangles after
@@ -312,6 +337,14 @@ private:
 	*/
 	bool insertAfterNonOppositeFlip(Triangle *t, Vertex * shared0, Vertex * shared1, Vertex *
 		opposite) const;
+
+	/*
+		The function undo() checks whether moving vertex still lays inside of its 
+		surrounding polygon. If it does not the function undoes all executed flips in
+		reversed order and sets the moving vertex back to its original position.
+	*/
+	bool undo();
+
 
 public:
 
@@ -410,7 +443,7 @@ public:
 		Destructor:
 		Checks and potentially repairs the surrounding polygon of the moved vertex and
 		deletes all the remaining construction vertices and edges. It errors with exit
-		code 6 if the surrounding polygon check fails.
+		code 6 if the surrounding polygon check fails. It also deletes the flip stack.
 	*/	
 	~Translation();
 };

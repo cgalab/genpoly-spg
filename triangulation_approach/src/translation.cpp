@@ -56,7 +56,7 @@ Translation::Translation(Triangulation *Tr, int i, double dX, double dY, Transla
 		This function also checks whether any of the triangles is zero and tries to repair it. If
 		it finds something not repairable it erros with exit code 7.
 */
-bool Translation::generateInitialQueue() const{
+bool Translation::generateInitialQueue(){
 	double t;
 	std::list<Triangle*> triangles = (*original).getTriangles();
 	TEdge *opposite;
@@ -336,7 +336,7 @@ bool Translation::checkEdge(Vertex *fromV, TEdge *newE) const{
 		be the case besides such splitted translation where the vertex is moved exactly to a
 		triangulation edge on purpose.
 */
-void Translation::repairEnd() const{
+void Translation::repairEnd(){
 	std::list<Triangle*> triangles;
 	double area;
 	TEdge *edge;
@@ -459,7 +459,7 @@ enum Executed Translation::executeSplitRetainSide() const{
 	Note:
 		For detailed information why we can do that take a look at my Master Thesis
 */
-enum Executed Translation::executeSplitChangeSide() const{
+enum Executed Translation::executeSplitChangeSide(){
 	double middleX, middleY;
 	double transX, transY;
 	Translation *trans;
@@ -532,7 +532,7 @@ enum Executed Translation::executeSplitChangeSide() const{
 			to wrong decisions
 		- For more information on the method of deciding take a look into my Master Thesis
 */
-bool Translation::flip(Triangle *t0, const bool singleFlip) const{
+bool Translation::flip(Triangle *t0, const bool singleFlip){
 	TEdge *e, *e1, *e2;
 	Triangle *t1;
 	Vertex *vj0, *vj1; // Joint vertices
@@ -595,6 +595,10 @@ bool Translation::flip(Triangle *t0, const bool singleFlip) const{
 	t1 = new Triangle(e, e1, e2, vn0, vn1, vj1);
 
 	if(!singleFlip){
+		
+		// Add the flip to the flip stack
+		FlipStack.push(new Flip(vj0, vj1, vn0, vn1));
+
 		// Reset coordinates temporarely to original position for the calcalation of the event time
 		x = (*original).getX();
 		y = (*original).getY();
@@ -859,6 +863,61 @@ bool Translation::insertAfterNonOppositeFlip(Triangle *t, Vertex * shared0, Vert
 	return false;
 }
 
+/*
+	The function undo() checks whether moving vertex still lays inside of its 
+	surrounding polygon. If it does not the function undoes all executed flips in
+	reversed order and sets the moving vertex back to its original position.
+*/
+bool Translation::undo(){
+	struct Flip *f;
+	bool ok;
+	Vertex *oldD0, *oldD1;
+	Vertex *newD0, *newD1;
+	TEdge *e;
+
+	ok = (*original).checkSurroundingPolygon();
+
+	if(!ok){
+
+		printf("Surrounding polygon check after abortion failed...");
+		// Undo all flips
+		while(!FlipStack.empty()){
+			
+			f = FlipStack.top();
+			FlipStack.pop();
+
+			oldD0 = f -> oldDV0;
+			oldD1 = f -> oldDV1;
+			newD0 = f -> newDV0;
+			newD1 = f -> newDV1;
+
+			// Get the new edge to delete it
+			e = (*newD0).getEdgeTo(newD1);
+
+			delete e;
+
+			// Recreate the old edge
+			e = new TEdge(oldD0, oldD1);
+			(*T).addEdge(e);
+
+			// And the old triangles
+			new Triangle(e, (*oldD0).getEdgeTo(newD0), (*oldD1).getEdgeTo(newD0), oldD0, oldD1, newD0);
+			new Triangle(e, (*oldD0).getEdgeTo(newD1), (*oldD1).getEdgeTo(newD1), oldD0, oldD1, newD1);
+
+			delete f;
+		}
+
+		// Reset the vertex to the start position
+		(*original).setPosition((*oldV).getX(), (*oldV).getY());
+
+		printf("translation undone!\n");
+
+		return true;
+	}
+
+	return false;
+}
+
 
 /*
 	C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
@@ -956,6 +1015,7 @@ enum Executed Translation::execute(){
 	Triangle *t = NULL;
 	std::pair<double, Triangle*> e;
 	double oldArea, newArea;
+	bool undone;
 
 	// The translation must be split into two translations
 	if(split){
@@ -988,7 +1048,11 @@ enum Executed Translation::execute(){
 
 			// Abort if the event queue becomes unstable
 			if(!flip(t, false)){
-				return Executed::PARTIAL;
+				undone = undo();
+				if(undone)
+					return Executed::UNDONE;
+				else
+					return Executed::PARTIAL;
 			}
 		}
 
@@ -1040,10 +1104,19 @@ void Translation::checkSplit(){
 	Destructor:
 	Checks and potentially repairs the surrounding polygon of the moved vertex and deletes all
 	the remaining construction vertices and edges. It errors with exit code 6 if the surrounding
-	polygon check fails.
+	polygon check fails. It also deletes the flip stack.
 */	
 Translation::~Translation(){
 	bool ok;
+	struct Flip *f;
+
+	// Delete the flip stack
+	while(!FlipStack.empty()){
+		f = FlipStack.top();
+		FlipStack.pop();
+
+		delete f;
+	}
 
 	repairEnd();
 
