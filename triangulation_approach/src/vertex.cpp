@@ -736,6 +736,13 @@ bool Vertex::checkSurroundingPolygon(){
 	return true;
 }
 
+/*
+	@return 	The Euclidean distance to the origin
+*/
+double Vertex::getDistanceToOrigin() const{
+	return sqrt(x * x + y * y);
+}
+
 
 /*
 	D ~ E ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R

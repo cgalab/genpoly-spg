@@ -182,6 +182,7 @@ public:
 		bool 					check()
 		void 					stretch(const double factor)
 		bool 					checkSurroundingPolygon()
+		double 					getDistanceToOrigin() const
 	*/
 
 
@@ -524,6 +525,11 @@ public:
 		@return 	True if the vertex is inside of its surrounding polygon, otherwise false
 	*/
 	bool checkSurroundingPolygon();
+
+	/*
+		@return 	The Euclidean distance to the origin
+	*/
+	double getDistanceToOrigin() const;
 	
 	
 	/*
