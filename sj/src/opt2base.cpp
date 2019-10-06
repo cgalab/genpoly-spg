@@ -1082,7 +1082,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, unsigned 
         }
       }
       else {
-        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+//        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
         //len11 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points);
         //len21 = pol_calc_chain_length((before.getPLow()).v, (before.getPHigh()).v, polygon, points);
         //edgeS.erase(retval.first);
