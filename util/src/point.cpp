@@ -4,10 +4,12 @@
 #include <assert.h> // for assert
 #include <math.h>
 #include <cmath> // for fabs()
+#include <iterator>     // std::next
 #include "point.h" // for Point class
 #include "pol.h" // for doFlip
 #include "edge.h"
 
+// function that verifies whether any points in the 'points' vector are collinear, or identical.
 enum error verify_point_set(std::vector<Point>& points) {
   enum error retval = SUCCESS;
 
@@ -22,6 +24,9 @@ enum error verify_point_set(std::vector<Point>& points) {
     if (prev == cur) {
       retval = COINCIDENTAL_POINTS;
       std::cerr << "Error: Found 2 points with same coordinates!" << std::endl;
+      std::cerr << std::setprecision(24);
+      std::cerr << "p1: " << points[lex[i-1]] << std::endl;
+      std::cerr << "p2: " << points[lex[i]] << std::endl;
       break;
     }
   }
@@ -92,7 +97,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
       double y_j = y_i - points[upper[j]].y;
       double a_j;
 
-      if (fabs(x_j) < EPSILON) a_j = (1 + signbit(y_j)*(-2))*INFINITY;
+      if (fabs(x_j) < EPSILON) a_j = (1 + std::signbit(y_j)*(-2))*INFINITY;
       else a_j = y_j/x_j;
 //      std::cerr << "j: " << j << ", p: " << points[upper[j]] << ", x_j: " << x_j << ", y_j: " << y_j << ", a_j: " << a_j << std::endl;
 
@@ -102,7 +107,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
         double y_next = points[upper[j+1]].y - points[upper[j]].y;
         double a_next;
 
-        if (fabs(x_next) < EPSILON) a_next = (1 + signbit(y_next)*(-2))*INFINITY ;
+        if (fabs(x_next) < EPSILON) a_next = (1 + std::signbit(y_next)*(-2))*INFINITY ;
         else a_next = y_next/x_next;
 //        std::cerr << "upper: next point: " << points[upper[j+1]] << ", x_next: " << x_next << ", y_next: " << y_next << ", a_next: " << a_next << std::endl;
 
@@ -132,7 +137,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
       double y_j = y_i - points[lower[j]].y;
       double a_j;
 
-      if (fabs(x_j) < EPSILON) a_j = (1 + signbit(y_j)*(-2))*INFINITY;
+      if (fabs(x_j) < EPSILON) a_j = (1 + std::signbit(y_j)*(-2))*INFINITY;
       else a_j = y_j/x_j;
 
 //      std::cerr << "j: " << j << ", p: " << points[upper[j]] << ", x_j: " << x_j << ", y_j: " << y_j << ", a_j: " << a_j << std::endl;
@@ -143,7 +148,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
         double y_next = points[lower[j+1]].y - points[lower[j]].y;
         double a_next;
 
-        if (fabs(x_next) < EPSILON) a_next = (1 + signbit(y_next)*(-2))*INFINITY;
+        if (fabs(x_next) < EPSILON) a_next = (1 + std::signbit(y_next)*(-2))*INFINITY;
         else a_next = y_next/x_next;
 //        std::cerr << "lower: next point: " << points[upper[j+1]] << ", x_next: " << x_next << ", y_next: " << y_next << ", a_next: " << a_next << std::endl;
 
@@ -178,7 +183,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, 
   // 'upper' and 'lower' both have the same start point, to return a CCW c.h.,
   // first add 'lower' to 'ch' then 'upper' minus the start
   ch.insert(ch.end(), lower.begin(), lower.end());
-  ch.insert(ch.end(), std::next(upper.rbegin()), std::prev(upper.rend()));
+  ch.insert(ch.end(), --upper.rbegin(), ++upper.rend());
 
   // make sure of the ordering
 	if (enforceCCWOrder) {
@@ -213,30 +218,57 @@ void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& 
 
 // check for if p1 is a 'left' vertex compared to p2
 bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
-  unsigned int lo, hi, left, right;
-  bool p1_left;
+  unsigned int lo, hi, left, right, dist_left, dist_right;
+  bool p1_hi;
   if ((*p1).v < (*p2).v) {
     lo = (*p1).v;
-    hi = (*p2).v;
-    p1_left = true;
+    hi = (*p2).v; // 'hi' is the center with distance to 'lo' calculated on 'left' and 'right' side
+    p1_hi = false;
   } else {
     lo = (*p2).v;
     hi = (*p1).v;
-    p1_left = false;
+    p1_hi = true;
   }
-  left = lo;
-  right = lo + cycle;
+//  std::cerr << "lo: " << lo << ", hi: " << hi << ", p1_hi: " << ((p1_hi) ? "true" : "false") << std::endl;
+  left = lo;  // value of 'lo' to the left of 'hi'
+  right = lo + cycle; // value of 'lo' to the right of 'hi'
+  dist_left = hi - left;
+  dist_right = right - hi;
+//  std::cerr << "left: " << left << ", right: " << right << std::endl;
+//  std::cerr << "dist_left: " << dist_left << ", dist_right: " << dist_right << std::endl;
 
-  if (hi - left < right - hi) {
-    if (p1_left) return false;
-    else return true;
+  if (dist_left < dist_right) {  // if 'hi' has a shorter distance to the left
+    if (p1_hi) return true;      // if p1 is the 'hi' point
+    return false;
   }
-  else {
-    if (p1_left) return true;
-    else return false;
-  }
+  if (p1_hi) return false;      // you only get here if shorter distance is to the right.
+  return false;
 }
 
+
+// check for if p1 is the incidental 'left' vertex compared to p2
+/*
+bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
+  int left, right;
+
+  left = (cycle + (*p2).v - (*p1).v) % cycle;
+  right = (cycle + (*p1).v - (*p2).v) % cycle;
+
+  return left < right;
+}
+*/
+/*
+bool isPolLeft(Point *p1, Point *p2, unsigned int cycle) {
+  if ((*p1).v == 0) {
+    if ((*p2).v == 1) return true;
+  }
+  if ((*p2).v == 0) {
+    if ((*p1).v == cycle-1) return true;
+  }
+  if ((*p1).v < (*p2).v) return true;
+  return false;
+}
+*/
 // check for if p1 is the incidental 'left' vertex compared to p2
 bool isPol1Left(Point *p1, Point *p2, unsigned int cycle) {
   if ((*p1).v == 0) {
@@ -246,6 +278,17 @@ bool isPol1Left(Point *p1, Point *p2, unsigned int cycle) {
     if ((*p1).v == cycle-1) return true;
   }
   if (((*p1).v < (*p2).v) && (abs((int)((*p1).v - (*p2).v)) == 1)) return true;
+  return false;
+}
+
+bool isPol1Left(unsigned int p1, unsigned int p2, unsigned int cycle) {
+  if (p1 == 0) {
+    if (p2 == 1) return true;
+  }
+  if (p2 == 0) {
+    if (p1 == cycle-1) return true;
+  }
+  if ((p1 < p2) && (abs((int)(p1 - p2)) == 1)) return true;
   return false;
 }
 
@@ -327,6 +370,25 @@ double getYmax(const std::vector<Point>& p) {
   return ymax;
 }
 
+unsigned int get_lowest_v(Point *a, Point *b, Point *c) {
+  std::vector<unsigned int> vec {(*a).v, (*b).v, (*c).v};
+  std::sort(vec.begin(), vec.end());
+  return vec[0];
+}
+
+unsigned int get_highest_v(Point *a, Point *b, Point *c) {
+  std::vector<unsigned int> vec {(*a).v, (*b).v, (*c).v};
+  std::sort(vec.begin(), vec.end());
+  return vec[2];
+}
+
+double get_length(const Point& p1, const Point& p2) {
+  double x = fabs(p1.x - p2.x);
+  double y = fabs(p1.y - p2.y);
+  double length = sqrt(x*x+y*y);
+  return length;
+}
+
 // comparison function for the sort algorithm in 'star'
 bool angleComparator (Point i,Point j) {
   double ai = i.y/i.x;
@@ -334,8 +396,8 @@ bool angleComparator (Point i,Point j) {
   double aj = j.y/j.x;
   double lj = sqrt(j.x*j.x + j.y*j.y);
 
-  if (fabs(ai - aj) < EPSILON) {
-    if (fabs(li - lj) < EPSILON) return false;
+  if (fabs(ai - aj) == 0) {
+    if (fabs(li - lj) == 0) return false;
     else return (li < lj);
   }
   else return (ai < aj);

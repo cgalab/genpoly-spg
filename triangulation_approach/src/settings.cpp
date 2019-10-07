@@ -3,7 +3,7 @@
 /*
 	Polygon parameters
 */
-unsigned int Settings::nrInnerPolygons = 1;
+unsigned int Settings::nrInnerPolygons = 0;
 int Settings::outerSize = 1000000;
 std::vector<int> Settings::innerSizes;
 
@@ -11,7 +11,7 @@ std::vector<int> Settings::innerSizes;
 /*
 	Initial polygon
 */
-int Settings::initialSize = 10;
+int Settings::initialSize = 100;
 double Settings::radiusPolygon = 0.1;
 double Settings::radiusHole = 0.05;
 double Settings::boxSize = 3.0;
@@ -42,7 +42,7 @@ Timer* Settings::timer = NULL;
 	Random generator
 */
 bool Settings::fixedSeed = false;
-unsigned int Settings::seed = 2051178898;
+unsigned int Settings::seed = 891098421;
 RandomGenerator* Settings::generator = NULL;
 
 
@@ -58,7 +58,7 @@ void Settings::initSettings(){
 	(*timer).start();
 
 	// Generate the vector of sizes of the inner polygons
-	innerSizes.push_back(100000);
+	//innerSizes.push_back(100000);
 
 	// Compute the number of translations for the initial polygon
 	if(initialSize < outerSize){
@@ -71,7 +71,7 @@ void Settings::initSettings(){
 	// Initialize the RandomGenerator
 	generator = new RandomGenerator(fixedSeed, seed);
 
-	// Initialise the exact arithmetic
+	// Initialize the exact arithmetic
 	if(arithmetics == Arithmetics::EXACT)
 		exactinit();
 }

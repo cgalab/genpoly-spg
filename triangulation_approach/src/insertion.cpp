@@ -13,7 +13,7 @@
 	@param 	pid 	The id of the polygon to insert in
 	@param 	index 	The index of the vertex
 */
-Insertion::Insertion(Triangulation *t, unsigned int pid, int index) :
+Insertion::Insertion(Triangulation * const t, const unsigned int pid, const int index) :
 	T(t), pID(pid), i(index) {
 
 	v0 = (*T).getVertex(i, pID);
@@ -34,7 +34,7 @@ Insertion::Insertion(Triangulation *t, unsigned int pid, int index) :
 
 	@return 	True if the chosen edge fulfils the criteria, otherwise false
 */
-bool Insertion::checkStability(){
+bool Insertion::checkStability() const{
 	double l = (*e).length();
 	Triangle *t;
 
@@ -118,7 +118,7 @@ void Insertion::execute(){
 	which leads to a simple polygon and execute it. If it has not found a suitable
 	translation till the limit is reached, the new vertex will just stay were it is.
 */
-void Insertion::translate(){
+void Insertion::translate() const{
 	int index;
 	bool overroll, simple = false;
 	double alpha, stddev, r, dx, dy;

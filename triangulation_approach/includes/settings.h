@@ -64,7 +64,7 @@ public:
 	static Arithmetics arithmetics;
 
 	// Minimal time distance between events in the event queue
-	static constexpr double epsEventTime = 0.00001; //10^-5
+	static constexpr double epsEventTime = 0.00001; //10⁻⁵
 
 	// At intersection check all determinants' absolute values less then epsInt
 	// are interpreted as zero

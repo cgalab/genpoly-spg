@@ -29,7 +29,7 @@ private:
 	/*
 		The triangulation the polygon lives in
 	*/
-	Triangulation *T;
+	Triangulation const * const T;
 
 	/*
 		A vector of all vertices belonging to the polygon
@@ -41,7 +41,7 @@ private:
 		It is always assumed that the outer polygon has ID 0 (so it was generated first) and the
 		inner polygons have IDs from 1 to n
 	*/
-	unsigned int id;
+	const unsigned int id;
 
 	/*
 		The number of already generated polygons
@@ -61,7 +61,7 @@ public:
 		@param 	t 	The triangulation the new polygon lives in
 		@param 	n 	The target number of vertices of the new polygon
 	*/
-	TPolygon(Triangulation *t, int n);
+	TPolygon(Triangulation const * const t, const int n);
 
 
 	/*
@@ -71,7 +71,7 @@ public:
 	/*
 		@param	v 	Vertex to be added to the vertices vector
 	*/
-	void addVertex(Vertex *v);
+	void addVertex(Vertex * const v);
 
 
 	/*
@@ -81,7 +81,7 @@ public:
 	/*
 		@return 	The id of the polygon
 	*/
-	unsigned int getID();
+	unsigned int getID() const;
 
 	/*
 		@param	i 	Index of the vertex in the vertices vector
@@ -95,12 +95,12 @@ public:
 			- This will not work after inserting additional vertices, as the vertices won't be 
 				in the same order in the vertices vector as they are in the polygon
 	*/
-	Vertex *getVertex(int i);
+	Vertex *getVertex(const int i) const;
 
 	/*
 		@return 	The actual size of the polygon
 	*/
-	int getActualPolygonSize();
+	int getActualPolygonSize() const;
 
 
 	/*
@@ -111,7 +111,7 @@ public:
 		@param 	i 	The index of the vertex to be removed in the vertices list
 		@return 	The vertex to be removed
 	*/
-	Vertex *removeVertex(int i);
+	Vertex *removeVertex(const int i);
 };
 
 #endif

@@ -7,6 +7,7 @@ add_library(util
     src/point.cpp
     src/pol.cpp
     src/predicates.cpp
+    src/elapsed.cpp
     src/simple_pol_check.cpp
     )
 
@@ -19,7 +20,7 @@ target_include_directories(util PUBLIC
     PRIVATE src)
 
 # manually inserted..
-#add_definitions(-DNDEBUG)
+add_definitions(-O3 -DNDEBUG -std=c++11 -DCPUTIME_IN_MILLISECONDS)
 
 # 'make install' to the correct locations (provided by GNUInstallDirs).
 #install(TARGETS util EXPORT MyLibraryConfig

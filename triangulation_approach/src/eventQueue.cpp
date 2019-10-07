@@ -69,10 +69,13 @@ void EventQueue::stabilize(struct Event *e0, struct Event *e1){
 	area1 = (*t).signedArea();
 	delete t;
 
-	// We have convex shape if sign(area0) != sign(area1)
-	// or in the special case that area1 equals 0
+	if((*original).getID() == 2865905)
+		printf("area0: %.20f area1: %.20f  equals zero: %d \n", area0, area1, area1 == 0);
 
-	if(area1 == 0 || (signbit(area0) != signbit(area1)))
+	// We have convex shape if sign(area0) != sign(area1)
+	// The special case area1 = 0 counts as non-convex shape
+
+	if(area1 != 0 && (signbit(area0) != signbit(area1)))
 		stabilizeConvex(e0, e1, edge);
 
 	// 2. case:
@@ -147,7 +150,7 @@ void EventQueue::stabilizeConvex(struct Event* e0, struct Event* e1, TEdge* comm
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff0: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 
 	// Transition line intersects one of the oppossing edges
@@ -164,7 +167,7 @@ void EventQueue::stabilizeConvex(struct Event* e0, struct Event* e1, TEdge* comm
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff1: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 	}
 }
@@ -212,6 +215,8 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 	area1 = (*t).signedArea();
 	delete t;
 
+	if((*original).getID() == 2865905)
+		printf("area0: %.20f area1: %.20f \n", area0, area1);
 	// Transition line doesn't intersect the opposing edges
 	if(signbit(area0) == signbit(area1)){
 		// Now we have to check on which side the transition line passes
@@ -235,14 +240,19 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff2: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 
 	// Transition line intersects one of the oppossing edges
 	}else{
+		
 		t = new Triangle(oldV, newV, common);
 		areaCommon = (*t).signedArea();
 		delete t;
+
+		if((*original).getID() == 2865905){
+			printf("areaCommon: %.20f \n", areaCommon);
+		}
 
 		// If the transition line intersects t1, then t0 has to collapse first
 		// so the ordering was right
@@ -252,7 +262,7 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			printf("order change time diff3: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 	}
 }
@@ -269,7 +279,7 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 	@param 	oV 		A copy of the vertex at its start position
 	@param	nV 		A copy of the vertex at its target position
 */	
-EventQueue::EventQueue(Vertex *orig, Vertex *oV, Vertex *nV) : 
+EventQueue::EventQueue(Vertex * const orig, Vertex * const oV, Vertex * const nV) : 
 	first(NULL), n(0), original(orig), oldV(oV), newV(nV) {}
 
 
@@ -290,7 +300,7 @@ EventQueue::EventQueue(Vertex *orig, Vertex *oV, Vertex *nV) :
 */
 // TODO:
 // Maybe add a function for inserting elements with checking
-void EventQueue::insertWithoutCheck(double time, Triangle *t){
+void EventQueue::insertWithoutCheck(const double time, Triangle *t){
 	struct Event *e0;
 	struct Event *e1, *prev = NULL;
 	double time1;
@@ -357,7 +367,7 @@ void EventQueue::insertWithoutCheck(double time, Triangle *t){
 	@return 			True if there are not more than two neighboring concurrent
 						events, otherwise false
 */
-bool EventQueue::makeStable(bool initial){
+bool EventQueue::makeStable(const bool initial){
 	struct Event *e0, *e1;
 	double time0, time1, dif;
 
@@ -375,19 +385,26 @@ bool EventQueue::makeStable(bool initial){
 		// Two events are concurrent
 		if(dif < Settings::epsEventTime){
 			// Check first whether there is a third concurrent event
-			dif = fabs(time1 - e1 -> collapseTime);
-			if(dif < Settings::epsEventTime){
-				if(Settings::feedback == FeedbackMode::VERBOSE){
-					if(initial)
-						printf("Eventqueue: More than two events at the same time -> \
-							refused translation\n");
-					else
-						printf("Eventqueue: More than two events at the same time -> \
-							aborted translation\n");
-				}
-				return false;
-			}
 
+			// TODO:
+			// Definitelly the changing of event orders is not stable at the moment
+			/*if(e1 -> next != NULL){
+				dif = fabs(time1 - e1 -> next -> collapseTime);
+				if(dif < Settings::epsEventTime){
+					if(initial)
+						printf("Eventqueue: More than two events at the same time -> refused translation\n");
+					else
+						printf("Eventqueue: More than two events at the same time -> aborted translation\n");
+					return false;
+				}
+			}*/
+
+			if(initial)
+				printf("Eventqueue: Two events at the same time -> refused translation\n");
+			else
+				printf("Eventqueue: Two events at the same time -> aborted translation\n");
+			return false;
+			
 			// Attentione: do not change the ordering of e0 and e1 in stabilize, otherwise you would
 			// get an infinite loop here!
 			stabilize(e0, e1);
@@ -424,7 +441,7 @@ std::pair<double, Triangle*> EventQueue::pop(){
 /*
 	@return 	The actual number of events in the event queue
 */
-int EventQueue::size(){
+int EventQueue::size() const{
 	return n;
 }
 
@@ -435,7 +452,7 @@ int EventQueue::size(){
 
 	@param 	t 	The triangle to be deleted
 */
-void EventQueue::remove(Triangle *t){
+void EventQueue::remove(Triangle * const t){
 	unsigned long long id = (*t).getID();
 	struct Event *e, *prev = NULL;
 
@@ -461,7 +478,7 @@ void EventQueue::remove(Triangle *t){
 /*
 	The function print() prints all event times in an ordered way to stdout.
 */
-void EventQueue::print(){
+void EventQueue::print() const{
 	struct Event *e;
 	int i = 0;
 

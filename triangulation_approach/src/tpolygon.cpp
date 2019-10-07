@@ -21,7 +21,7 @@ unsigned int TPolygon::N = 0;
 	@param 	t 	The triangulation the new polygon lives in
 	@param 	n 	The target number of vertices of the new polygon
 */
-TPolygon::TPolygon(Triangulation *t, int n) :
+TPolygon::TPolygon(Triangulation const * const t, const int n) :
 	T(t), id(N) {
 
 	vertices.reserve(n);
@@ -37,7 +37,7 @@ TPolygon::TPolygon(Triangulation *t, int n) :
 /*
 	@param	v 	Vertex to be added to the vertices vector
 */
-void TPolygon::addVertex(Vertex *v){
+void TPolygon::addVertex(Vertex * const v){
 	vertices.push_back(v);
 
 	(*v).setPolygon(this);
@@ -51,7 +51,7 @@ void TPolygon::addVertex(Vertex *v){
 /*
 	@return 	The id of the polygon
 */
-unsigned int TPolygon::getID(){
+unsigned int TPolygon::getID() const{
 	return id;
 }
 
@@ -67,7 +67,7 @@ unsigned int TPolygon::getID(){
 		- This will not work after inserting additional vertices, as the vertices won't be 
 			in the same order in the vertices vector as they are in the polygon
 */
-Vertex *TPolygon::getVertex(int i){ 	
+Vertex *TPolygon::getVertex(const int i) const{ 	
 	int n;
 
 	n = vertices.size();
@@ -85,7 +85,7 @@ Vertex *TPolygon::getVertex(int i){
 /*
 	@return 	The actual size of the polygon
 */
-int TPolygon::getActualPolygonSize(){
+int TPolygon::getActualPolygonSize() const{
 	return vertices.size();
 }
 
@@ -98,7 +98,7 @@ int TPolygon::getActualPolygonSize(){
 	@param 	i 	The index of the vertex to be removed in the vertices list
 	@return 	The vertex to be removed
 */
-Vertex *TPolygon::removeVertex(int i){
+Vertex *TPolygon::removeVertex(const int i){
 	Vertex *v;
 
 	v = vertices[i];

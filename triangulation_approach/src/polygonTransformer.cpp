@@ -17,7 +17,7 @@
 		- For polygons with holes the vertex also is reandomly choosen, i.e. it can be from
 			the outer polygon as well as of one of the inner polygons
 */
-int transformPolygonByMoves(Triangulation *T, int iterations){
+int transformPolygonByMoves(Triangulation * const T, const int iterations){
 	int index = 0;
 	double dx = 0, dy = 0, stddev, alpha, r;
 	bool simple, overroll;
@@ -84,7 +84,7 @@ int transformPolygonByMoves(Triangulation *T, int iterations){
 
 
 /*
-	The function growPolygon() grows a polygon by n insertions.
+	The function growPolygonBy() grows a polygon by n insertions.
 
 	@param 	T 		The triangulation the polygon lives in
 	@param	pID 	The ID of the polygon
@@ -93,7 +93,7 @@ int transformPolygonByMoves(Triangulation *T, int iterations){
 	Note:
 		This function works just for polygons without holes!
 */
-void growPolygonBy(Triangulation *T, unsigned int pID, int n){
+void growPolygonBy(Triangulation * const T, const unsigned int pID, const int n){
 	int index, actualN, i;
 	Insertion *in;
 	bool ok;
@@ -149,7 +149,7 @@ void growPolygonBy(Triangulation *T, unsigned int pID, int n){
 /*
 
 */
-void strategyNoHoles0(Triangulation *T){
+void strategyNoHoles0(Triangulation * const T){
 	int performed;
 
 	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
@@ -176,7 +176,7 @@ void strategyNoHoles0(Triangulation *T){
 		exit(9);
 	}
 
-	performed = transformPolygonByMoves(T, Settings::outerSize * 10);
+	performed = transformPolygonByMoves(T, Settings::outerSize);
 	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed,
 		Settings::outerSize * 10, (*Settings::timer).elapsedTime());
 
@@ -192,7 +192,7 @@ void strategyNoHoles0(Triangulation *T){
 /*
 
 */
-void strategyWithHoles0(Triangulation *T){
+void strategyWithHoles0(Triangulation * const T){
 	int performed;
 	int nrInsertions;
 	int i, k;

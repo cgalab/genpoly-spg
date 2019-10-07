@@ -76,40 +76,43 @@ public:
 
 		CONSTRUCTORS:
 
-					Triangulation()
+						Triangulation()
 
 		SETTER:
 		
-		void 			addInnerPolygon(TPolygon *p)
-		void 			addVertex(Vertex *v, unsigned int pID)
-		void 			changeVertex(int i, unsigned int fromP, unsigned int toP)
-		void 			addEdge(TEdge *e)
-		void 			setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3)
+		void 			addInnerPolygon(TPolygon * const p)
+		void 			addVertex(Vertex * const v, const unsigned int pID)
+		void 			changeVertex(const int i, const unsigned int fromP,
+						const unsigned int toP)
+		void 			addEdge(TEdge * const e)
+		void 			setRectangle(Vertex * const v0, Vertex * const v1, Vertex * const v2,
+						Vertex * const v3)
 
 		GETTER:
-
-		unsgined int 	getActualNrInnerPolygons()
-		int 			getTargetNumberOfVertices()
-		int 			getActualNumberOfVertices()
-		int 			getActualNumberOfVertices(unsigned int pID)
-		Vertex*			getVertex(int i, unsigned int pID)
-		Vertex* 		getVertex(int i)
+		
+		unsgined int 	getActualNrInnerPolygons() const
+		int 			getTargetNumberOfVertices() const
+		int 			getActualNumberOfVertices() const
+		int 			getActualNumberOfVertices(const unsigned int pID) const
+		Vertex*			getVertex(const int i, const unsigned int pID) const
+		Vertex* 		getVertex(const int i) const
 
 		REMOVER:
 
-		void 			removeVertex(int index)
-		void 			removeEdge(TEdge *e)
+		void 			removeVertex(const int index)
+		void 			removeEdge(TEdge * const e)
 
 		PRINTER:
 
-		void 			print(const char *filename)
-		void 			printPolygon(const char *filename)
+		void 			print(const char *filename) const
+		void 			printPolygon(const char *filename) const
+		void 			printPolygonToDat(const char *filename) const
 
 		OTHERS:
 
-		bool 			check()
-		void 			stretch(double factor)
-		void			checkSimplicity()
+		bool 			check() const
+		void 			stretch(const double factor)
+		void			checkSimplicity() const
 	*/
 
 
@@ -132,7 +135,7 @@ public:
 	/*
 		@param 	p 	The new inner polygon
 	*/
-	void addInnerPolygon(TPolygon *p);
+	void addInnerPolygon(TPolygon * const p);
 
 	/*
 		The function addVertex() inserts a vertex into the vertices list of the triangulation
@@ -143,7 +146,7 @@ public:
 		@param 	pID 	The polygon the vertex belongs to (pID = 0 outer polygon, else inner
 						polygon)
 	*/
-	void addVertex(Vertex *v, unsigned int pID);
+	void addVertex(Vertex * const v, const unsigned int pID);
 
 	/*
 		The function changeVertex() removes the vertex at index i from the polygon with ID
@@ -153,12 +156,12 @@ public:
 		@param 	fromP 	The ID of the polygon the vertex lives in originally
 		@param 	toP 	The ID of the polygon the vertex should be moved to
 	*/
-	void changeVertex(int i, unsigned int fromP, unsigned int toP);
+	void changeVertex(const int i, const unsigned int fromP, const unsigned int toP);
 
 	/*
 		@param	e 	Edge to be added to the edge map
 	*/
-	void addEdge(TEdge *e);
+	void addEdge(TEdge * const e);
 
 	/*
 		The function setRectangle() sets the vertices of the Rectangle0, ..., Rectangle3 of
@@ -167,7 +170,7 @@ public:
 		@param	v0, v1, v2, v3 	Vertices building the bounding box for the polygon (ordering
 								doesn't matter as the vertices are connected by their edges)
 	*/
-	void setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3);
+	void setRectangle(Vertex * const v0, Vertex * const v1, Vertex * const v2, Vertex * const v3);
 
 
 	/*
@@ -177,25 +180,25 @@ public:
 	/*
 		@return 	The actual number of inner polygons
 	*/
-	unsigned int getActualNrInnerPolygons();
+	unsigned int getActualNrInnerPolygons() const;
 
 	/*
 		@return		Final number of vertices the polygon will contain (including the vertices
 					of inner polygons)
 	*/
-	int getTargetNumberOfVertices();
+	int getTargetNumberOfVertices() const;
 
 	/*
 		@return		The number of vertices the polygon does contain now (including the vertices
 					of inner polygons)
 	*/
-	int getActualNumberOfVertices();
+	int getActualNumberOfVertices() const;
 
 	/*
 		@param 	pID The polygon of interest
 		@return		The number of vertices the polygon with pID does contain now
 	*/
-	int getActualNumberOfVertices(unsigned int pID);
+	int getActualNumberOfVertices(const unsigned int pID) const;
 
 	/*
 		@param	i 	Index of the vertex in the vertices vector of the polygon with pID
@@ -211,13 +214,13 @@ public:
 			- This will not work after inserting additional vertices, as the vertices won't be 
 				in the same order in the vertices vector as they are in the polygon
 	*/
-	Vertex *getVertex(int i, unsigned int pID);
+	Vertex *getVertex(const int i, const unsigned int pID) const;
 
 	/*
 		@param 	i 	The index of the vertex in the vertices vector
 		@return 	The vertex at index i in the vertices vector
 	*/
-	Vertex *getVertex(int i);
+	Vertex *getVertex(const int i) const;
 
 
 	/*
@@ -234,14 +237,14 @@ public:
 			- This function is just for debugging purposes and should normally not be used
 				anywhere in the code
 	*/
-	void removeVertex(int i);
+	void removeVertex(const int i);
 
 	/*
 		The function removeEdge() searches one edge by its ID in the edges map and removes it
 
 		@param	e 	The edge to be removed
 	*/
-	void removeEdge(TEdge *e);
+	void removeEdge(TEdge * const e);
 
 	
 	/*
@@ -259,7 +262,7 @@ public:
 			- Works here: http://graphonline.ru/en/
 			- This crappy website is the reason why we need the scaling factor here
 	*/
-	void print(const char *filename);
+	void print(const char *filename) const;
 
 	/*
 		The function printPolygon() prints just the polygon in .graphml style into a file
@@ -270,7 +273,7 @@ public:
 			- Graphml: https://de.wikipedia.org/wiki/GraphML
 			- Works here: http://graphonline.ru/en/
 	*/
-	void printPolygon(const char *filename);
+	void printPolygon(const char *filename) const;
 
 	/*
 		The function printPolygonToDat() prints all polygons to a .dat file which can be
@@ -278,7 +281,7 @@ public:
 
 		@param 	filename 	The name of the .dat file
 	*/
-	void printPolygonToDat(const char *filename);
+	void printPolygonToDat(const char *filename) const;
 
 
 	/*
@@ -296,7 +299,7 @@ public:
 
 		@return 	true if everything is alright, otherwise false
 	*/
-	bool check();
+	bool check() const;
 
 	/*
 		The function stretch() stretches the whole polygon by a constant factor, i.e. the
@@ -308,7 +311,7 @@ public:
 			- It is not checked, whether this operations is numerically stable!
 			- It is not used anywhere at the moment
 	*/
-	void stretch(double factor);
+	void stretch(const double factor);
 
 	/*
 	The function checkSimplicity() checks whether a polygon is simple by checking for self-
@@ -320,7 +323,7 @@ public:
 	Note:
 		This function does not consider edges of other polygons!
 */
-	void checkSimplicity();
+	void checkSimplicity() const;
 };
 
 #endif

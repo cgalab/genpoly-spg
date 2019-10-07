@@ -28,13 +28,13 @@ code 	name						meaning
 
 int main(){
 	Triangulation* T;
-	int performed;
 
 	Settings::initSettings();
 
 	T = generateRegularPolygon();
 
 	(*T).check();
+
 	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n",
 		Settings::initialSize, (*Settings::timer).elapsedTime());
 

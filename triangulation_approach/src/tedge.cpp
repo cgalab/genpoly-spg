@@ -22,7 +22,7 @@ unsigned long long TEdge::n = 0;
 	@param	V0 	First vertex defining the edge
 	@param 	V1 	Second vertex defining the edge
 */
-TEdge::TEdge(Vertex *V0, Vertex *V1) :
+TEdge::TEdge(Vertex * const V0, Vertex * const V1) :
 	T(NULL), v0(V0), v1(V1), t0(NULL), t1(NULL), type(EdgeType::TRIANGULATION), id(n) { 
 	
 	// Register the new edge at its vertices
@@ -52,7 +52,7 @@ TEdge::TEdge(Vertex *V0, Vertex *V1) :
 		For edges oft type POLYGON the ordering of the vertices as parameters is
 		important!
 */
-TEdge::TEdge(Vertex *V0, Vertex *V1, EdgeType tp) :
+TEdge::TEdge(Vertex * const V0, Vertex * const V1, const EdgeType tp) :
 	T(NULL), v0(V0), v1(V1), t0(NULL), t1(NULL), type(tp), id(n) {
 	
 	// For polygon edges set the ordering in the polygon
@@ -81,14 +81,14 @@ TEdge::TEdge(Vertex *V0, Vertex *V1, EdgeType tp) :
 /*
 	@param 	t 	The triangulation the edge belongs to
 */
-void TEdge::setTriangulation(Triangulation *t){
+void TEdge::setTriangulation(Triangulation * const t){
 	T = t;
 }
 
 /*
 	@param 	tp 	The new type of the edge
 */
-void TEdge::setEdgeType(EdgeType tp){
+void TEdge::setEdgeType(const EdgeType tp){
 	type = tp;
 
 	// For polygon edges set the ordering in the polygon
@@ -107,7 +107,7 @@ void TEdge::setEdgeType(EdgeType tp){
 
 	@param 	t 	The new triangle
 */
-void TEdge::setTriangle(Triangle *t){
+void TEdge::setTriangle(Triangle * const t){
 	if(t0 == NULL) t0 = t;
 	else if(t1 == NULL) t1 = t;
 	else{
@@ -129,42 +129,42 @@ void TEdge::setTriangle(Triangle *t){
 /*
 	@return 	The ID of the edge
 */
-unsigned long long TEdge::getID(){
+unsigned long long TEdge::getID() const{
 	return id;
 }
 
 /*
 	@return 	The type of the edge
 */
-EdgeType TEdge::getEdgeType(){
+EdgeType TEdge::getEdgeType() const{
 	return type;
 }
 
 /*
 	@return 	The vertex at v0
 */
-Vertex *TEdge::getV0(){
+Vertex *TEdge::getV0() const{
 	return v0;
 }
 
 /*
 	@return 	The vertex at v1
 */
-Vertex *TEdge::getV1(){
+Vertex *TEdge::getV1() const{
 	return v1;
 }
 
 /*
 	@return 	The triangle at t0
 */
-Triangle *TEdge::getT0(){
+Triangle *TEdge::getT0() const{
 	return t0;
 }
 
 /*
 	@return 	The triangle at t1
 */
-Triangle *TEdge::getT1(){
+Triangle *TEdge::getT1() const{
 	return t1;
 }
 
@@ -175,7 +175,7 @@ Triangle *TEdge::getT1(){
 	@param	v 	The vertex which should not be contained by the triangle
 	@return 	The triangle not containing v
 */
-Triangle *TEdge::getTriangleNotContaining(Vertex *v){
+Triangle *TEdge::getTriangleNotContaining(Vertex const * const v) const{
 	if((*t0).contains(v)) return t1;
 	else return t0;
 }
@@ -187,7 +187,7 @@ Triangle *TEdge::getTriangleNotContaining(Vertex *v){
 	@param	v 	The vertex which should be contained by the triangle
 	@return 	The triangle containing v
 */
-Triangle *TEdge::getTriangleContaining(Vertex *v){
+Triangle *TEdge::getTriangleContaining(Vertex const * const v) const{
 	if((*t0).contains(v)) return t0;
 	else return t1;
 }
@@ -198,7 +198,7 @@ Triangle *TEdge::getTriangleContaining(Vertex *v){
 	@param 	t 	The triangle which should not be returned
 	@return 	Another triangle
 */
-Triangle *TEdge::getOtherTriangle(Triangle *t){
+Triangle *TEdge::getOtherTriangle(Triangle const * const t) const{
 	if((*t).getID() == (*t0).getID()) return t1;
 	else return t0;
 }
@@ -210,7 +210,7 @@ Triangle *TEdge::getOtherTriangle(Triangle *t){
 	@param 	v 	The vertex which should not be returned
 	@return 	Another vertex
 */
-Vertex *TEdge::getOtherVertex(Vertex *v){
+Vertex *TEdge::getOtherVertex(Vertex const * const v) const{
 	if((*v).getID() == (*v0).getID())
 		return v1;
 	else
@@ -226,8 +226,11 @@ Vertex *TEdge::getOtherVertex(Vertex *v){
 	The function removeTriangle() cancels the assignment of the triangle t at the edge.
 
 	@param 	t 	Triangle to be removed
+
+	Note:
+		This function does not remove the edge from the triangle
 */
-void TEdge::removeTriangle(Triangle *t){
+void TEdge::removeTriangle(Triangle * const t){
 	if(t0 != NULL && (*t0).getID() == (*t).getID())
 	 	t0 = NULL;
 	else if(t1 != NULL && (*t1).getID() == (*t).getID()) 
@@ -248,7 +251,7 @@ void TEdge::removeTriangle(Triangle *t){
 
 	@param 	f 	Pointer to the file to print in
 */
-void TEdge::print(FILE *f){
+void TEdge::print(FILE * const f) const{
 	int w;
 
 	w = nrAssignedTriangles();
@@ -263,7 +266,7 @@ void TEdge::print(FILE *f){
 	The function print() prints the the edge ID, the IDs of its vertices and its edge type
 	to stdout.
 */
-void TEdge::print(){
+void TEdge::print() const{
 	std::string tp;
 
 	if(type == EdgeType::POLYGON) tp = "POLYGON";
@@ -271,6 +274,8 @@ void TEdge::print(){
 	else tp = "TRIANGULATION";
 
 	printf("Edge %llu from vertex %llu to vertex %llu of type %s \n", id, (*v0).getID(), (*v1).getID(), tp.c_str());
+	(*v0).print();
+	(*v1).print();
 }
 
 
@@ -281,7 +286,7 @@ void TEdge::print(){
 /*
 	@return 	The euclidean length of the edge
 */
-double TEdge::length(){
+double TEdge::length() const{
 	double x0, x1, y0, y1;
 
 	x0 = (*v0).getX();
@@ -299,7 +304,7 @@ double TEdge::length(){
 	@param 	v 	The vertex of interest
 	@return 	True if the edge contains v, otherwise false
 */
-bool TEdge::contains(Vertex *v){
+bool TEdge::contains(Vertex const * const v) const{
 	if((*v).getID() == (*v0).getID()) return true;
 	if((*v).getID() == (*v1).getID()) return true;
 	return false;
@@ -308,7 +313,7 @@ bool TEdge::contains(Vertex *v){
 /*
 	@return 	The number of triangles which are assigned at the edge
 */
-int TEdge::nrAssignedTriangles(){
+int TEdge::nrAssignedTriangles() const{
 	int n = 0;
 
 	if(t0 != NULL) n++;
@@ -324,7 +329,7 @@ int TEdge::nrAssignedTriangles(){
 	@param 	v 	The vertex where the edge and the x-axis meet
 	@return 	The angle between the edge and the x-axis with -pi < angle <= pi
 */
-double TEdge::getAngle(Vertex *v){
+double TEdge::getAngle(Vertex const * const v) const{
 	double x0, y0, x1, y1, dx, dy;
 	double cosa, alpha;
 
@@ -372,7 +377,7 @@ double TEdge::getAngle(Vertex *v){
 		It is assumed that v lays pretty close to the supporting line of the edge, so it is only
 		necessary to check whether v lays between the longer edge of the ractangle.
 */
-bool TEdge::isBetween(Vertex *v){
+bool TEdge::isBetween(Vertex const * const v) const{
 	double v0x, v1x, v0y, v1y, dx, dy, z;
 
 	v0x = (*v0).getX();
@@ -448,7 +453,9 @@ TEdge::~TEdge(){
 		determinantent's absolute value is less than Settings::EpsInt. This also keeps vertices a bit
 		away from edges.
 */
-enum IntersectionType checkIntersection(TEdge *e0, TEdge *e1, bool precise){
+enum IntersectionType checkIntersection(TEdge const * const e0, TEdge const * const e1,
+	const bool precise){
+	
 	Vertex *v00, *v01, *v10, *v11;
 	double area00, area01, area10, area11;
 	Triangle *t;
@@ -512,36 +519,33 @@ enum IntersectionType checkIntersection(TEdge *e0, TEdge *e1, bool precise){
 	return IntersectionType::NONE;
 }
 
-// TODO:
-// Maybe rework this function in a way that it takes edges as input instead of vertices
 /*
-	The function getIntersectionPoint() computes the intersection point between the edges defined by
-	the vertices s0 and e0 and the vertices s1 and e1. This algorithm is taken from the article
-	"Intersection of two lines in three-space" by Ronald Goldman, published in Graphics Gems, page 304.
+	The function getIntersectionPoint() computes the intersection point between the edges e0 and e1.
+	This algorithm is taken from the article "Intersection of two lines in three-space" by Ronald
+	Goldman, published in Graphics Gems, page 304.
 
-	@param 	s0 	The start vertex of the first edge
-	@param 	e0 	The end vertex of the first edge
-	@param 	s1 	The start vertex of the second edge
-	@param 	e1 	The end vertex if the second edge
+	@param 	e0 	The first edge
+	@param 	e1 	The second edge
 	@return 	The intersection point if both edges do intersect, otherwise NULL
 
 	Note:
 		https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 */
-Vertex *getIntersectionPoint(Vertex *s0, Vertex *e0, Vertex *s1, Vertex *e1){
+Vertex *getIntersectionPoint(TEdge const * const e0, TEdge const * const e1){
 	double s0x, s0y, e0x, e0y, s1x, s1y, e1x, e1y;
 	double d0x, d0y, d1x, d1y; // Compenents of the displacement vectors
 	double t, s; // Intersection times
 	double crossD;
 
-	s0x = (*s0).getX();
-	s0y = (*s0).getY();
-	e0x = (*e0).getX();
-	e0y = (*e0).getY();
-	s1x = (*s1).getX();
-	s1y = (*s1).getY();
-	e1x = (*e1).getX();
-	e1y = (*e1).getY();
+	// Get the coordinates of the vertices forming the edges
+	s0x = (*(*e0).getV0()).getX();
+	s0y = (*(*e0).getV0()).getY();
+	e0x = (*(*e0).getV1()).getX();
+	e0y = (*(*e0).getV1()).getY();
+	s1x = (*(*e1).getV0()).getX();
+	s1y = (*(*e1).getV0()).getY();
+	e1x = (*(*e1).getV1()).getX();
+	e1y = (*(*e1).getV1()).getY();
 
 	d0x = e0x - s0x;
 	d0y = e0y - s0y;
@@ -575,6 +579,6 @@ Vertex *getIntersectionPoint(Vertex *s0, Vertex *e0, Vertex *s1, Vertex *e1){
 	@param 	y1 	y-component of the second vector
 	@returm 	The 2D cross product of the two vectors
 */
-double crossProduct2D(double x0, double y0, double x1, double y1){
+double crossProduct2D(const double x0, const double y0, const double x1, const double y1){
 	return x0 * y1 - y0 * x1;
 }

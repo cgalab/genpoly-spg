@@ -23,7 +23,7 @@ private:
 	/*
 		The triangulation the polygon lives in
 	*/
-	Triangulation *T;
+	Triangulation * const T;
 
 	/*
 
@@ -33,7 +33,7 @@ private:
 	/*
 		The index of the vertex in the vertices vector of the triangulation
 	*/
-	int i;
+	const int i;
 
 	/*
 		The edge to insert in
@@ -58,13 +58,13 @@ public:
 
 		CONSTRUCTORS:
 		
-				Insertion(Triangulation *t, int index)
+				Insertion(Triangulation * const t, const unsigned int pid, const int index)
 
 		OTHERS:
 
-		bool 	checkStability()
+		bool 	checkStability() const
 		void 	execute()
-		void 	translate()
+		void 	translate() const
 	*/
 
 
@@ -81,7 +81,7 @@ public:
 		@param 	pid 	The id of the polygon to insert in
 		@param 	index 	The index of the vertex
 	*/
-	Insertion(Triangulation *t, unsigned int pid, int index);
+	Insertion(Triangulation * const t, const unsigned int pid, const int index);
 
 
 	/*
@@ -96,7 +96,7 @@ public:
 
 		@return 	True if the chosen edge fulfils the criteria, otherwise false
 	*/
-	bool checkStability();
+	bool checkStability() const;
 
 	/*
 		The function execute() inserts a vertex at the middle of the choosen edge.
@@ -112,7 +112,7 @@ public:
 		which leads to a simple polygon and execute it. If it has not found a suitable
 		translation till the limit is reached, the new vertex will just stay were it is.
 	*/
-	void translate();
+	void translate() const;
 };
 
 #endif

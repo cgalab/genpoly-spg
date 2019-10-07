@@ -75,12 +75,12 @@ private:
 	*/
 	// TODO:
 	// Maybe rename this to bounding box or something
-	bool rectangleVertex;
+	const bool rectangleVertex;
 
 	/*
 		The unique ID of the vertex
 	*/
-	unsigned long long id;
+	const unsigned long long id;
 
 	/*
 		The reserveID is used for computing determinants with double arithmetics, because
@@ -115,7 +115,7 @@ private:
 		Note:
 			By default the reserveID is set to 2 * ID
 	*/
-	void setRID(unsigned long long rid);
+	void setRID(const unsigned long long rid);
 
 	/*
 		The function getEnvironment() recursivelly inserts all adjacent edges and vertices
@@ -127,7 +127,8 @@ private:
 						means that all vertices with distance less then n to this vertex
 						are included
 	*/
-	void getEnvironment(std::map<int, TEdge*> &es, std::map<int, Vertex*> &vs, int depth);
+	void getEnvironment(std::map<const unsigned long long, const TEdge*> &es,
+		std::map<const unsigned long long, const Vertex*> &vs, const int depth) const;
 	
 
 public:
@@ -137,61 +138,62 @@ public:
 
 		CONSTRUCTORS:
 
-								Vertex(double X, double Y)
-								Vertex(double X, double Y, bool RV)
-		Vertex* 				getTranslated(double dx, double dy)
+								Vertex(const double X, const double Y)
+								Vertex(const double X, const double Y, const bool RV)
+		Vertex* 				getTranslated(const double dx, const double dy) const
 		
 		SETTER:
 
-		void 					setTriangulation(Triangulation *t)
-		void 					setPolygon(TPolygon *p)
-		void 					setPosition(double X, double Y)
-		void 					addEdge(TEdge *e)
-		void 					addTriangle(Triangle *t)
-		void 					setToPrev(TEdge *e)
-		void 					setToNext(TEdge *e)
+		void 					setTriangulation(Triangulation * const t)
+		void 					setPolygon(TPolygon * const p)
+		void 					setPosition(const double X, const double Y)
+		void 					addEdge(TEdge * const e)
+		void 					addTriangle(Triangle * const t)
+		void 					setToPrev(TEdge * const e)
+		void 					setToNext(TEdge * const e)
 
 		GETTER:
 
-		double 					getX()
-		double 					getY()
-		std::list<Triangle*> 	getTriangles()
-		unsigned long long 		getID()
-		unsigned long long 		getRID()
-		TEdge* 					getEdgeTo(Vertex *toV)
-		std::vector<TEdge*> 	getSurroundingEdges()
-		std::list<TEdge*> 		getPolygonEdges()
-		bool 					isRectangleVertex()
-		double 					getMediumEdgeLength()
-		double 					getDirectedEdgeLength(double alpha)
-		TEdge* 					getToPrev()
-		TEdge* 					getToNext()
-		Vertex* 				getPrev()
-		Vertex* 				getNext()
-		Triangulation* 			getTriangulation()
-		Triangle* 				getTriangleWith(Vertex *v0, Vertex *v1)
-		unsigned int 			getPID()
-		int 					getActualPolygonSize()
+		double 					getX() const
+		double 					getY() const
+		std::list<Triangle*> 	getTriangles() const
+		unsigned long long 		getID() const
+		unsigned long long 		getRID() const
+		TEdge* 					getEdgeTo(Vertex * const toV) const
+		std::vector<TEdge*> 	getSurroundingEdges() const
+		std::list<TEdge*> 		getPolygonEdges() const
+		bool 					isRectangleVertex() const
+		double 					getMediumEdgeLength() const
+		double 					getDirectedEdgeLength(const double alpha) const
+		TEdge* 					getToPrev() const
+		TEdge* 					getToNext() const
+		Vertex* 				getPrev() const
+		Vertex* 				getNext() const
+		Triangulation* 			getTriangulation() const
+		Triangle* 				getTriangleWith(Vertex const * const v0, Vertex const * const v1)
+		unsigned int 			getPID() const
+		int 					getActualPolygonSize() const
 
 		REMOVER:
 
-		void 					removeEdge(TEdge *e)
-		void 					removeTriangle(Triangle *t)
+		void 					removeEdge(TEdge * const e)
+		void 					removeTriangle(Triangle * const t)
 
 		PRINTER:
 
-		void 					print(FILE *f, double factor)
-		void 					printToDat(FILE *f)
-		void 					print()
-		void 					printEnvironment(int depth, const char *filename)
-		void 					printSurroundingTriangulation(const char *filename)
-		void 					printStats()
+		void 					print(FILE * const f, double factor) const
+		void 					printToDat(FILE * const f)
+		void 					print() const
+		void 					printEnvironment(const int depth, const char *filename) const
+		void 					printSurroundingTriangulation(const char *filename) const
+		static void				printStats()
 
 		OTHERS:
 
 		bool 					check()
-		void 					stretch(double factor)
+		void 					stretch(const double factor)
 		bool 					checkSurroundingPolygon()
+		double 					getDistanceToOrigin() const
 	*/
 
 
@@ -208,7 +210,7 @@ public:
 		@param 	X 	The x coordinate of the vertex
 		@param 	Y 	The y coordinate of the vertex
 	*/
-	Vertex(double X, double Y);
+	Vertex(const double X, const double Y);
 
 	/*
 		Constructor:
@@ -220,7 +222,7 @@ public:
 		@param 	Y 	The y coordinate of the vertex
 		@param 	RV 	Determines whether the new vertex is part of the bounding box
 	*/
-	Vertex(double X, double Y, bool RV);
+	Vertex(const double X, const double Y, const bool RV);
 
 	/*
 		The function getTranslated() is an implicit constructor which generates a new vertex
@@ -234,7 +236,7 @@ public:
 		@param 	dy 	Y-component of the translation vector
 		@return		The translated vertex
 	*/
-	Vertex *getTranslated(double dx, double dy);
+	Vertex *getTranslated(const double dx, const double dy) const;
 
 	
 	/*
@@ -244,7 +246,7 @@ public:
 	/*
 		@param 	t 	The triangulation the vertex lives in
 	*/
-	void setTriangulation(Triangulation *t);
+	void setTriangulation(Triangulation * const t);
 
 	/*
 		@param 	p 	The polygon the vertex belongs to
@@ -255,7 +257,7 @@ public:
 		@param 	X 	The new x-coordinate of the vertex
 		@param 	Y 	The new y-coordinate of the vertex
 	*/
-	void setPosition(double X, double Y);
+	void setPosition(const double X, const double Y);
 
 	/*
 		Adds the edge e to the edges list of the vertex.
@@ -267,7 +269,7 @@ public:
 			- While constructing an edge this function is automatically called to add the
 				edge to the edges lists of its vertices
 	*/
-	void addEdge(TEdge *e);
+	void addEdge(TEdge * const e);
 
 	/*
 		Adds the triangle t to the triangles list of the vertex.
@@ -279,7 +281,7 @@ public:
 			- While constructing a triangle this function is automatically called to add the
 				triangle to the triangles lists of its vertices
 	*/
-	void addTriangle(Triangle *t);
+	void addTriangle(Triangle * const t);
 
 	/*
 		The function setToPrev() sets the pointer for the polygon edge which connects the vertex
@@ -290,7 +292,7 @@ public:
 		Note:
 			This function is automatically called when a new polygon edge is constructed.
 	*/
-	void setToPrev(TEdge *e);
+	void setToPrev(TEdge * const e);
 
 	/*
 		The function setToNext() sets the pointer for the polygon edge which connects the vertex
@@ -301,7 +303,7 @@ public:
 		Note:
 			This function is automatically called when a new polygon edge is constructed.
 	*/
-	void setToNext(TEdge *e);
+	void setToNext(TEdge * const e);
 
 	
 	/*
@@ -311,27 +313,27 @@ public:
 	/*
 		@return 	The x-coordinate of the vertex's position
 	*/
-	double getX();
+	double getX() const;
 
 	/*
 		@return 	The y-coordinate of the vertex's position
 	*/
-	double getY();
+	double getY() const;
 
 	/*
 		@return 	The triangles list of the vertex
 	*/
-	std::list<Triangle*> getTriangles();
+	std::list<Triangle*> getTriangles() const;
 
 	/*
 		@return 	The ID of the vertex
 	*/
-	unsigned long long getID();
+	unsigned long long getID() const;
 
 	/*
 		@return 	The reserve ID of the vertex
 	*/
-	unsigned long long getRID();
+	unsigned long long getRID() const;
 
 	/*
 		The function getEdgeTo() searches the edges list for an edge to the vertex toV
@@ -341,7 +343,7 @@ public:
 		@return 		The edge from the vertex to the vertex toV if existing, otherwise
 						NULL
 	*/
-	TEdge *getEdgeTo(Vertex *v);
+	TEdge *getEdgeTo(Vertex * const v) const;
 
 	/*
 		The function getSurroundingEdges() returns a list of all surrounding edges of the
@@ -351,17 +353,17 @@ public:
 
 		@return 	A list of all surrounding edges
 	*/
-	std::vector<TEdge*> getSurroundingEdges();
+	std::vector<TEdge*> getSurroundingEdges() const;
 
 	/*
 		@return 	A list of all (2) polygon edges incident to the vertex
 	*/
-	std::list<TEdge*> getPolygonEdges();
+	std::list<TEdge*> getPolygonEdges() const;
 
 	/*
 		@return 	True if the vertex is part of the bounding box, otherwise false
 	*/
-	bool isRectangleVertex();
+	bool isRectangleVertex() const;
 
 	/*
 		The function getMediumEdgeLength() computes the mean of the lengths of all
@@ -370,7 +372,7 @@ public:
 
 		@return 	The mean of the lengths of all incident edges
 	*/
-	double getMediumEdgeLength();
+	double getMediumEdgeLength() const;
 
 	/*
 		The function getDirectedEdgeLength() finds the triangle incident to the vertex
@@ -388,32 +390,32 @@ public:
 			This gives a better estimate then getMediumEdgeLength(), but is more
 			expensive to compute
 	*/
-	double getDirectedEdgeLength(double alpha);
+	double getDirectedEdgeLength(const double alpha) const;
 
 	/*
 		@return 	The edge to the predecessor of the vertex in the polygon
 	*/
-	TEdge *getToPrev();
+	TEdge *getToPrev() const;
 
 	/*
 		@return 	The edge to the successor of the vertex in the polygon
 	*/
-	TEdge *getToNext();
+	TEdge *getToNext() const;
 
 	/*
 		@return 	 The predecessor of the vertex in the polygon
 	*/
-	Vertex *getPrev();
+	Vertex *getPrev() const;
 
 	/*
 		@return 	The successor of the vertex in the polygon
 	*/
-	Vertex *getNext();
+	Vertex *getNext() const;
 
 	/*
 		@return 	The triangulation the vertex lives in
 	*/
-	Triangulation *getTriangulation();
+	Triangulation *getTriangulation() const;
 
 	/*
 		The function getTriangleWith() searches for a triangle in the triangles list
@@ -424,17 +426,17 @@ public:
 		@param 	v1 	Third vertex vontained by the searched triangle
 		@return 	The searched triangle if it exists, otherwise NULL
 	*/
-	Triangle *getTriangleWith(Vertex *v0, Vertex *v1);
+	Triangle *getTriangleWith(Vertex const * const v0, Vertex const * const v1) const;
 
 	/*
 		@return 	The id of the polygon the vertex belongs to
 	*/
-	unsigned int getPID();
+	unsigned int getPID() const;
 
 	/*
 		@return 	The actual size of the polygon the vertex belongs to
 	*/
-	int getActualPolygonSize();
+	int getActualPolygonSize() const;
 
 
 	/*
@@ -444,12 +446,12 @@ public:
 	/*
 		@param 	e 	Edge to be removed from the edges list
 	*/
-	void removeEdge(TEdge *e);
+	void removeEdge(TEdge * const e);
 
 	/*
 		@param 	t 	Triangle to be removed from the triangles list
 	*/
-	void removeTriangle(Triangle *t);
+	void removeTriangle(Triangle * const t);
 	
 
 	/*
@@ -470,7 +472,7 @@ public:
 			This function just prints one node into a .graphml file, to print the hole
 			triangulation use the print functions of the Triangulation class
 	*/
-	void print(FILE *f, double factor);
+	void print(FILE * const f, double factor) const;
 
 	/*
 		The function printToDat() writes the coordinates of a vertex to a .dat file such that it
@@ -478,13 +480,13 @@ public:
 
 		@param 	f 	A handle for the .dat file
 	*/
-	void printToDat(FILE *f);
+	void printToDat(FILE * const f) const;
 
 	/*
 		The function print() prints the basic information of a vertex to standard out.
 		It prints the ID and both coordinates in a precision of 15 decimal digits.
 	*/
-	void print();
+	void print() const;
 
 	/*
 		The function printEnvironment() prints a local part of the triangulation around
@@ -496,7 +498,7 @@ public:
 							are included
 		@param 	filename 	The name of the file to write to
 	*/
-	void printEnvironment(int depth, const char *filename);
+	void printEnvironment(const int depth, const char *filename) const;
 
 	/*
 		The function printSurroundingTriangulation() writes a vertex and all vertices and
@@ -504,7 +506,7 @@ public:
 
 		@param 	filename 	The name of the .graphml file
 	*/
-	void printSurroundingTriangulation(const char *filename);
+	void printSurroundingTriangulation(const char *filename) const;
 
 	/*
 		The function printStats() prints an overview of created, deleted and still existing
@@ -538,7 +540,7 @@ public:
 			- It is not checked that a simple polygon after stretching is still simple.
 				In theory it has to, but for numerical reasons this might fail
 	*/
-	void stretch(double factor);
+	void stretch(const double factor);
 
 	/*
 		The function checkSurroundingPolygon() examines whether the vertex still is inside
@@ -557,6 +559,11 @@ public:
 		@return 	True if the vertex is inside of its surrounding polygon, otherwise false
 	*/
 	bool checkSurroundingPolygon();
+
+	/*
+		@return 	The Euclidean distance to the origin
+	*/
+	double getDistanceToOrigin() const;
 	
 	
 	/*

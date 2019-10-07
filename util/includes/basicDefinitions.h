@@ -4,6 +4,7 @@
 // largest number a double can take that works with ++/-- operation.
 #define DBL_MAX_ITER_INT 9007199254740992
 #define EPSILON 1e-13
+#define MAX_NO_OF_LOOPS 4 // this is the largest number of times a 2opt B.O. loop can return the same circumference.  Not total loops.
 
 #define Swap(X,Y)  do{ __typeof__ (X) _T = X; X = Y; Y = _T; }while(0)
 
@@ -28,9 +29,12 @@ enum error {
   INNER_POINTS_COLLINEAR = 16,
   NO_VERIFY_FILE = 17,
   RUN_SIMPLE_CHECK = 18,
-  CONVERT_FORMAT = 19,
-  COINCIDENTAL_POINTS = 20,
-  COLLINEAR_POINTS = 21
+  RUN_LONG_CHECK = 19,
+  CONVERT_FORMAT = 20,
+  COINCIDENTAL_POINTS = 21,
+  COLLINEAR_POINTS = 22,
+  INTERSECTING_POINTS = 23,
+  INFINITE_LOOP = 24
 };
 
 // the algorithms that should be selectable.
@@ -42,6 +46,9 @@ enum alg_t {
   A_2OPT_B,
   A_2OPT_C,
   A_2OPT_D,
+  A_2OPT_E,
+  A_2OPT_F,
+  A_2OPT_G,
   A_CURVE,
   A_HOLE,
   A_STAR
@@ -89,8 +96,15 @@ enum intersect_t {
 
 enum edge_t {
   E_VALID,
-  E_SKIP,
+  E_INTERSECTION,
+  E_COLLINEAR,
   E_NOT_VALID
+};
+
+enum planesweep_t {
+  P_CLEAN,
+  P_DIRTY_LEFT,
+  P_DIRTY_RIGHT
 };
 
 #endif

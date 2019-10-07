@@ -34,7 +34,7 @@ Triangulation::Triangulation() :
 /*
 	@param 	p 	The new inner polygon
 */
-void Triangulation::addInnerPolygon(TPolygon *p){
+void Triangulation::addInnerPolygon(TPolygon * const p){
 	innerPolygons.push_back(p);
 }
 
@@ -47,7 +47,7 @@ void Triangulation::addInnerPolygon(TPolygon *p){
 	@param 	pID 	The polygon the vertex belongs to (pID = 0 outer polygon, else inner
 					polygon)
 */
-void Triangulation::addVertex(Vertex *v, unsigned int pID){
+void Triangulation::addVertex(Vertex * const v, const unsigned int pID){
 	vertices.push_back(v);
 
 	if(pID == 0)
@@ -69,7 +69,7 @@ void Triangulation::addVertex(Vertex *v, unsigned int pID){
 	@param 	fromP 	The ID of the polygon the vertex lives in originally
 	@param 	toP 	The ID of the polygon the vertex should be moved to
 */
-void Triangulation::changeVertex(int i, unsigned int fromP, unsigned int toP){
+void Triangulation::changeVertex(const int i, const unsigned int fromP, const unsigned int toP){
 	Vertex *v;
 
 	if(fromP == 0)
@@ -90,10 +90,10 @@ void Triangulation::changeVertex(int i, unsigned int fromP, unsigned int toP){
 /*
 	@param	e 	Edge to be added to the edge map
 */
-void Triangulation::addEdge(TEdge *e){
+void Triangulation::addEdge(TEdge * const e){
 	edges.insert(std::pair<int, TEdge*>((*e).getID(), e));
 
-	// Do not forget the register the triangulation at the edge
+	// Do not forget to register the triangulation at the edge
 	(*e).setTriangulation(this);
 }
 
@@ -104,7 +104,9 @@ void Triangulation::addEdge(TEdge *e){
 	@param	v0, v1, v2, v3 	Vertices building the bounding box for the polygon (ordering
 							doesn't matter as the vertices are connected by their edges)
 */
-void Triangulation::setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3){
+void Triangulation::setRectangle(Vertex * const v0, Vertex * const v1,
+	Vertex * const v2, Vertex * const v3){
+	
 	Rectangle0 = v0;
 	Rectangle1 = v1;
 	Rectangle2 = v2;
@@ -126,7 +128,7 @@ void Triangulation::setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3)
 /*
 	@return 	The actual number of inner polygons
 */
-unsigned int Triangulation::getActualNrInnerPolygons(){
+unsigned int Triangulation::getActualNrInnerPolygons() const{
 	return innerPolygons.size();
 }
 
@@ -134,7 +136,7 @@ unsigned int Triangulation::getActualNrInnerPolygons(){
 	@return		Final number of vertices the polygon will contain (including the vertices
 				of inner polygons)
 */
-int Triangulation::getTargetNumberOfVertices(){
+int Triangulation::getTargetNumberOfVertices() const{
 	return N;
 }
 
@@ -142,7 +144,7 @@ int Triangulation::getTargetNumberOfVertices(){
 	@return		The number of vertices the polygon does contain now (including the vertices
 				of inner polygons)
 */
-int Triangulation::getActualNumberOfVertices(){
+int Triangulation::getActualNumberOfVertices() const{
 	return vertices.size();
 }
 
@@ -150,7 +152,7 @@ int Triangulation::getActualNumberOfVertices(){
 	@param 	pID The polygon of interest
 	@return		The number of vertices the polygon with pID does contain now
 */
-int Triangulation::getActualNumberOfVertices(unsigned int pID){
+int Triangulation::getActualNumberOfVertices(const unsigned int pID) const{
 	
 	if(pID == 0)
 		return (*outerPolygon).getActualPolygonSize();
@@ -174,7 +176,7 @@ int Triangulation::getActualNumberOfVertices(unsigned int pID){
 		- This will not work after inserting additional vertices, as the vertices won't be 
 			in the same order in the vertices vector as they are in the polygon
 */
-Vertex *Triangulation::getVertex(int i, unsigned int pID){ 	
+Vertex *Triangulation::getVertex(const int i, const unsigned int pID) const{ 	
 	
 	if(pID == 0)
 		return (*outerPolygon).getVertex(i);
@@ -188,7 +190,7 @@ Vertex *Triangulation::getVertex(int i, unsigned int pID){
 	@param 	i 	The index of the vertex in the vertices vector
 	@return 	The vertex at index i in the vertices vector
 */
-Vertex *Triangulation::getVertex(int i){
+Vertex *Triangulation::getVertex(const int i) const{
 	return vertices[i];
 }
 
@@ -207,7 +209,7 @@ Vertex *Triangulation::getVertex(int i){
 		- This function is just for debugging purposes and should normally not be used
 			anywhere in the code
 */
-void Triangulation::removeVertex(int index){
+void Triangulation::removeVertex(const int index){
 	vertices[index] = NULL;
 }
 
@@ -216,7 +218,7 @@ void Triangulation::removeVertex(int index){
 
 	@param	e 	The edge to be removed
 */
-void Triangulation::removeEdge(TEdge *e){
+void Triangulation::removeEdge(TEdge * const e){
 	edges.erase((*e).getID());
 }
 
@@ -237,7 +239,7 @@ void Triangulation::removeEdge(TEdge *e){
 		- Works here: http://graphonline.ru/en/
 		- This crappy website is the reason why we need the scaling factor here
 */
-void Triangulation::print(const char *filename){
+void Triangulation::print(const char *filename) const{
 	FILE *f;
 	TEdge *e;
 	int scale = 4000;
@@ -289,7 +291,7 @@ void Triangulation::print(const char *filename){
 		- Graphml: https://de.wikipedia.org/wiki/GraphML
 		- Works here: http://graphonline.ru/en/
 */
-void Triangulation::printPolygon(const char *filename){
+void Triangulation::printPolygon(const char *filename) const{
 	FILE *f;
 	TEdge *e;
 	int scale = 1000;
@@ -312,6 +314,7 @@ void Triangulation::printPolygon(const char *filename){
 	// Print all polygon edges
 	// TODO:
 	// Make this more efficient by using the function Vertex::getToNext()
+	// But wait till we merge in the polygon class
 	fprintf(f, "<edges>\n");
 	for(auto const& i : edges){
 		e = i.second;
@@ -331,7 +334,7 @@ void Triangulation::printPolygon(const char *filename){
 
 	@param 	filename 	The name of the .dat file
 */
-void Triangulation::printPolygonToDat(const char *filename){
+void Triangulation::printPolygonToDat(const char *filename) const{
 	Vertex *start, *other;
 	FILE *f;
 	int id = 0;
@@ -387,7 +390,7 @@ void Triangulation::printPolygonToDat(const char *filename){
 
 	@return 	true if everything is alright, otherwise false
 */
-bool Triangulation::check(){
+bool Triangulation::check() const{
 	EdgeType type;
 	int n;
 	TEdge *e;
@@ -450,7 +453,7 @@ bool Triangulation::check(){
 		- It is not checked, whether this operations is numerically stable!
 		- It is not used anywhere at the moment
 */
-void Triangulation::stretch(double factor){
+void Triangulation::stretch(const double factor){
 	(*Rectangle0).stretch(factor);
 	(*Rectangle1).stretch(factor);
 	(*Rectangle2).stretch(factor);
@@ -471,7 +474,10 @@ void Triangulation::stretch(double factor){
 	Note:
 		This function does not consider edges of other polygons!
 */
-void Triangulation::checkSimplicity(){
+// TODO:
+// This function finds maybe non-simplicities that do not really exist. We should check again
+// whether maybe we get better results by setting the epsInt to 0.
+void Triangulation::checkSimplicity() const{
 	Vertex *v, *u, *w;
 	TEdge *toCheck; // The edge which is compared to all others at the moment
 	TEdge *otherEdge;
@@ -507,8 +513,12 @@ void Triangulation::checkSimplicity(){
 			
 			type = checkIntersection(toCheck, otherEdge, true);
 
-			if(type != IntersectionType::NONE)
+			if(type != IntersectionType::NONE){
+				printf("Found intersection of type: %d \n", (int)type);
+				(*toCheck).print();
+				(*otherEdge).print();
 				exit(11);
+			}
 
 			// Get the next edge to check with
 			w = (*w).getNext();

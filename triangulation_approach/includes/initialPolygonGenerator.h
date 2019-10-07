@@ -45,7 +45,7 @@ Triangulation *generateRegularPolygon();
 		initial polygons as each vertex shares an edge with the one center
 		vertex so the edges list of the center vertex becomes very slow.
 */
-void initialTriangulationPseudoStar(Triangulation *T);
+void initialTriangulationPseudoStar(Triangulation * const T);
 
 
 /*
@@ -60,7 +60,7 @@ void initialTriangulationPseudoStar(Triangulation *T);
 	Note:
 		The suitable startindex for the box polygon function is 0!
 */
-void initialTriangulationZigZag(Triangulation *T);
+void initialTriangulationZigZag(Triangulation * const T);
 
 
 /*
@@ -73,7 +73,7 @@ void initialTriangulationZigZag(Triangulation *T);
 	Note:
 		The suitable startindex for the boxPolygon function is 0!
 */
-void generateInitialHoleTriangle(Triangulation *T);
+void generateInitialHoleTriangle(Triangulation * const T);
 
 
 /*
@@ -86,7 +86,7 @@ void generateInitialHoleTriangle(Triangulation *T);
 	Note:
 		For more information take a look at my Master Thesis
 */
-void splitHoleTriangle(Triangulation *T);
+void splitHoleTriangle(Triangulation * const T);
 
 
 /*
@@ -101,4 +101,4 @@ void splitHoleTriangle(Triangulation *T);
 						triangulations, e.g. pseudoStar, the vertex 0 is not at 
 						the	circle)
 */
-void boxPolygon(Triangulation *T, int startIndex);
+void boxPolygon(Triangulation * const T, const int startIndex);

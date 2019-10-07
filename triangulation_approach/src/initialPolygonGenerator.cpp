@@ -59,7 +59,7 @@ Triangulation *generateRegularPolygon(){
 	@param	T 	The triangulation containing the already generated but not
 				linked vertices of the start polygon
 */
-void initialTriangulationPseudoStar(Triangulation* T){
+void initialTriangulationPseudoStar(Triangulation * const T){
 	int i;
 	Vertex *center, *v0, *v1;
 	TEdge *e0, *e1, *e2, *start;
@@ -113,7 +113,7 @@ void initialTriangulationPseudoStar(Triangulation* T){
 	Note:
 	The suitable startindex for the box polygon function is 0!
 */
-void initialTriangulationZigZag(Triangulation *T){
+void initialTriangulationZigZag(Triangulation * const T){
 	int i;
 	Vertex *v0 = NULL, *v1 = NULL, *v2 = NULL;
 	TEdge *e0 = NULL, *e1 = NULL, *e2 = NULL;
@@ -179,7 +179,7 @@ void initialTriangulationZigZag(Triangulation *T){
 	Note:
 		The suitable startindex for the boxPolygon function is 0!
 */
-void generateInitialHoleTriangle(Triangulation *T){
+void generateInitialHoleTriangle(Triangulation * const T){
 	double alpha;
 	int i;
 	Vertex *triangleV0, *triangleV1, *triangleV2;
@@ -308,7 +308,7 @@ void generateInitialHoleTriangle(Triangulation *T){
 	Note:
 		For more information take a look at my Master Thesis
 */
-void splitHoleTriangle(Triangulation *T){
+void splitHoleTriangle(Triangulation * const T){
 	int n;
 	double x0, x1, x2, y1, y2;
 	Vertex *v0, *v1, *v2;
@@ -440,7 +440,7 @@ void splitHoleTriangle(Triangulation *T){
 						triangulations, e.g. pseudoStar, the vertex 0 is not at 
 						the	circle)
 */
-void boxPolygon(Triangulation* T, int startIndex){
+void boxPolygon(Triangulation * const T, const int startIndex){
 	// Vertices and edges of the rectangle
 	Vertex *rv0, *rv1, *rv2, *rv3;
 	TEdge *re0, *re1, *re2, *re3;
@@ -452,7 +452,7 @@ void boxPolygon(Triangulation* T, int startIndex){
 	Vertex *v0, *v1;
 
 	/* 
-		Generate the rectangle int the following orientation:
+		Generate the rectangle in the following orientation:
 
 		1 - 0
 		|   |

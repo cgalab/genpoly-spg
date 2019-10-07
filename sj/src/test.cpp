@@ -10,6 +10,7 @@
 #include "pol.h"
 #include "heap.h"
 #include "predicates.h"
+#include <bitset>
 
 
 /*
@@ -46,6 +47,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   Point p4 = Point(0,0,3,3);
   p4.l = 4;
 
+  std::cerr << std::setprecision(17);
   std::cerr << "=== Point comparison tests ===" << std::endl;
 
   p1.set(1,1);
@@ -65,18 +67,42 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << p1 << " == " << p3 << ", should be false: " << ((p1 == p3) ? "true" : "false") << std::endl;
   std::cerr << p1 << " != " << p3 << ", should be true : " << ((p1 != p3) ? "true" : "false") << std::endl;
 
-  std::cerr << std::endl;
+  p1.set(-0.3623046875,0.21240234371874361);
+  p2.set(-0.36279296875,0.21240234371874361);
+  std::cerr << p1 << "  < " << p1 << ", should be false: " << ((p1 < p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  > " << p1 << ", should be false: " << ((p1 > p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " == " << p1 << ", should be true : " << ((p1 == p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " != " << p1 << ", should be false: " << ((p1 != p1) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  < " << p2 << ", should be false: " << ((p1 < p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  > " << p2 << ", should be true : " << ((p1 > p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " == " << p2 << ", should be false: " << ((p1 == p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " != " << p2 << ", should be true : " << ((p1 != p2) ? "true" : "false") << std::endl;
 
-  std::cerr << "=== Edge comparison with points ===" << std::endl;
+  p1.set(-0.5864844941069559,  -0.5519586413083573);
+  p2.set(-0.5864844941069558,  -0.6199163586916429);
+  std::cerr << p1 << "  < " << p2 << ", should be true: " << ((p1 < p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << "  > " << p2 << ", should be false: " << ((p1 > p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " == " << p2 << ", should be false : " << ((p1 == p2) ? "true" : "false") << std::endl;
+  std::cerr << p1 << " != " << p2 << ", should be true: " << ((p1 != p2) ? "true" : "false") << std::endl;
+  std::cerr << p2 << "  < " << p1 << ", should be false: " << ((p2 < p1) ? "true" : "false") << std::endl;
+  std::cerr << p2 << "  > " << p1 << ", should be true : " << ((p2 > p1) ? "true" : "false") << std::endl;
+  std::cerr << p2 << " == " << p1 << ", should be false: " << ((p2 == p1) ? "true" : "false") << std::endl;
+  std::cerr << p2 << " != " << p1 << ", should be true : " << ((p2 != p1) ? "true" : "false") << std::endl;
+
+  std::cerr << std::endl;
+  std::cerr << "=== Double Comparisons ===" << std::endl;
+
+  std::cerr << p1.x << " < " << p2.x << ", should be true: " << ((p1.x < p2.x) ? "true" : "false") << std::endl;
+
+  std::cerr << std::endl;
+  std::cerr << "=== Edge comparisons ===" << std::endl;
 
   p1.set(118532,919572,32577,48380,32577);
   p2.set(118532,978866,32578,48379,32578);
   p3.set(2,2,2,2,2);
   p4.set(3,3,3,3,3);
-
   Edge e1 = Edge(&p1, &p2);
   Edge e2 = Edge(&p3, &p4);
-
   std::cerr << "(*e1.p1): " << *e1.p1 << " == *p1: " << p1 << " : " <<  ((*e1.p1 == p1) ? "true" : "false") << std::endl;
   std::cerr << "(*e1.p2): " << *e1.p1 << " == *p2: " << p2 << " : " <<  ((*e1.p2 == p2) ? "true" : "false") << std::endl;
   std::cerr << std::endl;
@@ -87,14 +113,144 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(0.1776512115938656,0.59801348903157514,3008,2320,3010);
   e1.set(p1, p2);
   e2.set(p3, p4);
-
-  std::cerr << std::setprecision(15);
   std::cerr << "e1: " << e1 << std::endl;
   std::cerr << "e2: " << e2 << std::endl;
   std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
   std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
 
+  p1.set(-0.1529808807867781, 0.2521944381961845);
+  p2.set(-0.1529808806949973, 0.2521944378948504);
+  p3.set(-0.1529808807408841, 0.2521944380455210);
+  p4.set(-0.1529609603963920, 0.2504762372249587);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
 
+  p1.set(-0.3081799240194343, 0.2746582135433187);
+  p2.set(-0.3056010360799846, 0.2746582135433187);
+  p3.set(-0.3063961715780295, 0.2746582135433187);
+  p4.set(-0.3056010360799846, 0.2746582135433187);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.2943461057385031, -0.3283110598709391);
+  p2.set(-0.2939762461102735, -0.3309518576164938);
+  p3.set(-0.2943461057385031, -0.3283110598709391);
+  p4.set(-0.2940429691043516, -0.3304754554387765);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.1879568629943250, -0.3695956370056750);
+  p2.set(-0.1878378004943250, -0.3694765745056750);
+  p3.set(-0.1878774879943250, -0.3695162620056750);
+  p4.set( 0.3332349999999999,  0.0174609375000000);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.0105778125000000, -0.4809942187500000);
+  p2.set(-0.0088315624999999, -0.4809942187500000);
+  p3.set(-0.0089903125000000, -0.4809942187500000);
+  p4.set( 0.2053618750000000, -0.4999053125000000);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.1682165625000000, -0.2438812500000000);
+  p2.set(-0.1678593750000000, -0.2438812500000000);
+  p3.set(-0.1680975000000000, -0.2438812500000000);
+  p4.set(-0.0615762500000000, -0.2774965625000000);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.1580939378867000, -0.2439324980665031);
+  p2.set(-0.1567888746133000, -0.2438928105665031);
+  p3.set(-0.1582923753867000, -0.2439721855665031);
+  p4.set(-0.1578955003867000, -0.2438928105665031);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.3183227489004278,  0.4305545470863286);
+  p2.set(-0.3180112253344731,  0.4293374317588774);
+  p3.set(-0.3183227489004278,  0.4305545470863286);
+  p4.set(-0.2843666802113348,  0.2978889763940047);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(0.1624848962148917, -0.4609824302726415, 89,0,0);
+  p2.set(0.1630934538786164, -0.4615909879363671, 91,0,0);
+  p3.set(0.1618763385511670, -0.4603738726089159, 85,0,0);
+  p4.set(0.1630934538786164, -0.4615909879363671, 91,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(0.1618763385511670, -0.4603738726089159, 85,0,0);
+  p2.set(0.1630934538786164, -0.4615909879363671, 91,0,0);
+  p3.set(0.1624848962148917, -0.4609824302726415, 89,0,0);
+  p4.set(0.1637020115423411, -0.4981044477599457, 97,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.4084123883928586, -0.1114676339285719,885,0,0);
+  p2.set(-0.4056222098214299, -0.0365513392857152,906,0,0);
+  p3.set(-0.4101562500000014, -0.1149553571428578,876,0,0);
+  p4.set(-0.4066685267857159, -0.1079799107142863,896,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.4084123883928586, -0.1114676339285719,885,0,0);
+  p2.set(-0.4066685267857159, -0.1079799107142863,896,0,0);
+  p3.set(-0.4101562500000014, -0.1149553571428578,876,0,0);
+  p4.set(-0.4066685267857159, -0.1079799107142863,896,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  std::cerr << std::endl;
   std::cerr << "=== checkIntersection tests ===" << std::endl;
   std::cerr << "=== 'should be true' is a comparison 'itest >= IS_TRUE' : true when intersection exists ===" << std::endl;
   enum intersect_t itest;
@@ -485,7 +641,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 */
 
   std::cerr << std::endl;
-  std::cerr << "======= Shewchuks Predicates test ===============" << std::endl;
+  std::cerr << "======= Shewchuks Predicates test 1 ===============" << std::endl;
 
   point pa, pb, pc, pd;
   pa.x = -0.6034851544931661; pa.y = -0.0572553943219186; //-0.0572554;
@@ -538,8 +694,101 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
   std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
 
+  std::cerr << "======= Shewchuks Predicates test 2 ===============" << std::endl;
+
+  pa.x = 1; pa.y = 1;
+  pb.x = 2; pb.y = 2;
+  pc.x = 2; pc.y = 1;
+  pd.x = 1; pd.y = 2;
+  p1.set(1, 1);
+  p2.set(2, 2);
+  p3.set(2, 1);
+  p4.set(1, 2);
+
+  e1.set(p1,p2);
+  e2.set(p3,p4);
+
+  std::cerr << "pa.x: " << pa.x << ", pa.y: " << pa.y << std::endl;
+  std::cerr << "pb.x: " << pb.x << ", pb.y: " << pb.y << std::endl;
+  std::cerr << "pc.x: " << pc.x << ", pc.y: " << pc.y << std::endl;
+  std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
+
+  std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+
+  std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
+  std::cerr << "det(e1, p4)       : " << det(e1, p4) << std::endl;
+  std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
+
+  std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
+  std::cerr << "det(e2, p1)       : " << det(e2, p1) << std::endl;
+  std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
+
+  std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
+  std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
+  std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
+
+  std::cerr << "reldist(e1, p3): " << reldist(e1, p3) << std::endl;
+  std::cerr << "reldist(e1, p4): " << reldist(e1, p4) << std::endl;
+  std::cerr << "reldist(e2, p1): " << reldist(e2, p1) << std::endl;
+  std::cerr << "reldist(e2, p2): " << reldist(e2, p2) << std::endl;
+
+  //========================
+
+  pa.x = -0.36279296875; pa.y = 0.21240234371874361;
+  pb.x = -0.3623046875;  pb.y = 0.21240234371874361;
+  pc.x = -0.36328125;    pc.y = 0.21240234371874361;
+  pd.x = -0.361328125;   pd.y = 0.21240234371874361;
+  p1.set(-0.36279296875, 0.21240234371874361);
+  p2.set(-0.3623046875,  0.21240234371874361);
+  p3.set(-0.36328125,    0.21240234371874361);
+  p4.set(-0.361328125,   0.21240234371874361);
+
+  e1.set(p1,p2);
+  e2.set(p3,p4);
+
+  std::cerr << "pa.x: " << pa.x << ", pa.y: " << pa.y << std::endl;
+  std::cerr << "pb.x: " << pb.x << ", pb.y: " << pb.y << std::endl;
+  std::cerr << "pc.x: " << pc.x << ", pc.y: " << pc.y << std::endl;
+  std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
+
+  std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+
+  std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
+  std::cerr << "det(e1, p4)       : " << det(e1, p4) << std::endl;
+  std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
+
+  std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
+  std::cerr << "det(e2, p1)       : " << det(e2, p1) << std::endl;
+  std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
+
+  std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
+  std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
+  std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
+
+  std::cerr << "reldist(e1, p3): " << reldist(e1, p3) << std::endl;
+  std::cerr << "reldist(e1, p4): " << reldist(e1, p4) << std::endl;
+  std::cerr << "reldist(e2, p1): " << reldist(e2, p1) << std::endl;
+  std::cerr << "reldist(e2, p2): " << reldist(e2, p2) << std::endl;
+
   // test the time difference between det and orient2d
   //for (unsigned int i = 0; i < 100000000 ; ++i) orient2d(pa,pb,pc);
+/*
+  std::cerr << std::endl;
+  std::cerr << "============== equality bit check =================" << std::endl;
+
+  double x,y;
+  x = -0.6321507964350201;
+  y = -0.6321507964348736;
+
+  //std::cerr.precision(24);
+  std::cerr << "x: " << x << ", y: " << y << std::endl;
+  std::cerr << "bitset version: " << std::endl;
+  std::cerr << "x: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&x))) << ", y: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&y))) << std::endl;
+*/
 /*
   std::cerr << "=========== Heap's alg. test ================" << std::endl;
 

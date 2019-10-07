@@ -19,13 +19,17 @@
 #include "opt2b.h"
 #include "opt2c.h"
 #include "opt2d.h"
+#include "opt2e.h"
+#include "opt2f.h"
+#include "opt2g.h"
 #include "curve.h"
 #include "simple_pol_check.h"
 #include "star.h"
 #include "predicates.h"
 
 int main(int argc, char *argv[]) {
-
+  std::cout << std::setprecision(20);
+  std::cerr << std::setprecision(20);
   // final return value
   enum error returnValue = SUCCESS;
   // time measurement variables
@@ -39,18 +43,15 @@ int main(int argc, char *argv[]) {
   enum out_format_t outFormat = OF_UNDEFINED;
   bool writeNew = false; // whether to write a new file instead of saving over an existing file.
   bool calcArea = false;  // calculate and return the area
+  bool calcCircumference = false; // calculate and return the circumference.
   bool checkSimple = false; // only verify a given point set and polygon is simple.
   //bool shew_pred = false; // enable shewchucks' predicates
-  double areaMin = -1, areaMax = -1;
-  int runAreaLoopFor, areaLoopCounter;
-  clock_t areaTimerStart, areaTimerEnd;
-  double maxTime, areaTimerElapsed;
   unsigned int randseed = 0;
   unsigned int nr_holes = 0;
 
   // parse command line arguments
   returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat,
-                        writeNew, calcArea, areaMin, areaMax, randseed, checkSimple,
+                        writeNew, calcArea, calcCircumference, randseed, checkSimple,
                         nr_holes, vFile);
 //  std::cerr << "returnvalue: " << returnValue << std::endl;
 
@@ -74,47 +75,7 @@ int main(int argc, char *argv[]) {
 //        std::cerr << "point set verified." << std::endl;
         // get a simple polygon with a given method
         if (alg == A_2OPT) {
-          if (calcArea)
-          {
-            runAreaLoopFor = 1000;
-            maxTime = 600;
-            double area = 0;
-            areaLoopCounter = 0;
-            areaTimerStart = clock();
-            do
-            {
-              ++areaLoopCounter;
-
-              // get a simple polygon with a given method
-              returnValue = opt2(polygon, points, randseed);
-
-              area = pol_calc_area(polygon, points);
-              areaTimerEnd = clock();
-              areaTimerElapsed = (areaTimerEnd - areaTimerStart) / CLOCKS_PER_SEC;
-
-              //std::cerr << "areaMin: " << areaMin << ", areaMax: " << areaMax << ", area: " << area << std::endl;
-              //std::cerr << "time elapsed: " << areaTimerElapsed << ", areaLoopCounter: " << areaLoopCounter << std::endl;
-
-              if ((areaMin >= 0) && (area > 0) && (area > areaMin)) break;
-              if ((areaMax > 0)  && (area > 0) && (area < areaMax)) break;
-              if (randseed) break;
-            } while ((areaLoopCounter < runAreaLoopFor) && (areaTimerElapsed < maxTime));
-
-
-            if(area < 0) {
-              doFlip(0, polygon.size()-1, polygon, points);
-              area = pol_calc_area(polygon, points);
-              std::cout << std::setprecision(15) << area << std::endl;
-            }
-            else if (((areaMin >= 0) && (area > areaMin)) || ((areaMax > 0) && (area < areaMax)))
-              std::cout << std::setprecision(15) << area << std::endl;
-            else
-              returnValue = ERR_AREA_NOT_BETTER;
-          }
-          else {
-            // get a simple polygon with a given method
-            returnValue = opt2(polygon, points, randseed);
-          }
+          returnValue = opt2(polygon, points, randseed);
         }
         else if (alg == A_2OPT_A) {
           returnValue = opt2a(polygon, points, randseed);
@@ -128,6 +89,15 @@ int main(int argc, char *argv[]) {
         else if (alg == A_2OPT_D) {
             returnValue = opt2c(polygon, points, randseed);
         }
+        else if (alg == A_2OPT_E) {
+            returnValue = opt2e(polygon, points, randseed);
+        }
+        else if (alg == A_2OPT_F) {
+            returnValue = opt2f(polygon, points, randseed);
+        }
+        else if (alg == A_2OPT_G) {
+            returnValue = opt2g(polygon, points, randseed);
+        }
         else if (alg == A_STAR) {
             returnValue = star(polygon, points, randseed);
         }
@@ -140,6 +110,15 @@ int main(int argc, char *argv[]) {
 
         if (returnValue == SUCCESS) {
           if (checkSimple) checkAllIntersections(polygon, points);
+          if (calcArea) {
+            double area = pol_calc_area(polygon, points);
+            if(area < 0) {
+              doFlip(0, polygon.size()-1, polygon, points);
+              area = pol_calc_area(polygon, points);
+            }
+            std::cout << "Area: " << area << std::endl;
+          }
+          if (calcCircumference) std::cout << "Circumference: " << pol_calc_circumference(polygon, points) << std::endl;
           if (outFile[0] != 0) {
             switch(alg) {
               case A_2OPT:
@@ -147,6 +126,9 @@ int main(int argc, char *argv[]) {
               case A_2OPT_B:
               case A_2OPT_C:
               case A_2OPT_D:
+              case A_2OPT_E:
+              case A_2OPT_F:
+              case A_2OPT_G:
               case A_STAR:
                 if (outFormat == OF_PURE_AND_PERM){
                   char tempFileName[255];
@@ -184,11 +166,37 @@ int main(int argc, char *argv[]) {
 //      pdisplay(points);
       returnValue = readvFile(vFile, polygon, points);
       if (returnValue == SUCCESS) {
+        if (calcArea) std::cout << "Area: " << pol_calc_area(polygon, points) << std::endl;
+        if (calcCircumference) std::cout << "Circumference: " << pol_calc_circumference(polygon, points) << std::endl;
 //        std::cerr << "indices found in file: " << std::endl;
 //        pdisplay(polygon, points);
         if (points.size() == polygon.size()) {
 //          std::cerr << "Nr. of points in both files match." << std::endl;
           returnValue = simple_pol_check(polygon, points);
+        }
+        else std::cerr << "Error: Number of points mismatch between points file and polygon file." << std::endl;
+      }
+      else std::cerr << "Error reading polygon indices file." << std::endl;
+    }
+    else std::cerr << "Error reading points input file." << std::endl;
+  }
+  else if (returnValue == RUN_LONG_CHECK) {
+//    std::cerr << "running verify check" << std::endl;
+    std::vector<Point> points;
+    std::vector<unsigned int> polygon;
+    returnValue = readInFile(inFile, inFormat, points);
+    if (returnValue == SUCCESS) {
+//      std::cerr << "points found in file:" << std::endl;
+//      pdisplay(points);
+      returnValue = readvFile(vFile, polygon, points);
+      if (returnValue == SUCCESS) {
+        if (calcArea) std::cout << "Area: " << pol_calc_area(polygon, points) << std::endl;
+        if (calcCircumference) std::cout << "Circumference: " << pol_calc_circumference(polygon, points) << std::endl;
+//        std::cerr << "indices found in file: " << std::endl;
+//        pdisplay(polygon, points);
+        if (points.size() == polygon.size()) {
+//          std::cerr << "Nr. of points in both files match." << std::endl;
+          if(checkAllIntersections(polygon, points)) returnValue = INTERSECTING_POINTS;
         }
         else std::cerr << "Error: Number of points mismatch between points file and polygon file." << std::endl;
       }
@@ -213,11 +221,5 @@ int main(int argc, char *argv[]) {
 
   }
   else if (returnValue == RUN_TESTS) test();
-
-  //begin = clock();
-  //end = clock();
-  //elapsed = (end - begin);
-  //std::cout << "elapsed: " << elapsed << std::endl;
-
   return returnValue;
 }
