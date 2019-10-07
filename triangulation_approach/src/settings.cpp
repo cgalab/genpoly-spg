@@ -6,12 +6,12 @@ double Settings::boxSize = 3.0;
 int Settings::initialTranslationFactor = 1000;
 int Settings::initialTranslationNumber = -1;
 Arithmetics Settings::arithmetics = Arithmetics::DOUBLE;
-int Settings::targetSize = 100000;
+int Settings::targetSize = 1000000;
 int Settings::insertionTries = 100;
 double Settings::minLength = 0.0000001;
 Timer* Settings::timer = NULL;
 bool Settings::fixedSeed = false;
-unsigned int Settings::seed = 0;
+unsigned int Settings::seed = 891098421;
 RandomGenerator* Settings::generator = NULL;
 FeedbackMode Settings::feedback = FeedbackMode::EXECUTION;
 bool Settings::simplicityCheck = false;
@@ -32,7 +32,7 @@ void Settings::initSettings(){
 	// Initialize the RandomGenerator
 	generator = new RandomGenerator(fixedSeed, seed);
 
-	// Initialise the exact arithmetic
+	// Initialize the exact arithmetic
 	if(arithmetics == Arithmetics::EXACT)
 		exactinit();
 }

@@ -54,7 +54,7 @@ private:
 	/*
 		The target number of polygon vertices (including the vertices of inner polygons)
 	*/
-	int N;
+	const int N;
 
 public:
 	
@@ -63,35 +63,36 @@ public:
 
 		CONSTRUCTORS:
 
-					Triangulation(int n)
+					Triangulation(const int n)
 
 		SETTER:
 
-		void 		addVertex(Vertex *v)
-		void 		addEdge(TEdge *e)
-		void 		setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3)
+		void 		addVertex(Vertex * const v)
+		void 		addEdge(TEdge * const e)
+		void 		setRectangle(Vertex * const v0, Vertex * const v1, Vertex * const v2,
+					Vertex * const v3)
 
 		GETTER:
 
-		int 		getTargetNumberOfVertices()
-		int 		getActualNumberOfVertices()
-		Vertex*		getVertex(int i)
+		int 		getTargetNumberOfVertices() const
+		int 		getActualNumberOfVertices() const
+		Vertex*		getVertex(const int i) const
 
 		REMOVER:
 
-		void 		removeVertex(int index)
-		void 		removeEdge(TEdge *e)
+		void 		removeVertex(const int index)
+		void 		removeEdge(TEdge * const e)
 
 		PRINTER:
 
-		void 		print(const char *filename)
-		void 		printPolygon(const char *filename)
+		void 		print(const char *filename) const
+		void 		printPolygon(const char *filename) const
 
 		OTHERS:
 
-		bool 		check()
-		void 		stretch(double factor)
-		void		checkSimplicity()
+		bool 		check() const
+		void 		stretch(const double factor)
+		void		checkSimplicity() const
 	*/
 
 
@@ -105,7 +106,7 @@ public:
 
 		@param 	n 	Final number of vertices (including the vertices of inner polygons)
 	*/
-	Triangulation(int n);
+	Triangulation(const int n);
 
 
 
@@ -116,12 +117,12 @@ public:
 	/*
 		@param	v 	Vertex to be added to the vertices vector
 	*/
-	void addVertex(Vertex *v);
+	void addVertex(Vertex * const v);
 
 	/*
 		@param	e 	Edge to be added to the edge map
 	*/
-	void addEdge(TEdge *e);
+	void addEdge(TEdge * const e);
 
 	/*
 		The function setRectangle() sets the vertices of the Rectangle0, ..., Rectangle3 of
@@ -130,7 +131,7 @@ public:
 		@param	v0, v1, v2, v3 	Vertices building the bounding box for the polygon (ordering
 								doesn't matter as the vertices are connected by their edges)
 	*/
-	void setRectangle(Vertex *v0, Vertex *v1, Vertex *v2, Vertex *v3);
+	void setRectangle(Vertex * const v0, Vertex * const v1, Vertex * const v2, Vertex * const v3);
 
 
 
@@ -142,13 +143,13 @@ public:
 		@return		Final number of vertices the polygon will contain (including the vertices
 					of inner polygons)
 	*/
-	int getTargetNumberOfVertices();
+	int getTargetNumberOfVertices() const;
 
 	/*
 		@return		The number of vertices the polygon does contain now (including the vertices
 					of inner polygons)
 	*/
-	int getActualNumberOfVertices();
+	int getActualNumberOfVertices() const;
 
 	/*
 		@param	i 	Index of the vertex in the vertices vector
@@ -162,7 +163,7 @@ public:
 			- This will not work after inserting additional vertices, as the vertices won't be 
 				in the same order in the vertices vector as they are in the polygon
 	*/
-	Vertex *getVertex(int i);
+	Vertex *getVertex(const int i) const;
 
 
 
@@ -180,14 +181,14 @@ public:
 			- This function is just for debugging purposes and should normally not be used
 				anywhere in the code
 	*/
-	void removeVertex(int i);
+	void removeVertex(const int i);
 
 	/*
 		The function removeEdge() searches one edge by its ID in the edges map and removes it
 
 		@param	e 	The edge to be removed
 	*/
-	void removeEdge(TEdge *e);
+	void removeEdge(TEdge * const e);
 
 
 	
@@ -206,7 +207,7 @@ public:
 			- Works here: http://graphonline.ru/en/
 			- This crappy website is the reason why we need the scaling factor here
 	*/
-	void print(const char *filename);
+	void print(const char *filename) const;
 
 	/*
 		The function printPolygon() prints just the polygon in .graphml style into a file
@@ -217,7 +218,7 @@ public:
 			- Graphml: https://de.wikipedia.org/wiki/GraphML
 			- Works here: http://graphonline.ru/en/
 	*/
-	void printPolygon(const char *filename);
+	void printPolygon(const char *filename) const;
 
 
 
@@ -236,7 +237,7 @@ public:
 
 		@return 	true if everything is alright, otherwise false
 	*/
-	bool check();
+	bool check() const;
 
 	/*
 		The function stretch() stretches the whole polygon by a constant factor, i.e. the
@@ -248,7 +249,7 @@ public:
 			- It is not checked, whether this operations is numerically stable!
 			- It is not used anywhere at the moment
 	*/
-	void stretch(double factor);
+	void stretch(const double factor);
 
 	/*
 	The function checkSimplicity() checks whether a polygon is simple by checking for self-
@@ -260,7 +261,7 @@ public:
 	Note:
 		This function does not consider edges of other polygons!
 */
-	void checkSimplicity();
+	void checkSimplicity() const;
 };
 
 #endif

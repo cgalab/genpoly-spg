@@ -34,7 +34,7 @@
 		- For polygons with holes the vertex also is reandomly choosen, i.e. it can be from
 			the outer polygon as well as of one of the inner polygons
 */
-int transformPolygonByMoves(Triangulation *T, int iterations);
+int transformPolygonByMoves(Triangulation * const T, const int iterations);
 
 /*
 	The function growPolygon() grows the polygon by insertions to Settings::targetSize.
@@ -44,4 +44,4 @@ int transformPolygonByMoves(Triangulation *T, int iterations);
 	Note:
 		This function works just for polygons without holes!
 */
-void growPolygon(Triangulation *T);
+void growPolygon(Triangulation * const T);

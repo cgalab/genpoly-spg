@@ -6,6 +6,7 @@
 #include "settings.h"
 #include "randomGenerator.h"
 #include "predicates.h"
+#include "statistics.h"
 
 /*
 list of exit codes:
@@ -25,7 +26,6 @@ code 	name						meaning
 10		Vertex at PE end 			The surrounding polygon check recognizes a vertex exactly laying on a PE
 11 		Not simple					The check for simplicity found an intersection
 */
-
 
 int main(){
 	Triangulation* T;
@@ -53,10 +53,10 @@ int main(){
 	growPolygon(T);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", Settings::targetSize, (*Settings::timer).elapsedTime());
 
-	if(!(*T).check()){
+	/*if(!(*T).check()){
 		printf("Triangulation error: something is wrong in the triangulation at the end\n");
 		exit(9);
-	}
+	}*/
 
 	performed = transformPolygonByMoves(T, 1000000);
 	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed, 1000000, (*Settings::timer).elapsedTime());

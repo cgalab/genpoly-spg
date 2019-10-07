@@ -59,17 +59,17 @@ private:
 	/*
 		The real moving vertex
 	*/
-	Vertex *original;
+	Vertex * const original;
 
 	/*
 		A copy at the start position of the translation
 	*/
-	Vertex *oldV;
+	Vertex * const oldV;
 
 	/*
 		A copy at the target position of the translation
 	*/
-	Vertex *newV;
+	Vertex * const newV;
 
 
 	/*
@@ -138,16 +138,17 @@ public:
 
 		CONSTRUCTORS:
 		
-										EventQueue(Vertex *orig, Vertex *oV, Vertex *nV) 
+										EventQueue(Vertex * const orig, Vertex * const oV,
+										Vertex * const nV) 
 
 		OTHERS:
 
-		void 							insertWithoutCheck(double time, Triangle *t)
-		bool 							makeStable(bool initial)
+		void 							insertWithoutCheck(const double time, Triangle *t)
+		bool 							makeStable(const bool initial)
 		std::pair<double, Triangle*> 	pop()
-		int 							size()
-		void 							remove(Triangle *t)
-		void 							print()
+		int 							size() const
+		void 							remove(Triangle * const t)
+		void 							print() const
 	*/
 
 
@@ -162,7 +163,7 @@ public:
 		@param 	oV 		A copy of the vertex at its start position
 		@param	nV 		A copy of the vertex at its target position
 	*/	
-	EventQueue(Vertex *orig, Vertex *oV, Vertex *nV);
+	EventQueue(Vertex * const orig, Vertex * const oV, Vertex * const nV);
 
 
 	/*
@@ -180,7 +181,7 @@ public:
 		Note:
 			The ordering of the events will not be checked by this function!
 	*/
-	void insertWithoutCheck(double time, Triangle *t);
+	void insertWithoutCheck(const double time, Triangle *t);
 
 	/*
 		The function makeStable() iterates over the whole event queue and searches for
@@ -195,7 +196,7 @@ public:
 		@return 			True if there are not more than two neighboring concurrent
 							events, otherwise false
 	*/
-	bool makeStable(bool initial);
+	bool makeStable(const bool initial);
 
 	/*
 		The function pop() returns the element on top of the event queue and removes it.
@@ -207,7 +208,7 @@ public:
 	/*
 		@return 	The actual number of events in the event queue
 	*/
-	int size();
+	int size() const;
 
 	/*
 		The function remove() searches for an event containing the triangle t in the event
@@ -216,12 +217,12 @@ public:
 
 		@param 	t 	The triangle to be deleted
 	*/
-	void remove(Triangle *t);
+	void remove(Triangle * const t);
 	
 	/*
 		The function print() prints all event times in an ordered way to stdout.
 	*/
-	void print();
+	void print() const;
 
 
 	/*

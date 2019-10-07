@@ -44,7 +44,7 @@ Triangulation *generateRegularPolygon();
 	@param	T 	The triangulation containing the already generated but not
 				linked vertices of the start polygon
 */
-void initialTriangulationPseudoStar(Triangulation *T);
+void initialTriangulationPseudoStar(Triangulation * const T);
 
 
 /*
@@ -59,7 +59,7 @@ void initialTriangulationPseudoStar(Triangulation *T);
 	@param	T 	The triangulation containing the already generated but not
 				linked vertices of the start polygon
 */
-void initialTriangulationZigZag(Triangulation *T);
+void initialTriangulationZigZag(Triangulation * const T);
 
 
 /*
@@ -74,4 +74,4 @@ void initialTriangulationZigZag(Triangulation *T);
 						triangulations, e.g. pseudoStar, the vertex 0 is not at 
 						the	circle)
 */
-void boxPolygon(Triangulation *T, int startIndex);
+void boxPolygon(Triangulation * const T, const int startIndex);
