@@ -3,8 +3,8 @@
 /*
 	Polygon parameters
 */
-unsigned int Settings::nrInnerPolygons = 3;
-int Settings::outerSize = 10000;
+unsigned int Settings::nrInnerPolygons = 1;
+int Settings::outerSize = 1000000;
 std::vector<int> Settings::innerSizes;
 
 
@@ -58,9 +58,7 @@ void Settings::initSettings(){
 	(*timer).start();
 
 	// Generate the vector of sizes of the inner polygons
-	innerSizes.push_back(500);
-	innerSizes.push_back(1850);
-	innerSizes.push_back(300);
+	innerSizes.push_back(100000);
 
 	// Compute the number of translations for the initial polygon
 	if(initialSize < outerSize){
