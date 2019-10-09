@@ -4,6 +4,7 @@
 #include "triangulation.h"
 #include "polygonTransformer.h"
 #include "settings.h"
+#include "statistics.h"
 
 /*
 list of exit codes:
@@ -44,6 +45,8 @@ int main(){
 		strategyWithHoles0(T);
 	else
 		strategyWithHoles0(T);
+
+	calculateDistanceDistribution(T, 0.25);
 	
 	exit(0);
 }

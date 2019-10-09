@@ -12,6 +12,7 @@
 		- no higher density in the ring the start polygon lived in
 		- possibly lower density in the corner ring
 
+
 2. Filling of the bounding box
 	Why:
 		- it should be possible to generate polygons with convex hulls that are not close
@@ -40,6 +41,7 @@
 			- advantages: basically easy to determine in linear time
 			- disadvantages: does not rdirectly give information concerning the convex hull; what about
 				partially living in multiple quandrants?
+
 
 3. Enclosure of the holes
 	Why: 

@@ -178,7 +178,7 @@ void strategyNoHoles0(Triangulation * const T){
 
 	performed = transformPolygonByMoves(T, Settings::outerSize);
 	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed,
-		Settings::outerSize * 10, (*Settings::timer).elapsedTime());
+		Settings::outerSize, (*Settings::timer).elapsedTime());
 
 	if(!(*T).check()){
 		printf("Triangulation error: something is wrong in the triangulation at the end\n");
