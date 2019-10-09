@@ -54,3 +54,14 @@
 
 	Disadvantage:
 		- also includes area of polygon parts which are far away from the holes
+
+
+What others did:
+	1. "Generating Random Polygons", J. O'Rourke
+		- 1. method: pretty similar to my first method with the expectation of a uniform distribution
+		- 2. method: partition the area in 8 angular sectors and count the number of edges which fell
+			in each sector with the expectation of a uniform distribution
+		- Suggested: It seems that random polygons should have a certain "convoluted
+			ness." .". precise measure of this suggests itself: define the convolutedness of a
+			polygon to be maximum link distance of a path from any point in the plane exterior
+			to the polygon to infinity.
