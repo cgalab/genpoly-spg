@@ -1,0 +1,56 @@
+1. Distance (to origin) distribution of vertices
+	Why:
+		- start polygon should not be recognizable at the end of the processing
+	How:
+		- Measure point density relative to distance to origin
+		- Use area rings around the origin
+		- Outer ring will contain the corners of the bounding box
+		- Vertices of holes can maybe just be treated like the other vertices,
+			otherwise we get a decrease of density in the rings the holes live in
+	Expactation:
+		- uniform distribution over all rings
+		- no higher density in the ring the start polygon lived in
+		- possibly lower density in the corner ring
+
+2. Filling of the bounding box
+	Why:
+		- it should be possible to generate polygons with convex hulls that are not close
+			to the bounding box
+	How:
+		1. Idea:
+			- simply compute the mean of all vertex coordinates and take a look at the distance
+				to the origin
+			- advantage: really simple to compute
+			- disadvantage: even if most points are in the first and the third quadrant, a few points in
+				in the second and no points (and also no edges) are in the fourth quadrant, the mean
+				of the coordinates could be very close to the origin
+		2. Idea:
+			- compute the center of gravity of the polygon and take a look at the distances to the origin
+			- can potentially be done by computing the center of gravity of all triangles inside the polygon
+				and then computing the area weighted sum of these centers
+			- advantages: at least in cases like the above mentioned the center of gravity will diverge from
+				the origin
+			- disadvantages: it could be hard to find all triangles inside the polygon; maybe this measure
+				also tends to the origin
+		3. Idea:
+			- compute the area inside the polygon and outside the polygon for each quadrant
+			- could easily be done by giving each triangle a property which determines, whether it lives inside
+				or outside the polygon
+			- expectation: hugh differences between the quadrants should be possible
+			- advantages: basically easy to determine in linear time
+			- disadvantages: does not rdirectly give information concerning the convex hull; what about
+				partially living in multiple quandrants?
+
+3. Enclosure of the holes
+	Why: 
+		- the holes should be well enclosed by the polygon, i.e. the polygon should be very close to the holes
+			(at least at some points) and should also fill some of the inconvexities of the holes
+	How:
+		- measure area between polygon and holes
+		- therefore label triangles with outside, inside and in hole
+
+	Expectation:
+		- maybe small area compared to the area of the holes?!
+
+	Disadvantage:
+		- also includes area of polygon parts which are far away from the holes
