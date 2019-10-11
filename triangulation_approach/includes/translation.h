@@ -136,6 +136,17 @@ private:
 	double actualTime;
 
 	/*
+		The ID of the translation
+	*/
+	unsigned long long id;
+
+	/*
+		The number of already generated vertices
+	*/
+	static unsigned long long n;
+
+
+	/*
 		P ~ R ~ I ~ V ~ A ~ T ~ E 	M ~ E ~ M ~ B ~ E ~ R 	F ~ U ~ N ~ C ~ T ~ I ~ O ~ N ~ S
 	*/
 
@@ -175,23 +186,40 @@ private:
 	bool generateInitialQueue();
 
 	/*
-		The function insideQuadrilateral() checks whether the vertex v lays inside of a
-		quadrilateral formed by the edge from oldV to its neighboring  vertices and from
-		newV to its neighboring vertices.
-		Therefore it generates a dummy vertex with the same y-coordinate as v and a
-		x-coordinate which is the maximum x-coordinate of all vertices of the triangle plus
-		10. So the dummy vertex lays definitelly outside of the qudrilateral. Then it
-		checks how often the the edge between v and the dummy vertex intersects the edges
-		of the quadrilateral. If the number of intersections is odd, then v must lay inside
-		of the quadrilateral.
+		The function insideQuadrilateral() checks whether the vertex v lays inside of a quadrilateral
+		formed by the edge from oldV to its neighboring  vertices and from newV to its neighboring
+		vertices.
+		Therefore it generates a dummy vertex with the same y-coordinate as v and a x-coordinate which
+		is the maximum x-coordinate of all vertices of the quadrilateral plus 10. So the dummy vertex
+		lays definitelly lays outside of the qudrilateral. Then it checks how often the edge between v
+		and the dummy vertex intersects the edges of the quadrilateral. If the number of intersections
+		is odd, then v must lay inside of the quadrilateral.
 
 		@param 	v 	The vertex of interest
 		@return 	True if v is inside of the quadrilateral, otherwise false
 
 		Note:
-			Source: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+			- Source: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+			- If the dummy edge intersects exactly at a vertex, we will get intersections with two edges,
+				which makes the function think, that the vertex is outside of the quadrilateral.
+				Therefore the function automatically returns true, if it gets two or more vertex
+				intersection anywhere. This leads to rejecting the translation.
 	*/
 	bool insideQuadrilateral(Vertex * const v) const;
+
+	/*
+		The function insideTriangle() checks whether the vertex toCheck is inside the triangle
+		formed by the vertices v0, v1 and v2.
+
+		@param	v0 			First veretx of the triangle
+		@param 	v1 			Second vertex of the triangle
+		@param 	v2 			Third vertex of the triangle
+		@param 	toCheck 	The vertex for which should be checked whether it lays inside the
+							triangle or not
+		@return 			True if toCheck lays inside the triangle, otherwise false
+	*/
+	bool insideTriangle(Vertex * const v0, Vertex * const v1, Vertex * const v2,
+		Vertex * const toCheck);
 
 	/*
 		The function checkEdge() checks whether the edge newE starting at vertex fromV
@@ -389,20 +417,29 @@ public:
 	*/
 
 	/*
-		The function checkOverroll() checks whether the polygon would change its orientation
-		by this translation. This basically means that the moving vertex is shifted across
-		the whole polygon which corresponds to all other vertices and edges being inside of
-		the qudrilateral formed by the oldV, the newV and their neighboring edges. Obviously
-		if the quadrilateral is not simple, this can not happen at all. If the quadrilateral
-		is simple then it corresponds to having one of the other vertices of the polygon
-		inside the qudrilateral, because if one vertex is inside it follows all other
-		vertices must be inside or at least one is outside so it exist at least one edge
-		intersecting the quadrilateral so the translation can not lead to a simple polygon
-		at all.
+		The function checkOverroll() checks whether the polygon would change its orientation by
+		this translation. This basically means that the moving vertex is shifted across the whole
+		polygon which corresponds to all other vertices and edges being inside of the qudrilateral
+		formed by the oldV, the newV and their neighboring edges. Obviously if the quadrilateral is
+		not simple, this can not happen at all. If the quadrilateral is simple then it corresponds
+		to having one of the other vertices of the polygon inside the qudrilateral, because if
+		one vertex is inside it follows all other vertices must be inside or at least one is outside
+		so it exist at least one edge intersecting the quadrilateral so the translation can not lead
+		to a simple polygon at all.
+		For polygons with holes it also checks whether the outer polygon rolls over an inner one or
+		an inner polygon rolls over another one. Additionally it checks whether a vertex passes one
+		of the inner polygons in a way, that one polygon edge would crash into the inner polygon.
+		For some of these cases it is possible to solve it by splitting the translation. For these
+		cases it sets the split flag of the translation.
 
-		@return 	True if the polygon would change its orientation, otherwise false
+		@return 	True if the polygon would change its orientation or rolls over another inner 
+					polygon, otherwise false
+
+		Note:
+			For more information on how to check which cases can be solved by splitted translations
+			take a look at my Master Thesis
 	*/
-	bool checkOverroll() const;
+	bool checkOverroll();
 
 	/*
 		The function execute() processes a translation. If the flag split is set, it calls the
@@ -427,10 +464,11 @@ public:
 	bool checkSimplicityOfTranslation() const;
 
 	/*
-		The function checkSplit() determines whether a translation can be executed directly
-		or must be split into two translation. This corresponds to the question whether the
-		translation path intersects any polygon edge or not. If the translation must be
-		split the function sets the internal split flag.
+		The function checkSplit() determines whether a translation can be executed directly or must
+		be split into two translation. This corresponds to the question whether the translation path
+		intersects any polygon edge or not. If the translation must be split the function sets the
+		internal split flag. If the split flag was already set by the function checkOverroll() it 
+		does nothing.
 	*/
 	void checkSplit();
 

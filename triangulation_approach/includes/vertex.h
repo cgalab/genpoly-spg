@@ -26,10 +26,12 @@
 class Triangulation;
 class TEdge;
 class Triangle;
+class TPolygon;
 
 #include "triangulation.h"
 #include "tedge.h"
 #include "triangle.h"
+#include "tpolygon.h"
 
 class Vertex{
 
@@ -39,6 +41,11 @@ private:
 		The triangulation the vertex lives in
 	*/
 	Triangulation *T;
+
+	/*
+		The polygon the vertex belongs to
+	*/
+	TPolygon *P;
 
 	/*
 		The coordinates of the vertex
@@ -138,6 +145,7 @@ public:
 		SETTER:
 
 		void 					setTriangulation(Triangulation * const t)
+		void 					setPolygon(TPolygon * const p)
 		void 					setPosition(const double X, const double Y)
 		void 					addEdge(TEdge * const e)
 		void 					addTriangle(Triangle * const t)
@@ -163,6 +171,8 @@ public:
 		Vertex* 				getNext() const
 		Triangulation* 			getTriangulation() const
 		Triangle* 				getTriangleWith(Vertex const * const v0, Vertex const * const v1)
+		unsigned int 			getPID() const
+		int 					getActualPolygonSize() const
 
 		REMOVER:
 
@@ -172,6 +182,7 @@ public:
 		PRINTER:
 
 		void 					print(FILE * const f, double factor) const
+		void 					printToDat(FILE * const f)
 		void 					print() const
 		void 					printEnvironment(const int depth, const char *filename) const
 		void 					printSurroundingTriangulation(const char *filename) const
@@ -236,6 +247,11 @@ public:
 		@param 	t 	The triangulation the vertex lives in
 	*/
 	void setTriangulation(Triangulation * const t);
+
+	/*
+		@param 	p 	The polygon the vertex belongs to
+	*/
+	void setPolygon(TPolygon *p);
 
 	/*
 		@param 	X 	The new x-coordinate of the vertex
@@ -412,6 +428,16 @@ public:
 	*/
 	Triangle *getTriangleWith(Vertex const * const v0, Vertex const * const v1) const;
 
+	/*
+		@return 	The id of the polygon the vertex belongs to
+	*/
+	unsigned int getPID() const;
+
+	/*
+		@return 	The actual size of the polygon the vertex belongs to
+	*/
+	int getActualPolygonSize() const;
+
 
 	/*
 		R ~ E ~ M ~ O ~ V ~ E ~ R
@@ -447,6 +473,14 @@ public:
 			triangulation use the print functions of the Triangulation class
 	*/
 	void print(FILE * const f, double factor) const;
+
+	/*
+		The function printToDat() writes the coordinates of a vertex to a .dat file such that it
+		can be interpreted by gnuplot.
+
+		@param 	f 	A handle for the .dat file
+	*/
+	void printToDat(FILE * const f) const;
 
 	/*
 		The function print() prints the basic information of a vertex to standard out.

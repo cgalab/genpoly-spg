@@ -1,18 +1,54 @@
 #include "settings.h"
 
+/*
+	Polygon parameters
+*/
+unsigned int Settings::nrInnerPolygons = 0;
+int Settings::outerSize = 1000;
+std::vector<int> Settings::innerSizes;
+
+
+/*
+	Initial polygon
+*/
 int Settings::initialSize = 100;
-double Settings::radius = 0.1;
+double Settings::radiusPolygon = 0.1;
+double Settings::radiusHole = 0.05;
 double Settings::boxSize = 3.0;
 int Settings::initialTranslationFactor = 1000;
 int Settings::initialTranslationNumber = -1;
+
+
+/*
+	Translation parameters
+*/
 Arithmetics Settings::arithmetics = Arithmetics::DOUBLE;
-int Settings::targetSize = 1000000;
+
+
+/*
+	Insertion parameters
+*/
 int Settings::insertionTries = 100;
 double Settings::minLength = 0.0000001;
+
+
+/*
+	Utilities
+*/
 Timer* Settings::timer = NULL;
+
+
+/*
+	Random generator
+*/
 bool Settings::fixedSeed = false;
 unsigned int Settings::seed = 891098421;
 RandomGenerator* Settings::generator = NULL;
+
+
+/*
+	Feedback settings
+*/
 FeedbackMode Settings::feedback = FeedbackMode::EXECUTION;
 bool Settings::simplicityCheck = false;
 
@@ -21,12 +57,15 @@ void Settings::initSettings(){
 	timer = new Timer();
 	(*timer).start();
 
+	// Generate the vector of sizes of the inner polygons
+	//innerSizes.push_back(100000);
+
 	// Compute the number of translations for the initial polygon
-	if(initialSize < targetSize){
+	if(initialSize < outerSize){
 		initialTranslationNumber = initialTranslationFactor * initialSize;
 	}else{
-		initialTranslationNumber = initialTranslationFactor * targetSize;
-		initialSize = targetSize;
+		initialTranslationNumber = initialTranslationFactor * outerSize;
+		initialSize = outerSize;
 	}
 
 	// Initialize the RandomGenerator

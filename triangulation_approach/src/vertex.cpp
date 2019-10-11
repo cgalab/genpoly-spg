@@ -5,7 +5,7 @@
 */
 
 /*
-	The number of already generated edges
+	The number of already generated vertices
 */
 unsigned long long Vertex::n = 0;
 
@@ -72,7 +72,8 @@ void Vertex::getEnvironment(std::map<const unsigned long long, const TEdge*> &es
 	@param 	Y 	The y coordinate of the vertex
 */
 Vertex::Vertex(const double X, const double Y) :
-	T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(false), id(n), reserveID(2 * n) {
+	T(NULL), P(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(false), id(n), reserveID(2 * n) {
+
 	n++;
 }
 
@@ -86,7 +87,8 @@ Vertex::Vertex(const double X, const double Y) :
 	@param 	RV 	Determines whether the new vertex is part of the bounding box
 */
 Vertex::Vertex(const double X, const double Y, const bool RV) :
-	T(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(RV), id(n), reserveID(2 * n) {
+	T(NULL), P(NULL), x(X), y(Y), toPrev(NULL), toNext(NULL), rectangleVertex(RV), id(n), reserveID(2 * n) {
+
 	n++;
 }
 
@@ -121,6 +123,13 @@ Vertex *Vertex::getTranslated(const double dx, const double dy) const{
 */
 void Vertex::setTriangulation(Triangulation * const t){
 	T = t;
+}
+
+/*
+	@param 	p 	The polygon the vertex belongs to
+*/
+void Vertex::setPolygon(TPolygon *p){
+	P = p;
 }
 
 /*
@@ -392,6 +401,20 @@ Triangle *Vertex::getTriangleWith(Vertex const * const v0, Vertex const * const 
 	return NULL;
 }
 
+/*
+	@return 	The id of the polygon the vertex belongs to
+*/
+unsigned int Vertex::getPID() const{
+	return (*P).getID();
+}
+
+/*
+	@return 	The actual size of the polygon the vertex belongs to
+*/
+int Vertex::getActualPolygonSize() const{
+	return (*P).getActualPolygonSize();
+}
+
 
 /*
 	R ~ E ~ M ~ O ~ V ~ E ~ R
@@ -431,7 +454,8 @@ void Vertex::removeTriangle(Triangle * const t){
 		triangulation use the print functions of the Triangulation class
 */
 void Vertex::print(FILE * const f, double factor) const{
-	int n; 
+	int n;
+	int text;
 
 	if(factor == 0){
 		n = (*T).getActualNumberOfVertices();
@@ -442,9 +466,25 @@ void Vertex::print(FILE * const f, double factor) const{
 		else
 			factor = 20;
 	}
-	
 
-	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%llu\" mainText=\"%llu\"></node>\n", x * factor, y * factor, id, id);
+
+	/*if(P == NULL)
+		text = -1;
+	else
+		text = getPID();*/
+	text = id;
+
+	fprintf(f, "<node positionX=\"%f\" positionY=\"%f\" id=\"%llu\" mainText=\"%llu\"></node>\n", x * factor, y * factor, id, text);
+}
+
+/*
+	The function printToDat() writes the coordinates of a vertex to a .dat file such that it
+	can be interpreted by gnuplot.
+
+	@param 	f 	A handle for the .dat file
+*/
+void Vertex::printToDat(FILE * const f) const{
+	fprintf(f, "%f %f\n", x, y);
 }
 
 /*

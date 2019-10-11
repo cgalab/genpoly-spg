@@ -1,5 +1,6 @@
 #include "polygonTransformer.h"
 
+
 /*
 	The function transformPolygonByMoves() transforms a polygon by randomly chosing a
 	vertex and a direction to move and then randomly computing a distance to shift in
@@ -26,6 +27,8 @@ int transformPolygonByMoves(Triangulation * const T, const int iterations){
 	Vertex *v;
 	enum Executed ex;
 	int div;
+
+	printf("n: %d\n", n);
 
 	div = 0.01 * iterations;
 
@@ -79,37 +82,40 @@ int transformPolygonByMoves(Triangulation * const T, const int iterations){
 	return performedTranslations;
 }
 
-/*
-	The function growPolygon() grows the polygon by insertions to Settings::targetSize.
 
-	@param 	T 	The triangulation the polygon lives in
+/*
+	The function growPolygonBy() grows a polygon by n insertions.
+
+	@param 	T 		The triangulation the polygon lives in
+	@param	pID 	The ID of the polygon
+	@param 	n 		The number of vertices to insert
 
 	Note:
 		This function works just for polygons without holes!
 */
-void growPolygon(Triangulation *T){
-	int n, index, actualN, i;
+void growPolygonBy(Triangulation * const T, const unsigned int pID, const int n){
+	int index, actualN, i;
 	Insertion *in;
 	bool ok;
 	int div;
 	int counter = 0;
 
-	// Compute the number of insertion to do
-	n = Settings::targetSize - (*T).getActualNumberOfVertices();
 	div = 0.01 * n;
+	if(div == 0)
+		div = 1;
 
 	for(i = 0; i < n;){
-		
-		actualN = (*T).getActualNumberOfVertices();
+
+		actualN = (*T).getActualNumberOfVertices(pID);
 
 		// Chose randomly an edge to insert in
 		index = (*Settings::generator).getRandomIndex(actualN);
 
-		in = new Insertion(T, index);
+		in = new Insertion(T, pID, index);
 
 		// Check whether the choosen edge fulfills the stability criteria for insertions
 		ok = (*in).checkStability();
-
+;
 		// Recognized when it is hard to find a suitable edge to insert in
 		if(!ok){
 			delete in;
@@ -124,14 +130,135 @@ void growPolygon(Triangulation *T){
 		counter = 0;
 
 		// Execute the insertion and try to move the new vertex away from the edge
-		(*in).execute();		
+		(*in).execute();
+
 		(*in).translate();
 
 		delete in;
 
+		// Just increase the iteration count if a vertex has really been inserted
 		i++;
 
 		if(i % div == 0 && Settings::feedback != FeedbackMode::LACONIC)
-			printf("%f%% of %d insertions performed after %f seconds \n", (double)i / (double)n * 100, n, (*Settings::timer).elapsedTime());
+			printf("%f%% of %d insertions performed after %f seconds \n", (double)i / (double)n * 100,
+				n, (*Settings::timer).elapsedTime());
 	}
+}
+
+
+/*
+
+*/
+void strategyNoHoles0(Triangulation * const T){
+	int performed;
+
+	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
+	printf("Transformed initial polygon with %d of %d translations in %f \
+		seconds\n\n", performed, Settings::initialTranslationNumber,
+		(*Settings::timer).elapsedTime());
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation at the \
+			end of transforming the initial polygon\n");
+		exit(9);
+	}
+
+	(*T).print("triangulation_init.graphml");
+	(*T).printPolygonToDat("polygon_init.dat");
+
+	growPolygonBy(T, 0, Settings::outerSize - Settings::initialSize);
+	printf("Grew initial polygon to %d vertices afters %f seconds \n\n",
+		Settings::outerSize, (*Settings::timer).elapsedTime());
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation after growing the \
+			polygon\n");
+		exit(9);
+	}
+
+	performed = transformPolygonByMoves(T, Settings::outerSize);
+	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed,
+		Settings::outerSize, (*Settings::timer).elapsedTime());
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation at the end\n");
+		exit(9);
+	}
+
+	(*T).printPolygonToDat("polygon.dat");
+}
+
+
+/*
+
+*/
+void strategyWithHoles0(Triangulation * const T){
+	int performed;
+	int nrInsertions;
+	int i, k;
+	int actualN;
+
+	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
+	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n",
+		performed, Settings::initialTranslationNumber, (*Settings::timer).elapsedTime());
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation at the \
+			end of transforming the initial polygon\n");
+		exit(9);
+	}
+
+	performed = 1;
+	k = 0;
+	while(performed != 0 && k < 20){
+		performed = 0;
+
+		// Double up the sizes of the inner polygons (if still possible)
+		for(i = 1; i <= Settings::nrInnerPolygons; i++){
+			
+			actualN = (*T).getActualNumberOfVertices(i);
+
+			if(Settings::innerSizes[i - 1] >= 2 * actualN)
+				nrInsertions = actualN;
+			else
+				nrInsertions = Settings::innerSizes[i - 1] - actualN;
+
+			growPolygonBy(T, i, nrInsertions);
+
+			performed = performed + nrInsertions;
+
+			if(nrInsertions != 0)
+				printf("Grew the inner polygon with ID %d by %d vertices to %d vertices\n\n",
+					i, nrInsertions, nrInsertions + actualN);
+		}
+
+		// Double up the size of the outer polygon
+		actualN = (*T).getActualNumberOfVertices(0);
+
+		if(Settings::outerSize >= 2 * actualN)
+			nrInsertions = actualN;
+		else
+			nrInsertions = Settings::outerSize - actualN;
+
+		growPolygonBy(T, 0, nrInsertions);
+
+		performed = performed + nrInsertions;
+
+		if(nrInsertions != 0)
+			printf("Grew outer polygon by %d vertices to %d vertices\n\n", nrInsertions,
+				nrInsertions + actualN);
+
+		k++;
+	}
+
+	if(!(*T).check()){
+		printf("Triangulation error: something is wrong in the triangulation after \
+			growing the initial polygon\n");
+		exit(9);
+	}
+
+	(*T).print("triangulation_init.graphml");
+	(*T).printPolygonToDat("polygon_init.dat");
+
+	(*T).printPolygonToDat("polygon.dat");
 }

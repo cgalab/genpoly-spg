@@ -6,6 +6,11 @@
 #include <map>
 
 /*
+	Include my headers	
+*/
+#include "settings.h"
+
+/*
 	Define the class Triangulation
 */
 #ifndef __TRIANGULATION_H_
@@ -17,14 +22,22 @@
 class Vertex;
 class TEdge;
 class Triangle;
+class TPolygon;
 
 #include "vertex.h"
 #include "tedge.h"
 #include "triangle.h"
+#include "tpolygon.h"
 
 class Triangulation{
 
 private:
+
+	/*
+		The polygons living in the triangulation
+	*/
+	TPolygon *outerPolygon;
+	std::vector<TPolygon*> innerPolygons;
 	
 	/*
 		A vector of all polygon vertices contained by the triangulation
@@ -54,7 +67,7 @@ private:
 	/*
 		The target number of polygon vertices (including the vertices of inner polygons)
 	*/
-	const int N;
+	int N;
 
 public:
 	
@@ -63,36 +76,43 @@ public:
 
 		CONSTRUCTORS:
 
-					Triangulation(const int n)
+						Triangulation()
 
 		SETTER:
-
-		void 		addVertex(Vertex * const v)
-		void 		addEdge(TEdge * const e)
-		void 		setRectangle(Vertex * const v0, Vertex * const v1, Vertex * const v2,
-					Vertex * const v3)
+		
+		void 			addInnerPolygon(TPolygon * const p)
+		void 			addVertex(Vertex * const v, const unsigned int pID)
+		void 			changeVertex(const int i, const unsigned int fromP,
+						const unsigned int toP)
+		void 			addEdge(TEdge * const e)
+		void 			setRectangle(Vertex * const v0, Vertex * const v1, Vertex * const v2,
+						Vertex * const v3)
 
 		GETTER:
-
-		int 		getTargetNumberOfVertices() const
-		int 		getActualNumberOfVertices() const
-		Vertex*		getVertex(const int i) const
+		
+		unsgined int 	getActualNrInnerPolygons() const
+		int 			getTargetNumberOfVertices() const
+		int 			getActualNumberOfVertices() const
+		int 			getActualNumberOfVertices(const unsigned int pID) const
+		Vertex*			getVertex(const int i, const unsigned int pID) const
+		Vertex* 		getVertex(const int i) const
 
 		REMOVER:
 
-		void 		removeVertex(const int index)
-		void 		removeEdge(TEdge * const e)
+		void 			removeVertex(const int index)
+		void 			removeEdge(TEdge * const e)
 
 		PRINTER:
 
-		void 		print(const char *filename) const
-		void 		printPolygon(const char *filename) const
+		void 			print(const char *filename) const
+		void 			printPolygon(const char *filename) const
+		void 			printPolygonToDat(const char *filename) const
 
 		OTHERS:
 
-		bool 		check() const
-		void 		stretch(const double factor)
-		void		checkSimplicity() const
+		bool 			check() const
+		void 			stretch(const double factor)
+		void			checkSimplicity() const
 	*/
 
 
@@ -102,12 +122,10 @@ public:
 
 	/*
 		Constructor:
-		Already allocates memory for the vector of vertices
-
-		@param 	n 	Final number of vertices (including the vertices of inner polygons)
+		Already allocates memory for the vector of vertices and generates the TPolygon
+		instances for the outer polygon.
 	*/
-	Triangulation(const int n);
-
+	Triangulation();
 
 
 	/*
@@ -115,9 +133,30 @@ public:
 	*/
 
 	/*
-		@param	v 	Vertex to be added to the vertices vector
+		@param 	p 	The new inner polygon
 	*/
-	void addVertex(Vertex * const v);
+	void addInnerPolygon(TPolygon * const p);
+
+	/*
+		The function addVertex() inserts a vertex into the vertices list of the triangulation
+		and also calls the addVertex() function of the polygon the vertex belongs to. It errors
+		with exit code 12 if pID is greater then the number of inner polygons.
+
+		@param	v 		Vertex to be added to the vertices vector
+		@param 	pID 	The polygon the vertex belongs to (pID = 0 outer polygon, else inner
+						polygon)
+	*/
+	void addVertex(Vertex * const v, const unsigned int pID);
+
+	/*
+		The function changeVertex() removes the vertex at index i from the polygon with ID
+		fromP and adds it to the polygon with ID toP.
+
+		@param	i 		The index of the vertex to be moved in the polygon with ID fromP
+		@param 	fromP 	The ID of the polygon the vertex lives in originally
+		@param 	toP 	The ID of the polygon the vertex should be moved to
+	*/
+	void changeVertex(const int i, const unsigned int fromP, const unsigned int toP);
 
 	/*
 		@param	e 	Edge to be added to the edge map
@@ -134,10 +173,14 @@ public:
 	void setRectangle(Vertex * const v0, Vertex * const v1, Vertex * const v2, Vertex * const v3);
 
 
-
 	/*
 		G ~ E ~ T ~ T ~ E ~ R ~ S
 	*/
+
+	/*
+		@return 	The actual number of inner polygons
+	*/
+	unsigned int getActualNrInnerPolygons() const;
 
 	/*
 		@return		Final number of vertices the polygon will contain (including the vertices
@@ -152,8 +195,16 @@ public:
 	int getActualNumberOfVertices() const;
 
 	/*
-		@param	i 	Index of the vertex in the vertices vector
-		@return 	The vertex at index i in the vertices vector
+		@param 	pID The polygon of interest
+		@return		The number of vertices the polygon with pID does contain now
+	*/
+	int getActualNumberOfVertices(const unsigned int pID) const;
+
+	/*
+		@param	i 	Index of the vertex in the vertices vector of the polygon with pID
+		@param 	pID	The ID of the polygon of interest
+		@return 	The vertex at index i in the vertices vector, NULL if no polygon with pID
+					exists
 
 		Note:
 			- Be n the actual number of vertices in the vertex vector, then i < 0 
@@ -163,8 +214,13 @@ public:
 			- This will not work after inserting additional vertices, as the vertices won't be 
 				in the same order in the vertices vector as they are in the polygon
 	*/
-	Vertex *getVertex(const int i) const;
+	Vertex *getVertex(const int i, const unsigned int pID) const;
 
+	/*
+		@param 	i 	The index of the vertex in the vertices vector
+		@return 	The vertex at index i in the vertices vector
+	*/
+	Vertex *getVertex(const int i) const;
 
 
 	/*
@@ -189,7 +245,6 @@ public:
 		@param	e 	The edge to be removed
 	*/
 	void removeEdge(TEdge * const e);
-
 
 	
 	/*
@@ -220,6 +275,13 @@ public:
 	*/
 	void printPolygon(const char *filename) const;
 
+	/*
+		The function printPolygonToDat() prints all polygons to a .dat file which can be
+		interpreted by gnuplot.
+
+		@param 	filename 	The name of the .dat file
+	*/
+	void printPolygonToDat(const char *filename) const;
 
 
 	/*

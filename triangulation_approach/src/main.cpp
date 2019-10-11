@@ -4,8 +4,6 @@
 #include "triangulation.h"
 #include "polygonTransformer.h"
 #include "settings.h"
-#include "randomGenerator.h"
-#include "predicates.h"
 #include "statistics.h"
 
 /*
@@ -25,54 +23,30 @@ code 	name						meaning
 									during the translation
 10		Vertex at PE end 			The surrounding polygon check recognizes a vertex exactly laying on a PE
 11 		Not simple					The check for simplicity found an intersection
+12 		Vertex insertion error 		The pID passed to Triangulation::addVertex() exceeds the number of inner
+									polygons
 */
 
 int main(){
 	Triangulation* T;
-	int performed;
 
 	Settings::initSettings();
 
 	T = generateRegularPolygon();
 
 	(*T).check();
-	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n", Settings::initialSize, (*Settings::timer).elapsedTime());
 
+	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n",
+		Settings::initialSize, (*Settings::timer).elapsedTime());
 
-	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
-	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n", performed, Settings::initialTranslationNumber, (*Settings::timer).elapsedTime());
+	if(Settings::nrInnerPolygons == 0)
+		strategyNoHoles0(T);
+	else if(Settings::nrInnerPolygons == 1)
+		strategyWithHoles0(T);
+	else
+		strategyWithHoles0(T);
 
-	if(!(*T).check()){
-		printf("Triangulation error: something is wrong in the triangulation at the end\n");
-		exit(9);
-	}
-
-	(*T).print("triangulation_init.graphml");
-	(*T).printPolygon("polygon_int.graphml");
-
-	growPolygon(T);
-	printf("Grew initial polygon to %d vertices afters %f seconds \n\n", Settings::targetSize, (*Settings::timer).elapsedTime());
-
-	/*if(!(*T).check()){
-		printf("Triangulation error: something is wrong in the triangulation at the end\n");
-		exit(9);
-	}*/
-
-	performed = transformPolygonByMoves(T, 1000000);
-	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed, 1000000, (*Settings::timer).elapsedTime());
-	printf("number of vertices: %d \n", (*T).getActualNumberOfVertices());
+	calculateDistanceDistribution(T, 0.25);
 	
-
-	if(!(*T).check()){
-		printf("Triangulation error: something is wrong in the triangulation at the end\n");
-		exit(9);
-	}
-
-	Vertex::printStats();
-	
-	//(*T).print("triangulation.graphml");
-
-	(*T).printPolygon("polygon.graphml");
-
 	exit(0);
 }

@@ -307,6 +307,9 @@ TEdge *Triangle::getOtherEdgeContaining(Vertex const * const v, TEdge const * co
 	if((*e).getID() != (*e1).getID() && (*e1).contains(v)) return e1;
 	if((*e).getID() != (*e2).getID() && (*e2).contains(v)) return e2;
 
+	(*e0).print();
+	(*e1).print();
+	(*e2).print();
 	printf("error: no other edge is containing the vertex %llu \n", (*v).getID());
 	return NULL;
 }

@@ -18,6 +18,7 @@
 #include "insertion.h"
 #include "settings.h"
 
+
 /*
 	The function transformPolygonByMoves() transforms a polygon by randomly chosing a
 	vertex and a direction to move and then randomly computing a distance to shift in
@@ -36,12 +37,27 @@
 */
 int transformPolygonByMoves(Triangulation * const T, const int iterations);
 
-/*
-	The function growPolygon() grows the polygon by insertions to Settings::targetSize.
 
-	@param 	T 	The triangulation the polygon lives in
+/*
+	The function growPolygonBy() grows a polygon by n insertions.
+
+	@param 	T 		The triangulation the polygon lives in
+	@param	pID 	The ID of the polygon
+	@param 	n 		The number of vertices to insert
 
 	Note:
 		This function works just for polygons without holes!
 */
-void growPolygon(Triangulation * const T);
+void growPolygonBy(Triangulation * const T, const unsigned int pID,  const int n);
+
+
+/*
+
+*/
+void strategyNoHoles0(Triangulation * const T);
+
+
+/*
+
+*/
+void strategyWithHoles0(Triangulation * const T);

@@ -245,9 +245,9 @@ void TEdge::removeTriangle(Triangle * const t){
 
 /*
 	The function print() prints the edge to a .graphml file.
-	Edges of type POLYGON get the weight 5, of type FRAME gets the weight 10 and edges of
-	type triangulation get as weight the number of assigned triangles (2 for a correct
-	triangulation).
+	Edges of type POLYGON get the weight 5 plus the number of assigned triangles, of type FRAME gets the weight 10 plus
+	the number of assigned triangles and edges oftype triangulation get as weight the number of assigned triangles (2
+	for a correct triangulation).
 
 	@param 	f 	Pointer to the file to print in
 */
@@ -256,8 +256,8 @@ void TEdge::print(FILE * const f) const{
 
 	w = nrAssignedTriangles();
 
-	if(type == EdgeType::POLYGON) w = 5;
-	if(type == EdgeType::FRAME) w = 10;
+	if(type == EdgeType::POLYGON) w = 5 + w;
+	if(type == EdgeType::FRAME) w = 10 + w;
 
 	fprintf(f, "<edge vertex1=\"%llu\" vertex2=\"%llu\" weight=\"%d\" useWeight=\"true\"></edge>\n", (*v0).getID(), (*v1).getID(), w);
 }
