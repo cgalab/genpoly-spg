@@ -1,0 +1,42 @@
+This is a list of all known (all that we know) algorithms for generating a random simple polygon.
+
+1.
+	Author: 		O'Rourke, Virmani
+	Publication: 	Generating Random Polygons
+	Link: 			You can find it in literature/move_approach/
+	Year: 			1991
+	Approach: 		Moving vertices around
+	Description:
+		- Start with regular polygon
+		- Assign each vertex a random velocity in a random direction
+		- Move vertices in order with the corresponding velocity if it is not inflicting 
+			simplicity or leaving a bounding box, otherwise assign a new random velocity
+			to the vertex
+		- Uses just simply brute force for checking simplicity
+		- Does a specific number of moves per vertex
+
+2.
+	Author: 		Auer, Held
+	Publication: 	Heuristics for the Generation of Random Polygons (Chapter 2.1)
+	Link: 			We have a print
+	Based on: 		(1)
+	Year: 			1996
+	Approach: 		Moving vertices around
+	Description:
+		- Start with a starshaped polygon generated from a given pointset
+		- Randomly choose a vertex, generate a random translation vector,
+			check simplicity of the translation and apply
+		- Uses just simply brute force for checking simplicity
+
+3.
+	Author: 		Dailey, Whitfield
+	Publication: 	Constructing Random Polygons
+	Link: 			https://www.researchgate.net/publication/220707337_Constructing_random_polygons
+	Year: 			2008
+	Approach: 		Inserting new vertices
+	Description:
+		- Start with a random triangle (vertices a randomly choosen)
+		- (n-3) choose randomly one edge of the polygon, delete it, compute the set of all points
+			which can be seen from the two vertices of the deleted edge (which is basically a 
+			polygon), triangulate this polygon and choose randomly a new point out of this polygon
+		- Claims that all possible polygons can be reached
