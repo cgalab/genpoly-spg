@@ -40,3 +40,29 @@ This is a list of all known (all that we know) algorithms for generating a rando
 			which can be seen from the two vertices of the deleted edge (which is basically a 
 			polygon), triangulate this polygon and choose randomly a new point out of this polygon
 		- Claims that all possible polygons can be reached
+
+4.
+	Author: 		Sergey
+	Publication: 	Growing and Shrinking Polygons for Random Testing of Computational Geometry
+					Algorithms
+	Link: 			https://ilyasergey.net/papers/polygons-draft.pdf
+	Year: 			2016
+	Approach: 		Attachment of small polygons onto larger polygons
+	Description:
+		- Start with a small polygon and attach other polygons onto it
+		- It is necessary to check for simplicity for each attachment
+		- No complexity is given their, but I can not believe that this is fast
+
+5.
+	Author: 		Sadhu, N. Kumar, B. Kumar
+	Publication: 	Random Polygon Generation through Convex Layers
+	Link: 			https://www.sciencedirect.com/science/article/pii/S2212017313005331
+	Based on: 		TODO
+	Year: 			2013
+	Approach: 		Randomly connecting a set of vertices
+	Description:
+		- Computes convex layers of a pointset
+		- Connects adjacent convex layers by finding "End visible" pairs of edges in the layers
+			and replacing them by connecting edges
+		- Can not generate each possible polygon
+		- Complexity: O(n^2)
