@@ -4,7 +4,7 @@
 	Polygon parameters
 */
 unsigned int Settings::nrInnerPolygons = 0;
-int Settings::outerSize = 1000;
+int Settings::outerSize = 1000000;
 std::vector<int> Settings::innerSizes;
 
 

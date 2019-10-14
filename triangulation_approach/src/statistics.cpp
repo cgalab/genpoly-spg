@@ -24,8 +24,6 @@ void calculateDistanceDistribution(Triangulation const * const T, const double w
 	n_seg = ceil(Settings::boxSize / (2 * width)) + 1;
 	segments.reserve(n_seg);
 
-	printf("%d \n", n_seg);
-
 	for(i = 0; i < n_seg; i++)
 		segments.push_back(0);
 

@@ -399,10 +399,13 @@ bool EventQueue::makeStable(const bool initial){
 				}
 			}*/
 
-			if(initial)
-				printf("Eventqueue: Two events at the same time -> refused translation\n");
-			else
-				printf("Eventqueue: Two events at the same time -> aborted translation\n");
+			if(Settings::feedback != FeedbackMode::LACONIC){
+				if(initial)
+					printf("Eventqueue: Two events at the same time -> refused translation\n");
+				else
+					printf("Eventqueue: Two events at the same time -> aborted translation\n");
+			}
+			
 			return false;
 			
 			// Attentione: do not change the ordering of e0 and e1 in stabilize, otherwise you would

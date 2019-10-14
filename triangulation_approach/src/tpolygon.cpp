@@ -72,14 +72,16 @@ Vertex *TPolygon::getVertex(const int i) const{
 
 	n = vertices.size();
 
-	if(i < 0){
+	/*if(i < 0){
 		return vertices[n + i];
 	}else if(i >= n){
 		return vertices[i - n];
 	}else{
 		return vertices[i];
 	}
-	 return NULL;
+	return NULL;*/
+
+	return vertices[i % n];
 }
 
 /*
