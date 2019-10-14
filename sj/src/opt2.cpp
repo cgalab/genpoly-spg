@@ -71,14 +71,14 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
     decrementEdges(edgeS);
 
   	while (index < points.size()) {
-      //std::cerr << "i: " << index << std::endl;
-      //if (index > 205 && index < 207) {
-        //std::cerr << std::endl << "i: " << index << std::endl;
-        //debug = true;
-        //std::cerr << "edges in 'edgeS':" << std::endl;
-        //for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
-      //}
-      //else {debug = false;}
+//      std::cerr << "i: " << index << std::endl;
+//      if (1166 < index && index < 1211) {
+//        std::cerr << std::endl << "i: " << index << std::endl;
+//        debug = true;
+//        std::cerr << "edges in 'edgeS':" << std::endl;
+//        for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+//      }
+//      else {debug = false;}
 
       //std::cerr << "polygon:" << std::endl;
       //pdisplay(polygon, points);
