@@ -166,7 +166,7 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	//int sig,ex;
 	//sig = frexp(det_d, &ex);
 	//std::cerr << "sig: " << sig << ", exp: " << ex << std::endl;
-	std::cerr.precision(17);
+	//std::cerr.precision(17);
 //	std::cerr << "det_a: " << det_a << std::endl;
 //	std::cerr << "det_b: " << det_b << std::endl;
 //	std::cerr << "det_c: " << det_c << std::endl;
@@ -207,6 +207,9 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		else if (same12) return IS_VERTEX12;
 		else if (same21) return IS_VERTEX21;
 		else if (same22) return IS_VERTEX22;
+		unsigned int count = 0;
+		if (det_a==0) {++count;} if (det_b==0) {++count;} if (det_c==0) {++count;} if (det_d==0) {++count;}
+		if (count > 1) return IS_4P_COLLINEAR;
 
 		else if (col) return IS_3P_COLLINEAR;
 		else return IS_FALSE;
@@ -220,6 +223,7 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	}
 }
 
+// uses shewchuks predicates for the determinant.
 enum intersect_t checkIntersection2(const Edge e1, const Edge e2) {
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;

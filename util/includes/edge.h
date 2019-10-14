@@ -283,7 +283,9 @@ public:
 */
 
       // 4P coll.
-      if (fabs(det1)+fabs(det2)+fabs(det3)+fabs(det4) == 0) {
+      unsigned int count = 0;
+      if (det1==0) {++count;} if (det2==0) {++count;} if (det3==0) {++count;} if (det4==0) {++count;}
+      if (count > 1) {
 //        std::cerr << "4Pc: " << std::endl;
         if (*p1 == *e.p1) return *p2 < *e.p2;
 //        std::cerr << *p1 << " < " << *e.p1 << " : " << ((*p1 < *e.p1) ? "true" : "false") << std::endl;

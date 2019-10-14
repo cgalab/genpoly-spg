@@ -250,6 +250,17 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
   std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
 
+  p1.set(0.2600000000000000,  0.4040000000000000,1167,0,0);
+  p2.set(0.2760000000000000,  0.3960000000000000,1210,0,0);
+  p3.set(0.2680000000000000,  0.4000000000000000,1186,0,0);
+  p4.set(0.3400000000000000,  0.3640000000000000,1427,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
   std::cerr << std::endl;
   std::cerr << "=== checkIntersection tests ===" << std::endl;
   std::cerr << "=== 'should be true' is a comparison 'itest >= IS_TRUE' : true when intersection exists ===" << std::endl;
@@ -452,12 +463,63 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   printEnum(itest);
   std::cerr << std::endl;
 
-  std::cerr << std:: endl;
+  p1.set(0.1919999999999999, -0.3560000000000000, 1041, 0, 0);
+  p2.set(0.2040000000000000,  -0.3480000000000000, 1052, 0, 0);
+  e1.set(p1,p2);
+  p3.set(0.1919999999999999,  -0.3600000000000000, 1040, 0, 0);
+  p4.set(0.2120000000000000,  -0.3400000000000000, 1063, 0, 0);
+  e2.set(p3,p4);
+
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+  itest = checkIntersection(e2, e1);
+  std::cout << "intersection: " << e2 << " with " << e1 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+  itest = checkIntersection2(e1, e2);
+  std::cout << "intersection2: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+  itest = checkIntersection2(e2, e1);
+  std::cout << "intersection2: " << e2 << " with " << e1 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+
+  p1.set(-0.0640000000000000, 0.1240000000000001, 490, 0, 0);
+  p2.set( 0.0320000000000000, 0.0280000000000000, 717, 0, 0);
+  e1.set(p1,p2);
+  p3.set(-0.0680000000000000, 0.1280000000000001, 482,0,0);
+  p4.set( 0.0120000000000000, 0.0480000000000000, 665,0,0);
+  e2.set(p3,p4);
+  std::cerr << std::endl;
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+  itest = checkIntersection(e2, e1);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+
+  p1.set(0.5566406250000000, 0.1640625000000000, 2504, 0, 0);
+  p2.set(0.5605468750000000, 0.1562500000000000, 2508, 0, 0);
+  e1.set(p1,p2);
+  p3.set(0.5488281250000000, 0.1523437500000000, 2496,0,0);
+  p4.set(0.5605468750000000, 0.1679687500000000, 2510,0,0);
+  e2.set(p3,p4);
+  std::cerr << std::endl;
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+  itest = checkIntersection2(e2, e1);
+  std::cout << "intersection2: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+
+  p1.set(0.5488281250000000, 0.1523437500000000, 2496, 0, 0);
+  p2.set(0.5605468750000000, 0.1562500000000000, 2508, 0, 0);
+  e1.set(p1,p2);
+  p3.set(0.4902343750000000, 0.0273437500000000, 2452,0,0);
+  p4.set(0.5605468750000000, 0.1679687500000000, 2510,0,0);
+  e2.set(p3,p4);
+  std::cerr << std::endl;
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+  itest = checkIntersection2(e2, e1);
+  std::cout << "intersection2: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
 
 
 /*
   Testing Yval class in edge.h
 */
+  std::cerr << std:: endl;
   std::cerr << "=== Yval tests ===" << std::endl;
 
   Yval y1 = Yval(1,2);

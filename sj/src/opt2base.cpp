@@ -83,7 +83,6 @@ void print_enum(enum intersect_t val) {
   std::cerr << std::endl;
 }
 
-
 //used by: opt2b, opt2c, opt2d
 // function to update the 'lowest_index' variable if one of the points in either 'e1' or 'e1'
 // is lex. lower than current value in 'lowest_index'
@@ -1220,20 +1219,20 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
   if (retval.second) {  // successfully inserted edge.
     // check incidental edge 'before' if it intersects with 'e'
     if (bef) {
-      isval = checkIntersection2(e, before);
+      isval = checkIntersection(e, before);
       if (isval < IS_TRUE) {
 //        std::cerr << "No intersection with before." << std::endl;
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {
-        std::cerr << "4P collinearity between:" << e << " and before: " << before << std::endl;
+//        std::cerr << "4P collinearity between:" << e << " and before: " << before << std::endl;
         if (coll4Swap(e, before, idx, edgeS, polygon, points, lowest_index)) {
-          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
+//          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
           valid = E_COLLINEAR;
         }
       }
       else {
-        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+//        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
 
         //preparing for insertion of the edge not connected to 'idx' into 'edgeS'
         std::vector<unsigned int> vertices {(*e.p1).v, (*e.p2).v, (*before.p1).v, (*before.p2).v};
@@ -1254,7 +1253,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
       		}
       	}
       	if (((*new_edge.p1).l < (*idx).l) && ((*idx).l < (*new_edge.p2).l)) {
-      		std::cerr << "before flip insertion: " << new_edge << std::endl;
+//      		std::cerr << "before flip insertion: " << new_edge << std::endl;
 //      		std::cerr << "at idx: " << *idx << std::endl;
       		std::pair<std::set<Edge>::iterator,bool> retval;
       		retval = edgeS.insert(new_edge);
@@ -1266,9 +1265,9 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
     }
     // check incidental edge 'after' if it intersects with 'e'
     if (af && (valid == E_VALID)) {
-      isval = checkIntersection2(e, after);
+      isval = checkIntersection(e, after);
       if (isval < IS_TRUE) {
-//        std::cerr << "No intersection with before." << std::endl;
+//        std::cerr << "No intersection with after." << std::endl;
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {
@@ -1279,7 +1278,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
         }
       }
       else {
-        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
+//        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
 
         //preparing for insertion of the edge not connected to 'idx' into 'edgeS'
         std::vector<unsigned int> vertices {(*e.p1).v, (*e.p2).v, (*after.p1).v, (*after.p2).v};
@@ -1302,7 +1301,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
       		}
       	}
       	if (((*new_edge.p1).l < (*idx).l) && ((*idx).l < (*new_edge.p2).l)) {
-      		std::cerr << "after flip insertion: " << new_edge << std::endl;
+//      		std::cerr << "after flip insertion: " << new_edge << std::endl;
 //      		std::cerr << "at idx: " << *idx << std::endl;
       		std::pair<std::set<Edge>::iterator,bool> retval;
       		retval = edgeS.insert(new_edge);
