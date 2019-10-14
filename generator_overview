@@ -6,6 +6,7 @@ This is a list of all known (all that we know) algorithms for generating a rando
 	Link: 			You can find it in literature/move_approach/
 	Year: 			1991
 	Approach: 		Moving vertices around
+	Polygon type: 	Simple
 	Description:
 		- Start with regular polygon
 		- Assign each vertex a random velocity in a random direction
@@ -22,6 +23,7 @@ This is a list of all known (all that we know) algorithms for generating a rando
 	Based on: 		(1)
 	Year: 			1996
 	Approach: 		Moving vertices around
+	Polygon type: 	Simple
 	Description:
 		- Start with a starshaped polygon generated from a given pointset
 		- Randomly choose a vertex, generate a random translation vector,
@@ -34,6 +36,7 @@ This is a list of all known (all that we know) algorithms for generating a rando
 	Link: 			https://www.researchgate.net/publication/220707337_Constructing_random_polygons
 	Year: 			2008
 	Approach: 		Inserting new vertices
+	Polygon type: 	Simple
 	Description:
 		- Start with a random triangle (vertices a randomly choosen)
 		- (n-3) choose randomly one edge of the polygon, delete it, compute the set of all points
@@ -48,6 +51,7 @@ This is a list of all known (all that we know) algorithms for generating a rando
 	Link: 			https://ilyasergey.net/papers/polygons-draft.pdf
 	Year: 			2016
 	Approach: 		Attachment of small polygons onto larger polygons
+	Polygon tpye: 	Simple with fixed shape subpolygons
 	Description:
 		- Start with a small polygon and attach other polygons onto it
 		- It is necessary to check for simplicity for each attachment
@@ -60,9 +64,50 @@ This is a list of all known (all that we know) algorithms for generating a rando
 	Based on: 		TODO
 	Year: 			2013
 	Approach: 		Randomly connecting a set of vertices
+	Polygon type: 	Simple
 	Description:
 		- Computes convex layers of a pointset
 		- Connects adjacent convex layers by finding "End visible" pairs of edges in the layers
 			and replacing them by connecting edges
 		- Can not generate each possible polygon
-		- Complexity: O(n^2)
+		- Complexity: O(n²)
+
+6.
+	Author: 		Zhu, Sundaram, Snoeyink, Mitchell
+	Publication: 	Generating random polygons with given vertices
+	Link: 			https://www.sciencedirect.com/science/article/pii/0925772195000313
+	Year: 			1996
+
+	A:
+
+	Approach: 		Randomly connecting a set of vertices
+	Polygon type: 	Simple, x-monotone
+	Description:
+		- Computes one of all possible x-monotone polygons from a vertex set uniformly distributed
+		- Count all possible x-monotone polygons on a sorted pointsetby scanning forward, then
+			picking a random number and scanning to generate the polygon
+		- Complexity: O(n²)
+
+	B:
+
+	Approach: 		Randomly connecting a subset of a set of vertices
+	Polygon type: 	Simple, convex
+	Description:
+		- Count all possible random polygons and randomly choose one
+		- Complexity: O(n³)
+
+7.
+	Author: 		Crain
+	Publication: 	The Monte-Carlo generation of random polygons
+	Link: 			
+	Year: 			1978
+	Approach: 		
+	Description:
+
+8.
+	Author: 		Miles
+	Publication: 	Random polygons determined by random lines in a plane
+	Link: 			
+	Year: 			1964
+	Approach: 		
+	Description:
