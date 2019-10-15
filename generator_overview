@@ -16,19 +16,132 @@ This is a list of all known (all that we know) algorithms for generating a rando
 		- Uses just simply brute force for checking simplicity
 		- Does a specific number of moves per vertex
 
+
 2.
 	Author: 		Auer, Held
 	Publication: 	Heuristics for the Generation of Random Polygons (Chapter 2.1)
-	Link: 			We have a print
-	Based on: 		(1)
+	Link: 			We have a print	
 	Year: 			1996
+
+	A:
+
+	Based on: 		(1)
 	Approach: 		Moving vertices around
 	Polygon type: 	Simple
 	Description:
+		- Named Bouncing Vertices
 		- Start with a starshaped polygon generated from a given pointset
 		- Randomly choose a vertex, generate a random translation vector,
 			check simplicity of the translation and apply
 		- Uses just simply brute force for checking simplicity
+
+	B:
+
+	Approach: 		Connecting vertices of a pointset
+	Polygon type: 	Simple, starshaped
+	Description:
+		- Named Star Arrange
+		- Starts with computing the arrangement of all lines and the possible kernels
+		- Chooses randomly one cell of the arrangement to start the polygon with
+			and successivelly add the neighboring cells which are part of the same kernel
+		- Complexity: O(n⁴)
+
+	C:
+
+	Approach: 		Connecting vertices of a pointset
+	Polygon type: 	Simple, starshaped
+	Description:
+		- Named Star Universe
+		- At first it computes all intersection points of the lines
+		- Scans along each line and keeps track of the current polygons to the left and right,
+			searches for intersections and corrects them by switching the ordering of the
+			vertices in the polygon
+		- As polygons may be encountered more than once during the execution it is necessary to
+			keep track of all the polygons produced so far
+		- Complexity: O(n³)
+
+	D:
+
+	Approach: 		Connecting vertices of a pointset
+	Polygon type: 	Simple, starshaped
+	Description:
+		- Named Quick Star
+		- Triangulate the convex hull of the pointset
+		- Choose a random triangle of the triangulation with probabilities proportional to the
+			triangle areas
+		- Choose a random point in the choosen triangle and sort all other points around this
+			point
+		- Complexity: O(nlogn)
+
+	E:
+
+	Approach: 		Connecting vertices of a pointset
+	Polygon type: 	Simple
+	Description:
+		- Named Steady Growth
+		- Incremental construction by adding points to an existing polygon
+		- For addition: remove one edge from the polygon which can be seen completelly by the
+			point and add edges to the point
+		- To make sure that each point can be added during the process, each insertion must
+			be executed with the condition, that none of the non-added vertices is allowed to lay
+			in the convex hull of the polygon
+		- Can not generate each possible polygon and even can not generated a polygon using all 
+			points for each pointset
+		- Complexity: O(n²)
+
+	F:
+
+	Approach: 		Connecting vertices of a pointset
+	Polygon type: 	Simple
+	Description:
+		- Named Space Partitioning
+		- Divide & Conquer approach deviding the pointset recursivelly into subsets with disjoint
+			convex hulls
+		- At each division exactly one point must lay on the dividing line which later connects the
+			subpolygons created by the divided subsets (for the first division two points form the
+			dividing line)
+		- Can not generate all possible polygons
+		- Complexity: O(n²)
+
+	G:
+
+	Approach: 		Connecting vertices of a pointset
+	Polygon type: 	Simple, uniformly distributed
+	Description:
+		- Named Permute & Reject
+		- Generate random permutations of the pointset until one forms a simple polygon
+		- Complexity: 
+			Be v(n) the ration of simple polygons to polygons
+			With Chazelle: O(n v(n))
+			Otherwise: O(n logn v(n))
+
+	H:
+
+	Based on: 		(6c)
+	Approach: 		Connecting vertices of a pointset
+	Polygon type: 	Simple
+	Description:
+		- Named 2-Opt Moves
+		- Chooses any permuation at random and computes the set of selfintersections
+		- As long as there are intersections, take one of these at random, replace the involved
+			edge by the other edges between their points, remove all intersections involving
+			the removed edges and compute intersections of the new edges
+		- Complexity: O(n⁴)
+
+	I:
+
+	Approach: 		Connecting vertices of a pointset
+	Polygon type: 	Simple
+	Description:
+		- Named Construction & Backtracking
+		- Incrementally constructs a polygons by adding randomly selected points to a polygonal
+			chain
+		- Backtracks if the resulting polygon is not simple anymore or if it is clear
+			that the chain can not be completed
+		- Uses a graph of all edges which still do not intersect any of the polygons edges and
+			contain no already used point (in the beginning the complete graph of the pointset)
+		- Can generate each possible polygon
+		- Complexity: O(n³)
 
 3.
 	Author: 		Dailey, Whitfield
@@ -44,6 +157,7 @@ This is a list of all known (all that we know) algorithms for generating a rando
 			polygon), triangulate this polygon and choose randomly a new point out of this polygon
 		- Claims that all possible polygons can be reached
 
+
 4.
 	Author: 		Sergey
 	Publication: 	Growing and Shrinking Polygons for Random Testing of Computational Geometry
@@ -56,6 +170,7 @@ This is a list of all known (all that we know) algorithms for generating a rando
 		- Start with a small polygon and attach other polygons onto it
 		- It is necessary to check for simplicity for each attachment
 		- No complexity is given their, but I can not believe that this is fast
+
 
 5.
 	Author: 		Sadhu, N. Kumar, B. Kumar
@@ -71,6 +186,7 @@ This is a list of all known (all that we know) algorithms for generating a rando
 			and replacing them by connecting edges
 		- Can not generate each possible polygon
 		- Complexity: O(n²)
+
 
 6.
 	Author: 		Zhu, Sundaram, Snoeyink, Mitchell
@@ -96,6 +212,17 @@ This is a list of all known (all that we know) algorithms for generating a rando
 		- Count all possible random polygons and randomly choose one
 		- Complexity: O(n³)
 
+	C:
+
+	Appraoch: 		Randomly connecting a set of vertices
+	Polygon type:
+	Description:
+		- Generates a random permutation of the points
+		- Apply 2-Opt moves to intersecting pairs of edge till all intersections are fixed
+		- Can generate all possible polygons, but not uniformly distributed
+		- Complexity: O(n³)
+
+
 7.
 	Author: 		Crain
 	Publication: 	The Monte-Carlo generation of random polygons
@@ -103,6 +230,7 @@ This is a list of all known (all that we know) algorithms for generating a rando
 	Year: 			1978
 	Approach: 		
 	Description:
+
 
 8.
 	Author: 		Miles
