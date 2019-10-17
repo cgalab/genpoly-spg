@@ -861,7 +861,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
   if (retval.second) {  // successfully inserted edge.
     // check incidental edge 'before' if it intersects with 'e'
     if (bef) {
-      isval = checkIntersection2(e, before);
+      isval = checkIntersection(e, before);
       if (isval < IS_TRUE) {
 //        std::cerr << "No intersection with before." << std::endl;
         valid = E_VALID;
@@ -884,7 +884,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     }
     // check incidental edge 'after' if it intersects with 'e'
     if (af && (valid == E_VALID)) {
-      isval = checkIntersection2(e, after);
+      isval = checkIntersection(e, after);
       if (isval < IS_TRUE) {
 //        std::cerr << "No intersection with before." << std::endl;
         valid = E_VALID;
@@ -962,7 +962,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
   if (retval.second) {  // successfully inserted edge.
     // check incidental edge 'before' if it intersects with 'e'
     if (bef) {
-      isval = checkIntersection2(e, before);
+      isval = checkIntersection(e, before);
       if (isval < IS_TRUE) {
 //        std::cerr << "No intersection with before." << std::endl;
         valid = E_VALID;
@@ -985,7 +985,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
     }
     // check incidental edge 'after' if it intersects with 'e'
     if (af && (valid == E_VALID)) {
-      isval = checkIntersection2(e, after);
+      isval = checkIntersection(e, after);
       if (isval < IS_TRUE) {
 //        std::cerr << "No intersection with after." << std::endl;
         valid = E_VALID;
