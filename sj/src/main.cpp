@@ -84,22 +84,22 @@ int main(int argc, char *argv[]) {
           returnValue = opt2b(polygon, points, randseed);
         }
         else if (alg == A_2OPT_C) {
-            returnValue = opt2c(polygon, points, randseed);
+          returnValue = opt2c(polygon, points, randseed);
         }
         else if (alg == A_2OPT_D) {
-            returnValue = opt2c(polygon, points, randseed);
+          returnValue = opt2c(polygon, points, randseed);
         }
         else if (alg == A_2OPT_E) {
-            returnValue = opt2e(polygon, points, randseed);
+          returnValue = opt2e(polygon, points, randseed);
         }
         else if (alg == A_2OPT_F) {
-            returnValue = opt2f(polygon, points, randseed);
+          returnValue = opt2f(polygon, points, randseed);
         }
         else if (alg == A_2OPT_G) {
-            returnValue = opt2g(polygon, points, randseed);
+          returnValue = opt2g(polygon, points, randseed);
         }
         else if (alg == A_STAR) {
-            returnValue = star(polygon, points, randseed);
+          returnValue = star(polygon, points, randseed);
         }
         else if (alg == A_HOLE) {
 

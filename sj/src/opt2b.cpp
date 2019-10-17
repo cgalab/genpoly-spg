@@ -48,15 +48,17 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 	Point *p1, *p2, *p3;
 	Edge e1, e2;
   bool loop, revert;
-//  bool debug=false;
+  //bool debug=true;
+  unsigned int count_intersections=0, count_reversals=0, count_total_passes=0;
   std::set<Edge> edgeS; // a sweep-line-status object.
   //double circumference;
-  std::map<double, unsigned int> circ, c_counter;
-  std::map<double, unsigned int>::iterator c_it;
+  //std::map<double, unsigned int> circ, c_counter;
+  //std::map<double, unsigned int>::iterator c_it;
 
   collinear_index = points.size();
   duration = elapsed();
   do {
+    ++count_total_passes;
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     //circumference = pol_calc_circumference(polygon, points);
     //c_it = circ.find(circumference);
@@ -79,14 +81,15 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
   	while (index < points.size()) {
 
-  //    if (index > 3437 && index < 3503) {
-  //      debug = true;
-  //      std::cerr << std::endl << "edges in 'edgeS':" << std::endl;
-  //      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
-  //    }
-  //    else debug = false;
+//      if (442 < index && index < 495) {
+//        debug = true;
+//        std::cerr << std::endl << "edges in 'edgeS':" << std::endl;
+//        for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+//      }
+//      else debug = false;
 
-  //    if (debug) {std::cerr << "i: " << index << ", l_i: " << lowest_index << ", c_i: " << collinear_index << ", loop: " << loop << ", rev: " << ((revert) ? "T" : "F") << ", p_status: ";print_enum(p_status); std::cerr << std::endl;}
+//      if (debug) {std::cerr << "i: " << index << ", l_i: " << lowest_index << ", c_i: " << collinear_index << ", loop: " << loop << ", rev: " << ((revert) ? "T" : "F") << ", p_status: ";print_enum(p_status); std::cerr << std::endl;}
+//      std::cerr << "i: " << index << ", l_i: " << lowest_index << ", c_i: " << collinear_index << ", loop: " << loop << ", rev: " << ((revert) ? "T" : "F") << ", p_status: ";print_enum(p_status); std::cerr << std::endl;
   		val1.first = E_VALID; val2.first = E_VALID;
   		// get the current point at 'index'
   		p1 = &points[lex[index]];
@@ -98,7 +101,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   		p3 = &points[polygon[after]];
 
       // construct the edges
-  //    (debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
+//      (debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
       // collinearity was found, force advancing right.
       if (p_status == P_DIRTY_RIGHT) {
         if (*p2 < *p3) {
@@ -143,19 +146,18 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //            (debug) ? std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
 //            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
           if (coll3Swap(p1, p2, p3, edgeS, polygon, points, lowest_index)) {
+            ++count_intersections;
 //              (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
 //              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
             loop = true;
-            //if (p_status == P_CLEAN &&  revert) {p_status = P_DIRTY_LEFT;collinear_index=index;}
-            if (p_status == P_CLEAN) {p_status = P_DIRTY_RIGHT;collinear_index=index-1;}
+            p_status = P_DIRTY_RIGHT;
+            collinear_index=index-1;
             continue;
           }
         } //else std::cerr << "no collinearity found." << std::endl;
       }
 
       //process first edge
-      //if ((revert && (*e1.p1 == *p1)) || !revert && (*e1.p2 == *p1)) {
-      //if (!(revert ^ (*p1 == *e1.p1)))
       if ( ((p_status == P_CLEAN) && !(revert ^ (*p1 == *e1.p1)))
         || ((p_status == P_DIRTY_RIGHT) && (*p1 == *e1.p2))
         || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e1.p1)) )
@@ -165,6 +167,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        (debug) ? std::cerr << "val1: " << val1.first << std::endl : std::cerr;
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) { // intersection found in the removal, skip the rest and restart.
+          ++count_intersections;
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if ( ((p_status == P_CLEAN) && !(revert ^ (*p1 == *e2.p1)))
             || ((p_status == P_DIRTY_RIGHT) && (*p1 == *e2.p2))
@@ -184,18 +187,18 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         }
       }
       else {
-
 //        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
         val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);
 //        (debug) ? std::cerr << "val1: " << val1.first << std::endl : std::cerr;
         if (val1.first == E_NOT_VALID) break;
         if (val1.first == E_COLLINEAR) {
+          ++count_intersections;
           loop=true;
-          //if (p_status == P_CLEAN   revert) {p_status = P_DIRTY_LEFT;collinear_index=index;}
           if (p_status == P_CLEAN) {p_status = P_DIRTY_RIGHT;collinear_index=index-1;}
           continue;
         }
         if (val1.first == E_INTERSECTION) {
+          ++count_intersections;
           loop=true;
           if (p_status == P_CLEAN) revert=true;
           continue;
@@ -203,7 +206,6 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       }
 
       // process second edge
-      //if ((revert && (*e2.p1 == *p1)) || (!revert && (*e2.p2 == *p1))) {
       if ( ((p_status == P_CLEAN) && !(revert ^ (*p1 == *e2.p1)))
         || ((p_status == P_DIRTY_RIGHT) && (*p1 == *e2.p2))
         || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e2.p1)) )
@@ -213,12 +215,13 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        (debug) ? std::cerr << "val2: " << val2.first << std::endl : std::cerr;
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_COLLINEAR) {
+          ++count_intersections;
           loop=true;
-          //if (p_status == P_CLEAN &&  revert) {p_status = P_DIRTY_LEFT;collinear_index=index;}
           if (p_status == P_CLEAN) {p_status = P_DIRTY_RIGHT;collinear_index=index-1;}
           continue;
         }
         if (val2.first == E_INTERSECTION) {
+          ++count_intersections;
           loop=true;
           if (p_status == P_CLEAN) revert=true;
           continue;
@@ -230,23 +233,19 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        (debug) ? std::cerr << "val2: " << val2.first << std::endl : std::cerr;
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_INTERSECTION) {
+          ++count_intersections;
           // if e1 was inserted "in front of" the index, it needs to be removed.
-          //if ( ((p_status == P_CLEAN) && !(revert ^ (*p1 == *e1.p1)))
-          //  || ((p_status == P_DIRTY_RIGHT) && (*p1 == *e1.p1))
-          //  || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e1.p2)) )
-          //{
-          //std::cerr << "removing e1: " << e1 << std::endl;
+//          (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
           val2_1 = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
 //          (debug) ? std::cerr << "val2_1: " << val2_1 << std::endl : std::cerr;
           if (val2_1 == E_NOT_VALID) break;
-          //}
           loop=true;
           if (p_status == P_CLEAN) revert=true;
           continue;
         }
         // the index can repeat in case of collinearity
         if (val2.first == E_COLLINEAR) {
-          //if (p_status == P_CLEAN &&  revert) {p_status = P_DIRTY_LEFT;collinear_index=index;}
+          ++count_intersections;
           if (p_status == P_CLEAN) {p_status = P_DIRTY_RIGHT;collinear_index=index-1;}
           loop = true;
           continue;
@@ -259,6 +258,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         lowest_index = points.size();
         p_status = P_CLEAN;
         revert = false;
+        ++count_reversals;
         continue;
       }
       if ((collinear_index == index) && (p_status == P_DIRTY_RIGHT)) {
@@ -266,9 +266,9 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         lowest_index = points.size();
         p_status = P_CLEAN;
         revert = false;
+        ++count_reversals;
         ++index;
       }
-      //else if (p_status == P_DIRTY_LEFT) index = (points.size() + index - 1) % points.size();
   		else if ((p_status == P_CLEAN) && revert) --index;
       else ++index;
 //      std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
@@ -279,6 +279,9 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   } while (loop);
   duration = elapsed();
   std::cout << "Time elapsed: " << duration << std::endl;
+  std::cout << "Total passes: " << count_total_passes << std::endl;
+  std::cout << "Intersections: " << count_intersections << std::endl;
+  std::cout << "Reversals: " << count_reversals << std::endl;
 
 	return retval;
 }
