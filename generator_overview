@@ -226,16 +226,40 @@ This is a list of all known (all that we know) algorithms for generating a rando
 7.
 	Author: 		Crain
 	Publication: 	The Monte-Carlo generation of random polygons
-	Link: 			
+	Link: 			Was not able to find that
 	Year: 			1978
 	Approach: 		
 	Description:
 
 
 8.
-	Author: 		Miles
-	Publication: 	Random polygons determined by random lines in a plane
-	Link: 			
-	Year: 			1964
-	Approach: 		
+	Author: 		Tomas, Bajuelos
+	Publication: 	Quadratic-time linear-space alogrithms for generating orthogonal polygons with
+					a given number of vertices
+	Link: 			https://www.researchgate.net/publication/221432871_Quadratic-Time_Linear-Space_Algorithms_
+					for_Generating_Orthogonal_Polygons_with_a_Given_Number_of_Vertices
+	Year: 			2004
+	Approach: 		Attaching orthogonal onto each other
+	Polygon tpye: 	Simple, orthogonal
 	Description:
+		- Inflates orthogonal polygon and then cuts part of the inflated or attaches something new
+		- Don't understand the details :O
+		- Complexity: O(n^2)
+
+9.
+	Author: 		Sadhu, Hazaraki, Jain, Basu, De
+	Publication: 	GRP_CH heuristics for generating random simple polygons
+	Link: 			https://www.researchgate.net/publication/266942388_GRP_CH_Heuristic_for_Generating_Random_Simple_Polygon
+	Year: 			2012
+	Approach: 		Randomly connecting a set of vertices
+	Polygon type: 	Simple
+	Description:
+		- Namend GRP_CH
+		- Construct the convex hull by means of Graham's scan
+		- Randomly choose one point, compute all fully visible edges form this point and insert
+			into one of those
+		- Visibility is checked by brute force searching for intersections with the actual polygon
+			edges
+		- Gets restarted, if there is no fully visible edge for a point
+		- Can not obtain each possible polygon
+		- Complextiy: O(n^3)
