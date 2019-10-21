@@ -160,7 +160,7 @@ public:
     if ((*p1).y < (*p2).y) return (*p2).y;
     else return (*p1).y;
   }
-  double getLowerLexIdx() const {
+  double getLowerLexIdx() const { // not necessary as p1 is always the lower lex. index.
     if ((*p1).l < (*p2).l) return (*p1).l;
     else return (*p2).l;
   }
@@ -294,11 +294,11 @@ public:
       // 3P coll.  Some determinant wasn't 0
       else {
         // when one determinant is 0, the other (so to speak) completely describes the relationship between the edges
-        if (fabs(det1) + fabs(det2) == 0) {
+        if (fabs(det1) + fabs(det2) == 0) { // possibly not needed as if count > 1, it's 4pc.
           if (fabs(det3) == 0) return  std::signbit(det4);
           if (fabs(det4) == 0) return  std::signbit(det3);
         }
-        if (fabs(det3) + fabs(det4) == 0) {
+        if (fabs(det3) + fabs(det4) == 0) { // possibly not needed as if count > 1, it's 4pc.
           if (fabs(det1) == 0) return !std::signbit(det2);
           if (fabs(det2) == 0) return !std::signbit(det1);
         }
