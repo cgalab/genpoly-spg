@@ -37,17 +37,16 @@ enum error holes2(std::vector<std::vector<Point>>& sph, std::vector<Point>& poin
   // start with getting all c.h. points.
   std::vector<Point> ch;
   get_convex_hull(ch, points);
+//  std::cerr << "convex hull: " << std::endl;
+//  pdisplay(ch);
 
-  //double area = pol_calc_area(ch, points);
-
-  unsigned int nr_inner = points.size()-ch.size();
 	std::cerr << "holes: " << nr_holes << ", pol.size: " << polygon.size() << ", randseed: " << randseed << std::endl;
-
+  unsigned int nr_inner = points.size()-ch.size();
   std::cerr << "c.h. points: " << ch.size() << ", inner points: " << nr_inner << ", sph: " << sph.size() << std::endl;
 
   //if there are less than 3 inner points
-  if (points.size()-ch.size() < 3) return TOO_FEW_INNER_POINTS_FOR_HOLE;
-  if (points.size()-ch.size() == 3) {
+  if (nr_inner < 3) return TOO_FEW_INNER_POINTS_FOR_HOLE;
+  if (nr_inner == 3) {
     // get inner points
     std::vector<Point> ip;
     get_inner_points(ip, ch, points);
@@ -59,7 +58,7 @@ enum error holes2(std::vector<std::vector<Point>>& sph, std::vector<Point>& poin
   }
 
   if (points.size()-ch.size() > 3) {
-/*
+
     //std::vector<unsigned int> polygon;
     std::vector<Ends> ends;
 
@@ -70,14 +69,19 @@ enum error holes2(std::vector<std::vector<Point>>& sph, std::vector<Point>& poin
     // else try and return exactly 'nr_holes' holes
     if ((unsigned int)(nr_inner/3) < nr_holes) strict = false;
     else strict = true;
+    strict = false;
 
     do {
       // get a simple polygon to work with.
       if (polygon.size() == 0) opt2g(polygon, points, randseed);
+
       //set the simple polygon as the first polygon in 'sph'
-      for (unsigned int i = 0; i < polygon.size(); ++i) sph[0].push_back(points[polygon[i]]);
-      std::cerr << "=== The points in the simple polygon permutation ===" << std::endl;
-      pdisplay(sph[0]);
+      std::vector<Point> pp;
+      for (unsigned int i = 0; i < polygon.size(); ++i) pp.push_back(points[polygon[i]]);
+      sph.push_back(pp);
+//      std::cerr << "=== The points in the simple polygon permutation ===" << std::endl;
+//      pdisplay(sph[0]);
+
 
       // add the starting edges of all inner curves of the c.h. to 'ends' vector
       get_inner_chains_to_ch(ends, ch, polygon, points);
@@ -101,6 +105,8 @@ enum error holes2(std::vector<std::vector<Point>>& sph, std::vector<Point>& poin
       }
 
       std::cerr << "total (theoretically) possible holes " << total_holes << std::endl;
+
+/*
       if (strict) {
         if (total_holes < nr_holes) {
           ends.clear();
@@ -155,10 +161,10 @@ enum error holes2(std::vector<std::vector<Point>>& sph, std::vector<Point>& poin
       // * Let's say a primal pair has enough points to theoretically generate 5 holes
       //
 
-
-
-    } while ((strict && total_holes < nr_holes) || total_holes == 0);
 */
+
+} while (strict);//((strict && total_holes < nr_holes) || total_holes == 0);
+
     return SUCCESS;
   }
   return UNEXPECTED_ERROR;

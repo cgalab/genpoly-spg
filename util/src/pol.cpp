@@ -1554,15 +1554,15 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 
 // function to return the pairs of edges that are the beginning of a polygonal chain
 // that ends in incidental convex hull points.
-void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<Point>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   Point prev, p, next;
   unsigned int diff;
   bool is_left, inner;
 
   for (unsigned int i = 0; i < ch.size(); ++i) {
-    prev = points[ch[(ch.size() + i - 1) % ch.size()]];
-    p = points[ch[i]];
-    next = points[ch[(ch.size() + i + 1) % ch.size()]];
+    prev = ch[(ch.size() + i - 1) % ch.size()];
+    p = ch[i];
+    next = ch[(ch.size() + i + 1) % ch.size()];
 
     // get the difference in index distance between 'prev' and 'p'
     // it's just a quick check to make sure that the 2 convex hull points aren't connected by a single edge.
