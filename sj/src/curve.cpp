@@ -10,7 +10,7 @@
 #include "edge.h"
 #include "curve.h"
 #include "pol.h"
-#include "opt2.h" //needed to create polygons.
+#include "opt2g.h" //needed to create polygons.
 #include "rand.h"
 
 
@@ -31,17 +31,17 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 // Theorem of inner curves:  Every point on the convex hull is either connected to its incidental c.h. point directly,
 // or via an inner curve that ends in the incidental c.h. point.
 // This means we can traverse the c.h. points and find hole candidates from the start of all inner curves.
-enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int randseed, unsigned int nr_holes) {
+enum error holes2(std::vector<std::vector<Point>>& sph, std::vector<Point>& points, std::vector<unsigned int>& polygon, unsigned int randseed, unsigned int nr_holes) {
   assert(sph.size() == 0);
 
   // start with getting all c.h. points.
-  std::vector<unsigned int> ch;
-  get_convex_hull(ch, points, true);
+  std::vector<Point> ch;
+  get_convex_hull(ch, points);
 
-  double area = pol_calc_area(ch, points);
+  //double area = pol_calc_area(ch, points);
 
   unsigned int nr_inner = points.size()-ch.size();
-	std::cerr << "Area: " << area << ", holes: " << nr_holes << ", randseed: " << randseed << std::endl;
+	std::cerr << "holes: " << nr_holes << ", pol.size: " << polygon.size() << ", randseed: " << randseed << std::endl;
 
   std::cerr << "c.h. points: " << ch.size() << ", inner points: " << nr_inner << ", sph: " << sph.size() << std::endl;
 
@@ -49,7 +49,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
   if (points.size()-ch.size() < 3) return TOO_FEW_INNER_POINTS_FOR_HOLE;
   if (points.size()-ch.size() == 3) {
     // get inner points
-    std::vector<unsigned int> ip;
+    std::vector<Point> ip;
     get_inner_points(ip, ch, points);
     // append ch as the first vector of indexes to sph
     sph.push_back(ch);
@@ -57,8 +57,10 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
     sph.push_back(ip);
     return SUCCESS;
   }
+
   if (points.size()-ch.size() > 3) {
-    std::vector<unsigned int> polygon;
+/*
+    //std::vector<unsigned int> polygon;
     std::vector<Ends> ends;
 
     bool strict;
@@ -71,8 +73,11 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
 
     do {
       // get a simple polygon to work with.
-      opt2(polygon, points, randseed);
-      ++randseed;
+      if (polygon.size() == 0) opt2g(polygon, points, randseed);
+      //set the simple polygon as the first polygon in 'sph'
+      for (unsigned int i = 0; i < polygon.size(); ++i) sph[0].push_back(points[polygon[i]]);
+      std::cerr << "=== The points in the simple polygon permutation ===" << std::endl;
+      pdisplay(sph[0]);
 
       // add the starting edges of all inner curves of the c.h. to 'ends' vector
       get_inner_chains_to_ch(ends, ch, polygon, points);
@@ -80,9 +85,10 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       std::cerr << "ends: " << std::endl;
       // now I have to go through the ends and make sure that there are enough points in each inner polygonal chain to create desired # of holes
       for (unsigned int i=0; i < ends.size(); ++i) {
-        // get length of inner polygonal chain
+        // is_2D checks to see if the chain is somewhere non-collinear.
         if (is_2D(ends[i], polygon, points)) {
 //          std::cerr << "is 2D" << std::endl;
+          // get length of inner polygonal chain
           unsigned int diff = get_chain_length(ends[i], polygon.size());
           ends[i].nr_holes = (int)(diff/3);
           std::cerr << ends[i] << std::endl;
@@ -94,7 +100,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
         }
       }
 
-      std::cerr << "total inner polygonal chains: " << total_holes << std::endl;
+      std::cerr << "total (theoretically) possible holes " << total_holes << std::endl;
       if (strict) {
         if (total_holes < nr_holes) {
           ends.clear();
@@ -108,28 +114,20 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
         }
       }
 
-      // we can work with the current number of possible holes found in
-      // the pairs of I_Edges in 'ends' as they have been validated.
-      // first test: make the inner chains in 'ends' as holes as a first attempt
 
-      // what about:
-      // 1) add the whole polygon into sph[1]
-      // 2) for nr_holes: pick a random end, remove the hole from sph[1] and append it to sph
-      // after the first hole, I might have to quicksearch for the indexes to remove in sph[1]
-
-      //sph.push_back(polygon); // need to find and remove the pol. chain that forms the hole, found here below.
 
       for (unsigned int i=0; i < ends.size(); ++i) {
         std::cerr << "== Ends: " << i << "==" << std::endl;
-        //create a vector of indexes that for the points of the inner pol. chain.
+        //create a vector of indexes that form the points of the inner pol. chain.
         std::vector<unsigned int> inner_polygon;
         get_inner_chain_polygon(inner_polygon, ends[i], polygon);
-//        std::cerr << "== inner polygon: " << "==" << std::endl;
-//        pdisplay(inner_polygon, points);
+        //std::cerr << "== inner polygon: " << "==" << std::endl;
+        //pdisplay(inner_polygon, points);
         std::vector<Point> inner_points;
         get_inner_chain_points(inner_points, inner_polygon, points);
-//        std::cerr << "== inner points: " << "==" << std::endl;
-//        pdisplay(inner_points);
+        //std::cerr << "== inner points: " << "==" << std::endl;
+        //pdisplay(inner_polygon, inner_points);
+        // now we have the p.chain in inner_points and inner_polygon
 
         E_Edge h_e = inner_holes(inner_polygon, inner_points);
         std::cerr << "hole-edge: " << h_e << std::endl;
@@ -160,7 +158,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
 
 
     } while ((strict && total_holes < nr_holes) || total_holes == 0);
-
+*/
     return SUCCESS;
   }
   return UNEXPECTED_ERROR;
@@ -286,7 +284,7 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
       // Here we need to make a big decision..
       // Originally the inner polygonal chains were defined as 'curves' with
       // a starting point at the first lexicographical point of the curve (i.e. at a 'o<')
-      // So when 2 curves joines, we had the end pairs saved so we can create
+      // So when 2 curves joined, we had the end pairs saved so we can create
       // a new curve with the open ends of the 2 now joined curves.
 
       // If instead we create 2 chains from 'o<', I don't need to hunt down the ends.
@@ -512,15 +510,15 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
         continue;
       }
       else {
-//        std::cerr << "total edges: " << curves[r_c].edges.size() << std::endl;
+        std::cerr << "total edges: " << curves[r_c].edges.size() << std::endl;
         UniformRandomI(r_e, 0, (curves[r_c].edges).size()-1);
         break;
       }
     } while (curves.size() > 0);
   }
-//  std::cerr << "r_c: " << r_c << ", r_e: " << r_e << std::endl;
+  std::cerr << "r_c: " << r_c << ", r_e: " << r_e << std::endl;
   E_Edge r_edge = curves[r_c].edges[r_e];
-//  std::cerr << "random edge: " << r_edge << std::endl;
+  std::cerr << "random edge: " << r_edge << std::endl;
 
   return r_edge;
 }
