@@ -234,7 +234,7 @@ enum error writeOutIntFile(char *outFile, out_format_t outFormat, bool writeNew,
   return SUCCESS;
 }
 
-enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, std::vector< std::vector<unsigned int> >& sph, std::vector<Point>& points) {
+enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, std::vector< std::vector<Point> >& sph) {
   FILE *fout;
 
   if(writeNew) {
@@ -262,27 +262,27 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
       case OF_PERM:
         fprintf(fout, "#Polygon: %u\n", j+1);
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "%u\n", sph[j][i]);
+          fprintf(fout, "%u\n", sph[j][i].v);
         fprintf(fout, "\n");
         break;
       case OF_POLY:
-        if (j == 0) fprintf(fout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
+        if (j == 0) fprintf(fout, "%lf %lf %lf %lf\n", getXmin(sph[0]), getXmax(sph[0]), getYmin(sph[0]), getYmax(sph[0]));
         fprintf(fout, "%lu\n", sph[j].size());
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+          fprintf(fout, "%lf %lf\n", sph[j][i].x, sph[j][i].y);
         fprintf(fout, "\n");
         break;
       case OF_DAT:
         fprintf(fout, "# (index %u)\n", j);
         fprintf(fout, "# X   Y\n");
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
-        fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
+          fprintf(fout, "  %lf   %lf\n", sph[j][i].x, sph[j][i].y);
+        fprintf(fout, "  %lf   %lf\n", sph[j][0].x, sph[j][0].y);
         fprintf(fout, "\n\n");
         break;
       case OF_PURE:
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+          fprintf(fout, "%lf %lf\n", sph[j][i].x, sph[j][i].y);
         fprintf(fout, "\n");
         break;
       case OF_PURE_AND_PERM:

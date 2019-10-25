@@ -77,11 +77,20 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	else if(strcmp(optarg,"curve") == 0) {
 		*alg = A_CURVE;
 	}
-	else if(strcmp(optarg,"hole") == 0) {
+	else if(strcmp(optarg,"holes") == 0) {
 		*alg = A_HOLE;
 	}
 	else if(strcmp(optarg,"star") == 0) {
 		*alg = A_STAR;
+	}
+	else if(strcmp(optarg,"verify") == 0) {
+		*alg = A_VERIFY;
+	}
+	else if(strcmp(optarg,"verify_long") == 0) {
+		*alg = A_VERIFY_LONG;
+	}
+	else if(strcmp(optarg,"convert_format") == 0) {
+		*alg = A_CONVERT_FORMAT;
 	}
 	else {
 		*alg = A_UNDEFINED;
@@ -122,7 +131,7 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 enum error vFileInit(char *vFile, char *optarg) {
 	enum error returnValue = SUCCESS;
 	if(optarg[0] == 0) {
-		std::cerr << "Error: no input entered to verify polygonal data. Use -? for help." << std::endl;
+		std::cerr << "Error: no input file with polygonal data. Use -? for help." << std::endl;
 		returnValue = NO_VERIFY_FILE;
 	}
 	else if (optarg[0] == '-') {
@@ -141,7 +150,7 @@ enum error argInit(	int argc, char *argv[],
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
 										bool& writeNew, bool& area,	bool& circumference,
 										unsigned int& randseed, bool& checkSimple, unsigned int& holes,
-										char *vFile) {
+										char *vFile, bool& run_tests, bool& help) {
 	enum error returnValue = SUCCESS;
 	int comm;
 
@@ -152,20 +161,17 @@ enum error argInit(	int argc, char *argv[],
 		{"alg", required_argument, NULL, 'a'},
 		{"informat", required_argument, NULL, 'b'},
 		{"outformat", required_argument, NULL, 'c'},
-		{"verify", required_argument, NULL, 'v'},
-		{"verifylong", required_argument, NULL, 'l'},
+		{"holes", required_argument, NULL, 'h'},
+		{"pfile", required_argument, NULL, 'p'},
+		{"randseed", required_argument, NULL, 'r'},
 		{"area", no_argument, NULL, 'e'},
 		{"circumference", no_argument, NULL, 'f'},
-		{"randseed", required_argument, NULL, 'r'},
 		{"writenew", no_argument, NULL, 'w'},
-		{"simplecalc", no_argument, NULL, 's'},
-		{"holes", no_argument, NULL, 'h'},
-		{"convert", no_argument, NULL, 'k'},
 		{"help", no_argument, NULL, '?'},
 		{0, 0, 0, 0}
 	};
 
-	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:v:l:r:?efhkstw", long_options, NULL)) != -1) && returnValue == SUCCESS) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:efw?", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -189,8 +195,6 @@ enum error argInit(	int argc, char *argv[],
 				break;
 			case 'h':
 				holes = atoi(optarg);
-				*alg = A_HOLE;
-//				std::cerr << "Nr. of holes: " << holes << std::endl;
 				break;
 			case 'e':
 				area = true;
@@ -205,37 +209,35 @@ enum error argInit(	int argc, char *argv[],
 				checkSimple = true;
 				break;
 			case 't':
-				returnValue = RUN_TESTS; // needs no other arguments.
+				run_tests = true;
 				break;
-			case 'k':
-				returnValue = CONVERT_FORMAT; // must be the last argument.
-				break;
-			case 'v':
+			case 'p':
 				returnValue = vFileInit(vFile, optarg);
-				if (returnValue == SUCCESS) {
-					returnValue = RUN_SIMPLE_CHECK;
-				}
-				break;
-			case 'l':
-				returnValue = vFileInit(vFile, optarg);
-				if (returnValue == SUCCESS) {
-					returnValue = RUN_LONG_CHECK;
-				}
 				break;
 			case 'w':
 				writeNew = true;
 				break;
 			case '?':
-				returnValue = NO_ARGUMENTS;
+				help = true;
 				std::cerr << "Command line arguments:" << std::endl;
 				std::cerr << " -?, --help" << std::endl;
 				std::cerr << "             ignores any other argument and just prints this helpful information." << std::endl << std::endl;
+				std::cerr << " -a, --alg <arg>" << std::endl;
+				std::cerr << "           <arg> is the algorithm to be run:" << std::endl << std::endl;
+				std::cerr << "           2opt : calculates a simple random polygon based on Bentley-Ottman linesweep and the 2opt algorithm." << std::endl << std::endl;
+				std::cerr << "                 requires: infile, informat, outfile, outformat" << std::endl << std::endl;
+				std::cerr << "           star : calculates a simple random polygon that is a star-shaped polygon." << std::endl << std::endl;
+				std::cerr << "                 requires: infile, informat, outfile, outformat" << std::endl << std::endl;
+				std::cerr << "           holes : returns a simple polygon with simple holes." << std::endl << std::endl;
+				std::cerr << "                 requires: infile, informat, optional: pfile" << std::endl << std::endl;
+				std::cerr << "           convert_format : converts a point set from one file format to another." << std::endl << std::endl;
+				std::cerr << "                 requires: infile, informat, outfile, outformat" << std::endl << std::endl;
+				std::cerr << "           verify : checks whether a permutation of a point set is simple." << std::endl << std::endl;
+				std::cerr << "                 requires: infile, informat, pfile" << std::endl << std::endl;
 				std::cerr << " -i, --infile <string>" << std::endl;
 				std::cerr << "              <string> is the filename of a file containing a set of points." << std::endl << std::endl;
 				std::cerr << " -o. --outfile <string>" << std::endl;
 				std::cerr << "               <string> is the filename of a file with the processed output of the program." << std::endl << std::endl;
-				std::cerr << " -a, --alg <arg>" << std::endl;
-				std::cerr << "           <arg> can be '2opt' or 'hole' (without the '')." << std::endl << std::endl;
 				std::cerr << " -b, --informat <arg>" << std::endl;
 				std::cerr << "                <arg> can be:"  << std::endl;
 				std::cerr << "                     'points' : no header, each line: 'x y'" << std::endl;
@@ -247,6 +249,8 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << "                     'perm'   : each line as an index into the point set that was used." << std::endl;
 				std::cerr << "                     'poly'   : same as above for 'informat'" << std::endl;
 				std::cerr << "                     'dat'    : format that gnuplot understands and can plot." << std::endl << std::endl;
+				std::cerr << " -p, --pfile <string>" << std::endl;
+				std::cerr << "              <string> is the filename of a file where each line is an index into the point set given by infile." << std::endl << std::endl;
 				std::cerr << " -h, --holes <arg>" << std::endl;
 				std::cerr << "             <arg> is the number of holes desired." << std::endl << std::endl;
 				std::cerr << " -w, --writenew" << std::endl;
@@ -258,16 +262,6 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << "             option to print the circumference of the polygon to cout." << std::endl;
 				std::cerr << " -r, --randseed <arg>" << std::endl;
 				std::cerr << "                <arg> is an unsigned integer above 0." << std::endl << std::endl;
-				std::cerr << " -s, --simplecalc" << std::endl;
-				std::cerr << "              option to use a really slow check to verify simplicity and count intersections (if any)" << std::endl;
-				std::cerr << " -v, --verify <arg>" << std::endl;
-				std::cerr << "              <arg> is a file with a polygonal permutation of the point set, similar to 'perm' above." << std::endl;
-				std::cerr << "                    Verifies that the permutation is simple with a Bentley-Ottman linesweep algorithm" << std::endl;
-				std::cerr << " -l, --verifylong <arg>" << std::endl;
-				std::cerr << "              <arg> is a file with a polygonal permutation of the point set, similar to 'perm' above." << std::endl;
-				std::cerr << "                    Verifies that the permutation is simple with a slow n^2 intersection check" << std::endl;
-				std::cerr << " -k, --convert" << std::endl;
-				std::cerr << "              option to convert the infile to the outfile format; must be the last option." << std::endl;
 				std::cerr << " -t" << std::endl;
 				std::cerr << "   ignores all other arguments and runs the test-bed." << std::endl;
 				break;
