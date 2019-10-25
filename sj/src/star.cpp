@@ -22,7 +22,7 @@ enum error star(std::vector<unsigned int>& polygon, std::vector<Point>& points, 
   // To pick a random point inside for the 'center' point:
   // I need the convex hull
   std::vector<unsigned int> ch;
-  get_convex_hull(ch, points, true);
+  get_convex_hull(ch, points);
 
   // With the convex hull, I can use the first point, and go through each other 2 points and calculate the area.
   // as I only want to know which triangle the point should fall into, I can have a vector of doubles with the total sum of the triangles so far
