@@ -1199,7 +1199,7 @@ double pol_calc_circumference(std::vector<unsigned int>& polygon, std::vector<Po
   return circumference;
 }
 
-// function to calculate the area of a polygon.
+// function to calculate the area of a polygon given by points in 'points' and the permutation in 'polygon'.
 double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   double Area = 0;
   Point prev, p;
@@ -1209,6 +1209,26 @@ double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& poi
   // for each vertex in the polygon, index is the latter point
   for (index = 0; index < polygon.size(); ++index) {
     p = points[polygon[index]];
+
+    Area += p.y * prev.x - p.x * prev.y;
+    prev = p;
+  }
+
+  Area = Area / 2;
+  return Area;
+}
+
+// function to calculate the area of a polygon given by 'points'.
+// assumption: the vector is already in the order of the polygon.
+double pol_calc_area(std::vector<Point>& points) {
+  double Area = 0;
+  Point prev, p;
+  unsigned int index;
+
+  prev = points[points.size()-1];
+  // for each vertex in the polygon, index is the latter point
+  for (index = 0; index < points.size(); ++index) {
+    p = points[index];
 
     Area += p.y * prev.x - p.x * prev.y;
     prev = p;
@@ -1446,6 +1466,7 @@ bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& end
 }
 
 // function to fill 'inner_polygon' with the points defined by 'ends' from the polygon in 'inner_polygon' with points in 'points'
+// inner_polygon is changed to reflect the position in inner_points (i.e. becomes a unary monotonically increasing count from 0 to inner_points.size()).
 void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsigned int>& inner_polygon, std::vector<Point>& points) {
   assert(inner_polygon.size() > 2);
 
@@ -1499,7 +1520,7 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 
 	// start with getting all c.h. points.
 	std::vector<unsigned int> ch;
-	get_convex_hull(ch, points, true);
+	get_convex_hull(ch, points);
   //std::cerr << "ch: " << std::endl;
   //pdisplay(ch, points);
   // get all inner points.
@@ -1544,6 +1565,7 @@ void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& 
     next = points[ch[(ch.size() + i + 1) % ch.size()]];
 
     // get the difference in index distance between 'prev' and 'p'
+    // it's just a quick check to make sure that the 2 convex hull points aren't connected by a single edge.
     diff = get_lower_cyclic_difference(p.v, prev.v, polygon.size());
 //    std::cerr << "diff: " << diff << std::endl;
     //diff = 1 means the 2 c.h. points are connected by an edge.
@@ -1552,8 +1574,9 @@ void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& 
 //      std::cerr << "p: " << p << std::endl;
 //      std::cerr << "next: " << next << std::endl;
 
-      // 'p' and 'prev' create a 'inner' polygonal chain and an 'outer' polygonal chain.
-      // if 'next' is inside the 'inner' p. chain, then the inner curve defined by the 2 c.h. points is the 'outer' p. chain
+      // 'p' and 'prev' create a "inner" polygonal chain and an "outer" polygonal chain.
+      // [...outer...,'prev',...inner...,'p',...outer...] as an example
+      // if 'next' c.h. points is inside the 'inner' p. chain, then the inner curve defined by the 2 c.h. points is the 'outer' p. chain
       if (p.v > prev.v) {
         is_left = true;
         // check if 'next' is either lower than 'p' and higher than 'next'

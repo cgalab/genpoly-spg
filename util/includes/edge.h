@@ -479,6 +479,7 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2);
 enum intersect_t checkIntersection2(const Edge e1, const Edge e2);
 void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+void doFlip(unsigned int i1, unsigned int i2, std::vector<Point>& points);
 void flip2(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon);
 void poldisplay (std::vector<unsigned int>& p);
 

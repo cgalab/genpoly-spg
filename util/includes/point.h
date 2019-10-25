@@ -123,8 +123,10 @@ public:
 
 enum error verify_point_set(std::vector<Point>& points);
 double det(Point& pa, Point& pb, Point& p);
-void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points, bool enforceCCWOrder=false);
+void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points);
+void get_convex_hull(std::vector<Point>& ch, std::vector<Point>& points);
 void get_inner_points(std::vector<unsigned int>& ip, std::vector<unsigned int>& ch, std::vector<Point>& points);
+void get_inner_points(std::vector<Point>& ip, std::vector<Point>& ch, std::vector<Point>& points);
 bool isPolLeft(Point *p1, Point *p2, unsigned int cycle);
 bool isPol1Left(Point *p1, Point *p2, unsigned int cycle);
 bool isPol1Left(unsigned int p1, unsigned int p2, unsigned int cycle);
