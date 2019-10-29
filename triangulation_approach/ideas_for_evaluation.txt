@@ -58,6 +58,10 @@
 		- also includes area of polygon parts which are far away from the holes
 
 
+4. Convolutedness
+	
+
+
 What others did:
 	1. "Generating Random Polygons", J. O'Rourke
 		- 1. method: pretty similar to my first method with the expectation of a uniform distribution

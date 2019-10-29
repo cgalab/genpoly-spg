@@ -176,7 +176,7 @@ This is a list of all known (all that we know) algorithms for generating a rando
 	Author: 		Sadhu, N. Kumar, B. Kumar
 	Publication: 	Random Polygon Generation through Convex Layers
 	Link: 			https://www.sciencedirect.com/science/article/pii/S2212017313005331
-	Based on: 		TODO
+	Based on: 		(9)
 	Year: 			2013
 	Approach: 		Randomly connecting a set of vertices
 	Polygon type: 	Simple
@@ -226,10 +226,11 @@ This is a list of all known (all that we know) algorithms for generating a rando
 7.
 	Author: 		Crain
 	Publication: 	The Monte-Carlo generation of random polygons
-	Link: 			Was not able to find that
+	Link: 			https://reader.elsevier.com/reader/sd/pii/0098300478900821?token=CC351809F43DACCB87FAE7E4E1273564D6C008977C8190A84ED609EBE4EA30A5417032C5AB994EF9BB9FC387E946B398
 	Year: 			1978
 	Approach: 		
 	Description:
+		- Have not read that
 
 
 8.
