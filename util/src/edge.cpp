@@ -395,6 +395,49 @@ void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon
 	}
 }
 
+// flip a prat of point set 'points' from index: i1 to index: i2 .
+void doFlip(unsigned int i1, unsigned int i2, std::vector<Point>& points) {
+	//std::cout << "inside doFlip" << std::endl;
+	//std::cout << "flipping: i1: " << i1 << ", i2: " << i2 << std::endl;
+
+	Point t;
+	if (i1 < i2) {
+		while (i1 < i2) {
+			//std::cout << "i1: " << i1 << ", i2: " << i2 << std::endl;
+			//std::cout << "p[i1]: " << polygon[i1] << ", p[i2]: " << polygon[i2] << std::endl;
+			//std::cout << "p[p[i1]].v: " << points[polygon[i1]].v << ", p[p[i2]].v: " << points[polygon[i2]].v << std::endl;
+			t = points[i1];
+			points[i1] = points[i2];
+			points[i2] = t;
+			//std::cout << "p[i1]:" << polygon[i1] << ", p[i2]:" << polygon[i2] << std::endl;
+			++i1;
+			--i2;
+			//std::cout << "new i1:" << i1 << std::endl;
+			//std::cout << "new i2:" << i2 << std::endl;
+		}
+	}
+	else { // if i1 is higher than i2 we flip the outer polygonal chain
+		i2 += points.size();
+		//std::cout << "new i2: " << i2 << std::endl;
+
+		while(i1 < i2) {
+			//std::cout << "i1: " << i1 << ", i2: " << i2 << std::endl;;
+			//std::cout << "mod of i1: " << (i1 % points.size()) << std::endl;
+			//std::cout << "mod of i2: " << (i2 % points.size()) << std::endl;
+			//std::cout << "p[i1]: " << polygon[(i1 % points.size())] << ", p[i2]: " << polygon[(i2 % points.size())] << std::endl;
+			//std::cout << "p[p[i1]]: " << points[polygon[(i1 % points.size())]].v << ", p[p[i2]]: " << points[polygon[(i2 % points.size())]].v << std::endl;
+			t = points[(i1 % points.size())];
+			points[(i1 % points.size())] = points[(i2 % points.size())];
+			points[(i2 % points.size())] = t;
+			//std::cout << "p[i1]:" << polygon[(i1 % points.size())] << ", p[i2]:" << polygon[(i2 % points.size())] << std::endl;
+			++i1;
+			--i2;
+			//std::cout << "new i1:" << i1 << std::endl;
+			//std::cout << "new i2:" << i2 << std::endl;
+		}
+	}
+}
+
 // Only switches the 2 edges, does not reverse the whole polygonal chain.
 void flip2(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon) {
 	//std::cout << "inside flip" << std::endl;

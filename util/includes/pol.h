@@ -44,6 +44,7 @@ bool coll4Swap (Edge& e1, Edge& e2, Point *idx, std::set<Edge>& edgeS, std::vect
 bool collSwap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 double pol_calc_circumference(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& points);
+double pol_calc_area(std::vector<Point>& points);
 bool is_ascending(I_Edge e);
 bool is_ascending(unsigned int start, unsigned int stop, unsigned int cycle);
 unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle);
@@ -56,7 +57,7 @@ bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& end
 void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsigned int>& inner_polygon, std::vector<Point>& points);
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
 void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
-void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<Point>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points);
 
 #endif

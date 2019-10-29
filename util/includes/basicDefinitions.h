@@ -34,7 +34,9 @@ enum error {
   COINCIDENTAL_POINTS = 21,
   COLLINEAR_POINTS = 22,
   INTERSECTING_POINTS = 23,
-  INFINITE_LOOP = 24
+  INFINITE_LOOP = 24,
+  SIZE_NOT_EQUAL = 25,
+  HELP = 26
 };
 
 // the algorithms that should be selectable.
@@ -51,7 +53,10 @@ enum alg_t {
   A_2OPT_G,
   A_CURVE,
   A_HOLE,
-  A_STAR
+  A_STAR,
+  A_CONVERT_FORMAT,
+  A_VERIFY,
+  A_VERIFY_LONG
 };
 
 // the output format of the result.
