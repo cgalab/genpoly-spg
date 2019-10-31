@@ -73,7 +73,7 @@ enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       //circ[circumference] = 1;
     //}
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
-//    std::cerr << "looping" << std::endl;
+//    std::cerr << "looping: " << count_total_passes << std::endl;
     loop = false;
     coll_flag = false;
     reverse_flag = false;
@@ -86,7 +86,7 @@ enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 
   	while (index < points.size()) {
 
-//      if (1989 < index || index < 1990) {
+//      if (793 < index && index < 927) {
 //        debug = true;
 //        std::cerr << std::endl << "edges in 'edgeS':" << std::endl;
 //        for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
@@ -164,14 +164,14 @@ enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         //process first edge
         if (!(revert ^ (*p1 == *e1.p1))) {
 //        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
-          val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
+          val1.first = removeEdgeFromSetb(e1, lowest_index, highest_index, edgeS, polygon, points);
 //        if (debug) {std::cerr << "val1: "; print_enum(val1.first);}
           if (val1.first == E_NOT_VALID) break;
           if (val1.first == E_INTERSECTION) { // intersection found in the removal, skip the rest and restart.
             ++count_intersections;
             // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
             if (!(revert ^ (*p1 == *e2.p1))) {
-              val1_2 = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+              val1_2 = removeEdgeFromSetb(e2, lowest_index, highest_index, edgeS, polygon, points);
 //              if (debug) {std::cerr << "val1_2: "; print_enum(val1_2);}
               if (val1_2 == E_NOT_VALID) break; // the other conditions would be handled when handling 'e2' properly.  This error though has priority.
             }
@@ -184,35 +184,53 @@ enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points,
             ++count_intersections;
             // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
             if (!(revert ^ (*p1 == *e2.p1))) {
-              val1_2 = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+              val1_2 = removeEdgeFromSetb(e2, lowest_index, highest_index, edgeS, polygon, points);
 //              if (debug) {std::cerr << "val1_2: "; print_enum(val1_2);}
               if (val1_2 == E_NOT_VALID) break; // the other conditions would be handled when handling 'e2' properly.  This error though has priority.
             }
-            loop=true;
+            loop = true;
+            p_status = P_DIRTY_RIGHT;
+            coll_index = index;
+            revert = false;
+            coll_flag = true;
             continue;
           }
         }
         else {
 //          (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
-          val1 = processEdgef(e1, p1, lowest_index, edgeS, polygon, points);
+          val1 = processEdgef(e1, p1, lowest_index, highest_index, edgeS, polygon, points);
 //          if (debug) {std::cerr << "val1: "; print_enum(val1.first);}
           if (val1.first == E_NOT_VALID) break;
           if (val1.first == E_INTERSECTION) {++count_intersections;loop=true;reverse_flag=true;continue;}
-          if (val1.first == E_COLLINEAR) {++count_intersections;loop=true;continue;}
+          if (val1.first == E_COLLINEAR) {
+            ++count_intersections;
+            loop = true;
+            p_status = P_DIRTY_RIGHT;
+            coll_index = index;
+            revert = false;
+            coll_flag = true;
+            continue;}
         }
 
         // process second edge
         if (!(revert ^ (*p1 == *e2.p1))) {
 //          (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
-          val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+          val2.first = removeEdgeFromSetb(e2, lowest_index, highest_index, edgeS, polygon, points);
 //          if (debug) {std::cerr << "val2: "; print_enum(val2.first);}
           if (val2.first == E_NOT_VALID) break;
           if (val2.first == E_INTERSECTION) {++count_intersections;loop=true;reverse_flag=true;continue;}
-          if (val2.first == E_COLLINEAR) {++count_intersections;loop=true;continue;}
+          if (val2.first == E_COLLINEAR) {
+            ++count_intersections;
+            loop=true;
+            p_status = P_DIRTY_RIGHT;
+            coll_index = index;
+            revert = false;
+            coll_flag = true;
+            continue;}
         }
         else {
 //          (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
-          val2 = processEdgef(e2, p1, lowest_index, edgeS, polygon, points);
+          val2 = processEdgef(e2, p1, lowest_index, highest_index, edgeS, polygon, points);
 //          if (debug) {std::cerr << "val2: "; print_enum(val2.first);}
           if (val2.first == E_NOT_VALID) break;
           if (val2.first == E_INTERSECTION) {
@@ -237,6 +255,10 @@ enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points,
               if (val2_1 == E_NOT_VALID) break;
             }
             loop=true;
+            p_status = P_DIRTY_RIGHT;
+            coll_index = index;
+            revert = false;
+            coll_flag = true;
             continue;
           }
         }
