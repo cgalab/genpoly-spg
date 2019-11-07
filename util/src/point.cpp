@@ -184,7 +184,9 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<Point>& points) 
   // 'upper' and 'lower' both have the same start point, to return a CCW c.h.,
   // first add 'lower' to 'ch' then 'upper' minus the start
   ch.insert(ch.end(), lower.begin(), lower.end());
-  ch.insert(ch.end(), --upper.rbegin(), ++upper.rend());
+  ch.insert(ch.end(), ++upper.rbegin(), --upper.rend());
+//  std::cerr << "ch:" << std::endl;
+//  pdisplay(ch, points);
 }
 
 // function that fills the vector 'ch' with 'Point's that are the points on the convex hull
@@ -462,14 +464,21 @@ void fill_lex(std::vector<unsigned int>& lex, std::vector<unsigned int>& polygon
 
 // simple function to display points in a Point vector.
 void pdisplay (const std::vector<Point>& p) {
-  for (unsigned int i = 0; i < p.size(); i++) {
+  for (unsigned int i = 0; i < p.size(); ++i) {
     std::cerr << p[i] << std::endl;
   }
 }
 
 // simple function to display points in a Point vector.
 void pdisplay (const std::vector<unsigned int>& ind, const std::vector<Point>& p) {
-  for (unsigned int i = 0; i < ind.size(); i++) {
+  for (unsigned int i = 0; i < ind.size(); ++i) {
+    std::cerr << p[ind[i]] << std::endl;
+  }
+}
+
+// function to display points from one vertex to another
+void pdisplay (unsigned int start, unsigned int stop, const std::vector<unsigned int>& ind, const std::vector<Point>& p) {
+  for (unsigned int i = start; i != stop+1; i = (i+1)%p.size()) {
     std::cerr << p[ind[i]] << std::endl;
   }
 }

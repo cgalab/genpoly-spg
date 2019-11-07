@@ -144,6 +144,36 @@ public:
     else
       return *p1;
   }
+
+  unsigned int getVLow() const {
+    if ((*p1).v == 0) {
+      if ((*p2).v != 1) return (*p2).v;
+      else return (*p1).v;
+    }
+    if ((*p2).v == 0) {
+      if ((*p1).v != 1) return (*p1).v;
+      else return (*p2).v;
+    }
+    if ((*p1).v < (*p2).v)
+      return (*p1).v;
+    else
+      return (*p2).v;
+  }
+  unsigned int getVHigh() const {
+    if ((*p1).v == 0) {
+      if ((*p2).v != 1) return (*p1).v;
+      else return (*p2).v;
+    }
+    if ((*p2).v == 0) {
+      if ((*p1).v != 1) return (*p2).v;
+      else return (*p1).v;
+    }
+    if ((*p1).v < (*p2).v)
+      return (*p2).v;
+    else
+      return (*p1).v;
+  }
+
   double getxMin() const {
     if ((*p1).x < (*p2).x) return (*p1).x;
     else return (*p2).x;
@@ -460,7 +490,8 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const E_Edge& e) {
 		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
     << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
-    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id << "]";
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id
+    << "], cl: [" << (*e.closest.p1).i << "," << (*e.closest.p2).i << "]";
 		return os;
 	}
 };
