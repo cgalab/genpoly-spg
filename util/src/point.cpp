@@ -478,7 +478,7 @@ void pdisplay (const std::vector<unsigned int>& ind, const std::vector<Point>& p
 
 // function to display points from one vertex to another
 void pdisplay (unsigned int start, unsigned int stop, const std::vector<unsigned int>& ind, const std::vector<Point>& p) {
-  for (unsigned int i = start; i != stop+1; i = (i+1)%p.size()) {
+  for (unsigned int i = start; i != (stop+1)%p.size(); i = (i+1)%p.size()) {
     std::cerr << p[ind[i]] << std::endl;
   }
 }

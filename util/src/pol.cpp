@@ -2101,15 +2101,18 @@ bool coll4Swap4 (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned
 
   // go through the chains from lower to upper and add the point index into that index.
   index = 0;
-  for (unsigned int i=lower1; i <= upper1; i=(i+1)%points.size()) {
+  for (unsigned int i=lower1; i != (upper1+1)%points.size(); i=(i+1)%points.size()) {
+//    std::cerr << "index: " << index << ", i: " << i << std::endl;
     eraseVertexFromSet(&points[cp[index].i], edgeS, polygon, points);
     eraseVertexFromSet(&points[polygon[i]], edgeS, polygon, points);
     points[cp[index].i].v = i;
     polygon[i] = cp[index].i;
     index++;
   }
+//  std::cerr << "next loop" << std::endl;
   // we can continue with the same index position in 'cp'
-  for (unsigned int i=lower2; i <= upper2; i=(i+1)%points.size()) {
+  for (unsigned int i=lower2; i != (upper2+1)%points.size(); i=(i+1)%points.size()) {
+//    std::cerr << "index: " << index << ", i: " << i << std::endl;
     eraseVertexFromSet(&points[cp[index].i], edgeS, polygon, points);
     eraseVertexFromSet(&points[polygon[i]], edgeS, polygon, points);
     points[cp[index].i].v = i;
