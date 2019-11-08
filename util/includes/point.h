@@ -134,6 +134,7 @@ void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points);
 void fill_lex(std::vector<unsigned int>& lex, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void pdisplay (const std::vector< Point >& vy);
 void pdisplay (const std::vector<unsigned int>& ind, const std::vector<Point>& p);
+void pdisplay (unsigned int start, unsigned int stop, const std::vector<unsigned int>& ind, const std::vector<Point>& p);
 double getXmin(const std::vector<Point>& p);
 double getXmax(const std::vector<Point>& p);
 double getYmin(const std::vector<Point>& p);

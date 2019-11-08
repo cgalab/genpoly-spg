@@ -31,11 +31,14 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 // Theorem of inner curves:  Every point on the convex hull is either connected to its incidental c.h. point directly,
 // or via an inner curve that ends in the incidental c.h. point.
 // This means we can traverse the c.h. points and find hole candidates from the start of all inner curves.
-enum error holes2(std::vector<std::vector<Point>>& sph, std::vector<Point>& points, std::vector<unsigned int>& polygon, unsigned int randseed, unsigned int nr_holes) {
+enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, std::vector<unsigned int>& polygon, unsigned int randseed, unsigned int nr_holes) {
   assert(sph.size() == 0);
+  // variable for how many times you should generate a polygon to check for holes, skipped if a polygon is given.
+  unsigned int max_iterations = 500;
+  unsigned int count_iterations = 0;
 
   // start with getting all c.h. points.
-  std::vector<Point> ch;
+  std::vector<unsigned int> ch;
   get_convex_hull(ch, points);
 //  std::cerr << "convex hull: " << std::endl;
 //  pdisplay(ch);
@@ -48,7 +51,7 @@ enum error holes2(std::vector<std::vector<Point>>& sph, std::vector<Point>& poin
   if (nr_inner < 3) return TOO_FEW_INNER_POINTS_FOR_HOLE;
   if (nr_inner == 3) {
     // get inner points
-    std::vector<Point> ip;
+    std::vector<unsigned int> ip;
     get_inner_points(ip, ch, points);
     // append ch as the first vector of indexes to sph
     sph.push_back(ch);
@@ -62,94 +65,148 @@ enum error holes2(std::vector<std::vector<Point>>& sph, std::vector<Point>& poin
     //std::vector<unsigned int> polygon;
     std::vector<Ends> ends;
 
-    bool strict;
+    bool generate_polygons;
     unsigned int total_holes = 0;
 
-    // if true, any result that has 1 or more holes will be returned
-    // else try and return exactly 'nr_holes' holes
-    if ((unsigned int)(nr_inner/3) < nr_holes) strict = false;
-    else strict = true;
-    strict = false;
+    if (polygon.size() == 0) generate_polygons = true;
+    else generate_polygons = false;
 
+    // loop that would iterate over seeds to generate different simple polygons until nr_holes is reached,
+    // is skipped if a polygon is given.
     do {
+      if (sph.size() > 0) sph.clear();
       // get a simple polygon to work with.
-      if (polygon.size() == 0) opt2g(polygon, points, randseed);
-
-      //set the simple polygon as the first polygon in 'sph'
-      std::vector<Point> pp;
-      for (unsigned int i = 0; i < polygon.size(); ++i) pp.push_back(points[polygon[i]]);
-      sph.push_back(pp);
+      if (generate_polygons) opt2g(polygon, points, randseed);
+      // assign the polygon to sph[0] as sph[0] should always contain the simple polygon, and any/all holes are pushed below it.
+      sph.push_back(polygon);
 //      std::cerr << "=== The points in the simple polygon permutation ===" << std::endl;
-//      pdisplay(sph[0]);
-
+//      for (unsigned int i = 0; i < sph[0].size();++i) std::cerr << sph[0][i] << std::endl;
 
       // add the starting edges of all inner curves of the c.h. to 'ends' vector
-      get_inner_chains_to_ch(ends, ch, polygon, points);
+      get_inner_chains_to_ch(ends, ch, sph[0], points);
 
-      std::cerr << "ends: " << std::endl;
+//      std::cerr << "ends: " << std::endl;
       // now I have to go through the ends and make sure that there are enough points in each inner polygonal chain to create desired # of holes
-      for (unsigned int i=0; i < ends.size(); ++i) {
+      unsigned int i = 0;
+      do {
+//        std::cerr << "current end: "<< ends[i] << std::endl;
         // is_2D checks to see if the chain is somewhere non-collinear.
-        if (is_2D(ends[i], polygon, points)) {
+        if (is_2D(ends[i], sph[0], points)) {
 //          std::cerr << "is 2D" << std::endl;
           // get length of inner polygonal chain
-          unsigned int diff = get_chain_length(ends[i], polygon.size());
+          unsigned int diff = get_chain_length(ends[i], sph[0].size());
           ends[i].nr_holes = (int)(diff/3);
-          std::cerr << ends[i] << std::endl;
+
           total_holes = total_holes + ends[i].nr_holes;
+          ++i;
         }
         else {
 //          std::cerr << "not 2D" << std::endl;
+          //std::cerr << "end: " << *(std::next(ends.begin(),i)) << std::endl;
           ends.erase(std::next(ends.begin(),i));
+          //std::cerr << "after erase: " << *(std::next(ends.begin(),i)) << std::endl;
         }
-      }
+      } while (i < ends.size());
+      std::cerr << "total (theoretically possible) holes " << total_holes << std::endl;
 
-      std::cerr << "total (theoretically) possible holes " << total_holes << std::endl;
-
-/*
-      if (strict) {
-        if (total_holes < nr_holes) {
-          ends.clear();
-          continue;
-        }
-      }
-      else {
-        if (total_holes == 0) {
-          ends.clear();
-          continue;
-        }
-      }
+      std::cerr << "ends: " << std::endl;
+      for (unsigned int i=0; i < ends.size(); ++i) std::cerr << ends[i] << std::endl;
 
 
+//      if (strict) {
+//        if (total_holes < nr_holes) {
+//          ends.clear();
+//          continue;
+//        }
+//      }
+//      else {
+//        if (total_holes == 0) {
+//          ends.clear();
+//          continue;
+//        }
+//      }
 
-      for (unsigned int i=0; i < ends.size(); ++i) {
-        std::cerr << "== Ends: " << i << "==" << std::endl;
+      // Now we have the ends that form each inner polygonal chain.
+      // Best would be if we can:
+      //  1) randomly pick a chain,
+      //  2) make a hole (check if the chain can still make future holes, if not, delete the end)
+      // 3) check if we have enough holes, if not, go to 1)
+
+      // The problem with this is what if we selected for n holes, and n holes are possible,
+      // but we selected a hole that removes the option of more holes, such that we cannot have that many holes.
+
+      // i) we could decide that the # of holes is not guaranteed, and you have to play around with
+      // random seeds to maybe get the right number of holes (easy option)
+
+      // ii) we could also have an algorithm that can split up holes to increase the possible number of holes,
+      // but that still run up against i)
+
+      // iii) we could have it so that the hole that is in the deepest part of the chain is picked first,
+      // and all holes that can be picked from that first hole are picked which is closer to the ends.
+
+      // iv) if that's not enough, we would have to develop an algorithm to specifically create the c.h.,
+      // then create the holes as 3 point triangles, and then go through the points that haven't been assigned
+      // and add them to the nearest polygon
+
+      // I'm going to assume that #holes needed is always much smaller than total holes that could be made,
+      // and an algorithm that randomly picks a hole from an inner chain, and if that’s not enough,
+      // can split up holes in the same way should suffice.  If not, a new seed can be tested.
+
+      // pick a random chain, create a hole
+      unsigned int count_holes = 0;
+      do {
+        // select a random end
+        unsigned int r_end = 0;
+        if (randseed) mt.seed(randseed);
+        UniformRandomI(r_end, 0, ends.size()-1);
+        std::cerr << "random index: " << r_end << std::endl;
+        std::cerr << "Random end: " << ends[r_end] << std::endl;
+
         //create a vector of indexes that form the points of the inner pol. chain.
         std::vector<unsigned int> inner_polygon;
-        get_inner_chain_polygon(inner_polygon, ends[i], polygon);
-        //std::cerr << "== inner polygon: " << "==" << std::endl;
-        //pdisplay(inner_polygon, points);
+        get_inner_chain_polygon(inner_polygon, ends[r_end], sph[0]);
+//        std::cerr << "== inner polygon: " << "==" << std::endl;
+//        for (unsigned int i = 0; i < inner_polygon.size(); ++i) std::cerr << inner_polygon[i] << std::endl;
         std::vector<Point> inner_points;
         get_inner_chain_points(inner_points, inner_polygon, points);
-        //std::cerr << "== inner points: " << "==" << std::endl;
-        //pdisplay(inner_polygon, inner_points);
-        // now we have the p.chain in inner_points and inner_polygon
+//        std::cerr << "== inner points: " << "==" << std::endl;
+//        pdisplay(inner_points);
+        // now we have the points of the chain in 'inner_points' and the indices into 'points' in 'inner_polygon'
 
-        E_Edge h_e = inner_holes(inner_polygon, inner_points);
-        std::cerr << "hole-edge: " << h_e << std::endl;
+        // an E_Edge has a class property D_Edge: 'closest' as its closest edge, these 2 edges define 4 points we can use to make a hole.
+        E_Edge inner_hole = inner_holes(inner_points);
+        std::cerr << "inner_hole: " << inner_hole << std::endl;
+        std::cerr << "inner_hole.closest: " << inner_hole.closest << std::endl;
+        std::cerr << "original index edge #1.p1: " << inner_polygon[(*inner_hole.p1).i] << std::endl;
+        std::cerr << "original index edge #1.p2: " << inner_polygon[(*inner_hole.p2).i] << std::endl;
+        std::cerr << "original index edge #2.p1: " << inner_polygon[(*inner_hole.closest.p1).i] << std::endl;
+        std::cerr << "original index edge #2.p2: " << inner_polygon[(*inner_hole.closest.p2).i] << std::endl;
+        if (inner_hole != inner_hole.closest) {
+          std::cerr << "found a hole candidate!" << std::endl;
+          // the hole can be represented as a <unsigned int> vector of indices into points,
+          // as I don't do anything with the hole after making it,
+          // this could then be pushed into 'sph'.
+          // the new polygon can be a <Point> vector which overwrites 'polygon'
+          // so
+          std::vector<unsigned int> hole;
+          std::vector<unsigned int> new_polygon;
 
-        std::vector<unsigned int> hole;
-        std::vector<unsigned int> new_polygon;
-        get_hole_and_new_pol(hole, new_polygon, h_e, polygon, points);
-        sph.push_back(new_polygon);
-        sph.push_back(hole);
+          get_hole_and_new_pol(hole, new_polygon, inner_hole, sph[0], points);
+          sph[0] = new_polygon;
+          sph.push_back(hole);
+          ++count_holes;
+          if(!is_2D(ends[i], sph[0], points)) ends.erase(ends.begin()+r_end);
 
-        //std::cerr << "new polygon" << std:: endl;
-        //pdisplay (new_polygon, points);
-        //std::cerr << "hole:" << std::endl;
-        //pdisplay(hole, points);
-        break;
-      }
+          std::cerr << "new polygon" << std:: endl;
+          pdisplay (sph[0], points);
+          std::cerr << "new hole:" << std::endl;
+          pdisplay(hole, points);
+        }
+        else {
+          // no candidates were found, remove end from 'ends'
+          ends.erase(ends.begin()+r_end);
+        }
+      } while (count_holes < nr_holes);
 
 
 
@@ -161,9 +218,9 @@ enum error holes2(std::vector<std::vector<Point>>& sph, std::vector<Point>& poin
       // * Let's say a primal pair has enough points to theoretically generate 5 holes
       //
 
-*/
 
-} while (strict);//((strict && total_holes < nr_holes) || total_holes == 0);
+      ++count_iterations;
+    } while (generate_polygons && (count_iterations < max_iterations));
 
     return SUCCESS;
   }
@@ -232,10 +289,18 @@ bool check_ix_edges(E_Edge e1, E_Edge e2) {
 }
 
 //function to return the incidental edge of 'e' from the 'y_set'
-E_Edge get_inc_edge_from_set(E_Edge& e, std::vector<Curve>& curves, std::set<E_Edge>::iterator it) {
+// There are of course 2 incidental edges to most edges in a set, but as one side of an edge is always "inside"
+// the polygon and the other is then always "outside", only one edge is an incidental inside edge and thus usable to make a hole.
+E_Edge get_inc_edge_from_set(E_Edge& e, std::vector<Curve>& curves, std::set<E_Edge>::iterator it, std::set<E_Edge>& edges) {
   E_Edge inc_e;
-  if (curves[e.curve_id].bin) inc_e = *(std::prev(it));
-  else inc_e = *(std::next(it));
+  if (curves[e.curve_id].bin) {
+    if (it != edges.begin()) inc_e = *(std::prev(it));
+    else inc_e = e;
+  }
+  else {
+    if (it != --edges.end()) inc_e = *(std::next(it));
+    else inc_e = e;
+  }
   return inc_e;
 }
 
@@ -249,11 +314,17 @@ void update_edge_in_set(E_Edge& e, std::pair<std::set<E_Edge>::iterator, bool>& 
 //  std::cerr << "r: e1: " << (*retval1.first) << ", e1.closest: " << (*retval1.first).closest << std::endl;
 }
 
-E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+// A function to find and return an E edge which (along with it's 'closest' property) define a pair of edges that can be used to make a hole.
+// input:
+//        'points': assumed to be in the arrangement of the polygonal chain between 2 convex hull points.
+// return:
+//         a 'Ends' variable which defines 4 points in the polygon that can be split to make a hole.
+E_Edge inner_holes(std::vector<Point>& points) {
 
   //start with creating a vector for the lexicographically sorted indexes of 'points'
-  std::vector<unsigned int> lex (polygon.size());
-  fill_lex(lex, polygon, points);
+  std::vector<unsigned int> lex (points.size());
+  fill_lex(lex, points);
+//  std::cerr << "lex: " << std::endl;
 //  pdisplay(lex, points);
 
   // I need to do a linesweep over the lex points
@@ -267,24 +338,30 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
   Point *m, *l, *r; // m is the current point at lex. position 'i' and 'l' and 'r' are the 2 points it connects to by edges.
   bool isll, isrl; // are 'l' and 'r' points left of 'm'
   unsigned int count_open=0, count_cont=0, count_close=0; // just for development verification.
+  D_Edge temp = D_Edge(&points[0], &points[points.size()-1]);
 
+  // a sweep through the lex indices to check all edges for its 'closest' edge.
   for (unsigned int i = 0; i < lex.size()-1; ++i) {
+    std::cerr << std::endl << "i: " << i << std::endl;
     m = &points[lex[i]];
-    l = &points[polygon[(polygon.size() + (*m).v - 1) % polygon.size()]];
-    r = &points[polygon[(polygon.size() + (*m).v + 1) % polygon.size()]];
-//    std::cerr << "m: " << *m << ", l: " << *l << ", r: " << *r << std::endl;
+    l = &points[(points.size() + (*m).v - 1) % points.size()];
+    r = &points[(points.size() + (*m).v + 1) % points.size()];
+    std::cerr << "m: " << *m << ", l: " << *l << ", r: " << *r << std::endl;
 
     // create 2 new 'E_Edge's
     E_Edge e1 = E_Edge (m, l);
     E_Edge e2 = E_Edge (m, r);
+    e1.closest = temp;
+    e2.closest = temp;
+    std::cerr << "e1: " << e1 << std::endl;
+    std::cerr << "e2: " << e2 << std::endl;
 
-//    std::cerr << std::endl << "e1: " << e1 << ", e2: " << e2 << std::endl;
     // check for 'o<', '-o-', '>o' condition
     (*m < *l) ? isll = false : isll = true;
     (*m < *r) ? isrl = false : isrl = true;
 
     if (isll && isrl) {
-    //  std::cerr << "=== >o ===" << std::endl;
+      std::cerr << "=== >o ===" << std::endl;
       ++count_close;
 
       // Here we need to make a big decision..
@@ -311,14 +388,15 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
       // find 'e1' in 'y_set' and update with values of the edge in 'y_set'
       retval1.first = y_set.find(e1);
       assert(*(retval1.first) == e1);
-      e1 = (*retval1.first);
+      e1 = (*retval1.first); // there are properties in the edge in the set that are needed.
 
       // find 'e2' in 'y_set'
       retval2.first = y_set.find(e2);
       assert(*(retval2.first) == e2);
       e2 = (*retval2.first);
 
-      // need to check which is higher so I can assign them as each others incidental edges.
+      // need to check which is higher so I can assign them as each others incidental edges,
+      // but only if the "below edge is inside" boolean: 'bin' is true.  If it is false, they aren't each others closest edges.
       if (e1 < e2) {
         if (curves[e2.curve_id].bin) {
           e1.closest = e2;
@@ -330,22 +408,24 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
           e2.closest = e1;
         }
       }
+      std::cerr << "e1: " << e1 << std::endl;
+      std::cerr << "e2: " << e2 << std::endl;
 
       // if the 2 edges have each other as closest edges, no need for processing
       if (e1.closest != e2 || e2.closest != e1) {
-        if ((get_lower_cyclic_difference((*e1.p1).v, (*e1.closest.p1).v, polygon.size()) > 2) && (get_lower_cyclic_difference((*e1.p2).v, (*e1.closest.p2).v, polygon.size()))) {
-          curves[e1.curve_id].edges.push_back(e1);
+        if ((get_lower_cyclic_difference((*e1.p1).v, (*e1.closest.p1).v, points.size()) > 2) && (get_lower_cyclic_difference((*e1.p2).v, (*e1.closest.p2).v, points.size()))) {
+          if (e1 != temp && e1.closest != temp) curves[e1.curve_id].edges.push_back(e1);
         }
 
-        if ((get_lower_cyclic_difference((*e2.p1).v, (*e2.closest.p1).v, polygon.size()) > 2) && (get_lower_cyclic_difference((*e2.p2).v, (*e2.closest.p2).v, polygon.size()))) {
-          curves[e2.curve_id].edges.push_back(e2);
+        if ((get_lower_cyclic_difference((*e2.p1).v, (*e2.closest.p1).v, points.size()) > 2) && (get_lower_cyclic_difference((*e2.p2).v, (*e2.closest.p2).v, points.size()))) {
+          if (e2 != temp && e2.closest != temp) curves[e2.curve_id].edges.push_back(e2);
         }
       }
       y_set.erase(e1);
       y_set.erase(e2);
     }
     else if (isll ^ isrl) {
-      //std::cerr << "=== -o- ===" << std::endl;
+      std::cerr << "=== -o- ===" << std::endl;
       ++count_cont;
 
       E_Edge old_e, new_e;
@@ -364,8 +444,9 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
 
       // copy values from iterator to 'new_e'
       old_e = (*retval1.first);
-      new_e.curve_id = (*retval1.first).curve_id;
-//      std::cerr << "old: " << old_e << ", new: " << new_e << std::endl;
+      new_e.curve_id = old_e.curve_id;
+      std::cerr << "old: " << old_e << std::endl;
+      std::cerr << "new: " << new_e << std::endl;
       //std::cerr << "begin(): " << *(y_set.begin()) << ", end()-1: " << *(std::prev(y_set.end())) << std::endl;
 
       // old_e needs to be removed, i.e. first find the incidental edges and
@@ -374,8 +455,9 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
       // I need to find which side (bef or aft) is the "inside"
       //bool inc_found = false; // NOT NECESSARY.
       E_Edge inc_e; // incidental edge of the old_e.
-      inc_e = get_inc_edge_from_set(old_e, curves, retval1.first);
-//      std::cerr << "inc_e: " << inc_e << std::endl;
+      inc_e = get_inc_edge_from_set(old_e, curves, retval1.first, y_set);
+      if (old_e == inc_e) {inc_e = temp;inc_e.closest = temp;}
+      std::cerr << "inc_e: " << inc_e << std::endl;
 
       // Q: Do I have to make sure that incidental edges continuously only see the same curve?
       // If yes: that means a curve_id could start as an incidental curve,
@@ -387,7 +469,7 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
       // 1) each edge has a vector of [start,end] of all the curves it is incidental to, and we can randomly pick one and check validity
       // 2) grab the first or last curve it sees only (could be a nice first step that leads to 1) )
       // 3) at each incidental edge, compare the edges, and only the closest edge gets saved as a candidate for a hole intersection.
-      // 3) might guarantee we do not need to check any intersections with the reset of the curve,
+      // 3) might guarantee we do not need to check any intersections with the rest of the curve,
       // but it possibly throws out a lot of possible valid candidates.
       // As 3) seems the most simple currently, let's implement that.
 
@@ -404,10 +486,11 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
       // was never the closest edge, so old_edge only needs a length check..
 
       // process 'old_e'
-      if ((get_lower_cyclic_difference((*old_e.p1).v, (*old_e.closest.p1).v, polygon.size()) > 2) && (get_lower_cyclic_difference((*old_e.p2).v, (*old_e.closest.p2).v, polygon.size()) > 2)) {
+      if ((get_lower_cyclic_difference((*old_e.p1).v, (*old_e.closest.p1).v, points.size()) > 2) && (get_lower_cyclic_difference((*old_e.p2).v, (*old_e.closest.p2).v, points.size()) > 2)) {
         //std::cerr << "old_e: " << old_e << ", closest: " << old_e.closest << std::endl;
 //        std::cerr << "pushing old edge to curve, lcd is: " << get_lower_cyclic_difference((*old_e.p1).v, (*inc_e.p1).v, polygon.size()) << std::endl;
-        curves[old_e.curve_id].edges.push_back(old_e);
+        // we also have to check if the closest edge is the convex hull edge, and if so, not push it into the vector.
+        if (old_e != temp && old_e.closest != temp) curves[old_e.curve_id].edges.push_back(old_e);
       }
       y_set.erase(retval1.first);
 
@@ -433,7 +516,7 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
 //      std::cerr << "new_e: " << new_e << ", new_e.closest: " << new_e.closest << std::endl;
     }
     else {
-      //std::cerr << "=== o< ===" << std::endl;
+      std::cerr << "=== o< ===" << std::endl;
       ++count_open;
 
       Curve new_curve1, new_curve2; // create a new Curve
@@ -459,18 +542,23 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
       curves.push_back(new_curve2);
 
       // dependant on "inside" not being inside the 2 joined edges, we need to find the right 'closest' edges.
-      e1.closest = get_inc_edge_from_set(e1, curves, retval1.first);
+      e1.closest = get_inc_edge_from_set(e1, curves, retval1.first, y_set);
+      if (e1 == e1.closest) e1.closest = temp;
       update_edge_in_set(e1, retval1, y_set);
-      e2.closest = get_inc_edge_from_set(e2, curves, retval2.first);
+      e2.closest = get_inc_edge_from_set(e2, curves, retval2.first, y_set);
+      if (e1 == e1.closest) e1.closest = temp;
       update_edge_in_set(e2, retval2, y_set);
+      std::cerr << "e1: " << e1 << std::endl;
+      std::cerr << "e2: " << e2 << std::endl;
 
       // if closest edge isn't one of the 2 new edges, for 'closest' edge:
       // do a check to see whether e1/e2 is closer than its 'closest' edge.
       // possibilities are determinant check, intersect check, or just euclidean metric.
       // - Technically I don't care what is closer, I care if the new edges intersect with the old closest.
       if ((*retval1.first).closest != e2) {
-        E_Edge inc_e = get_inc_edge_from_set(e1, curves, retval1.first);
-//        std::cerr << "inc_e: " << inc_e << ", inc_e.closest: " << inc_e.closest << std::endl;
+        E_Edge inc_e = get_inc_edge_from_set(e1, curves, retval1.first, y_set);
+        if (e1 == inc_e) {inc_e = temp;inc_e.closest = temp;}
+        std::cerr << "inc_e: " << inc_e << ", inc_e.closest: " << inc_e.closest << std::endl;
         if (check_ix_edges(inc_e, e1)) {
           // e1 should be assigned closest as it intersects.
           inc_e.closest = e1;
@@ -479,7 +567,10 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
           update_edge_in_set(inc_e, retval1, y_set);
         }
         // check the closest edge of e2:
-        inc_e = get_inc_edge_from_set(e2, curves, retval2.first);
+        inc_e = get_inc_edge_from_set(e2, curves, retval2.first, y_set);
+        if (e1 == inc_e) {inc_e = temp;inc_e.closest = temp;}
+        std::cerr << "inc_e: " << inc_e << ", inc_e.closest: " << inc_e.closest << std::endl;
+        std::cerr << "in here" << std::endl;
         if (check_ix_edges(inc_e, e2)) {
           // e2 should be assigned closest as it intersects
           inc_e.closest = e2;
@@ -495,9 +586,12 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
 //    for (std::set<E_Edge>::iterator it=y_set.begin(); it!=y_set.end(); ++it) std::cerr << *it << ", closest: " << (*it).closest << std::endl;
   }
 
-//  std::cerr << "curves: " << std::endl;
+  std::cerr << "curves: " << std::endl;
   unsigned int count = 0;
-  for (unsigned int i = 0; i < curves.size();++i) count = count + curves[i].edges.size(); //std::cerr << curves[i] << std::endl;
+  for (unsigned int i = 0; i < curves.size();++i) {
+    count = count + curves[i].edges.size();
+    std::cerr << curves[i] << std::endl;
+  }
 
   // a hole still needs to be checked for 2D
   // if many edges have the same 'closest' edge, all of them can be checked for det() size, and the smallest picked.
@@ -506,27 +600,36 @@ E_Edge inner_holes(std::vector<unsigned int>& polygon, std::vector<Point>& point
   std::cerr << "total possible candidates: " << count << std::endl;
   // these are candidates for a single inner polygon..
 
-  unsigned int r_c=0, r_e=0;
+  if (count > 0) {
+    // r_c: a random curve selection
+    // r_e: a random edge selection
+    unsigned int r_c=0, r_e=0;
 
-  if (curves.size() > 0) {
-    do {
-      UniformRandomI(r_c, 0, curves.size()-1);
-      if (curves[r_c].edges.size() == 0) {
-        curves.erase(curves.begin()+r_c);
-        continue;
-      }
-      else {
-        std::cerr << "total edges: " << curves[r_c].edges.size() << std::endl;
-        UniformRandomI(r_e, 0, (curves[r_c].edges).size()-1);
-        break;
-      }
-    } while (curves.size() > 0);
+    if (curves.size() > 0) {
+      do {
+        UniformRandomI(r_c, 0, curves.size()-1);
+        if (curves[r_c].edges.size() == 0) {
+          curves.erase(curves.begin()+r_c);
+          continue;
+        }
+        else {
+          std::cerr << "total edges: " << curves[r_c].edges.size() << std::endl;
+          UniformRandomI(r_e, 0, (curves[r_c].edges).size()-1);
+          break;
+        }
+      } while (curves.size() > 0);
+    }
+    std::cerr << "r_c: " << r_c << ", r_e: " << r_e << std::endl;
+    E_Edge r_edge = curves[r_c].edges[r_e];
+    std::cerr << "random edge: " << r_edge << std::endl;
+
+    return r_edge;
   }
-  std::cerr << "r_c: " << r_c << ", r_e: " << r_e << std::endl;
-  E_Edge r_edge = curves[r_c].edges[r_e];
-  std::cerr << "random edge: " << r_edge << std::endl;
-
-  return r_edge;
+  else {
+    E_Edge r_edge = E_Edge(temp);
+    r_edge.closest = temp;
+    return r_edge;
+  }
 }
 
 

@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
   }
 
   // 'sph' is a vector of polygons, [0] is the simple polygon, subsequent polygons are holes in it.
-  std::vector<std::vector<Point>> sph;
+  std::vector<std::vector<unsigned int>> sph;
 
 // std::cerr << "point set verified." << std::endl;
   // get a simple polygon with a given method
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
       else returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
       break;
     case A_HOLE:
-      returnValue = writeOutFile(outFile, outFormat, writeNew, sph);
+      returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);
       break;
     case A_CONVERT_FORMAT:
       // as we are only writing the points to another format, only a lexicographical index is needed.
