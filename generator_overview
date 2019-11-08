@@ -200,8 +200,8 @@ This is a list of all known (all that we know) algorithms for generating a rando
 	Polygon type: 	Simple, x-monotone
 	Description:
 		- Computes one of all possible x-monotone polygons from a vertex set uniformly distributed
-		- Count all possible x-monotone polygons on a sorted pointsetby scanning forward, then
-			picking a random number and scanning to generate the polygon
+		- Count all possible x-monotone polygons on a sorted pointset by scanning forward, then
+			picking a random number and scanning backward to generate the polygon
 		- Complexity: O(n²)
 
 	B:
