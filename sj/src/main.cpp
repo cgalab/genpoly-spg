@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
     returnValue = opt2c(polygon, points, randseed);
   }
   else if (alg == A_2OPT_D) {
-    returnValue = opt2c(polygon, points, randseed);
+    returnValue = opt2d(polygon, points, randseed);
   }
   else if (alg == A_2OPT_E) {
     returnValue = opt2e(polygon, points, randseed);

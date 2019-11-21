@@ -441,7 +441,6 @@ enum edge_t removeEdgeFromSetf(Edge& e, unsigned int& lowest_index, std::set<Edg
       for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) std::cerr << *it1 << std::endl;
       valid = E_NOT_VALID;
     }
-    assert(e == *it);
 
     // get edges before and after
     if (it != edgeS.begin()) {
@@ -475,13 +474,20 @@ enum edge_t removeEdgeFromSetf(Edge& e, unsigned int& lowest_index, std::set<Edg
         update_lowest_index(before, after, lowest_index);
       } else if (isval >= IS_TRUE) {
         std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+        std::cerr << "removing edge from set(): " << e << std::endl;
+        std::cerr << "iterator: " << *it << std::endl;
         std::cerr << "isval: "; print_enum(isval);
+        std::cerr << "edges in 'edgeS':" << std::endl;
+        for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) std::cerr << *it1 << std::endl;
         valid = E_NOT_VALID;
       }
     }
   } else {
     // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
     // this is technically a crutch because there's a problem with the comparator function.
+//    std::cerr << "edges in 'edgeS':" << std::endl;
+//    for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) std::cerr << *it1 << std::endl;
+
     for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
       if (*it1 == e) {
         // get edges before and after
@@ -514,8 +520,12 @@ enum edge_t removeEdgeFromSetf(Edge& e, unsigned int& lowest_index, std::set<Edg
             valid = E_INTERSECTION;
             update_lowest_index(before, after, lowest_index);
           } else if (isval >= IS_TRUE) {
-            std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+            std::cerr << "Error!!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
+            std::cerr << "removing edge from set(): " << e << std::endl;
+            std::cerr << "iterator: " << *it1 << std::endl;
             std::cerr << "isval: "; print_enum(isval);
+            std::cerr << "edges in 'edgeS':" << std::endl;
+            for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) std::cerr << *it1 << std::endl;
             valid = E_NOT_VALID;
           }
         }
@@ -855,11 +865,16 @@ enum edge_t removeEdgeFromSetd(Edge& e, unsigned int& lowest_index, std::set<Edg
   enum intersect_t isval;
   std::set<Edge>::iterator it;
 
-//  std::cerr << "edge to be removed: " << e << std::endl;
   it = edgeS.find(e);
 
   if (it != edgeS.end()) {
-//    std::cerr << "*it: " << *it << std::endl;
+    if (e != *it) {
+      std::cerr << "edge to be removed: " << e << std::endl;
+      std::cerr << "*it: " << *it << std::endl;
+      std::cerr << "edges in 'edgeS':" << std::endl;
+      for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) std::cerr << *it1 << std::endl;
+      valid = E_NOT_VALID;
+    }
     assert(e == *it);
 
     // get edges before and after
@@ -876,14 +891,13 @@ enum edge_t removeEdgeFromSetd(Edge& e, unsigned int& lowest_index, std::set<Edg
     edgeS.erase(it);
 
     if (bef && af) {
-      //std::cerr << "before: " << before << ", after: " << after << std::endl;
+//      std::cerr << "before: " << before << ", after: " << after << std::endl;
       isval = checkIntersection(before, after);
       if (isval == IS_4P_COLLINEAR) {
-        //std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
-        if (coll4Swap(before, after, edgeS, polygon, points)) {
-          //std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
+//        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
+        if (coll4Swap4(before, after, edgeS, polygon, points, lowest_index)) {
+//          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
           valid = E_COLLINEAR;
-          update_lowest_index(before, after, lowest_index);
         }
       }
       else if ((isval == IS_TRUE) || (isval == IS_3P_COLLINEAR)) {
@@ -921,7 +935,7 @@ enum edge_t removeEdgeFromSetd(Edge& e, unsigned int& lowest_index, std::set<Edg
           isval = checkIntersection(before, after);
           if (isval == IS_4P_COLLINEAR) {
     //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
-            if (coll4Swap(before, after, edgeS, polygon, points)) {
+            if (coll4Swap4(before, after, edgeS, polygon, points, lowest_index)) {
     //          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
               valid = E_COLLINEAR;
             }
@@ -930,8 +944,9 @@ enum edge_t removeEdgeFromSetd(Edge& e, unsigned int& lowest_index, std::set<Edg
 //            std::cerr << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
             eraseEdgeFromSet(before, edgeS);
             eraseEdgeFromSet(after, edgeS);
-            flip(before, after, polygon, points);
+            flip2(before, after, polygon);
             valid = E_INTERSECTION;
+            update_lowest_index(before, after, lowest_index);
           } else if (isval >= IS_TRUE) {
             std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
             std::cerr << "isval: "; print_enum(isval);
@@ -942,10 +957,6 @@ enum edge_t removeEdgeFromSetd(Edge& e, unsigned int& lowest_index, std::set<Edg
         break;
       }
     }
-  }
-  if ((valid == E_INTERSECTION) || (valid == E_COLLINEAR)){
-    if (e.getLowerLexIdx() < before.getLowerLexIdx()) lowest_index = e.getLowerLexIdx();
-    else lowest_index = before.getLowerLexIdx();
   }
   return valid;
 }
@@ -1357,14 +1368,13 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeb(Edge& e, unsigned 
 }
 
 // updates lowest_index and uses a different flip function (used by 'd' and 'g')
-std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, unsigned int& lowest_index, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, Point *idx, unsigned int& lowest_index, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum edge_t valid = E_VALID;
   enum intersect_t isval;
   bool bef = false, af = false;
   Edge before, after;
   std::pair<std::set<Edge>::iterator,bool> retval;
   std::pair<enum edge_t, std::set<Edge>::iterator> retval2;
-  //double len11, len12, len21, len22;
 
   retval = edgeS.insert(e);
 
@@ -1373,6 +1383,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, unsigned 
 	   std::cerr << "retval.second: " << retval.second << std::endl;
      std::cerr << "edges in 'edgeS':" << std::endl;
      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+     valid = E_NOT_VALID;
    }
 
   assert(*retval.first == e);
@@ -1400,44 +1411,41 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, unsigned 
       }
       else if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << e << " and before: " << before << std::endl;
-        //len1 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points) + pol_calc_chain_length((before.getPLow()).v, (before.getPHigh()).v, polygon, points);
-        if (coll4Swap(e, before, edgeS, polygon, points)) {
+        if (coll4Swap4(e, before, edgeS, polygon, points, lowest_index)) {
 //          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
-          //len2 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points) + pol_calc_chain_length((before.getPLow()).v, (before.getPHigh()).v, polygon, points);
-          //if (len1 < len2) std::cerr << "len1: " << len1 << ", len2: " << len2 << std::endl;
           valid = E_COLLINEAR;
-          update_lowest_index(e, before, lowest_index);
         }
       }
       else {
 //        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
-        //len11 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points);
-        //len21 = pol_calc_chain_length((before.getPLow()).v, (before.getPHigh()).v, polygon, points);
-        //edgeS.erase(retval.first);
-        //eraseEdgeFromSet(before, edgeS);
-        eraseVertexFromSet(e.p1, edgeS, polygon, points);
-        eraseVertexFromSet(e.p2, edgeS, polygon, points);
-        eraseVertexFromSet(before.p1, edgeS, polygon, points);
-        eraseVertexFromSet(before.p2, edgeS, polygon, points);
+
+        //preparing for insertion of the edge not connected to 'idx' into 'edgeS'
+        std::vector<unsigned int> vertices {(*e.p1).v, (*e.p2).v, (*before.p1).v, (*before.p2).v};
+
+        edgeS.erase(retval.first);
+        eraseEdgeFromSet(before, edgeS);
         flip2(e, before, polygon);
-        //len12 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points);
-        //len22 = pol_calc_chain_length((before.getPLow()).v, (before.getPHigh()).v, polygon, points);
-        /*
-        if (len11 < len12) {
-          std::cerr << "len11: " << len11 << ", len12: " << len12 << std::endl;
-          doFlip((e.getPLow()).v, (e.getPHigh()).v, polygon, points);
-          len12 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points);
-          std::cerr << "len11: " << len11 << ", new len12: " << len12 << std::endl;
-        }
-        if (len21 < len22) {
-          std::cerr << "len21: " << len21 << ", len22: " << len22 << std::endl;
-          doFlip((before.getPLow()).v, (before.getPHigh()).v, polygon, points);
-          len22 = pol_calc_chain_length((before.getPLow()).v, (before.getPHigh()).v, polygon, points);
-          std::cerr << "len21: " << len21 << ", new len22: " << len22 << std::endl;
-        }
-        */
         valid = E_INTERSECTION;
         update_lowest_index(e, before, lowest_index);
+
+        //code to insert the edge not connected to 'idx' into 'edgeS'
+      	Edge new_edge;
+      	for (unsigned int i = 0; i < vertices.size();++i) {
+      		if (points[polygon[vertices[i]]].l == (*idx).l) {
+      			if (i < 2) new_edge.set(points[polygon[2]], points[polygon[3]]);
+      			else new_edge.set(points[polygon[0]], points[polygon[1]]);
+      			break;
+      		}
+      	}
+      	if (((*new_edge.p1).l < (*idx).l) && ((*idx).l < (*new_edge.p2).l)) {
+//      		std::cerr << "before flip insertion: " << new_edge << std::endl;
+//      		std::cerr << "at idx: " << *idx << std::endl;
+      		std::pair<std::set<Edge>::iterator,bool> retval;
+      		retval = edgeS.insert(new_edge);
+      		if (*retval.first != new_edge) {
+      			std::cerr << "Error!  inserting: " << new_edge << ", returned: " << *retval.first << std::endl;
+      		}
+      	}
       }
     }
     // check incidental edge 'after' if it intersects with 'e'
@@ -1448,47 +1456,44 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, unsigned 
         valid = E_VALID;
       }
       else if (isval == IS_4P_COLLINEAR) {
-//        std::cerr << "4P collinearity between:" << e << " and aft: " << after << std::endl;
-        //len1 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points) + pol_calc_chain_length((after.getPLow()).v, (after.getPHigh()).v, polygon, points);
-        if (coll4Swap(e, after, edgeS, polygon, points)) {
-//          std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
-          //len2 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points) + pol_calc_chain_length((after.getPLow()).v, (after.getPHigh()).v, polygon, points);
-          //if (len1 < len2) std::cerr << "len1: " << len1 << ", len2: " << len2 << std::endl;
+//        std::cerr << "4P collinearity between:" << e << " and after: " << after << std::endl;
+        if (coll4Swap4(e, after, edgeS, polygon, points, lowest_index)) {
+//          std::cerr << "coll. after swap: " << e << " and " << after << std::endl;
           valid = E_COLLINEAR;
-          update_lowest_index(e, after, lowest_index);
         }
       }
       else {
-        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
-        //edgeS.erase(retval.first);
-        //eraseEdgeFromSet(after, edgeS);
-        eraseVertexFromSet(e.p1, edgeS, polygon, points);
-        eraseVertexFromSet(e.p2, edgeS, polygon, points);
-        eraseVertexFromSet(after.p1, edgeS, polygon, points);
-        eraseVertexFromSet(after.p2, edgeS, polygon, points);
+//        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
+
+        //preparing for insertion of the edge not connected to 'idx' into 'edgeS'
+        std::vector<unsigned int> vertices {(*e.p1).v, (*e.p2).v, (*after.p1).v, (*after.p2).v};
+
+        edgeS.erase(retval.first);
+        eraseEdgeFromSet(after, edgeS);
         //removeEdgeFromSetb(e, edgeS, polygon, points);
         //removeEdgeFromSetb(after, edgeS, polygon, points);
-        //len11 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points);
-        //len21 = pol_calc_chain_length((after.getPLow()).v, (after.getPHigh()).v, polygon, points);
         flip2(e, after, polygon);
-        //len12 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points);
-        //len22 = pol_calc_chain_length((after.getPLow()).v, (after.getPHigh()).v, polygon, points);
-        /*
-        if (len11 < len12) {
-          std::cerr << "len11: " << len11 << ", len12: " << len12 << std::endl;
-          doFlip((e.getPLow()).v, (e.getPHigh()).v, polygon, points);
-          len12 = pol_calc_chain_length((e.getPLow()).v, (e.getPHigh()).v, polygon, points);
-          std::cerr << "len11: " << len11 << ", new len12: " << len12 << std::endl;
-        }
-        if (len21 < len22) {
-          std::cerr << "len21: " << len21 << ", len22: " << len22 << std::endl;
-          doFlip((after.getPLow()).v, (after.getPHigh()).v, polygon, points);
-          len22 = pol_calc_chain_length((after.getPLow()).v, (after.getPHigh()).v, polygon, points);
-          std::cerr << "len21: " << len21 << ", new len22: " << len22 << std::endl;
-        }
-        */
         valid = E_INTERSECTION;
         update_lowest_index(e, after, lowest_index);
+
+        //code to insert the edge not connected to 'idx' into 'edgeS'
+      	Edge new_edge;
+      	for (unsigned int i = 0; i < vertices.size();++i) {
+      		if (points[polygon[vertices[i]]].l == (*idx).l) {
+      			if (i < 2) new_edge.set(points[polygon[2]], points[polygon[3]]);
+      			else new_edge.set(points[polygon[0]], points[polygon[1]]);
+      			break;
+      		}
+      	}
+      	if (((*new_edge.p1).l < (*idx).l) && ((*idx).l < (*new_edge.p2).l)) {
+//      		std::cerr << "after flip insertion: " << new_edge << std::endl;
+//      		std::cerr << "at idx: " << *idx << std::endl;
+      		std::pair<std::set<Edge>::iterator,bool> retval;
+      		retval = edgeS.insert(new_edge);
+      		if (*retval.first != new_edge) {
+      			std::cerr << "Error!  inserting: " << new_edge << ", returned: " << *retval.first << std::endl;
+      		}
+      	}
       }
     }
 
@@ -1496,10 +1501,11 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, unsigned 
     // edge already existed in set.
     // this can happen if an index is going backwards through the lex. order of points.
     // but if it's reversing and it hits an edge already in, earlier code should have caught it and removed it.
-    std::cerr << "Error: Edge already exists in set!" << std::endl;
-    std::cerr << "edge: " << e << std::endl;
-    std::cerr << "edges in 'edgeS':" << std::endl;
-    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+    std::cerr << "Processing error: Edge already exists in set!" << std::endl;
+    std::cerr << "idx: " << *idx << std::endl;
+    std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
+//    std::cerr << "edges in 'edgeS':" << std::endl;
+//    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
     valid = E_NOT_VALID;
   }
 
@@ -1582,13 +1588,16 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
       		}
       	}
       	if (((*new_edge.p1).l < (*idx).l) && ((*idx).l < (*new_edge.p2).l)) {
-//      		std::cerr << "before flip insertion: " << new_edge << std::endl;
+//      		std::cerr << "'before' flip insertion: " << new_edge << std::endl;
 //      		std::cerr << "at idx: " << *idx << std::endl;
       		std::pair<std::set<Edge>::iterator,bool> retval;
-      		retval = edgeS.insert(new_edge);
-      		if (*retval.first != new_edge) {
-      			std::cerr << "Error!  inserting: " << new_edge << ", returned: " << *retval.first << std::endl;
-      		}
+          retval.first = edgeS.find(new_edge);
+          if (retval.first == edgeS.end()) {
+            retval = edgeS.insert(new_edge);
+        		if (*retval.first != new_edge) {
+        			std::cerr << "Error!  inserting: " << new_edge << ", returned: " << *retval.first << std::endl;
+        		}
+          }
       	}
       }
     }
@@ -1630,13 +1639,20 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
       		}
       	}
       	if (((*new_edge.p1).l < (*idx).l) && ((*idx).l < (*new_edge.p2).l)) {
-//      		std::cerr << "after flip insertion: " << new_edge << std::endl;
+//      		std::cerr << "'after' flip insertion: " << new_edge << std::endl;
 //      		std::cerr << "at idx: " << *idx << std::endl;
+//          std::cerr << "edges in 'edgeS':" << std::endl;
+//          for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
       		std::pair<std::set<Edge>::iterator,bool> retval;
-      		retval = edgeS.insert(new_edge);
-      		if (*retval.first != new_edge) {
-      			std::cerr << "Error!  inserting: " << new_edge << ", returned: " << *retval.first << std::endl;
-      		}
+          retval.first = edgeS.find(new_edge);
+          if(retval.first == edgeS.end()) {
+            retval = edgeS.insert(new_edge);
+//            std::cerr << "edge added to 'edgeS':" << std::endl;
+//            for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+      		  if (*retval.first != new_edge) {
+      			  std::cerr << "Error!  inserting: " << new_edge << ", returned: " << *retval.first << std::endl;
+      		  }
+          }
       	}
       }
     }

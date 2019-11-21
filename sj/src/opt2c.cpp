@@ -49,6 +49,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 	Edge e1, e2;
   bool loop, revert, rev_found;
 //  bool debug=true;
+  unsigned int count_intersections=0, count_coll=0, count_reversals=0, count_total_passes=0;
   std::set<Edge> edgeS, edgeS_old; // a sweep-line-status object.
   //double circumference;
   std::map<double, unsigned int> circ, c_counter;
@@ -57,6 +58,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   collinear_index = points.size();
   duration = elapsed();
   do {
+    ++count_total_passes;
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     //circumference = pol_calc_circumference(polygon, points);
     //c_it = circ.find(circumference);
@@ -146,9 +148,11 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e1.p1)) )
       {
 //        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
-        val1.first = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
+        val1.first = removeEdgeFromSetf(e1, lowest_index, edgeS, polygon, points);
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) { // intersection found in the removal, skip the rest and restart.
+          if (val1.first == E_INTERSECTION) ++count_intersections;
+          else ++count_coll;
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           //if ((revert && (*e2.p1 == *p1)) || (!revert && (*e2.p2 == *p1)))
           //if (!(revert ^ (*p1 == *e2.p1)))
@@ -156,7 +160,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
             || ((p_status == P_DIRTY_RIGHT) && (*p1 == *e2.p2))
             || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e2.p1)) )
           {
-            val1_2 = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+            val1_2 = removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
             if (val1_2 == E_NOT_VALID) break; // the other conditions would be handled when handling 'e2' properly.  This error though has priority.
           }
           if (val1.first == E_COLLINEAR) {
@@ -168,6 +172,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
           if ((p_status == P_CLEAN) && !revert) {
             edgeS_old = edgeS;rev_found=false;old_index=index;
             revert=true;
+            ++count_reversals;
           }
           continue;
         }
@@ -179,7 +184,8 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
           if (((*p2 < *p1) && (*p3 < *p1)) || ((*p1 < *p2) && (*p1 < *p3))) {
 //            (debug) ? std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
 //            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
-            if (coll3Swap(p1, p2, p3, edgeS, polygon, points, lowest_index)) {
+            if (coll3Sort2(p1, p2, p3, p1, edgeS, polygon, points, lowest_index)) {
+              ++count_coll;
 //              (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
 //              std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl;
               loop = true;
@@ -191,22 +197,25 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         }
 
 //        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
-        val1 = processEdgeb(e1, lowest_index, edgeS, polygon, points);
+        val1 = processEdgef(e1, p1, lowest_index, edgeS, polygon, points);
         if (val1.first == E_NOT_VALID) break;
         if (val1.first == E_COLLINEAR) {
+          ++count_coll;
           loop=true;
           //if (p_status == P_CLEAN   revert) {p_status = P_DIRTY_LEFT;collinear_index=index;}
           if (p_status == P_CLEAN) {p_status = P_DIRTY_RIGHT;collinear_index=index-1;if(revert)rev_found=true;}
           continue;
         }
         if (val1.first == E_INTERSECTION) {
+          ++count_intersections;
           loop=true;
           if ((p_status == P_CLEAN) &&  revert) rev_found = true;
           if ((p_status == P_CLEAN) && !revert) {
-            removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
-            removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+            removeEdgeFromSetf(e1, lowest_index, edgeS, polygon, points);
+            removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
             edgeS_old = edgeS;rev_found=false;old_index=index;
             revert=true;
+            ++count_reversals;
           }
           continue;
         }
@@ -219,49 +228,55 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e2.p1)) )
       {
 //        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
-        val2.first = removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+        val2.first = removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_COLLINEAR) {
+          ++count_coll;
           loop=true;
           //if (p_status == P_CLEAN &&  revert) {p_status = P_DIRTY_LEFT;collinear_index=index;}
           if (p_status == P_CLEAN) {p_status = P_DIRTY_RIGHT;collinear_index=index-1;if(revert)rev_found=true;}
           continue;
         }
         if (val2.first == E_INTERSECTION) {
+          ++count_intersections;
           loop=true;
           if ((p_status == P_CLEAN) &&  revert) rev_found = true;
           if ((p_status == P_CLEAN) && !revert) {
             edgeS_old = edgeS;rev_found=false;old_index=index;
             revert=true;
+            ++count_reversals;
           }
           continue;
         }
       }
       else {
 //        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
-        val2 = processEdgeb(e2, lowest_index, edgeS, polygon, points);
+        val2 = processEdgef(e2, p1, lowest_index, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_INTERSECTION) {
+          ++count_intersections;
           // if e1 was inserted "in front of" the index, it needs to be removed.
           //if ( ((p_status == P_CLEAN) && !(revert ^ (*p1 == *e1.p1)))
           //  || ((p_status == P_DIRTY_RIGHT) && (*p1 == *e1.p1))
           //  || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e1.p2)) )
           //{
           //std::cerr << "removing e1: " << e1 << std::endl;
-          val2_1 = removeEdgeFromSetb(e1, lowest_index, edgeS, polygon, points);
+          val2_1 = removeEdgeFromSetf(e1, lowest_index, edgeS, polygon, points);
           if (val2_1 == E_NOT_VALID) break;
           //}
           loop=true;
           if ((p_status == P_CLEAN) &&  revert) rev_found = true;
           if ((p_status == P_CLEAN) && !revert) {
-            removeEdgeFromSetb(e2, lowest_index, edgeS, polygon, points);
+            removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
             edgeS_old = edgeS;rev_found=false;old_index=index;
             revert=true;
+            ++count_reversals;
           }
           continue;
         }
         // the index can repeat in case of collinearity
         if (val2.first == E_COLLINEAR) {
+          ++count_coll;
           //if (p_status == P_CLEAN &&  revert) {p_status = P_DIRTY_LEFT;collinear_index=index;}
           if (p_status == P_CLEAN) {p_status = P_DIRTY_RIGHT;collinear_index=index-1;if(revert)rev_found=true;}
           loop = true;
@@ -301,6 +316,10 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   } while (loop);
   duration = elapsed();
   std::cout << "Time elapsed: " << duration << std::endl;
+  std::cout << "Total passes: " << count_total_passes << std::endl;
+  std::cout << "Intersections: " << count_intersections << std::endl;
+  std::cout << "Collinearities: " << count_coll << std::endl;
+  std::cout << "Reversals: " << count_reversals << std::endl;
 
 	return retval;
 }

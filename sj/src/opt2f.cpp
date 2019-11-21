@@ -47,7 +47,7 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 	Edge e1, e2;
   bool loop, revert, reverse_flag;
   //bool debug=true;
-  unsigned int count_intersections=0, count_reversals=0, count_total_passes=0;
+  unsigned int count_intersections=0, count_coll=0, count_reversals=0, count_total_passes=0;
   std::set<Edge> edgeS; // a sweep-line-status object.
   //double circumference;
   //std::map<double, unsigned int> circ, c_counter;
@@ -123,7 +123,7 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //            (debug) ? std::cerr << "before sort: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
 
           if (coll3Sort2(p1, p2, p3, p1, edgeS, polygon, points, lowest_index)) {
-            ++count_intersections;
+            ++count_coll;
 //              (debug) ? std::cerr << "after 3P collsort: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
             loop = true;
             reverse_flag = true;
@@ -152,7 +152,7 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         }
         // when a collinearity is found, the current index is restarted, but no reversal.
         if (val1.first == E_COLLINEAR) {
-          ++count_intersections;
+          ++count_coll;
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if (!(revert ^ (*p1 == *e2.p1))) {
             val1_2 = removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
@@ -170,7 +170,7 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        if (debug) {std::cerr << "val1: "; print_enum(val1.first);}
         if (val1.first == E_NOT_VALID) break;
         if (val1.first == E_INTERSECTION) {++count_intersections;loop=true;reverse_flag=true;continue;}
-        if (val1.first == E_COLLINEAR) {++count_intersections;loop=true;reverse_flag=true;continue;}
+        if (val1.first == E_COLLINEAR) {++count_coll;loop=true;reverse_flag=true;continue;}
       }
 
       // process second edge
@@ -180,7 +180,7 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 //        if (debug) {std::cerr << "val2: "; print_enum(val2.first);}
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_INTERSECTION) {++count_intersections;loop=true;reverse_flag=true;continue;}
-        if (val2.first == E_COLLINEAR) {++count_intersections;loop=true;reverse_flag=true;continue;}
+        if (val2.first == E_COLLINEAR) {++count_coll;loop=true;reverse_flag=true;continue;}
       }
       else {
 //        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
@@ -199,7 +199,7 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
           loop=true;reverse_flag=true;continue;
         }
         if (val2.first == E_COLLINEAR) {
-          ++count_intersections;
+          ++count_coll;
           // when a collinearity is found, the current index is restarted, but no reversal.
           // if e1 was inserted "in front of" the index, it needs to be removed.
           if (revert ^ (*p1 == *e1.p1)) {
@@ -244,6 +244,7 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points,
   std::cout << "Time elapsed: " << duration << std::endl;
   std::cout << "Total passes: " << count_total_passes << std::endl;
   std::cout << "Intersections: " << count_intersections << std::endl;
+  std::cout << "Collinearities: " << count_coll << std::endl;
   std::cout << "Reversals: " << count_reversals << std::endl;
 
 	return retval;
