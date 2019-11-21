@@ -264,3 +264,15 @@ This is a list of all known (all that we know) algorithms for generating a rando
 		- Gets restarted, if there is no fully visible edge for a point
 		- Can not obtain each possible polygon
 		- Complextiy: O(n^3)
+
+
+10.
+	Author: 		Sohler, Nixdorf
+	Publication: 	Generating Random Star-shaped Polygons
+	Link: 			https://www.semanticscholar.org/paper/
+					Generating-Random-Star-shaped-Polygons-(extended-Sohler-Nixdorf/3fb70460a8e5fd7c8181fbcc0ef3d869eb3263ae
+	Year: 			2007
+	Approach: 		Randomly connecting a set of vertices
+	Polygon type: 	Star-shaped
+	Description:
+		- 
