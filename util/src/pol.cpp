@@ -2552,7 +2552,7 @@ void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned 
   std::vector<unsigned int> pol1, pol2;
   bool inside = false;
   Edge e1 = Edge(e.p1, e.p2);
-  Edge e2 = Edge(e.closest.p1, e.closest.p2);
+  Edge e2 = Edge(e.closest[e.closest.size()-1].p1, e.closest[e.closest.size()-1].p2);
 
   Point p, prev;
   prev = points[polygon[polygon.size()-1]];

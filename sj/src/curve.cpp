@@ -60,7 +60,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
     return SUCCESS;
   }
 
-  if (points.size()-ch.size() > 3) {
+  if (nr_inner > 3) {
 
     //std::vector<unsigned int> polygon;
     std::vector<Ends> ends;
@@ -174,14 +174,14 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
         // now we have the points of the chain in 'inner_points' and the indices into 'points' in 'inner_polygon'
 
         // an E_Edge has a class property D_Edge: 'closest' as its closest edge, these 2 edges define 4 points we can use to make a hole.
-        E_Edge inner_hole = inner_holes(inner_points);
+        E_Edge inner_hole = inner_holes2(inner_points, true);
         std::cerr << "inner_hole: " << inner_hole << std::endl;
-        std::cerr << "inner_hole.closest: " << inner_hole.closest << std::endl;
+        std::cerr << "inner_hole.closest: " << inner_hole.closest[0] << std::endl;
         std::cerr << "original index edge #1.p1: " << inner_polygon[(*inner_hole.p1).i] << std::endl;
         std::cerr << "original index edge #1.p2: " << inner_polygon[(*inner_hole.p2).i] << std::endl;
-        std::cerr << "original index edge #2.p1: " << inner_polygon[(*inner_hole.closest.p1).i] << std::endl;
-        std::cerr << "original index edge #2.p2: " << inner_polygon[(*inner_hole.closest.p2).i] << std::endl;
-        if (inner_hole != inner_hole.closest) {
+        std::cerr << "original index edge #2.p1: " << inner_polygon[(*inner_hole.closest[0].p1).i] << std::endl;
+        std::cerr << "original index edge #2.p2: " << inner_polygon[(*inner_hole.closest[0].p2).i] << std::endl;
+        if (inner_hole != inner_hole.closest[0]) {
           std::cerr << "found a hole candidate!" << std::endl;
           // the hole can be represented as a <unsigned int> vector of indices into points,
           // as I don't do anything with the hole after making it,
@@ -278,11 +278,11 @@ bool check_ix_edges(E_Edge e1, E_Edge e2) {
   E_Edge ix;
   enum intersect_t isval; // return value for intersect check.
 
-  ix = E_Edge(e1.p1, e1.closest.p1);
+  ix = E_Edge(e1.p1, e1.closest[0].p1);
   isval = checkIntersection(ix, e2);
   if (isval >= IS_TRUE) return true;
 
-  ix = E_Edge(e1.p2, e1.closest.p2);
+  ix = E_Edge(e1.p2, e1.closest[0].p2);
   isval = checkIntersection(ix, e2);
   if (isval >= IS_TRUE) return true;
   return false;
@@ -333,10 +333,11 @@ E_Edge inner_holes(std::vector<Point>& points) {
   // I want to skip the edge between [0] and [n-1] as that's the edge between the convex hull points.
 
   std::vector<Curve> curves; // container for curves and their valid edges to create holes from.
+  std::vector<E_Edge> valid_edges;  // all edges with a valid 'closest' edge, edges are added when they are removed from y_set'
   std::set<E_Edge> y_set; // container for the planesweep structure.
   std::pair<std::set<E_Edge>::iterator, bool> retval1, retval2; // return values from the y_set 'insert' or 'erase' functions.
-  Point *m, *l, *r; // m is the current point at lex. position 'i' and 'l' and 'r' are the 2 points it connects to by edges.
-  bool isll, isrl; // are 'l' and 'r' points left of 'm'
+  Point *m, *l, *r; // m is the current point at lex. position 'i' and 'l' and 'r' are the 2 points it connects to by edges in the polygon.
+  bool isll, isrl; // are 'l' and 'r' points left of 'm' in the euclidian planar sense.
   unsigned int count_open=0, count_cont=0, count_close=0; // just for development verification.
   D_Edge temp = D_Edge(&points[0], &points[points.size()-1]);
 
@@ -351,8 +352,8 @@ E_Edge inner_holes(std::vector<Point>& points) {
     // create 2 new 'E_Edge's
     E_Edge e1 = E_Edge (m, l);
     E_Edge e2 = E_Edge (m, r);
-    e1.closest = temp;
-    e2.closest = temp;
+    e1.closest[0] = temp;
+    e2.closest[0] = temp;
     std::cerr << "e1: " << e1 << std::endl;
     std::cerr << "e2: " << e2 << std::endl;
 
@@ -399,26 +400,31 @@ E_Edge inner_holes(std::vector<Point>& points) {
       // but only if the "below edge is inside" boolean: 'bin' is true.  If it is false, they aren't each others closest edges.
       if (e1 < e2) {
         if (curves[e2.curve_id].bin) {
-          e1.closest = e2;
-          e2.closest = e1;
+          e1.closest[0] = e2;
+          e2.closest[0] = e1;
         }
       } else {
         if (curves[e1.curve_id].bin) {
-          e1.closest = e2;
-          e2.closest = e1;
+          e1.closest[0] = e2;
+          e2.closest[0] = e1;
         }
       }
-      std::cerr << "e1: " << e1 << std::endl;
-      std::cerr << "e2: " << e2 << std::endl;
+      std::cerr << "e1 in set: " << e1 << std::endl;
+      std::cerr << "e2 in set: " << e2 << std::endl;
 
       // if the 2 edges have each other as closest edges, no need for processing
-      if (e1.closest != e2 || e2.closest != e1) {
-        if ((get_lower_cyclic_difference((*e1.p1).v, (*e1.closest.p1).v, points.size()) > 2) && (get_lower_cyclic_difference((*e1.p2).v, (*e1.closest.p2).v, points.size()))) {
-          if (e1 != temp && e1.closest != temp) curves[e1.curve_id].edges.push_back(e1);
+      if (e1.closest[0] != e2 || e2.closest[0] != e1) {
+//        std::cerr << " lower cyclic diff. of e1.p1 and e1.closest.p1: " << get_lower_cyclic_difference((*e1.p1).v, (*e1.closest.p1).v, points.size()) << std::endl;
+//        std::cerr << " lower cyclic diff. of e1.p2 and e1.closest.p2: " << get_lower_cyclic_difference((*e1.p2).v, (*e1.closest.p2).v, points.size()) << std::endl;
+        if ((get_lower_cyclic_difference((*e1.p1).v, (*e1.closest[0].p1).v, points.size()) > 2) && (get_lower_cyclic_difference((*e1.p2).v, (*e1.closest[0].p2).v, points.size()) > 2)) {
+//          std::cerr << "true" << std::endl;
+          if (e1 != temp && e1.closest[0] != temp) curves[e1.curve_id].edges.push_back(e1);
         }
-
-        if ((get_lower_cyclic_difference((*e2.p1).v, (*e2.closest.p1).v, points.size()) > 2) && (get_lower_cyclic_difference((*e2.p2).v, (*e2.closest.p2).v, points.size()))) {
-          if (e2 != temp && e2.closest != temp) curves[e2.curve_id].edges.push_back(e2);
+//        std::cerr << " lower cyclic diff. of e2.p1 and e2.closest.p1: " << get_lower_cyclic_difference((*e2.p1).v, (*e2.closest.p1).v, points.size()) << std::endl;
+//        std::cerr << " lower cyclic diff. of e2.p2 and e2.closest.p2: " << get_lower_cyclic_difference((*e2.p2).v, (*e2.closest.p2).v, points.size()) << std::endl;
+        if ((get_lower_cyclic_difference((*e2.p1).v, (*e2.closest[0].p1).v, points.size()) > 2) && (get_lower_cyclic_difference((*e2.p2).v, (*e2.closest[0].p2).v, points.size()) > 2)) {
+//          std::cerr << "true" << std::endl;
+          if (e2 != temp && e2.closest[0] != temp) curves[e2.curve_id].edges.push_back(e2);
         }
       }
       y_set.erase(e1);
@@ -438,6 +444,10 @@ E_Edge inner_holes(std::vector<Point>& points) {
         new_e = e1;
       }
 
+      // Here I need to find the 'closest' edge for the 'new' edge, candidates are
+      // the 'closest' edge of 'old' and the incidental edges in 'y_set'
+      // I also need to check if 'new' is a new 'closest' for the incidental edges.
+
       // find 'old_e' in 'y_set'
       retval1.first = y_set.find(old_e);
       assert(*(retval1.first) == old_e);
@@ -445,6 +455,7 @@ E_Edge inner_holes(std::vector<Point>& points) {
       // copy values from iterator to 'new_e'
       old_e = (*retval1.first);
       new_e.curve_id = old_e.curve_id;
+      new_e.bin = old_e.bin;
       std::cerr << "old: " << old_e << std::endl;
       std::cerr << "new: " << new_e << std::endl;
       //std::cerr << "begin(): " << *(y_set.begin()) << ", end()-1: " << *(std::prev(y_set.end())) << std::endl;
@@ -453,10 +464,9 @@ E_Edge inner_holes(std::vector<Point>& points) {
       // check conditions for 'last' and whether it's still the same curve.
 
       // I need to find which side (bef or aft) is the "inside"
-      //bool inc_found = false; // NOT NECESSARY.
       E_Edge inc_e; // incidental edge of the old_e.
       inc_e = get_inc_edge_from_set(old_e, curves, retval1.first, y_set);
-      if (old_e == inc_e) {inc_e = temp;inc_e.closest = temp;}
+      if (old_e == inc_e) {inc_e = temp;inc_e.closest[0] = temp;std::cerr<<"old_e == inc_e" << std::endl;}
       std::cerr << "inc_e: " << inc_e << std::endl;
 
       // Q: Do I have to make sure that incidental edges continuously only see the same curve?
@@ -486,16 +496,18 @@ E_Edge inner_holes(std::vector<Point>& points) {
       // was never the closest edge, so old_edge only needs a length check..
 
       // process 'old_e'
-      if ((get_lower_cyclic_difference((*old_e.p1).v, (*old_e.closest.p1).v, points.size()) > 2) && (get_lower_cyclic_difference((*old_e.p2).v, (*old_e.closest.p2).v, points.size()) > 2)) {
+      if ((get_lower_cyclic_difference((*old_e.p1).v, (*old_e.closest[0].p1).v, points.size()) > 2) && (get_lower_cyclic_difference((*old_e.p2).v, (*old_e.closest[0].p2).v, points.size()) > 2)) {
         //std::cerr << "old_e: " << old_e << ", closest: " << old_e.closest << std::endl;
 //        std::cerr << "pushing old edge to curve, lcd is: " << get_lower_cyclic_difference((*old_e.p1).v, (*inc_e.p1).v, polygon.size()) << std::endl;
         // we also have to check if the closest edge is the convex hull edge, and if so, not push it into the vector.
-        if (old_e != temp && old_e.closest != temp) curves[old_e.curve_id].edges.push_back(old_e);
+        if (old_e != temp && old_e.closest[0] != temp) curves[old_e.curve_id].edges.push_back(old_e);
       }
       y_set.erase(retval1.first);
 
       // process 'new_e'
-      new_e.closest = inc_e; // Is this ok?  Shouldn't I find where to put it first and get the real inc_e?
+      // This is the first candidate for a 'closest edge', it's fine to check and set it as closest.
+      //new_e.update_closest(inc_e, true); // true for lex-low-to-high
+      //std::cerr << "new_e: " << new_e << std::endl;
 
       // process 'inc_e' - reuse retval1 to find inc_e and update it if necessary.
       // need to add an intersection check to make sure that 'inc_e.closest' is
@@ -503,8 +515,10 @@ E_Edge inner_holes(std::vector<Point>& points) {
 
       retval1.first = y_set.find(inc_e);
       assert(*retval1.first == inc_e);
+      std::cerr << "found inc in set: " << *retval1.first << std::endl;
       if (check_ix_edges(inc_e, new_e)) {
-        inc_e.closest = new_e;
+        std::cerr << "new_e is closer to inc_e than inc_e.closest" << std::endl;
+        inc_e.closest[0] = new_e;
         update_edge_in_set(inc_e, retval1, y_set);
 //        std::cerr << "inc_e: " << inc_e << ", inc_e.closest: " << inc_e.closest << std::endl;
       }
@@ -542,11 +556,11 @@ E_Edge inner_holes(std::vector<Point>& points) {
       curves.push_back(new_curve2);
 
       // dependant on "inside" not being inside the 2 joined edges, we need to find the right 'closest' edges.
-      e1.closest = get_inc_edge_from_set(e1, curves, retval1.first, y_set);
-      if (e1 == e1.closest) e1.closest = temp;
+      e1.closest[0] = get_inc_edge_from_set(e1, curves, retval1.first, y_set);
+      if (e1 == e1.closest[0]) e1.closest[0] = temp;
       update_edge_in_set(e1, retval1, y_set);
-      e2.closest = get_inc_edge_from_set(e2, curves, retval2.first, y_set);
-      if (e1 == e1.closest) e1.closest = temp;
+      e2.closest[0] = get_inc_edge_from_set(e2, curves, retval2.first, y_set);
+      if (e1 == e1.closest[0]) e1.closest[0] = temp;
       update_edge_in_set(e2, retval2, y_set);
       std::cerr << "e1: " << e1 << std::endl;
       std::cerr << "e2: " << e2 << std::endl;
@@ -555,25 +569,25 @@ E_Edge inner_holes(std::vector<Point>& points) {
       // do a check to see whether e1/e2 is closer than its 'closest' edge.
       // possibilities are determinant check, intersect check, or just euclidean metric.
       // - Technically I don't care what is closer, I care if the new edges intersect with the old closest.
-      if ((*retval1.first).closest != e2) {
+      if ((*retval1.first).closest[0] != e2) {
         E_Edge inc_e = get_inc_edge_from_set(e1, curves, retval1.first, y_set);
-        if (e1 == inc_e) {inc_e = temp;inc_e.closest = temp;}
-        std::cerr << "inc_e: " << inc_e << ", inc_e.closest: " << inc_e.closest << std::endl;
+        if (e1 == inc_e) {inc_e = temp;inc_e.closest[0] = temp;}
+        std::cerr << "inc_e: " << inc_e << ", inc_e.closest: " << inc_e.closest[0] << std::endl;
         if (check_ix_edges(inc_e, e1)) {
           // e1 should be assigned closest as it intersects.
-          inc_e.closest = e1;
+          inc_e.closest[0] = e1;
           // need to update the inc_e edge in y_set:
           retval1.first = y_set.find(inc_e);
           update_edge_in_set(inc_e, retval1, y_set);
         }
         // check the closest edge of e2:
         inc_e = get_inc_edge_from_set(e2, curves, retval2.first, y_set);
-        if (e1 == inc_e) {inc_e = temp;inc_e.closest = temp;}
-        std::cerr << "inc_e: " << inc_e << ", inc_e.closest: " << inc_e.closest << std::endl;
+        if (e1 == inc_e) {inc_e = temp;inc_e.closest[0] = temp;}
+        std::cerr << "inc_e: " << inc_e << ", inc_e.closest: " << inc_e.closest[0] << std::endl;
         std::cerr << "in here" << std::endl;
         if (check_ix_edges(inc_e, e2)) {
           // e2 should be assigned closest as it intersects
-          inc_e.closest = e2;
+          inc_e.closest[0] = e2;
           // need to update the inc_e edge in y_set:
           retval2.first = y_set.find(inc_e);
           update_edge_in_set(inc_e, retval2, y_set);
@@ -627,11 +641,47 @@ E_Edge inner_holes(std::vector<Point>& points) {
   }
   else {
     E_Edge r_edge = E_Edge(temp);
-    r_edge.closest = temp;
+    r_edge.closest[0] = temp;
     return r_edge;
   }
 }
 
+// function that takes a vector of Points and whether it's a hole or an inner polygonal chain
+// and returns an edge with a single 'closest' edge which can be used to split the hole/chain.
+E_Edge inner_holes2(std::vector<Point>& points, bool is_hole) {
+
+  // start with creating a vector for the lexicographically sorted indexes of 'points'
+  std::vector<unsigned int> lex (points.size());
+  fill_lex(lex, points);
+//  std::cerr << "lex: " << std::endl;
+//  pdisplay(lex, points);
+
+  std::vector<E_Edge> valid_edges;  // all edges with a valid 'closest' edge, edges are added when they are removed from y_set'
+  std::set<E_Edge> y_set; // container for the planesweep structure.
+  std::pair<std::set<E_Edge>::iterator, bool> retval1, retval2; // return values from the y_set 'insert' or 'erase' functions.
+  Point *m, *l, *r; // m is the current point at lex. position 'i' and 'l' and 'r' are the 2 points it connects to by edges in the polygon.
+  //bool isll, isrl; // are 'l' and 'r' points left of 'm' in the euclidian planar sense.
+  //unsigned int count_open=0, count_cont=0, count_close=0; // just for development verification.
+
+  // a sweep through the lex indices to check all edges for its 'closest' edge.
+  for (unsigned int i = 0; i < lex.size()-1; ++i) {
+    if (is_hole) std::cerr << std::endl << "i: " << i << std::endl;
+    m = &points[lex[i]];
+    l = &points[(points.size() + (*m).v - 1) % points.size()];
+    r = &points[(points.size() + (*m).v + 1) % points.size()];
+    std::cerr << "m: " << *m << ", l: " << *l << ", r: " << *r << std::endl;
+
+    // create 2 new 'E_Edge's
+    E_Edge e1 = E_Edge (m, l);
+    E_Edge e2 = E_Edge (m, r);
+    std::cerr << "e1: " << e1 << std::endl;
+    std::cerr << "e2: " << e2 << std::endl;
+    exit(0);
+
+
+  }
+  return valid_edges[0];
+}
 
 
 // function that accepts a simple polygon that is assumed to be the inner polygonal chain defined by 2 incidental convex hull points,
