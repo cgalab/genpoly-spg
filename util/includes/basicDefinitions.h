@@ -54,6 +54,7 @@ enum alg_t {
   A_CURVE,
   A_HOLE,
   A_STAR,
+  A_ALLSP,
   A_CONVERT_FORMAT,
   A_VERIFY,
   A_VERIFY_LONG

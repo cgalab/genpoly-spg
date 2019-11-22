@@ -25,6 +25,7 @@
 #include "curve.h"
 #include "simple_pol_check.h"
 #include "star.h"
+#include "allsp.h"
 #include "predicates.h"
 
 int main(int argc, char *argv[]) {
@@ -133,6 +134,9 @@ int main(int argc, char *argv[]) {
   else if (alg == A_HOLE) {
     returnValue = holes2(sph, points, polygon, randseed, nr_holes);
   }
+  else if (alg == A_ALLSP) {
+    returnValue = allsp(sph, points, randseed);
+  }
   else if (alg == A_VERIFY) {
     return simple_pol_check(polygon, points);
   }
@@ -178,6 +182,9 @@ int main(int argc, char *argv[]) {
       else returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
       break;
     case A_HOLE:
+      returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);
+      break;
+    case A_ALLSP:
       returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);
       break;
     case A_CONVERT_FORMAT:

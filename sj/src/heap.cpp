@@ -13,7 +13,7 @@ void swap (std::vector<unsigned int>& a, int i, int j) {
 void heap(std::vector<unsigned int>& a, int n) {
   if(n == 1) {
     // (got a new permutation)
-    for(unsigned int i = 0; i < a.size(); ++i) std::cerr << a[i] << "\n";
+    for(unsigned int i = 0; i < a.size(); ++i) std::cerr << a[i] << ",";
     std::cerr << "\n";
     return;
   }
