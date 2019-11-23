@@ -59,6 +59,17 @@
 
 
 4. Convolutedness
+
+5. Distribution of angles
+	Why:
+		- A broad distribution of the angles is far away from the start polygon and makes interlacing likely
+		- Also maybe a broad distribution might be interesting for testing
+	How:
+		- Sum of inside angles is pi * (n - 2)
+		- Mean angle and angles of the startpolygon are pi * (1 - 2 / n) (also roughly the upper bound for the
+			standard deviation for larger n)
+		- Compute angle standard deviation for each polygon
+		- Standard deviations for more polygons should roughly yield a single-sided normal distribution around 0
 	
 
 
