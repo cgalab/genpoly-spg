@@ -451,6 +451,10 @@ public:
 		else {p1=P2; p2=P1;}
     l_idx=0;curve_id=0;bin=false;
 	}
+  D_Edge(Edge e) {
+    p1 = e.p1; p2 = e.p2;
+    l_idx = e.l_idx;curve_id=0;bin=false;
+  }
 
   // returns true if the point is on the side of the edge that is 'inside' the polygon.
   bool check_side (Point p) {
@@ -490,6 +494,10 @@ public:
   E_Edge(D_Edge e) {
     p1 = e.p1; p2 = e.p2;
     l_idx = e.l_idx; curve_id = e.curve_id;bin=false;
+  }
+  E_Edge(Edge e) {
+    p1 = e.p1; p2 = e.p2;
+    l_idx = e.l_idx;curve_id=0;bin=false;
   }
 /*
   // this shouldn't be here... better as a standalone function.

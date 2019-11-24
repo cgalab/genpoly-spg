@@ -65,3 +65,22 @@ void printEnum(enum intersect_t val) {
       break;
   }
 }
+
+void printEnum(enum edge_t val) {
+  switch (val) {
+    case E_VALID:
+      std::cerr << "E_VALID";
+      break;
+    case E_INTERSECTION:
+      std::cerr << "E_INTERSECTION";
+      break;
+    case E_COLLINEAR:
+      std::cerr << "E_COLLINEAR";
+      break;
+    case E_NOT_VALID:
+      std::cerr << "E_NOT_VALID";
+      break;
+    default:
+      break;
+  }
+}

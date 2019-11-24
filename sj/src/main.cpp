@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
     returnValue = holes2(sph, points, polygon, randseed, nr_holes);
   }
   else if (alg == A_ALLSP) {
-    returnValue = allsp(sph, points, randseed);
+    returnValue = allsp(points);
   }
   else if (alg == A_VERIFY) {
     return simple_pol_check(polygon, points);

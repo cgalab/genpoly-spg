@@ -81,6 +81,7 @@ public:
 
 enum error getSP(std::vector<unsigned int>& polygon, std::vector<Point>& points, enum alg_t alg, unsigned int randseed);
 void printEnum(enum intersect_t val);
+void printEnum(enum edge_t val);
 void test();
 
 #endif

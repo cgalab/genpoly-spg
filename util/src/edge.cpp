@@ -146,6 +146,9 @@ unsigned int getLowestLexIdx(const Edge e1, const Edge e2) {
 }
 
 enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
+	// is e1 and e2 the same edge?
+	if (e1 == e2) return IS_SAME_EDGE;
+	
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;
 	bool same11 = false, same12 = false, same21 = false, same22 = false;
@@ -180,9 +183,6 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		if (*(e1.p1) == *(e2.p2)) same12 = true;
 		if (*(e1.p2) == *(e2.p1)) same21 = true;
 		if (*(e1.p2) == *(e2.p2)) same22 = true;
-
-		// is e1 and e2 the same edge?
-		if (e1 == e2) return IS_SAME_EDGE;
 
 		// some determinant was 0, need to check if it's inside an edge or outside.
 		dp_1 = reldist(e1, *e2.p1);
