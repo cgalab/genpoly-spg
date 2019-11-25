@@ -2,7 +2,7 @@
 #include <iostream> // for std::endl
 #include <assert.h>
 #include <algorithm>    // std::sort
-#include <math.h>       /* sqrt */
+#include <math.h>       /* sqrt, INFINITY */
 #include "point.h"
 #include "edge.h"
 #include "basicFunctions.h"
@@ -2521,13 +2521,13 @@ bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& po
   // get direction from 'a' to 'b' through the inner chain, whether it is ascending through the index or descending
   ascending = is_ascending(ends.par.first);
 //  std::cerr << "a: " << a << ", b: " << b << ", ascending: " << (ascending ? "true" : "false") << std::endl;
+  if (ascending) it = 1;
+  else it = -1;
+
   // get length of the inner chain
   l = get_chain_length(ends, polygon.size());
 //  std::cerr << "length: " << l << std::endl;
   if (l < 3) return false;
-
-  if (ascending) it = 1;
-  else it = -1;
 
   e = Edge (&points[polygon[(polygon.size() + a + it) % polygon.size()]], &points[polygon[(polygon.size() + b - it) % polygon.size()]]);
 //  std::cerr << "inner edge: " << e << std::endl;
@@ -2543,6 +2543,81 @@ bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& po
   }
   return false;
 }
+
+// function that checks if the chain defined by the 2 edges in 'e' and 'e.closest' of
+// the polygon in 'polygon' of the points in 'points' is 2 dimensional.
+// An inner polygonal chain will have the c.h. points as [0] and [last]
+// A hole will have no c.h. points in it.
+// An inner polygonal chain can have [0,last] as one edge and the rest of the chain as the other
+// A hole must be 2D on both sides of the edges.
+bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole) {
+  assert(polygon.size() > 2);
+
+  unsigned int a, b;
+  bool is2d = false;
+  Edge e1, e2, e3, e4;
+  Point p;
+
+  // get the edge that is lex. lower in the polygon (easier to compare to [0,last] later)
+  if (candidate.getVLow() < candidate.closest[0].getVLow()) {
+
+    e1 = Edge(candidate.p1, candidate.p2);
+    e2 = Edge(candidate.closest[0].p1, candidate.closest[0].p2);
+  }
+  else {
+    e1 = Edge(candidate.closest[0].p1, candidate.closest[0].p2);
+    e2 = Edge(candidate.p1, candidate.p2);
+  }
+
+  if (is_hole) {
+    // this is a hole, so both chains on each side of 'e1' and 'e2' must be 2D
+    // chain1: from higher vertex of e1 to lower vertex of e2
+    a = e1.getVHigh();
+    b = e2.getVLow();
+    if (3 < (b-a)) return false; // calc. includes one endpoint, so has to be 4 or more
+
+    e3 = Edge(&points[polygon[(a+1)%polygon.size()]], &points[polygon[(a+2)%polygon.size()]]);
+    for (unsigned int i = (e3.getVHigh()+1)%polygon.size(); i != e2.getVLow(); i = (i+1)%polygon.size()) {
+      p = points[polygon[i]];
+      if (det(e3,p) != 0) {
+        is2d = true;
+        break;
+      }
+    }
+    if (!is2d) return false; // if the earlier chain wasn't 2D, then we skip the rest.
+
+    a = e1.getVLow();
+    b = e2.getVHigh();
+    if (4 < (polygon.size()+a-b)%polygon.size()) return false; // calc. includes both endpoints, so has to be 5 or more
+
+    e4 = Edge(&points[polygon[(b+1)%polygon.size()]], &points[polygon[(b+2)%polygon.size()]]);
+    for (unsigned int i = (e4.getVHigh()+1)%polygon.size(); i != e1.getVLow(); i = (i+1)%polygon.size()) {
+      p = points[polygon[i]];
+      if (det(e2,p) != 0) {
+        return true;
+      }
+    }
+  }
+  else {
+    // c.h. points are [0] and [last], if e2 is the c.h. edge, it should be the edge with [0]
+    if ((e2.getVHigh() == 0) && (e2.getVLow() == polygon.size()-1)) {
+      // e2 is the c.h. edge.  rest of the points can be tested against e1.
+      for (unsigned int i = 1; i < polygon.size()-2; ++i) {
+        p = points[polygon[i]];
+        if (det(e1,p) != 0) return true;
+      }
+    }
+    else {
+      // otherwise we check the chain between e1 and e2.
+      for (unsigned int i = (e1.getVHigh()+1)%polygon.size(); i < e2.getVLow(); i = (i+1)%polygon.size()) {
+        p = points[polygon[i]];
+        if (det(e2,p) != 0) return true;
+      }
+    }
+  }
+  return false;
+}
+
 
 // Temporary 'slow' function to fill 'hole' vector with the hole given by 'end' in polygon 'polygon'
 void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
@@ -2568,19 +2643,40 @@ void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned 
     prev = p;
   }
 
+  // to make sure "polygon" is the polygon, find the polygon with lower x-coordinate of the 2 polygons.
+  double xmin = INFINITY;
   if (pol1.size() < pol2.size()) {
-    hole = pol1;
-    new_polygon = pol2;
-  }
-  else {
+    for (unsigned int i = 0; i < pol1.size(); ++i) {
+      if (points[pol1[i]].x < xmin) xmin = points[pol1[i]].x;
+    }
+    for (unsigned int i = 0; i < pol2.size(); ++i) {
+      if (points[pol2[i]].x < xmin) {
+        hole = pol1;
+        new_polygon = pol2;
+        return;
+      }
+    }
     hole = pol2;
     new_polygon = pol1;
+  }
+  else {
+    for (unsigned int i = 0; i < pol2.size(); ++i) {
+      if (points[pol2[i]].x < xmin) xmin = points[pol2[i]].x;
+    }
+    for (unsigned int i = 0; i < pol1.size(); ++i) {
+      if (points[pol1[i]].x < xmin) {
+        hole = pol2;
+        new_polygon = pol1;
+        return;
+      }
+    }
+    hole = pol1;
+    new_polygon = pol2;
   }
 //  std::cerr << "polygon:" << std::endl;
 //  pdisplay(new_polygon, points);
 //  std::cerr << "hole:" << std::endl;
 //  pdisplay(hole, points);
-
 }
 
 // function to fill the 'inner_polygon' vector with the inner polygonal chain of 'polygon' defined by 'ends'

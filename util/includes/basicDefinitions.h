@@ -36,7 +36,8 @@ enum error {
   INTERSECTING_POINTS = 23,
   INFINITE_LOOP = 24,
   SIZE_NOT_EQUAL = 25,
-  HELP = 26
+  HOLES_INADEQUATE = 26,
+  HELP = 27
 };
 
 // the algorithms that should be selectable.

@@ -148,7 +148,7 @@ unsigned int getLowestLexIdx(const Edge e1, const Edge e2) {
 enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 	// is e1 and e2 the same edge?
 	if (e1 == e2) return IS_SAME_EDGE;
-	
+
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;
 	bool same11 = false, same12 = false, same21 = false, same22 = false;
@@ -461,4 +461,153 @@ void poldisplay (std::vector<unsigned int>& p) {
 		std::cout << p[i] << " ";
 	}
 	std::cout  << std::endl;
+}
+
+// function that returns the smaller angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
+// use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
+double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
+  Point p0, p1, p2, p3;
+  if(use_p1) {
+    p0 = *e1.p1;p1 = *e1.p2;
+    p2 = *e2.p1;p3 = *e2.p2;
+  }
+  else {
+    p0 = *e1.p2;p1 = *e1.p1;
+    p2 = *e2.p1;p3 = *e2.p2;
+  }
+	std::cerr << "e1: " << e1 << std::endl;
+	std::cerr << "e2: " << e2 << std::endl;
+	std::cerr << "smaller angle" << std::endl;
+	std::cerr << "p0: " << p0 << std::endl;
+	std::cerr << "p1: " << p1 << std::endl;
+	std::cerr << "p2: " << p2 << std::endl;
+	std::cerr << "p3: " << p3 << std::endl;
+  double ang1 = atan2(p1.y - p0.y, p1.x - p0.x) - atan2(p2.y - p0.y, p2.x - p0.x);
+  double ang2 = atan2(p1.y - p0.y, p1.x - p0.x) - atan2(p3.y - p0.y, p3.x - p0.x);
+  std::cerr << "ang1: " << ang1 << ", ang2: " << ang2 << std::endl;
+
+	//in case either angle is 0, the sign of the 0 is set to the same as the other angle.
+	if (ang1 == 0) {
+		if (fabs(ang2) > 0) ang1 = ang1*signbit(ang2)*(-1);
+		std::cerr << "ang1 was 0: is negative: " << (signbit(ang1) ? "true" : "false") << std::endl;
+	}
+	if (ang2 == 0) {
+		if (fabs(ang1) > 0) ang2 = ang2*signbit(ang1)*(-1);
+		std::cerr << "ang2 was 0: is negative: " << (signbit(ang2) ? "true" : "false") << std::endl;
+	}
+
+	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << std::endl;
+	if ((e1.bin && use_p1) || (!e1.bin && !use_p1)) {
+		// sign of angles should be positive
+		if (!signbit(ang1)) {
+			std::cerr << "ang1 positive" << std::endl;
+			if (!signbit(ang2)) {
+				std::cerr << "ang2 positive" << std::endl;
+				if (fabs(ang1) < fabs(ang2)) return ang1;
+			  else return ang2;
+			}
+			else return ang1;
+		}
+		else if (!signbit(ang2)) {
+			std::cerr << "ang2 positive" << std::endl;
+			return ang2;
+		}
+		else {
+			std::cerr << "Error!  Fallthrough in get_smaller_angle function!" << std::endl;
+			return 0.0;
+		}
+	}
+	else {
+		// sign of angles should be negative
+		if (signbit(ang1)) {
+			std::cerr << "ang1 negative" << std::endl;
+			if (signbit(ang2)) {
+				std::cerr << "ang2 negative" << std::endl;
+				if (fabs(ang1) < fabs(ang2)) return ang1;
+			  else return ang2;
+			}
+			else return ang1;
+		}
+		else if (signbit(ang2)) {
+			std::cerr << "ang2 negative" << std::endl;
+			return ang2;
+		}
+		else {
+			std::cerr << "Error!  Fallthrough in get_smaller_angle function!" << std::endl;
+			return 0.0;
+		}
+	}
+}
+
+// function that returns the larger angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
+// use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
+double get_larger_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
+  Point p0, p1, p2, p3;
+  if(use_p1) {
+    p0 = *e1.p1;p1 = *e1.p2;
+    p2 = *e2.p1;p3 = *e2.p2;
+  }
+  else {
+    p0 = *e1.p2;p1 = *e1.p1;
+    p2 = *e2.p1;p3 = *e2.p2;
+  }
+	std::cerr << "larger angle" << std::endl;
+	std::cerr << "p0: " << p0 << std::endl;
+	std::cerr << "p1: " << p1 << std::endl;
+	std::cerr << "p2: " << p2 << std::endl;
+	std::cerr << "p3: " << p3 << std::endl;
+  double ang1 = atan2(p1.y - p0.y, p1.x - p0.x) - atan2(p2.y - p0.y, p2.x - p0.x);
+  double ang2 = atan2(p1.y - p0.y, p1.x - p0.x) - atan2(p3.y - p0.y, p3.x - p0.x);
+  std::cerr << "ang1: " << ang1 << ", ang2: " << ang2 << std::endl;
+
+	//in case either angle is 0, the sign of the 0 is set to the same as the other angle.
+	if (ang1 == 0) {
+		if (fabs(ang2) > 0) ang1 = ang1*signbit(ang2)*(-1);
+		std::cerr << "ang1 was 0: is negative: " << (signbit(ang1) ? "true" : "false") << std::endl;
+	}
+	if (ang2 == 0) {
+		if (fabs(ang1) > 0) ang2 = ang2*signbit(ang1)*(-1);
+		std::cerr << "ang2 was 0: is negative: " << (signbit(ang2) ? "true" : "false") << std::endl;
+	}
+
+	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << std::endl;
+	if ((e1.bin && use_p1) || (!e1.bin && !use_p1)) {
+		// sign of angles should be positive
+		if (!signbit(ang1)) {
+			std::cerr << "ang1 positive" << std::endl;
+			if (!signbit(ang2)) {
+				std::cerr << "ang2 positive" << std::endl;
+				if (fabs(ang1) < fabs(ang2)) return ang2;
+			  else return ang1;
+			}
+			else return ang1;
+		}
+		else if (!signbit(ang2)) {
+			std::cerr << "ang2 positive" << std::endl;
+			return ang2;
+		}
+		else {
+			std::cerr << "Error!  Fallthrough in get_larger_angle function!" << std::endl;
+			return 0.0;
+		}
+	}
+	else {
+		// sign of angles should be negative
+		if (signbit(ang1)) {
+			std::cerr << "ang1 negative" << std::endl;
+			if (signbit(ang2)) {
+				std::cerr << "ang2 negative" << std::endl;
+				if (fabs(ang1) < fabs(ang2)) return ang2;
+			  else return ang1;
+			}
+			else return ang1;
+		}
+		else if (signbit(ang2)) {
+			return ang2;
+		}
+		else {
+			std::cerr << "Error!  Fallthrough in get_larger_angle function!" << std::endl;
+			return 0.0;
+		}
+	}
 }

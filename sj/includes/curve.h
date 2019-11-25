@@ -61,6 +61,8 @@ E_Edge get_inc_edge_from_set(E_Edge& e, std::vector<Curve>& curves, std::set<E_E
 void update_edge_in_set(E_Edge& e, std::pair<std::set<E_Edge>::iterator, bool>& retval, std::set<E_Edge>& y_set);
 E_Edge inner_holes(std::vector<Point>& points);
 E_Edge inner_holes2(std::vector<Point>& points, bool is_hole);
+void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E_Edge>& y_set);
+void validate_closest(E_Edge& e);
 enum error inner_holes_old(std::vector<std::vector<unsigned int>>& sph, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int nr_holes, bool inner_bool);
 enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, std::vector<unsigned int>& polygon, unsigned int randseed, unsigned int nr_holes);
 
