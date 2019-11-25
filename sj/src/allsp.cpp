@@ -1,6 +1,6 @@
 #include <iostream> // for endl
 #include <assert.h>
-#include <array>
+#include <set>
 #include "basicDefinitions.h"
 #include "basicFunctions.h" // for printEnum
 #include "io.h"
@@ -11,14 +11,9 @@
 #include "allsp.h"
 
 
-enum error allsp(std::vector<Point>& points) {
-  //unsigned int arr_s = points.size()*points.size();
-  //std::vector<std::vector<bool> > intersects;
-
-  //for (unsigned int i = 0; i < arr_s;++i) {
-  //  intersects.push_back(std::vector<bool> (arr_s,0));
-  //}
-  //std::cerr << "intersects: " << intersects.size() << std::endl;
+enum error allsp(std::vector<Point>& points, char *outFile, out_format_t& outFormat, bool& writeNew) {
+  std::set<unsigned int> seen;
+  unsigned int counter = 0;
 
   std::vector<unsigned int> polygon;
   for (unsigned int i = 0; i < points.size();++i) {
@@ -26,7 +21,7 @@ enum error allsp(std::vector<Point>& points) {
     polygon.push_back(i);
   }
   bool intersects = false;
-  heap2(polygon, polygon.size()-1, intersects, points);
+  heap2(polygon, polygon.size()-1, intersects, points, seen, counter, outFile, outFormat, writeNew);
 
 
   return SUCCESS;
@@ -66,7 +61,10 @@ void swap2 (std::vector<unsigned int>& a, int i, int j, bool& intersects, std::v
   }
 }
 
-enum error heap2(std::vector<unsigned int>& polygon, int n, bool& intersects, std::vector<Point>& points) {
+enum error heap2(std::vector<unsigned int>& polygon, int n, bool& intersects,
+                  std::vector<Point>& points, std::set<unsigned int>& seen,
+                  unsigned int& counter, char *outFile, out_format_t& outFormat, bool& writeNew) {
+  std::set<unsigned int>::iterator it;
   if(n == 1) {
     // (got a new permutation)
 
@@ -75,20 +73,22 @@ enum error heap2(std::vector<unsigned int>& polygon, int n, bool& intersects, st
     // is that enough or do I need a boolean as well for when no intersection?
     // add the intersection into 'intersects'
     if (!intersects) {
+      //std::cerr << "finding: " << polygon[0] << std::endl;;
+      it = seen.find(polygon[0]);
+      if (it != seen.end()) return SUCCESS;
       std::pair<E_Edge, enum error> result = simple_pol_check2(polygon, points);
       if (result.second == SUCCESS) {
-        std::cerr << "simple polygon: ";
-        for(unsigned int i = 0; i < polygon.size(); ++i) std::cerr << polygon[i] << ",";
-        std::cerr << "\n";
-        char of[255] = "all_simple_";
-        enum error returnValue = writeOutFile(of, OF_DAT, true, polygon, points);
+        //std::cerr << "simple polygon: ";
+        //for(unsigned int i = 0; i < polygon.size(); ++i) std::cerr << polygon[i] << ",";
+        //std::cerr << "\n";
+        char tempOutFile[255];
+        snprintf(tempOutFile, sizeof(tempOutFile), "%s%d", outFile, counter);
+        enum error returnValue = writeOutFile(tempOutFile, outFormat, writeNew, polygon, points);
         if (returnValue != SUCCESS) std::cerr << "Error writing polygon file!" << std::endl;
+        counter++;
       }
-      else {
-//        std::cerr << "non-simple polygon." << std::endl;
-//        std::cerr << "edge 1: " << result.first << std::endl;
-//        std::cerr << "edge 2: " << result.first.closest[0] << std::endl;
-      }
+      //std::cerr << "inserting: " << polygon[polygon.size()-2] << std::endl;
+      seen.insert(polygon[polygon.size()-2]);
     }
     //else std::cerr << "swap already found intersection" << std::endl;
 
@@ -96,13 +96,13 @@ enum error heap2(std::vector<unsigned int>& polygon, int n, bool& intersects, st
   }
   for(int i = 0;i < (n - 1);i++) {
 //    std::cerr << "i: " << i << ", n: " << n << std::endl;
-    heap2(polygon, n-1, intersects, points);
+    heap2(polygon, n-1, intersects, points, seen, counter, outFile, outFormat, writeNew);
     // always swap the first when odd,
     // swap the i-th when even
 //    std::cerr << "calling swap, i: " << i << ", n: " << n << std::endl;
     if(n % 2 == 0) swap2(polygon, n-1, i, intersects, points);
     else swap2(polygon, n-1, 0, intersects, points);
   }
-  heap2(polygon, n-1, intersects, points);
+  heap2(polygon, n-1, intersects, points, seen, counter, outFile, outFormat, writeNew);
   return SUCCESS;
 }

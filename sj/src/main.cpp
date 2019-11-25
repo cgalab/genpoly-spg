@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
     returnValue = holes2(sph, points, polygon, randseed, nr_holes);
   }
   else if (alg == A_ALLSP) {
-    returnValue = allsp(points);
+    returnValue = allsp(points, outFile, outFormat, writeNew);
   }
   else if (alg == A_VERIFY) {
     return simple_pol_check(polygon, points);
@@ -182,9 +182,6 @@ int main(int argc, char *argv[]) {
       else returnValue = writeOutFile(outFile, outFormat, writeNew, polygon, points);
       break;
     case A_HOLE:
-      returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);
-      break;
-    case A_ALLSP:
       returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);
       break;
     case A_CONVERT_FORMAT:

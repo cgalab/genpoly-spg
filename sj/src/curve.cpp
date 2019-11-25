@@ -837,8 +837,10 @@ void validate_closest(E_Edge& e) {
     int i = e.closest.size()-2;
     while(i > -1) {
 //      std::cerr<< "val_i: " << i << std::endl;
-      angle_right = get_smaller_angle(e, e.closest[i+1], false);
-      angle_left = get_larger_angle(e, e.closest[i], false);
+      E_Edge temp = e.closest[i+1];
+      angle_right = get_smaller_angle(e, temp, false);
+      temp = e.closest[i];
+      angle_left = get_larger_angle(e, temp, false);
 //      std::cerr << "angle_left: " << angle_left << ", angle_right: " << angle_right << std::endl;
 
       if (angle_right < angle_left) {
@@ -895,7 +897,8 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
     // is larger than the larger angle 'e' makes with the incidental edge.
     else {
 //      std::cerr << "checking angles of e-e.closest[last] vs. e-inc_e" << std::endl;
-      angle_left = get_smaller_angle(e, e.closest[e.closest.size()-1], true);
+      E_Edge temp = e.closest[e.closest.size()-1];
+      angle_left = get_smaller_angle(e, temp, true);
       angle_right = get_larger_angle(e, inc_e, true);
 //      std::cerr << "angle_left: " << angle_left << ", angle_right: " << angle_right << std::endl;
       if (fabs(angle_right) <= fabs(angle_left)) {
@@ -913,7 +916,8 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
     }
     else {
 //      std::cerr << "checking angles of inc_e-inc_e.closest[last] vs. inc_e-e" << std::endl;
-      angle_left = get_smaller_angle(inc_e, inc_e.closest[inc_e.closest.size()-1], true);
+      E_Edge temp = inc_e.closest[inc_e.closest.size()-1];
+      angle_left = get_smaller_angle(inc_e, temp, true);
       angle_right = get_larger_angle(inc_e, e, true);
 //      std::cerr << "inc_e angle_left: " << angle_left << ", inc_e angle_right: " << angle_right << std::endl;
       if (fabs(angle_right) <= fabs(angle_left)) {
