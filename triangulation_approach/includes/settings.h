@@ -1,4 +1,8 @@
 #include <vector>
+#include <stdio.h>
+#include <string.h>
+#include <fstream>
+#include <iostream>
 
 #include "timer.h"
 #include "randomGenerator.h"
@@ -119,6 +123,23 @@ public:
 	// Function for initialising the settings
 	static void initSettings();
 
+	// Function for reading the configuration file
+	static void readConfigFile(char *filename);
+
+	// Function for printing the settings
+	static void printSettings();
+
+	// cast string to char*
+	static char* stringToChar(std::string str);
+
+	// Reads booleans
+	static bool readBoolean(bool &found);
+
+	// Read arithmetic type
+	static Arithmetics readArithmeticType(bool &found);
+
+	// Checks whether all necessary settings are given
+	static void checkSettings();
 
 	/*
 		Check

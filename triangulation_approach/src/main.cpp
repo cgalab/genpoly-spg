@@ -25,10 +25,20 @@ code 	name						meaning
 11 		Not simple					The check for simplicity found an intersection
 12 		Vertex insertion error 		The pID passed to Triangulation::addVertex() exceeds the number of inner
 									polygons
+13 		Parameter error				A parameter given in the configuration file has a wrong type
+14 		Setting error				Some mandatory settings are not given or settings are conflicting
 */
 
-int main(){
+int main(int argc, char *argv[]){
 	Triangulation* T;
+
+	if(argc != 2){
+		printf("Usage: fpg <CONFIG FILE>\n");
+		printf("Printed a default config file named default.fpg\n");
+	}else{
+		Settings::readConfigFile(argv[1]);
+		Settings::checkSettings();		
+	}
 
 	Settings::initSettings();
 

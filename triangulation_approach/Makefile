@@ -17,17 +17,17 @@ USRC := $(wildcard $(USDIR)/*.cpp)
 UOBJ := $(patsubst $(USDIR)/%.cpp, $(UODIR)/%.o, $(USRC))
 
 all: dir $(UOBJ) $(OBJ)
-	$(PP) $(OBJ) $(UOBJ) -o app $(WFLAGS)
+	$(PP) $(OBJ) $(UOBJ) -o fpg $(WFLAGS)
 
 all_win: $(UOBJ) $(OBJ)
-	$(PP) $(OBJ) $(UOBJ) -o app $(WFLAGS)
+	$(PP) $(OBJ) $(UOBJ) -o fpg $(WFLAGS)
 
 dir:
 	mkdir -p $(ODIR)
 	mkdir -p $(UODIR)
 
 test: clean all
-	./app
+	./fpg default.fpg
 
 
 $(UODIR)/%.o: $(USDIR)/%.cpp
@@ -38,7 +38,7 @@ $(ODIR)/%.o: $(SDIR)/%.cpp
 
 clean:
 
-	rm -f app $(ODIR)/*.o $(UODIR)/*.o
+	rm -f fpg $(ODIR)/*.o $(UODIR)/*.o
 	rm -f -d $(ODIR) $(UODIR)
 	rm -f *.dat
 	rm -f output/*.graphml
