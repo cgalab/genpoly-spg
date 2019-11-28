@@ -141,6 +141,9 @@ public:
 	// Checks whether all necessary settings are given
 	static void checkSettings();
 
+	// Get hole sizes
+	static void readHoleSizes(bool &found);
+
 	/*
 		Check
 	*/

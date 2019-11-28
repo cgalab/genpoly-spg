@@ -80,7 +80,7 @@ void Settings::readConfigFile(char *filename){
 	std::fstream file;
 	std::string line;
 	char *token;
-	char delimiters[] = "= ,{}\n";
+	char delimiters[] = "= ,{}\n:";
 	unsigned int i;
 	bool found;
 
@@ -131,6 +131,12 @@ void Settings::readConfigFile(char *filename){
         	arithmetics = Settings::readArithmeticType(found);
         	if(!found){
         		printf("Arithmetic: \"EXACT\" or \"DOUBLE\" expected!\n");
+        		exit(13);
+        	}
+        }else if(!strcmp(token, "HOLESIZES")){
+        	Settings::readHoleSizes(found);
+        	if(!found){
+        		printf("HoleSizes: single integer or list of integers expected!\n");
         		exit(13);
         	}
         }
@@ -210,4 +216,49 @@ void Settings::checkSettings(){
 		printf("Given start size: %d Given target size: %d\n", initialSize, outerSize);
 		exit(14);
 	}
+}
+
+// Get hole sizes
+void Settings::readHoleSizes(bool &found){
+	int n, k;
+	int i;
+	char delimiters[] = "= ,{}\n:";
+	char *token;
+
+	// Get the first given size
+	if(!(token = strtok(0, delimiters)) || !sscanf(token, "%d", &n)){
+		found = false;
+		return;
+	}
+	innerSizes.push_back(n);
+	k = n;
+
+	// No we have to check whether there is an additional size given
+	if(!(token = strtok(0, delimiters)) || !sscanf(token, "%d", &n)){
+		// If no additional size is given, all holes may have the same size
+		if(nrInnerPolygons == 0){
+			printf("HoleSizes: Can not be specified as single integer before specifying\
+				the number of holes\n");
+			found = false;
+			return;
+		}
+
+		for(i = 1; i < nrInnerPolygons; i++)
+			innerSizes.push_back(k);
+	}
+
+	// Hole sizes are given as a list
+	while(token != NULL){
+		innerSizes.push_back(n);
+
+		// Get next
+		token = strtok(0, delimiters);
+
+		if(token != NULL){
+			if(!sscanf(token, "%d", &n)){
+				printf("HoleSizes: integer expected, got %s\n", token);
+			}
+		}
+	}
+	found = true;
 }
