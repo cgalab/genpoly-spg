@@ -120,9 +120,6 @@ public:
 	// Feedback mode
 	static FeedbackMode feedback;
 
-	// Function for initialising the settings
-	static void initSettings();
-
 	// Function for reading the configuration file
 	static void readConfigFile(char *filename);
 
@@ -139,7 +136,7 @@ public:
 	static Arithmetics readArithmeticType(bool &found);
 
 	// Checks whether all necessary settings are given
-	static void checkSettings();
+	static void checkAndApplySettings();
 
 	// Get hole sizes
 	static void readHoleSizes(bool &found);

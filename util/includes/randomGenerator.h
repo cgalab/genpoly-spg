@@ -33,12 +33,13 @@ class RandomGenerator{
 			@param 	seed 		This number will be used as the seed of the random generator if the
 								flag fixedSeed is unset
 		*/
-		RandomGenerator(bool fixedSeed, unsigned int seed){
+		RandomGenerator(bool fixedSeed, unsigned int &seed){
 			
-			if(!fixedSeed)
-				seed = rd();
-
-			printf("seed: %u \n", seed);
+			if(!fixedSeed){
+				seed = 0;
+				while(seed == 0)
+					seed = rd();
+			}
 
 			generator.seed(seed);
 		}

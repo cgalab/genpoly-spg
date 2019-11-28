@@ -37,10 +37,10 @@ int main(int argc, char *argv[]){
 		printf("Printed a default config file named default.fpg\n");
 	}else{
 		Settings::readConfigFile(argv[1]);
-		Settings::checkSettings();		
+		Settings::checkAndApplySettings();	
+		Settings::printSettings();	
 	}
-
-	Settings::initSettings();
+	exit(0);
 
 	T = generateRegularPolygon();
 

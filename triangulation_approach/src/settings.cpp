@@ -52,30 +52,6 @@ RandomGenerator* Settings::generator = NULL;
 FeedbackMode Settings::feedback = FeedbackMode::EXECUTION;
 bool Settings::simplicityCheck = false;
 
-void Settings::initSettings(){
-	// Generate and start Timer
-	timer = new Timer();
-	(*timer).start();
-
-	// Generate the vector of sizes of the inner polygons
-	//innerSizes.push_back(100000);
-
-	// Compute the number of translations for the initial polygon
-	if(initialSize < outerSize){
-		initialTranslationNumber = initialTranslationFactor * initialSize;
-	}else{
-		initialTranslationNumber = initialTranslationFactor * outerSize;
-		initialSize = outerSize;
-	}
-
-	// Initialize the RandomGenerator
-	generator = new RandomGenerator(fixedSeed, seed);
-
-	// Initialize the exact arithmetic
-	if(arithmetics == Arithmetics::EXACT)
-		exactinit();
-}
-
 void Settings::readConfigFile(char *filename){
 	std::fstream file;
 	std::string line;
@@ -139,16 +115,46 @@ void Settings::readConfigFile(char *filename){
         		printf("HoleSizes: single integer or list of integers expected!\n");
         		exit(13);
         	}
+        }else{
+        	printf("Unknown token %s\n", token);
+        	exit(13);
         }
 	}
 
 	file.close();
 
-	printf("successful\n");
+	printf("successful\n\n");
 }
 
 void Settings::printSettings(){
+	int i;
 
+	printf("Polygon settings:\n");
+	printf("Number of holes: %d\n", nrInnerPolygons);
+	printf("Number of vertices (start polygon): %d\n", initialSize);
+	printf("Target number of vertices (polygon): %d\n", outerSize);
+
+	if(nrInnerPolygons > 0){
+		printf("Target number of vertices (holes):\n");
+		for(i = 0; i < nrInnerPolygons; ++i){
+			printf("%d\n", innerSizes[i]);
+		}
+	}
+
+	printf("\n");
+
+	printf("Machine settings:\n");
+	if(arithmetics == Arithmetics::DOUBLE)
+		printf("Arithmetic: DOUBLE\n");
+	else
+		printf("Arithmetic: EXACT\n");
+	if(fixedSeed)
+		printf("Seed configuration: FIXED\n");
+	else
+		printf("Seed configuration: RANDOM\n");
+	printf("Seed: %llu\n", seed);
+
+	printf("\n");
 }
 
 // cast string to char*
@@ -204,7 +210,8 @@ Arithmetics Settings::readArithmeticType(bool &found){
 }
 
 // Checks whether all necessary settings are given
-void Settings::checkSettings(){
+void Settings::checkAndApplySettings(){
+	int i;
 
 	if(outerSize < 3){
 		printf("The polygon must have at least 3 vertices, given number %d\n", outerSize);
@@ -216,6 +223,50 @@ void Settings::checkSettings(){
 		printf("Given start size: %d Given target size: %d\n", initialSize, outerSize);
 		exit(14);
 	}
+
+	if(nrInnerPolygons != innerSizes.size()){
+		printf("Conflicting number of holes:\n");
+		printf("Given number: %d Given number of sizes: %d\n", nrInnerPolygons,
+			innerSizes.size());
+		exit(14);
+	}
+
+	for(i = 0; i < nrInnerPolygons; i++){
+		if(innerSizes[i] < 3){
+			printf("Holes must have a size of at least 3, given size for polygon with id %d: %d\n",
+				i + 1, innerSizes[i]);
+			exit(14);
+		}
+	}
+
+	if(fixedSeed){
+		if(seed == 0){
+			printf("Fixed seed is marked to use, but no seed is given!\n");
+			exit(14);
+		}
+	}
+
+
+	// Apply settings
+
+	// Generate and start Timer
+	timer = new Timer();
+	(*timer).start();
+
+	// Compute the number of translations for the initial polygon
+	if(initialSize < outerSize){
+		initialTranslationNumber = initialTranslationFactor * initialSize;
+	}else{
+		initialTranslationNumber = initialTranslationFactor * outerSize;
+		initialSize = outerSize;
+	}
+
+	// Initialize the RandomGenerator
+	generator = new RandomGenerator(fixedSeed, seed);
+
+	// Initialize the exact arithmetic
+	if(arithmetics == Arithmetics::EXACT)
+		exactinit();
 }
 
 // Get hole sizes
