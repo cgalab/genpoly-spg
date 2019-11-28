@@ -141,6 +141,9 @@ public:
 	// Get hole sizes
 	static void readHoleSizes(bool &found);
 
+	//Print a dummy configuration file
+	static void printDummyFile();
+
 	/*
 		Check
 	*/

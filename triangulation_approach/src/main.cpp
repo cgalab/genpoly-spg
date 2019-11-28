@@ -34,7 +34,8 @@ int main(int argc, char *argv[]){
 
 	if(argc != 2){
 		printf("Usage: fpg <CONFIG FILE>\n");
-		printf("Printed a default config file named default.fpg\n");
+		Settings::printDummyFile();
+		printf("Printed a dummy config file named dummy.fpg\n");
 	}else{
 		Settings::readConfigFile(argv[1]);
 		Settings::checkAndApplySettings();	
