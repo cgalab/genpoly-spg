@@ -163,9 +163,6 @@ void strategyNoHoles0(Triangulation * const T){
 		exit(9);
 	}
 
-	(*T).print("triangulation_init.graphml");
-	(*T).printPolygonToDat("polygon_init.dat");
-
 	growPolygonBy(T, 0, Settings::outerSize - Settings::initialSize);
 	printf("Grew initial polygon to %d vertices afters %f seconds \n\n",
 		Settings::outerSize, (*Settings::timer).elapsedTime());
@@ -184,8 +181,6 @@ void strategyNoHoles0(Triangulation * const T){
 		printf("Triangulation error: something is wrong in the triangulation at the end\n");
 		exit(9);
 	}
-
-	(*T).printPolygonToDat("polygon.dat");
 }
 
 
@@ -195,7 +190,7 @@ void strategyNoHoles0(Triangulation * const T){
 void strategyWithHoles0(Triangulation * const T){
 	int performed;
 	int nrInsertions;
-	int i, k;
+	unsigned int i, k;
 	int actualN;
 
 	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
@@ -209,6 +204,8 @@ void strategyWithHoles0(Triangulation * const T){
 	}
 
 	performed = 1;
+	// TODO:
+	// What the hell is this k doing?
 	k = 0;
 	while(performed != 0 && k < 20){
 		performed = 0;
@@ -256,9 +253,4 @@ void strategyWithHoles0(Triangulation * const T){
 			growing the initial polygon\n");
 		exit(9);
 	}
-
-	(*T).print("triangulation_init.graphml");
-	(*T).printPolygonToDat("polygon_init.dat");
-
-	(*T).printPolygonToDat("polygon.dat");
 }

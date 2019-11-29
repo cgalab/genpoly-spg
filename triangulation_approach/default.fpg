@@ -3,10 +3,11 @@
 # All lines starting with '#' are ignored!                                       #
 ##################################################################################
 
+
 ##################################################################################
 # Specify the number of holes (optional; default: 0)                             #
 ##################################################################################
-NrOfHoles = 2
+NrOfHoles = 0
 
 ##################################################################################
 # Specify the target number of vertices for the polygon (mandatory)              #
@@ -26,7 +27,8 @@ StartSize = 5
 # specified before!                                                              # 
 # (mandatory if the number of holes is not 0)                                    #
 ##################################################################################
-HoleSizes = {25, 20}
+#HoleSizes = {25, 20}
+
 
 ##################################################################################
 # Specifies the type of arithmetics for determinants, either standard            #
@@ -43,4 +45,22 @@ FixedSeed = False
 ##################################################################################
 # The seed to use (mandatory if FixedSeed = TRUE; 0 is permitted)                #
 ##################################################################################
-Seed = 12
+Seed = 6542123
+
+
+##################################################################################
+# Specifies the output file for the polygon (optional; default: polygon.dat)     #
+##################################################################################
+PolygonFile = "poly.dat"
+
+##################################################################################
+# Specifies a graphml-file to print the whole triangulation in.                  #
+# (optional; default: NULL)                                                      #
+##################################################################################
+TriangulationFile = "triangulation.graphml"
+
+##################################################################################
+# Specifies a file to print the statistics of the polygon and generation in.     #
+# (optional; default: NULL)                                                      #
+##################################################################################
+StatisticsFile = "stats.dat"

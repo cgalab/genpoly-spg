@@ -41,7 +41,6 @@ int main(int argc, char *argv[]){
 		Settings::checkAndApplySettings();	
 		Settings::printSettings();	
 	}
-	exit(0);
 
 	T = generateRegularPolygon();
 
@@ -56,6 +55,11 @@ int main(int argc, char *argv[]){
 		strategyWithHoles0(T);
 	else
 		strategyWithHoles0(T);
+
+	(*T).printPolygonToDat(Settings::polygonFile);
+
+	if(Settings::triangulationOutputRequired)
+		(*T).print(Settings::triangulationFile);
 
 	calculateDistanceDistribution(T, 0.25);
 	

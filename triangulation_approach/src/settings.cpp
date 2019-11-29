@@ -51,12 +51,17 @@ RandomGenerator* Settings::generator = NULL;
 */
 FeedbackMode Settings::feedback = FeedbackMode::EXECUTION;
 bool Settings::simplicityCheck = false;
+char* Settings::polygonFile = (char*)"polygon.dat";
+bool Settings::triangulationOutputRequired = false;
+char* Settings::triangulationFile = NULL;
+char* Settings::statisticsFile = NULL;
+
 
 void Settings::readConfigFile(char *filename){
 	std::fstream file;
 	std::string line;
 	char *token;
-	char delimiters[] = "= ,{}\n:";
+	char delimiters[] = "= ,{}\n:\"";
 	unsigned int i;
 	bool found;
 
@@ -78,22 +83,22 @@ void Settings::readConfigFile(char *filename){
         for (i = 0; i < strlen(token); i++)
             token[i] = (char) toupper(token[i]);
         if(!strcmp(token, "NROFHOLES")){
-        	if (!(token = strtok(0, delimiters)) || !sscanf(token, "%d", &nrInnerPolygons)){
+        	if(!(token = strtok(0, delimiters)) || !sscanf(token, "%d", &nrInnerPolygons)){
         		printf("NrOfHoles: expected integer, got \"%s\"!\n", token);
         		exit(13);
         	}
         }else if(!strcmp(token, "POLYGONSIZE")){
-        	if (!(token = strtok(0, delimiters)) || !sscanf(token, "%d", &outerSize)){
+        	if(!(token = strtok(0, delimiters)) || !sscanf(token, "%d", &outerSize)){
         		printf("PolygonSize: expected integer, got \"%s\"!\n", token);
         		exit(13);
         	}
         }else if(!strcmp(token, "STARTSIZE")){
-        	if (!(token = strtok(0, delimiters)) || !sscanf(token, "%d", &initialSize)){
+        	if(!(token = strtok(0, delimiters)) || !sscanf(token, "%d", &initialSize)){
         		printf("StartSize: expected integer, got \"%s\"!\n", token);
         		exit(13);
         	}
         }else if(!strcmp(token, "SEED")){
-        	if (!(token = strtok(0, delimiters)) || !sscanf(token, "%d", &seed)){
+        	if(!(token = strtok(0, delimiters)) || !sscanf(token, "%d", &seed)){
         		printf("Seed: expected integer, got \"%s\"!\n", token);
         		exit(13);
         	}
@@ -115,6 +120,24 @@ void Settings::readConfigFile(char *filename){
         		printf("HoleSizes: single integer or list of integers expected!\n");
         		exit(13);
         	}
+        }else if(!strcmp(token, "POLYGONFILE")){
+        	if(!(token = strtok(0, delimiters))){
+        		printf("PolygonFile: missing argument!\n");
+        		exit(13);
+        	}
+        	Settings::polygonFile = token;
+        }else if(!strcmp(token, "TRIANGULATIONFILE")){
+        	if(!(token = strtok(0, delimiters))){
+        		printf("TriangulationFile: missing argument!\n");
+        		exit(13);
+        	}
+        	Settings::triangulationFile = token;
+        }else if(!strcmp(token, "STATISTICSFILE")){
+        	if(!(token = strtok(0, delimiters))){
+        		printf("StatisticsFile: missing argument!\n");
+        		exit(13);
+        	}
+        	Settings::statisticsFile = token;
         }else{
         	printf("Unknown token %s\n", token);
         	exit(13);
@@ -127,7 +150,7 @@ void Settings::readConfigFile(char *filename){
 }
 
 void Settings::printSettings(){
-	int i;
+	unsigned int i;
 
 	printf("Polygon settings:\n");
 	printf("Number of holes: %d\n", nrInnerPolygons);
@@ -155,6 +178,15 @@ void Settings::printSettings(){
 	printf("Seed: %llu\n", seed);
 
 	printf("\n");
+
+	printf("Output settings:\n");
+	printf("Polygon file: %s\n", polygonFile);
+	if(triangulationOutputRequired)
+		printf("Triangulation file: %s\n", triangulationFile);
+	if(statisticsFile != NULL)
+		printf("Statistics file: %s\n", statisticsFile);
+
+	printf("\n");
 }
 
 // cast string to char*
@@ -167,7 +199,7 @@ char* Settings::stringToChar(std::string str){
 
 // Reads booleans
 bool Settings::readBoolean(bool &found){
-    bool out;
+    bool out = false;
     unsigned int i;
     char *token = strtok(0, "= ,{}\n");
 
@@ -211,7 +243,7 @@ Arithmetics Settings::readArithmeticType(bool &found){
 
 // Checks whether all necessary settings are given
 void Settings::checkAndApplySettings(){
-	int i;
+	unsigned int i;
 
 	if(outerSize < 3){
 		printf("The polygon must have at least 3 vertices, given number %d\n", outerSize);
@@ -264,6 +296,10 @@ void Settings::checkAndApplySettings(){
 	// Initialize the RandomGenerator
 	generator = new RandomGenerator(fixedSeed, seed);
 
+	// Enable triangulation output
+	if(triangulationFile != NULL)
+		triangulationOutputRequired = true;
+
 	// Initialize the exact arithmetic
 	if(arithmetics == Arithmetics::EXACT)
 		exactinit();
@@ -272,7 +308,7 @@ void Settings::checkAndApplySettings(){
 // Get hole sizes
 void Settings::readHoleSizes(bool &found){
 	int n, k;
-	int i;
+	unsigned int i;
 	char delimiters[] = "= ,{}\n:";
 	char *token;
 
@@ -380,6 +416,29 @@ void Settings::printDummyFile(){
 	fprintf(f, "# The seed to use (mandatory if FixedSeed = TRUE; 0 is permitted)                #\n");
 	fprintf(f, "##################################################################################\n");
 	fprintf(f, "Seed = 6542123\n");
+
+	fprintf(f, "\n\n");
+
+	fprintf(f, "##################################################################################\n");
+	fprintf(f, "# Specifies the output file for the polygon (optional; default: polygon.dat)     #\n");
+	fprintf(f, "##################################################################################\n");
+	fprintf(f, "PolygonFile = \"poly.dat\"\n");
+
+	fprintf(f, "\n");
+
+	fprintf(f, "##################################################################################\n");
+	fprintf(f, "# Specifies a graphml-file to print the whole triangulation in.                  #\n");
+	fprintf(f, "# (optional; default: NULL)                                                      #\n");
+	fprintf(f, "##################################################################################\n");
+	fprintf(f, "TriangulationFile = \"triangulation.graphml\"\n");
+
+	fprintf(f, "\n");
+
+	fprintf(f, "##################################################################################\n");
+	fprintf(f, "# Specifies a file to print the statistics of the polygon and generation in.     #\n");
+	fprintf(f, "# (optional; default: NULL)                                                      #\n");
+	fprintf(f, "##################################################################################\n");
+	fprintf(f, "StatisticsFile = \"stats.dat\"\n");
 
 	fclose(f);
 }

@@ -19,7 +19,7 @@ void calculateDistanceDistribution(Triangulation const * const T, const double w
 	int i, cat;
 	std::vector<int> segments;
 	Vertex *v;
-	double distance, area;
+	double distance, area = 0;
 
 	n_seg = ceil(Settings::boxSize / (2 * width)) + 1;
 	segments.reserve(n_seg);

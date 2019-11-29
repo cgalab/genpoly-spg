@@ -120,6 +120,22 @@ public:
 	// Feedback mode
 	static FeedbackMode feedback;
 
+	// Filename for polygon output file
+	static char *polygonFile;
+
+	// A flag whether the triangulation is required
+	static bool triangulationOutputRequired;
+
+	// Filename for triangulation file
+	static char *triangulationFile;
+
+	// Filename for statistics file
+	static char *statisticsFile;
+
+
+
+
+
 	// Function for reading the configuration file
 	static void readConfigFile(char *filename);
 
