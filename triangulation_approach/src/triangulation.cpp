@@ -91,7 +91,8 @@ void Triangulation::changeVertex(const int i, const unsigned int fromP, const un
 	@param	e 	Edge to be added to the edge map
 */
 void Triangulation::addEdge(TEdge * const e){
-	edges.insert(std::pair<int, TEdge*>((*e).getID(), e));
+	if(Settings::triangulationOutputRequired)
+		edges.insert(std::pair<int, TEdge*>((*e).getID(), e));
 
 	// Do not forget to register the triangulation at the edge
 	(*e).setTriangulation(this);
@@ -219,7 +220,8 @@ void Triangulation::removeVertex(const int index){
 	@param	e 	The edge to be removed
 */
 void Triangulation::removeEdge(TEdge * const e){
-	edges.erase((*e).getID());
+	if(Settings::triangulationOutputRequired)
+		edges.erase((*e).getID());
 }
 
 

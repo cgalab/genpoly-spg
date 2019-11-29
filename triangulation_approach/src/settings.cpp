@@ -244,6 +244,8 @@ Arithmetics Settings::readArithmeticType(bool &found){
 // Checks whether all necessary settings are given
 void Settings::checkAndApplySettings(){
 	unsigned int i;
+	bool conflict = false;
+	printf("Checking for configuration conflicts...");
 
 	if(outerSize < 3){
 		printf("The polygon must have at least 3 vertices, given number %d\n", outerSize);
@@ -251,7 +253,7 @@ void Settings::checkAndApplySettings(){
 	}
 
 	if(outerSize < initialSize){
-		printf("The size of the start polygon is not allowed to exceed the target size.\n");
+		printf("The size of the start polygon is not allowed to exceed the target size:\n");
 		printf("Given start size: %d Given target size: %d\n", initialSize, outerSize);
 		exit(14);
 	}
@@ -273,10 +275,20 @@ void Settings::checkAndApplySettings(){
 
 	if(fixedSeed){
 		if(seed == 0){
-			printf("Fixed seed is marked to use, but no seed is given!\n");
-			exit(14);
+			printf("\nNote: FixedSeed is marked to use, but no seed is given!\n");
+			conflict = true;
+		}
+	}else{
+		if(seed != 0){
+			printf("\nNote: A seed is given but FixedSeed is not marked to use!\n");
+			conflict = true;
 		}
 	}
+
+	if(!conflict)
+		printf("no conflicts\n\n");
+	else
+		printf("\n");
 
 
 	// Apply settings
