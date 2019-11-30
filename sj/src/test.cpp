@@ -648,10 +648,20 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   std::cerr << "=== Determinant test ===" << std::endl;
 
+  p1.set(-0.4410479999999999956,0.30967199999999989179);
+  p2.set(-0.43791999999999997595,0.30967199999999989179);
+  e1.set(p1,p2);
+  p3.set(-0.45356000000000001871,0.31280000000000002247);
+  double area = det(e1, p3);
+  std::cerr << "e1: " << e1 << ", p3: " << p3 << std::endl;
+  std::cerr << "det: " << area  << ", det != 0: " << ((area != 0) ? "true" : "false") << std::endl;
+
+
+
   bool detBool = false;
 
   if (detBool) {
-    double max=0, current=0.0, area=0;
+    double max=0, current=0.0;
     unsigned int counter = 0;
 
     p1.set(current, current);
