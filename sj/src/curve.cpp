@@ -211,19 +211,25 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
 
           // need to make a function that can take the end and the new polygon and return the new chain
           // then verify that the hole and the new inner chain are both still simple.
-          std::vector<unsigned int> new_inner_polygon;
-          get_new_inner_polygon(ends[r_end], new_inner_polygon, new_polygon, points);
+          //std::vector<unsigned int> new_inner_polygon;
+          //get_new_inner_polygon(ends[r_end], new_inner_polygon, new_polygon, points);
+          enum error simple = SUCCESS;
+          simple = simple_pol_check(hole, points);
+          if (simple == SUCCESS) {
+            simple = simple_pol_check(new_polygon, points);
+            if (simple == SUCCESS) {
+              // need to reindex the points in new polygon.
+              for (unsigned int i = 0; i < new_polygon.size(); ++i) points[new_polygon[i]].v = i;
+              sph[0] = new_polygon;
+              sph.push_back(hole);
+              ++count_holes;
 
-          // need to reindex the points in new polygon.
-          for (unsigned int i = 0; i < new_polygon.size(); ++i) points[new_polygon[i]].v = i;
-          sph[0] = new_polygon;
-          sph.push_back(hole);
-          ++count_holes;
-
-          std::cerr << "new polygon" << std:: endl;
-          pdisplay (sph[0], points);
-          std::cerr << "new hole:" << std::endl;
-          pdisplay(hole, points);
+              std::cerr << "new polygon" << std:: endl;
+              pdisplay (sph[0], points);
+              std::cerr << "new hole:" << std::endl;
+              pdisplay(hole, points);
+            }
+          }
         }
         else {
           std::cerr << "no hole found, removing: " << ends[r_end] << std::endl;
