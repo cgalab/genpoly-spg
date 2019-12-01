@@ -252,7 +252,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
 
 
       ++count_iterations;
-    } while (generate_polygons && (count_iterations < max_iterations));
+    } while (generate_polygons && (count_iterations < max_iterations) && (count_holes < nr_holes));
 
     std::cerr << "wanted holes:" << nr_holes << ", found holes: " << count_holes << std::endl;
     std::cerr << "backup holes: " << backup_holes.size() << std::endl;
