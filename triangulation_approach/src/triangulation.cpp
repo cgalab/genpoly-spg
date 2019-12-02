@@ -400,6 +400,9 @@ bool Triangulation::check() const{
 	bool ok = true;
 	bool part;
 
+	if(!Settings::globalChecking)
+		return true;
+
 	for(auto const& i : edges){
 		e = i.second;
 		type = (*e).getEdgeType();

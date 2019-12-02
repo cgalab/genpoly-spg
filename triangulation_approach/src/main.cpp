@@ -39,6 +39,7 @@ int main(int argc, char *argv[]){
 	}else{
 		Settings::readConfigFile(argv[1]);
 		Settings::checkAndApplySettings();
+		
 		if(!Settings::mute)
 			Settings::printSettings();
 	}
@@ -65,7 +66,7 @@ int main(int argc, char *argv[]){
 			printf("Write triangulation to %s...", Settings::triangulationFile);
 
 		(*T).writeTriangulation(Settings::triangulationFile);
-		
+
 		if(Settings::executionInfo)
 			printf("successful\n");
 	}

@@ -79,6 +79,12 @@ public:
 	// out of its surrounding polygon (just with double arithmetics)
 	static constexpr double minDetInsertion = 0.000000000001; // 10⁻¹²
 
+	// Enable local correctness checking after aborted translations
+	static bool localChecking;
+
+	// Enable global correctness checking between stages
+	static bool globalChecking;
+
 
 	/*
 		Insertion parameters
@@ -88,7 +94,7 @@ public:
 	static int insertionTries;
 
 	// Minimal allowed edge length for insertions
-	static double minLength;	
+	static double minLength;
 
 
 	/*

@@ -919,6 +919,8 @@ bool Translation::insertAfterNonOppositeFlip(Triangle *t, Vertex * shared0, Vert
 	The function undo() checks whether moving vertex still lays inside of its 
 	surrounding polygon. If it does not the function undoes all executed flips in
 	reversed order and sets the moving vertex back to its original position.
+
+	@return 	True if the translation has been undone, otherwise false
 */
 bool Translation::undo(){
 	struct Flip *f;
@@ -926,6 +928,9 @@ bool Translation::undo(){
 	Vertex *oldD0, *oldD1;
 	Vertex *newD0, *newD1;
 	TEdge *e;
+
+	if(!Settings::localChecking)
+		return false;
 
 	ok = (*original).checkSurroundingPolygon();
 

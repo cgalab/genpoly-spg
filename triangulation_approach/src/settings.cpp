@@ -23,6 +23,8 @@ int Settings::initialTranslationNumber = -1;
 	Translation parameters
 */
 Arithmetics Settings::arithmetics = Arithmetics::DOUBLE;
+bool Settings::localChecking = true;
+bool Settings::globalChecking = false;
 
 
 /*
@@ -153,6 +155,18 @@ void Settings::readConfigFile(char *filename){
         		printf("NumericalCorrectionInfo: boolean expected!\n");
         		exit(13);
         	}
+        }else if(!strcmp(token, "ENABLELOCALCHECKS")){
+        	localChecking = Settings::readBoolean(found);
+        	if(!found){
+        		printf("EnableLocalChecks: boolean expected!\n");
+        		exit(13);
+        	}
+        }else if(!strcmp(token, "ENABLEGLOBALCHECKS")){
+        	globalChecking = Settings::readBoolean(found);
+        	if(!found){
+        		printf("EnableGlobalChecks: boolean expected!\n");
+        		exit(13);
+        	}
         }else if(!strcmp(token, "COMPLETEMUTE")){
         	mute = Settings::readBoolean(found);
         	if(!found){
@@ -197,6 +211,14 @@ void Settings::printSettings(){
 	else
 		printf("Seed configuration: RANDOM\n");
 	printf("Seed: %llu\n", seed);
+	if(localChecking)
+		printf("Local checking: enabled\n");
+	else
+		printf("Local checking: disbaled\n");
+	if(globalChecking)
+		printf("Global checking: enabled\n");
+	else
+		printf("Global checking: disbaled\n");
 
 	printf("\n");
 
