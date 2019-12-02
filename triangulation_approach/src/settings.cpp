@@ -50,6 +50,8 @@ RandomGenerator* Settings::generator = NULL;
 	Feedback settings
 */
 FeedbackMode Settings::feedback = FeedbackMode::EXECUTION;
+bool Settings::executionInfo = true;
+bool Settings::mute = false;
 bool Settings::simplicityCheck = false;
 char* Settings::polygonFile = (char*)"polygon.dat";
 bool Settings::triangulationOutputRequired = false;
@@ -138,6 +140,12 @@ void Settings::readConfigFile(char *filename){
         		exit(13);
         	}
         	Settings::statisticsFile = token;
+        }else if(!strcmp(token, "PRINTEXECUTIONINFO")){
+        	executionInfo = Settings::readBoolean(found);
+        	if(!found){
+        		printf("PrintExecutionInfo: boolean expected!\n");
+        		exit(13);
+        	}
         }else{
         	printf("Unknown token %s\n", token);
         	exit(13);
@@ -185,6 +193,10 @@ void Settings::printSettings(){
 		printf("Triangulation file: %s\n", triangulationFile);
 	if(statisticsFile != NULL)
 		printf("Statistics file: %s\n", statisticsFile);
+	if(executionInfo)
+		printf("Print execution information: true\n");
+	else
+		printf("Print execution information: false\n");
 
 	printf("\n");
 }
@@ -292,6 +304,11 @@ void Settings::checkAndApplySettings(){
 
 
 	// Apply settings
+
+	// Mute overrides all other command line output settings
+	if(mute){
+		executionInfo = false;
+	}
 
 	// Generate and start Timer
 	timer = new Timer();

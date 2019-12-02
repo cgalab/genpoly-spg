@@ -38,16 +38,18 @@ int main(int argc, char *argv[]){
 		printf("Printed a dummy config file named dummy.fpg\n");
 	}else{
 		Settings::readConfigFile(argv[1]);
-		Settings::checkAndApplySettings();	
-		Settings::printSettings();	
+		Settings::checkAndApplySettings();
+		if(!Settings::mute)
+			Settings::printSettings();
 	}
 
 	T = generateRegularPolygon();
 
 	(*T).check();
 
-	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n",
-		Settings::initialSize, (*Settings::timer).elapsedTime());
+	if(Settings::executionInfo)
+		printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n",
+			Settings::initialSize, (*Settings::timer).elapsedTime());
 
 	if(Settings::nrInnerPolygons == 0)
 		strategyNoHoles0(T);
@@ -58,8 +60,15 @@ int main(int argc, char *argv[]){
 
 	(*T).writePolygonToDat(Settings::polygonFile);
 
-	if(Settings::triangulationOutputRequired)
+	if(Settings::triangulationOutputRequired){
+		if(Settings::executionInfo)
+			printf("Write triangulation to %s...", Settings::triangulationFile);
+
 		(*T).writeTriangulation(Settings::triangulationFile);
+		
+		if(Settings::executionInfo)
+			printf("successful\n");
+	}
 
 	calculateDistanceDistribution(T, 0.25);
 	

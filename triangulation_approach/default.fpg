@@ -7,18 +7,18 @@
 ##################################################################################
 # Specify the number of holes (optional; default: 0)                             #
 ##################################################################################
-NrOfHoles = 0
+NrOfHoles = 2
 
 ##################################################################################
 # Specify the target number of vertices for the polygon (mandatory)              #
 ##################################################################################
-PolygonSize = 1000000
+PolygonSize = 1000
 
 ##################################################################################
 # Specifies the the size of the start polygon (optional; default: 10)            #
 # Note that the StartSize must be less or equal to PolygonSize!                  #
 ##################################################################################
-StartSize = 5
+StartSize = 10
 
 ##################################################################################
 # Specify the number of vertices of the holes either as one integer, so all      #
@@ -27,7 +27,7 @@ StartSize = 5
 # specified before!                                                              # 
 # (mandatory if the number of holes is not 0)                                    #
 ##################################################################################
-#HoleSizes = {25, 20}
+HoleSizes = {25, 20}
 
 
 ##################################################################################
@@ -57,10 +57,28 @@ PolygonFile = "poly.dat"
 # Specifies a graphml-file to print the whole triangulation in.                  #
 # (optional; default: NULL)                                                      #
 ##################################################################################
-#TriangulationFile = "triangulation.graphml"
+TriangulationFile = "triangulation.graphml"
 
 ##################################################################################
 # Specifies a file to print the statistics of the polygon and generation in.     #
 # (optional; default: NULL)                                                      #
 ##################################################################################
 StatisticsFile = "stats.dat"
+
+
+##################################################################################
+# Mute all output to stdout. (optional; default: false)                          #
+##################################################################################
+#CompleteMute = false
+
+##################################################################################
+# Specify whether FPG should print information on the state of execution during  #
+# the execution. (optional; default:true)                                        #
+##################################################################################
+PrintExecutionInfo = true
+
+##################################################################################
+# Specify whether FPG should print note numerical corrections at stdout.         #
+# (optional; default:false)                                                      #
+##################################################################################
+#NumericalCorrectionInfo = false

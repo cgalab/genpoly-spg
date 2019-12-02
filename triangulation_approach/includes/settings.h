@@ -120,6 +120,12 @@ public:
 	// Feedback mode
 	static FeedbackMode feedback;
 
+	// Flag whether execution info should be printed
+	static bool executionInfo;
+
+	// Flag to mute all output
+	static bool mute;
+
 	// Filename for polygon output file
 	static char *polygonFile;
 
