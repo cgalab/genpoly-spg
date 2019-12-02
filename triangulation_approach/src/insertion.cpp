@@ -163,6 +163,6 @@ void Insertion::translate() const{
 		count++;
 	}
 
-	if(Settings::feedback == FeedbackMode::VERBOSE && count == Settings::insertionTries)
-		printf("translation after insertion was impossible!\n");
+	if(Settings::correctionInfo && count == Settings::insertionTries)
+		printf("Warning: Was not able to find a suitable translation after the insertion!\n");
 }

@@ -51,6 +51,7 @@ RandomGenerator* Settings::generator = NULL;
 */
 FeedbackMode Settings::feedback = FeedbackMode::EXECUTION;
 bool Settings::executionInfo = true;
+bool Settings::correctionInfo = false;
 bool Settings::mute = false;
 bool Settings::simplicityCheck = false;
 char* Settings::polygonFile = (char*)"polygon.dat";
@@ -146,6 +147,18 @@ void Settings::readConfigFile(char *filename){
         		printf("PrintExecutionInfo: boolean expected!\n");
         		exit(13);
         	}
+        }else if(!strcmp(token, "NUMERICALCORRECTIONINFO")){
+        	correctionInfo = Settings::readBoolean(found);
+        	if(!found){
+        		printf("NumericalCorrectionInfo: boolean expected!\n");
+        		exit(13);
+        	}
+        }else if(!strcmp(token, "COMPLETEMUTE")){
+        	mute = Settings::readBoolean(found);
+        	if(!found){
+        		printf("CompleteMute: boolean expected!\n");
+        		exit(13);
+        	}
         }else{
         	printf("Unknown token %s\n", token);
         	exit(13);
@@ -197,6 +210,10 @@ void Settings::printSettings(){
 		printf("Print execution information: true\n");
 	else
 		printf("Print execution information: false\n");
+	if(correctionInfo)
+		printf("Print numerical correction information: true\n");
+	else
+		printf("Print numerical correction information: false\n");
 
 	printf("\n");
 }
@@ -308,6 +325,9 @@ void Settings::checkAndApplySettings(){
 	// Mute overrides all other command line output settings
 	if(mute){
 		executionInfo = false;
+		correctionInfo = false;
+
+		printf("Command line muted!\n");
 	}
 
 	// Generate and start Timer

@@ -98,7 +98,9 @@ bool Translation::generateInitialQueue(){
 
 			// Otherwise we can do a flip, but will reject the translation because this flip will
 			// crash the iterator of this loop
-			printf("The moving vertex lays exactly on an edge before the translation -> security flip\n");
+			if(Settings::correctionInfo)
+				printf("Numerical correction: The moving vertex lays exactly on an edge before the translation -> security flip\n");
+
 			flip(i, true);
 			return false;
 		}
@@ -114,12 +116,16 @@ bool Translation::generateInitialQueue(){
 			t = (*i).calculateCollapseTime(original, dx, dy);
 
 			if(t < 0){
-				printf("numerical correction: collapse time of collapsing triangle was %.20f \n", t);
+				if(Settings::correctionInfo)
+					printf("Numerical correction: Collapse time of collapsing triangle was %.20f \n", t);
+
 				t = 0;
 			}
 
 			if(t > 1){
-				printf("numerical correction: collapse time of collapsing triangle was %.20f \n", t);
+				if(Settings::correctionInfo)
+					printf("Numerical correction: Collapse time of collapsing triangle was %.20f \n", t);
+
 				t = 1;
 			}
 
@@ -315,8 +321,9 @@ bool Translation::checkEdge(Vertex * const fromV, TEdge * const newE) const{
 		return true;
 	// Multiple intersections -> numerical error
 	}else if(count > 1){
-		if(Settings::feedback == FeedbackMode::VERBOSE)
+		if(Settings::correctionInfo)
 			printf("CheckEdge: new edge intersects multiple edges of the surrounding polygon -> translation rejected due to numerical problem\n");
+		
 		return false;
 	}
 
@@ -350,8 +357,9 @@ bool Translation::checkEdge(Vertex * const fromV, TEdge * const newE) const{
 
 		// Check for numerical problems
 		if(iType0 != IntersectionType::NONE && iType1 != IntersectionType::NONE){
-			if(Settings::feedback == FeedbackMode::VERBOSE)
+			if(Settings::correctionInfo)
 				printf("CheckEdge: new edge intersects multiple edges of the actual triangle -> translation rejected due to numerical problem\n");
+			
 			return false;
 		}
 
@@ -402,20 +410,11 @@ void Translation::repairEnd(){
 		area = (*i).signedArea();
 
 		if(area == 0){
-			if(type == TranslationType::DEFAULT){
+			if(type == TranslationType::DEFAULT && Settings::correctionInfo){
 				printf("Translation: Triangle area = 0 after translation...");
-				printf("start position\n");
-				(*oldV).print();
-				printf("target position\n");
-				(*newV).print();
-				printf("actual end position\n");
-				(*original).print();
 			}
 
 			edge = (*i).getLongestEdgeAlt();
-
-			if(type == TranslationType::DEFAULT)
-				printf("intersectiontype: %d\n", (int)checkIntersection(transPath, edge, false));
 
 			// Try to do a security flip
 			if((*edge).getEdgeType() != EdgeType::POLYGON)
@@ -433,7 +432,7 @@ void Translation::repairEnd(){
 				}
 			}
 
-			if(type == TranslationType::DEFAULT)
+			if(type == TranslationType::DEFAULT && Settings::correctionInfo)
 				printf("corrected! \n");
 		}
 	}
@@ -932,7 +931,9 @@ bool Translation::undo(){
 
 	if(!ok){
 
-		printf("Surrounding polygon check after abortion failed...");
+		if(Settings::correctionInfo)
+			printf("Surrounding polygon check after abortion failed...");
+
 		// Undo all flips
 		while(!FlipStack.empty()){
 			
@@ -963,7 +964,8 @@ bool Translation::undo(){
 		// Reset the vertex to the start position
 		(*original).setPosition((*oldV).getX(), (*oldV).getY());
 
-		printf("translation undone!\n");
+		if(Settings::correctionInfo)
+			printf("translation undone!\n");
 
 		return true;
 	}

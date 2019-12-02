@@ -69,9 +69,6 @@ void EventQueue::stabilize(struct Event *e0, struct Event *e1){
 	area1 = (*t).signedArea();
 	delete t;
 
-	if((*original).getID() == 2865905)
-		printf("area0: %.20f area1: %.20f  equals zero: %d \n", area0, area1, area1 == 0);
-
 	// We have convex shape if sign(area0) != sign(area1)
 	// The special case area1 = 0 counts as non-convex shape
 
@@ -150,7 +147,9 @@ void EventQueue::stabilizeConvex(struct Event* e0, struct Event* e1, TEdge* comm
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff0: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			if(Settings::correctionInfo)
+				printf("Numerical correction: Order change for events with time diff: %.20f \n",
+					fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 
 	// Transition line intersects one of the oppossing edges
@@ -167,7 +166,9 @@ void EventQueue::stabilizeConvex(struct Event* e0, struct Event* e1, TEdge* comm
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff1: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			if(Settings::correctionInfo)
+				printf("Numerical correction: Order change for events with time diff: %.20f \n",
+					fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 	}
 }
@@ -215,8 +216,6 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 	area1 = (*t).signedArea();
 	delete t;
 
-	if((*original).getID() == 2865905)
-		printf("area0: %.20f area1: %.20f \n", area0, area1);
 	// Transition line doesn't intersect the opposing edges
 	if(signbit(area0) == signbit(area1)){
 		// Now we have to check on which side the transition line passes
@@ -240,7 +239,9 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff2: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			if(Settings::correctionInfo)
+				printf("Numerical correction: Order change for events with time diff: %.20f \n",
+					fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 
 	// Transition line intersects one of the oppossing edges
@@ -250,10 +251,6 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 		areaCommon = (*t).signedArea();
 		delete t;
 
-		if((*original).getID() == 2865905){
-			printf("areaCommon: %.20f \n", areaCommon);
-		}
-
 		// If the transition line intersects t1, then t0 has to collapse first
 		// so the ordering was right
 
@@ -262,7 +259,9 @@ void EventQueue::stabilizeNonConvex(struct Event *e0, struct Event *e1, TEdge *c
 			e0 -> triangle = t1;
 			e1 -> triangle = t0;
 
-			printf("order change time diff3: %.25f \n", fabs(e0 -> collapseTime - e1 -> collapseTime));
+			if(Settings::correctionInfo)
+				printf("Numerical correction: Order change for events with time diff: %.20f \n",
+					fabs(e0 -> collapseTime - e1 -> collapseTime));
 		}
 	}
 }
@@ -399,7 +398,7 @@ bool EventQueue::makeStable(const bool initial){
 				}
 			}*/
 
-			if(Settings::feedback != FeedbackMode::LACONIC){
+			if(Settings::correctionInfo){
 				if(initial)
 					printf("Eventqueue: Two events at the same time -> refused translation\n");
 				else
@@ -487,7 +486,7 @@ void EventQueue::print() const{
 
 	e = first;
 	while(e != NULL){
-		printf("element nr. %d: time = %f \n", i, e -> collapseTime);
+		printf("Element nr. %d: time = %f \n", i, e -> collapseTime);
 
 		i++;
 		e = e -> next;

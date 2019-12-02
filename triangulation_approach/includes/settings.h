@@ -123,6 +123,9 @@ public:
 	// Flag whether execution info should be printed
 	static bool executionInfo;
 
+	// Flag whether info an numerical correction should be printed
+	static bool correctionInfo;
+
 	// Flag to mute all output
 	static bool mute;
 
