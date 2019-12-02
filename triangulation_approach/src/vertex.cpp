@@ -440,7 +440,7 @@ void Vertex::removeTriangle(Triangle * const t){
 */
 
 /*
-	The function print() prints the information of a vertex as node into a .graphml file.
+	The function write() writes the information of a vertex as node into a .graphml file.
 	The node information contains the ID of the vertex, its coordinates and its ID as
 	mainText. This functions also provides a scaling factor for the coordinates as some
 	graphml-viewers are not capable of scaling. The setting of the scaling factor is
@@ -453,7 +453,7 @@ void Vertex::removeTriangle(Triangle * const t){
 		This function just prints one node into a .graphml file, to print the hole
 		triangulation use the print functions of the Triangulation class
 */
-void Vertex::print(FILE * const f, double factor) const{
+void Vertex::write(FILE * const f, double factor) const{
 	int n;
 	int text;
 
@@ -478,12 +478,12 @@ void Vertex::print(FILE * const f, double factor) const{
 }
 
 /*
-	The function printToDat() writes the coordinates of a vertex to a .dat file such that it
+	The function writeToDat() writes the coordinates of a vertex to a .dat file such that it
 	can be interpreted by gnuplot.
 
 	@param 	f 	A handle for the .dat file
 */
-void Vertex::printToDat(FILE * const f) const{
+void Vertex::writeToDat(FILE * const f) const{
 	fprintf(f, "%f %f\n", x, y);
 }
 
@@ -496,7 +496,7 @@ void Vertex::print() const{
 }
 
 /*
-	The function printEnvironment() prints a local part of the triangulation around
+	The function writeEnvironment() writes a local part of the triangulation around
 	the vertex to a -graphml file. It collects the data recursivelly by the function
 	getEnvironment().
 
@@ -505,7 +505,7 @@ void Vertex::print() const{
 						are included
 	@param 	filename 	The name of the file to write to
 */
-void Vertex::printEnvironment(const int depth, const char *filename) const{
+void Vertex::writeEnvironment(const int depth, const char *filename) const{
 	FILE *f;
 	std::map<const unsigned long long, const TEdge*> es;
 	std::map<const unsigned long long, const Vertex*> vs;
@@ -527,7 +527,7 @@ void Vertex::printEnvironment(const int depth, const char *filename) const{
 
 	for(auto const& i : vs){
 		v = i.second;
-		(*v).print(f, 2000);
+		(*v).write(f, 2000);
 	}
 	fprintf(f, "</nodes>\n");
 
@@ -535,7 +535,7 @@ void Vertex::printEnvironment(const int depth, const char *filename) const{
 	fprintf(f, "<edges>\n");
 	for(auto const& i : es){
 		e = i.second;
-		(*e).print(f);
+		(*e).write(f);
 	}
 	fprintf(f, "</edges>\n");
 
@@ -546,12 +546,12 @@ void Vertex::printEnvironment(const int depth, const char *filename) const{
 }
 
 /*
-	The function printSurroundingTriangulation() writes a vertex and all vertices and
+	The function writeSurroundingTriangulation() writes a vertex and all vertices and
 	edges of its adjacent triangles into a .graphml file.
 
 	@param 	filename 	The name of the .graphml file
 */
-void Vertex::printSurroundingTriangulation(const char *filename) const{
+void Vertex::writeSurroundingTriangulation(const char *filename) const{
 	FILE *f;
 	std::map<const unsigned long long, const TEdge*> es;
 	std::map<const unsigned long long, const Vertex*> vs;
@@ -593,7 +593,7 @@ void Vertex::printSurroundingTriangulation(const char *filename) const{
 
 	for(auto const& i : vs){
 		v = i.second;
-		(*v).print(f, 3000);
+		(*v).write(f, 3000);
 	}
 	fprintf(f, "</nodes>\n");
 
@@ -601,7 +601,7 @@ void Vertex::printSurroundingTriangulation(const char *filename) const{
 	fprintf(f, "<edges>\n");
 	for(auto const& i : es){
 		e = i.second;
-		(*e).print(f);
+		(*e).write(f);
 	}
 	fprintf(f, "</edges>\n");
 

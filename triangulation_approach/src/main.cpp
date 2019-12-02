@@ -56,10 +56,10 @@ int main(int argc, char *argv[]){
 	else
 		strategyWithHoles0(T);
 
-	(*T).printPolygonToDat(Settings::polygonFile);
+	(*T).writePolygonToDat(Settings::polygonFile);
 
 	if(Settings::triangulationOutputRequired)
-		(*T).print(Settings::triangulationFile);
+		(*T).writeTriangulation(Settings::triangulationFile);
 
 	calculateDistanceDistribution(T, 0.25);
 	

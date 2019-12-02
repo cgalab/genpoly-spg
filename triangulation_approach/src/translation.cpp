@@ -1279,7 +1279,7 @@ Translation::~Translation(){
 		(*newV).print();
 		printf("translation vector: dx = %.20f dy = %.20f \n", dx, dy);
 
-		(*T).print("bug.graphml");
+		(*T).writeTriangulation("bug.graphml");
 
 		exit(6);
 	}

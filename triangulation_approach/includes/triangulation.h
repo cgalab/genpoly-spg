@@ -104,9 +104,9 @@ public:
 
 		PRINTER:
 
-		void 			print(const char *filename) const
-		void 			printPolygon(const char *filename) const
-		void 			printPolygonToDat(const char *filename) const
+		void 			writeTriangulation(const char *filename) const
+		void 			writePolygon(const char *filename) const
+		void 			writePolygonToDat(const char *filename) const
 
 		OTHERS:
 
@@ -252,7 +252,8 @@ public:
 	*/
 
 	/*
-		The function print() prints the whole triangulation in .graphml style into a file
+		The function writeTriangulation() writes the whole triangulation in .graphml style into
+		a file
 
 		@param	filename	The name of the .graphml file
 
@@ -262,10 +263,10 @@ public:
 			- Works here: http://graphonline.ru/en/
 			- This crappy website is the reason why we need the scaling factor here
 	*/
-	void print(const char *filename) const;
+	void writeTriangulation(const char *filename) const;
 
 	/*
-		The function printPolygon() prints just the polygon in .graphml style into a file
+		The function writePolygon() writes just the polygon in .graphml style into a file
 
 		@param	filename	The name of the .graphml file
 
@@ -273,15 +274,15 @@ public:
 			- Graphml: https://de.wikipedia.org/wiki/GraphML
 			- Works here: http://graphonline.ru/en/
 	*/
-	void printPolygon(const char *filename) const;
+	void writePolygon(const char *filename) const;
 
 	/*
-		The function printPolygonToDat() prints all polygons to a .dat file which can be
+		The function writePolygonToDat() writes all polygons to a .dat file which can be
 		interpreted by gnuplot.
 
 		@param 	filename 	The name of the .dat file
 	*/
-	void printPolygonToDat(const char *filename) const;
+	void writePolygonToDat(const char *filename) const;
 
 
 	/*

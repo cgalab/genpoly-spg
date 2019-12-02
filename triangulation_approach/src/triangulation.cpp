@@ -231,7 +231,7 @@ void Triangulation::removeEdge(TEdge * const e){
 */
 
 /*
-	The function print() prints the whole triangulation in .graphml style into a file
+	The function writeTriangulation() writes the whole triangulation in .graphml style into a file
 
 	@param	filename	The name of the .graphml file
 
@@ -241,7 +241,7 @@ void Triangulation::removeEdge(TEdge * const e){
 		- Works here: http://graphonline.ru/en/
 		- This crappy website is the reason why we need the scaling factor here
 */
-void Triangulation::print(const char *filename) const{
+void Triangulation::writeTriangulation(const char *filename) const{
 	FILE *f;
 	TEdge *e;
 	int scale = 4000;
@@ -258,15 +258,15 @@ void Triangulation::print(const char *filename) const{
 
 	// Start with the bounding box
 	if(Rectangle0 != NULL){
-		(*Rectangle0).print(f, scale);
-		(*Rectangle1).print(f, scale);
-		(*Rectangle2).print(f, scale);
-		(*Rectangle3).print(f, scale);
+		(*Rectangle0).write(f, scale);
+		(*Rectangle1).write(f, scale);
+		(*Rectangle2).write(f, scale);
+		(*Rectangle3).write(f, scale);
 	}
 
 	// Then all polygon vertices
 	for(auto const& i : vertices){
-		if(i != NULL) (*i).print(f, scale);
+		if(i != NULL) (*i).write(f, scale);
 	}
 	fprintf(f, "</nodes>\n");
 
@@ -274,7 +274,7 @@ void Triangulation::print(const char *filename) const{
 	fprintf(f, "<edges>\n");
 	for(auto const& i : edges){
 		e = i.second;
-		(*e).print(f);
+		(*e).write(f);
 	}
 	fprintf(f, "</edges>\n");
 
@@ -285,7 +285,7 @@ void Triangulation::print(const char *filename) const{
 }
 
 /*
-	The function printPolygon() prints just the polygon in .graphml style into a file
+	The function writePolygon() writes just the polygon in .graphml style into a file
 
 	@param	filename	The name of the .graphml file
 
@@ -293,7 +293,7 @@ void Triangulation::print(const char *filename) const{
 		- Graphml: https://de.wikipedia.org/wiki/GraphML
 		- Works here: http://graphonline.ru/en/
 */
-void Triangulation::printPolygon(const char *filename) const{
+void Triangulation::writePolygon(const char *filename) const{
 	FILE *f;
 	TEdge *e;
 	int scale = 1000;
@@ -309,7 +309,7 @@ void Triangulation::printPolygon(const char *filename) const{
 	fprintf(f, "<nodes>\n");
 	for(auto const& i : vertices){
 		if(i != NULL && !(*i).isRectangleVertex())
-			(*i).print(f, scale);
+			(*i).write(f, scale);
 	}
 	fprintf(f, "</nodes>\n");
 
@@ -320,7 +320,8 @@ void Triangulation::printPolygon(const char *filename) const{
 	fprintf(f, "<edges>\n");
 	for(auto const& i : edges){
 		e = i.second;
-		if((*e).getEdgeType() == EdgeType::POLYGON)(*e).print(f);
+		if((*e).getEdgeType() == EdgeType::POLYGON)
+			(*e).write(f);
 	}
 	fprintf(f, "</edges>\n");
 
@@ -331,12 +332,12 @@ void Triangulation::printPolygon(const char *filename) const{
 }
 
 /*
-	The function printPolygonToDat() prints all polygons to a .dat file which can be
+	The function writePolygonToDat() writes all polygons to a .dat file which can be
 	interpreted by gnuplot.
 
 	@param 	filename 	The name of the .dat file
 */
-void Triangulation::printPolygonToDat(const char *filename) const{
+void Triangulation::writePolygonToDat(const char *filename) const{
 	Vertex *start, *other;
 	FILE *f;
 	int id = 0;
@@ -347,30 +348,30 @@ void Triangulation::printPolygonToDat(const char *filename) const{
 	fprintf(f, "\"outer polygon\"\n");
 
 	start = (*outerPolygon).getVertex(0);
-	(*start).printToDat(f);
+	(*start).writeToDat(f);
 
 	other = (*start).getNext();
 	while((*start).getID() != (*other).getID()){
-		(*other).printToDat(f);
+		(*other).writeToDat(f);
 
 		other = (*other).getNext();
 	}
-	(*start).printToDat(f);
+	(*start).writeToDat(f);
 
 	for(auto const& i : innerPolygons){
 		// Add all inner polygons
 		fprintf(f, "\n\n\"inner polygon %d\"\n", id);
 
 		start = (*i).getVertex(0);
-		(*start).printToDat(f);
+		(*start).writeToDat(f);
 
 		other = (*start).getNext();
 		while((*start).getID() != (*other).getID()){
-			(*other).printToDat(f);
+			(*other).writeToDat(f);
 
 			other = (*other).getNext();
 		}
-		(*start).printToDat(f);
+		(*start).writeToDat(f);
 
 		id++;
 	}
