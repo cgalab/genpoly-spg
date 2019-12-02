@@ -2551,6 +2551,7 @@ bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& po
 // An inner polygonal chain can have [0,last] as one edge and the rest of the chain as the other
 // A hole must be 2D on both sides of the edges.
 bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole) {
+  std::cerr << "=== is_2D function ===" << std::endl;
   assert(polygon.size() > 2);
 
   unsigned int a, b;
@@ -2568,17 +2569,23 @@ bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Poi
     e1 = Edge(candidate.closest[0].p1, candidate.closest[0].p2);
     e2 = Edge(candidate.p1, candidate.p2);
   }
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
 
   if (is_hole) {
     // this is a hole, so both chains on each side of 'e1' and 'e2' must be 2D
     // chain1: from higher vertex of e1 to lower vertex of e2
     a = e1.getVHigh();
     b = e2.getVLow();
-    if (3 < (b-a)) return false; // calc. includes one endpoint, so has to be 4 or more
+    std::cerr << "a: " << a << ", b: " << b << std::endl;
+    if ((b-a) < 2) return false;
 
-    e3 = Edge(&points[polygon[(a+1)%polygon.size()]], &points[polygon[(a+2)%polygon.size()]]);
-    for (unsigned int i = (e3.getVHigh()+1)%polygon.size(); i != e2.getVLow(); i = (i+1)%polygon.size()) {
+    e3 = Edge(&points[polygon[(a)%polygon.size()]], &points[polygon[(a+1)%polygon.size()]]);
+    std::cerr << "e3: " << e3 << std::endl;
+    for (unsigned int i = (a+2)%polygon.size(); i != (b+1)%polygon.size(); i = (i+1)%polygon.size()) {
       p = points[polygon[i]];
+      std::cerr << "p: " << p << std::endl;
+      std::cerr << "det: " << det(e3,p) << ", det != 0: " << ((det(e3,p) != 0) ? "true" : "false") << std::endl;
       if (det(e3,p) != 0) {
         is2d = true;
         break;
@@ -2586,14 +2593,19 @@ bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Poi
     }
     if (!is2d) return false; // if the earlier chain wasn't 2D, then we skip the rest.
 
+    // next check if the other part of the chain is 2D
     a = e1.getVLow();
     b = e2.getVHigh();
-    if (4 < (polygon.size()+a-b)%polygon.size()) return false; // calc. includes both endpoints, so has to be 5 or more
+    std::cerr << "a: " << a << ", b: " << b << ", diff: " << (polygon.size()+a-b)%polygon.size() << std::endl;
+    if (2 > (polygon.size()+a-b)%polygon.size()) return false; // calc. includes both endpoints, so has to be 5 or more
 
-    e4 = Edge(&points[polygon[(b+1)%polygon.size()]], &points[polygon[(b+2)%polygon.size()]]);
-    for (unsigned int i = (e4.getVHigh()+1)%polygon.size(); i != e1.getVLow(); i = (i+1)%polygon.size()) {
+    e4 = Edge(&points[polygon[b%polygon.size()]], &points[polygon[(b+1)%polygon.size()]]);
+    std::cerr << "e4: " << e4 << std::endl;
+    for (unsigned int i = (b+2)%polygon.size(); i != (a+1)%polygon.size(); i = (i+1)%polygon.size()) {
+      std::cerr << "i: " << i << std::endl;
       p = points[polygon[i]];
-      if (det(e2,p) != 0) {
+      std::cerr << "p: " << p << std::endl;
+      if (det(e4,p) != 0) {
         return true;
       }
     }
@@ -2601,6 +2613,7 @@ bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Poi
   else {
     // c.h. points are [0] and [last], if e2 is the c.h. edge, it should be the edge with [0]
     if ((e2.getVHigh() == 0) && (e2.getVLow() == polygon.size()-1)) {
+      std::cerr << "one edge is the c.h. edge." << std::endl;
       // e2 is the c.h. edge.  rest of the points can be tested against e1.
       for (unsigned int i = 1; i < polygon.size()-2; ++i) {
         p = points[polygon[i]];
@@ -2609,9 +2622,20 @@ bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Poi
     }
     else {
       // otherwise we check the chain between e1 and e2.
-      for (unsigned int i = (e1.getVHigh()+1)%polygon.size(); i < e2.getVLow(); i = (i+1)%polygon.size()) {
+      a = e1.getVHigh();
+      b = e2.getVLow();
+      std::cerr << "a: " << a << ", b: " << b << std::endl;
+      if ((b-a) < 2) return false;
+
+      e3 = Edge(&points[polygon[(a)%polygon.size()]], &points[polygon[(a+1)%polygon.size()]]);
+      std::cerr << "e3: " << e3 << std::endl;
+      for (unsigned int i = (a+2)%polygon.size(); i != (b+1)%polygon.size(); i = (i+1)%polygon.size()) {
         p = points[polygon[i]];
-        if (det(e2,p) != 0) return true;
+        std::cerr << "p: " << p << std::endl;
+        std::cerr << "det: " << det(e3,p) << ", det != 0: " << ((det(e3,p) != 0) ? "true" : "false") << std::endl;
+        if (det(e3,p) != 0) {
+          return true;
+        }
       }
     }
   }
@@ -2621,6 +2645,7 @@ bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Poi
 
 // Temporary 'slow' function to fill 'hole' vector with the hole given by 'end' in polygon 'polygon'
 void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  std::cerr << "=== get_hole_and_new_pol function ===" << std::endl;
   assert(hole.size() == 0);
   assert(new_polygon.size() == 0);
 
@@ -2628,6 +2653,10 @@ void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned 
   bool inside = false;
   Edge e1 = Edge(e.p1, e.p2);
   Edge e2 = Edge(e.closest[e.closest.size()-1].p1, e.closest[e.closest.size()-1].p2);
+  std::cerr << "edge 1: " << e1 << std::endl;
+  std::cerr << "edge 2: " << e2 << std::endl;
+  std::cerr << "current polygon: " << std::endl;
+  pdisplay(polygon, points);
 
   Point p, prev;
   prev = points[polygon[polygon.size()-1]];
@@ -2677,6 +2706,11 @@ void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned 
 //  pdisplay(new_polygon, points);
 //  std::cerr << "hole:" << std::endl;
 //  pdisplay(hole, points);
+}
+
+void get_new_inner_polygon(Ends& end, std::vector<unsigned int>& new_inner_polygon, std::vector<unsigned int>& new_polygon, std::vector<Point>& points) {
+  std::cerr << "end: " << end << std::endl;
+  std::cerr << "nip: " << new_inner_polygon.size() << ", np: " << new_polygon.size() << "points: " << points.size() << std::endl;
 }
 
 // function to fill the 'inner_polygon' vector with the inner polygonal chain of 'polygon' defined by 'ends'

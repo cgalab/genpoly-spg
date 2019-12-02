@@ -170,11 +170,12 @@ enum error argInit(	int argc, char *argv[],
 		{"area", no_argument, NULL, 'e'},
 		{"circumference", no_argument, NULL, 'f'},
 		{"writenew", no_argument, NULL, 'w'},
+		{"test", no_argument, NULL, 't'},
 		{"help", no_argument, NULL, '?'},
 		{0, 0, 0, 0}
 	};
 
-	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:efw?", long_options, NULL)) != -1) && returnValue == SUCCESS) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:efwt?", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
