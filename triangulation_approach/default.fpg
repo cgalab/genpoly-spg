@@ -12,7 +12,7 @@ NrOfHoles = 0
 ##################################################################################
 # Specify the target number of vertices for the polygon (mandatory)              #
 ##################################################################################
-PolygonSize = 1000000
+PolygonSize = 100000
 
 ##################################################################################
 # Specifies the the size of the start polygon (optional; default: 10)            #
@@ -40,7 +40,7 @@ Arithmetic = DOUBLE
 # Enables local correctness checking after aborted translations.                 #
 # (optional; default: true)                                                      #
 ##################################################################################
-EnableLocalChecks = true
+EnableLocalChecks = false
 
 ##################################################################################
 # Enables global correctness checking between stages and after the last stage.   #

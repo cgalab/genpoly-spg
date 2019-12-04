@@ -649,7 +649,8 @@ bool Translation::flip(Triangle *t0, const bool singleFlip){
 	if(!singleFlip){
 		
 		// Add the flip to the flip stack
-		FlipStack.push(new Flip(vj0, vj1, vn0, vn1));
+		if(Settings::localChecking)
+			FlipStack.push(new Flip(vj0, vj1, vn0, vn1));
 
 		// Reset coordinates temporarely to original position for the calcalation of the event time
 		x = (*original).getX();
