@@ -12,6 +12,7 @@
 #include "pol.h"
 #include "opt2g.h" //needed to create polygons.
 #include "rand.h"
+#include "simple_pol_check.h"
 
 
 
