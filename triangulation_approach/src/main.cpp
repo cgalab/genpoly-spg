@@ -61,11 +61,14 @@ int main(int argc, char *argv[]){
 		strategyWithHoles0(T);
 
 	(*T).writePolygonToDat(Settings::polygonFile);
+	(*T).writePolygon("polygon.graphml");
 
 	if(Settings::triangulationOutputRequired)
 		(*T).writeTriangulation(Settings::triangulationFile);
 
 	calculateDistanceDistribution(T, 0.25);
+
+	(*T).printAngles();
 	
 	exit(0);
 }

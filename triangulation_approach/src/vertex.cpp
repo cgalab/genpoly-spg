@@ -415,6 +415,51 @@ int Vertex::getActualPolygonSize() const{
 	return (*P).getActualPolygonSize();
 }
 
+/*
+
+*/
+double Vertex::getInsideAngle() const{
+	double alpha0, alpha1, angle;
+	Vertex *prev = (*toPrev).getOtherVertex(this);
+	Vertex *next = (*toNext).getOtherVertex(this);
+
+
+	alpha0 = fabs((*toPrev).getAngle(this));
+	alpha1 = fabs((*toNext).getAngle(this));
+
+	//printf("id: %llu alpha0: %.3f alpha1: %.3f\n", id, alpha0 / M_PI * 180, alpha1 / M_PI * 180);
+
+	// If toPrev is decreasing (from prev to this), then the angle is outside
+	// otherwise it is inside
+	if(y - (*prev).getY() < 0){
+		// First down, second down
+		if((*next).getY() - y < 0){
+			angle = alpha0 + alpha1;
+		// First down, second up
+		}else{
+			if(alpha1 > alpha0){
+				angle = 2 * M_PI - ( alpha1 - alpha0);
+			}else{
+				angle = alpha0 - alpha1;
+			}
+		}
+	}else{
+		// First up, second down
+		if((*next).getY() - y < 0){
+			if(alpha1 > alpha0){
+				angle = alpha1 - alpha0;
+			}else{
+				angle = 2 * M_PI - (alpha0 - alpha1);
+			}
+		// First up, second up
+		}else{
+			angle = 2 * M_PI - alpha0 - alpha1;
+		}
+	}
+
+	return angle;
+}
+
 
 /*
 	R ~ E ~ M ~ O ~ V ~ E ~ R

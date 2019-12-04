@@ -173,6 +173,7 @@ public:
 		Triangle* 				getTriangleWith(Vertex const * const v0, Vertex const * const v1)
 		unsigned int 			getPID() const
 		int 					getActualPolygonSize() const
+		double					getInsideAngle() const;
 
 		REMOVER:
 
@@ -437,6 +438,11 @@ public:
 		@return 	The actual size of the polygon the vertex belongs to
 	*/
 	int getActualPolygonSize() const;
+
+	/*
+
+	*/
+	double getInsideAngle() const;
 
 
 	/*

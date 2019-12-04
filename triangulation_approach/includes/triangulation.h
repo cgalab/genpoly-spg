@@ -71,6 +71,7 @@ private:
 
 public:
 	
+	void printAngles();
 	/*
 		LIST OF PUBLIC MEMBER FUNCTIONS
 
