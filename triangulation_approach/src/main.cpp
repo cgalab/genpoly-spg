@@ -36,6 +36,7 @@ int main(int argc, char *argv[]){
 		printf("Usage: fpg <CONFIG FILE>\n");
 		Settings::printDummyFile();
 		printf("Printed a dummy config file named dummy.fpg\n");
+		exit(14);
 	}else{
 		Settings::readConfigFile(argv[1]);
 		Settings::checkAndApplySettings();
