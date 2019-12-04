@@ -62,15 +62,8 @@ int main(int argc, char *argv[]){
 
 	(*T).writePolygonToDat(Settings::polygonFile);
 
-	if(Settings::triangulationOutputRequired){
-		if(Settings::executionInfo)
-			printf("Write triangulation to %s...", Settings::triangulationFile);
-
+	if(Settings::triangulationOutputRequired)
 		(*T).writeTriangulation(Settings::triangulationFile);
-
-		if(Settings::executionInfo)
-			printf("successful\n");
-	}
 
 	calculateDistanceDistribution(T, 0.25);
 	

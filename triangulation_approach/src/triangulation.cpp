@@ -246,6 +246,9 @@ void Triangulation::writeTriangulation(const char *filename) const{
 	TEdge *e;
 	int scale = 4000;
 
+	if(Settings::executionInfo)
+		printf("Write triangulation to .graphml file %s...", filename);
+
 	f = fopen(filename, "w");
 
 	// Print the graphml header
@@ -282,6 +285,9 @@ void Triangulation::writeTriangulation(const char *filename) const{
 	fprintf(f, "</graphml>\n");
 
 	fclose(f);
+
+	if(Settings::executionInfo)
+		printf("successful\n");
 }
 
 /*
@@ -297,6 +303,9 @@ void Triangulation::writePolygon(const char *filename) const{
 	FILE *f;
 	TEdge *e;
 	int scale = 1000;
+
+	if(Settings::executionInfo)
+		printf("Write polygon to .graphml file %s...", filename);
 
 	f = fopen(filename, "w");
 
@@ -329,6 +338,9 @@ void Triangulation::writePolygon(const char *filename) const{
 	fprintf(f, "</graphml>\n");
 
 	fclose(f);
+
+	if(Settings::executionInfo)
+		printf("successful\n");
 }
 
 /*
@@ -341,6 +353,9 @@ void Triangulation::writePolygonToDat(const char *filename) const{
 	Vertex *start, *other;
 	FILE *f;
 	int id = 0;
+
+	if(Settings::executionInfo)
+		printf("Write polygon to .dat file %s...", filename);
 
 	f = fopen(filename, "w");
 
@@ -375,6 +390,9 @@ void Triangulation::writePolygonToDat(const char *filename) const{
 
 		id++;
 	}
+
+	if(Settings::executionInfo)
+		printf("successful\n");
 }
 
 
