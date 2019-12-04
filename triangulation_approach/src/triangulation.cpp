@@ -303,6 +303,7 @@ void Triangulation::writePolygon(const char *filename) const{
 	FILE *f;
 	TEdge *e;
 	int scale = 1000;
+	Vertex *v, *start;
 
 	if(Settings::executionInfo)
 		printf("Write polygon to .graphml file %s...", filename);
@@ -323,15 +324,21 @@ void Triangulation::writePolygon(const char *filename) const{
 	fprintf(f, "</nodes>\n");
 
 	// Print all polygon edges
-	// TODO:
-	// Make this more efficient by using the function Vertex::getToNext()
-	// But wait till we merge in the polygon class
 	fprintf(f, "<edges>\n");
-	for(auto const& i : edges){
-		e = i.second;
-		if((*e).getEdgeType() == EdgeType::POLYGON)
-			(*e).write(f);
+
+	// Print first edge
+	start = vertices[0];
+	e = (*start).getToNext();
+	(*e).write(f);
+	v = (*start).getNext();
+
+	// Add all others till the start vertex is reached again
+	while((*v).getID() != (*start).getID()){
+		e = (*v).getToNext();
+		(*e).write(f);
+		v = (*v).getNext();
 	}
+
 	fprintf(f, "</edges>\n");
 
 	fprintf(f, "</graph>\n");

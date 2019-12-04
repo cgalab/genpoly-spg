@@ -29,6 +29,8 @@ int transformPolygonByMoves(Triangulation * const T, const int iterations){
 	int div;
 
 	div = 0.01 * iterations;
+	if(div == 0)
+		div = 1;
 
 	// Try the given number of moves
 	for(int i = 0; i < iterations; i++){
