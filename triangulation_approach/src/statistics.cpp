@@ -54,3 +54,41 @@ void calculateDistanceDistribution(Triangulation const * const T, const double w
 
 	printf("\n");
 }
+
+void calculateTwist(Triangulation const * const T){
+	int n = (*T).getActualNumberOfVertices(0);
+	double min, max, sum, angle, average;
+	Vertex *start, *v;
+
+	// Calculate the average inside angle of the polygon
+	average = 180 * (1 - 2.0 / n);
+	printf("Average inside angle: %.3f\n", average);
+
+	start = (*T).getVertex(0, 0);
+
+	angle = (*start).getInsideAngle() / M_PI * 180;
+	angle = angle - average;
+	sum = angle;
+	min = angle;
+	max = angle;
+
+	v = (*start).getNext();
+	while((*v).getID() != (*start).getID()){
+		angle = (*v).getInsideAngle() / M_PI * 180;
+		angle = angle - average;
+
+		sum = sum + angle;
+
+		if(sum < min)
+			min = sum;
+
+		if(sum > max)
+			max = sum;
+
+		v = (*v).getNext();
+	}
+
+	printf("sum at end: %.3f\n", sum);
+	printf("min: %.3f max: %.3f amplitude: %.3f\n", min, max, fabs(min) + fabs(max));
+
+}
