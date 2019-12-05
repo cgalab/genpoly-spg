@@ -438,9 +438,13 @@ public:
 		@return 	The actual size of the polygon the vertex belongs to
 	*/
 	int getActualPolygonSize() const;
-
+	
 	/*
+		The function getInsideAngle() computes the angle in the interior of the polygon
+		(in counter-clockwise orientation) between the to polygon edges incident to the
+		vertex.
 
+		@return 	The interior angle of the polygon at this vertex
 	*/
 	double getInsideAngle() const;
 

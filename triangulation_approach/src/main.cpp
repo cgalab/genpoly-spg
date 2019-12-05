@@ -67,8 +67,6 @@ int main(int argc, char *argv[]){
 		(*T).writeTriangulation(Settings::triangulationFile);
 
 	calculateDistanceDistribution(T, 0.25);
-
-	(*T).printAngles();
 	
 	exit(0);
 }

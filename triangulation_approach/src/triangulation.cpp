@@ -1,14 +1,5 @@
 #include "triangulation.h"
 
-void Triangulation::printAngles(){
-	double alpha;
-
-	for(auto const& i : vertices){
-		alpha = (*i).getInsideAngle();
-		printf("Inside angle for id %d: %.3f\n", (*i).getID(), alpha / M_PI * 180);
-	}
-}
-
 /*
 	C ~ O ~ N ~ S ~ T ~ R ~ U ~ C ~ T ~ O ~ R ~ S
 */

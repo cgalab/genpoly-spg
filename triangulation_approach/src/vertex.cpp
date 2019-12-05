@@ -416,21 +416,24 @@ int Vertex::getActualPolygonSize() const{
 }
 
 /*
+	The function getInsideAngle() computes the angle in the interior of the polygon
+	(in counter-clockwise orientation) between the to polygon edges incident to the
+	vertex.
 
+	@return 	The interior angle of the polygon at this vertex
 */
 double Vertex::getInsideAngle() const{
 	double alpha0, alpha1, angle;
 	Vertex *prev = (*toPrev).getOtherVertex(this);
 	Vertex *next = (*toNext).getOtherVertex(this);
 
-
+	// The angles between the incident edges and the x-axis
 	alpha0 = fabs((*toPrev).getAngle(this));
 	alpha1 = fabs((*toNext).getAngle(this));
 
-	//printf("id: %llu alpha0: %.3f alpha1: %.3f\n", id, alpha0 / M_PI * 180, alpha1 / M_PI * 180);
-
-	// If toPrev is decreasing (from prev to this), then the angle is outside
-	// otherwise it is inside
+	// The computation of the inside angle depends on the configuration of the edges
+	// First we have to check whether the edges are increasing or decreasing (directed
+	// edges from the lower index in the polygon to the higher one)
 	if(y - (*prev).getY() < 0){
 		// First down, second down
 		if((*next).getY() - y < 0){
