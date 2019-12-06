@@ -5,7 +5,9 @@
 #include "vertex.h"
 
 
-void calculateDistanceDistribution(Triangulation const * const T, const double width);
+void calculateRadialDistanceDistribution(Triangulation const * const T, const double width);
+
+void calculateRadialDistanceDeviation(Triangulation const * const T);
 
 void calculateMaxTwist(Triangulation const * const T);
 

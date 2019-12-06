@@ -13,7 +13,7 @@
 		defined as the rectangle minus the circle defined by the outer border of the
 		second outer layer.
 */
-void calculateDistanceDistribution(Triangulation const * const T, const double width){
+void calculateRadialDistanceDistribution(Triangulation const * const T, const double width){
 	int n_seg; // The number of segments
 	int n_vert; // The number of vertices of the polygon
 	int i, cat;
@@ -53,6 +53,33 @@ void calculateDistanceDistribution(Triangulation const * const T, const double w
 	printf("%6.f \t", segments[n_seg - 1] / area);
 
 	printf("\n");
+}
+
+void calculateRadialDistanceDeviation(Triangulation const * const T){
+	double sum = 0;
+	double radius = Settings::radiusPolygon;
+	double dist;
+	Vertex *start, *v;
+
+	start = (*T).getVertex(0, 0);
+	v = start;
+
+	do{
+		dist = (*v).getDistanceToOrigin();
+
+		sum = sum + pow(dist - radius, 2);
+
+		v = (*v).getNext();
+
+	}while((*v).getID() != (*start).getID());
+
+	sum = sum / ((*T).getActualNumberOfVertices(0) - 1);
+
+	sum = sqrt(sum);
+
+	printf("Initial radius: %.3f\n", radius);
+	printf("Box size: %.3f\n", Settings::boxSize);
+	printf("Radial distance deviation: %.3f\n", sum);
 }
 
 void calculateMaxTwist(Triangulation const * const T){
