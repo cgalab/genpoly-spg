@@ -7,4 +7,6 @@
 
 void calculateDistanceDistribution(Triangulation const * const T, const double width);
 
-void calculateTwist(Triangulation const * const T);
+void calculateMaxTwist(Triangulation const * const T);
+
+void countOrientationChanges(Triangulation const * const T);

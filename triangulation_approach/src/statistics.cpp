@@ -55,7 +55,7 @@ void calculateDistanceDistribution(Triangulation const * const T, const double w
 	printf("\n");
 }
 
-void calculateTwist(Triangulation const * const T){
+void calculateMaxTwist(Triangulation const * const T){
 	int n = (*T).getActualNumberOfVertices(0);
 	double min, max, sum, angle, average;
 	Vertex *start, *v;
@@ -91,4 +91,39 @@ void calculateTwist(Triangulation const * const T){
 	printf("sum at end: %.3f\n", sum);
 	printf("min: %.3f max: %.3f amplitude: %.3f\n", min, max, fabs(min) + fabs(max));
 
+}
+
+void countOrientationChanges(Triangulation const * const T){
+	int n = 0;
+	double angle;
+	Vertex *start, *v;
+	bool toRight = false;
+
+	start = (*T).getVertex(0, 0);
+
+	// Initialise direction
+	angle = (*start).getInsideAngle();
+	if(angle > M_PI)
+		toRight = true;
+
+	v = start;
+	do{
+		v = (*v).getNext();
+
+		angle = (*v).getInsideAngle();
+
+		// Angles greater then pi a considered as curves to the right,
+		// others as curve to the left
+		if(angle > M_PI){
+			if(!toRight)
+				n++;
+			toRight = true;
+		}else{
+			if(toRight)
+				n++;
+			toRight = false;
+		}
+	}while((*v).getID() != (*start).getID());
+
+	printf("Number of orientation changes: %d\n", n);
 }
