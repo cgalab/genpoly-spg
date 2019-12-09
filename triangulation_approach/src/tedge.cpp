@@ -239,19 +239,20 @@ void TEdge::removeTriangle(Triangle * const t){
 		printf("Removed triangle was not adjacent to edge from vertex %llu to vertex %llu \n", (*v0).getID(), (*v1).getID());
 }
 
+
 /*
 	P ~ R ~ I ~ N ~ T ~ E ~ R
 */
 
 /*
-	The function print() prints the edge to a .graphml file.
+	The function write() writes the edge to a .graphml file.
 	Edges of type POLYGON get the weight 5 plus the number of assigned triangles, of type FRAME gets the weight 10 plus
 	the number of assigned triangles and edges oftype triangulation get as weight the number of assigned triangles (2
 	for a correct triangulation).
 
 	@param 	f 	Pointer to the file to print in
 */
-void TEdge::print(FILE * const f) const{
+void TEdge::write(FILE * const f) const{
 	int w;
 
 	w = nrAssignedTriangles();

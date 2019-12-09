@@ -173,6 +173,7 @@ public:
 		Triangle* 				getTriangleWith(Vertex const * const v0, Vertex const * const v1)
 		unsigned int 			getPID() const
 		int 					getActualPolygonSize() const
+		double					getInsideAngle() const;
 
 		REMOVER:
 
@@ -181,11 +182,11 @@ public:
 
 		PRINTER:
 
-		void 					print(FILE * const f, double factor) const
-		void 					printToDat(FILE * const f)
+		void 					write(FILE * const f, double factor) const
+		void 					writeToDat(FILE * const f)
 		void 					print() const
-		void 					printEnvironment(const int depth, const char *filename) const
-		void 					printSurroundingTriangulation(const char *filename) const
+		void 					writeEnvironment(const int depth, const char *filename) const
+		void 					writeSurroundingTriangulation(const char *filename) const
 		static void				printStats()
 
 		OTHERS:
@@ -437,6 +438,15 @@ public:
 		@return 	The actual size of the polygon the vertex belongs to
 	*/
 	int getActualPolygonSize() const;
+	
+	/*
+		The function getInsideAngle() computes the angle in the interior of the polygon
+		(in counter-clockwise orientation) between the to polygon edges incident to the
+		vertex.
+
+		@return 	The interior angle of the polygon at this vertex
+	*/
+	double getInsideAngle() const;
 
 
 	/*
@@ -459,7 +469,7 @@ public:
 	*/
 
 	/*
-		The function print() prints the information of a vertex as node into a .graphml file.
+		The function write() writes the information of a vertex as node into a .graphml file.
 		The node information contains the ID of the vertex, its coordinates and its ID as
 		mainText. This functions also provides a scaling factor for the coordinates as some
 		graphml-viewers are not capable of scaling. The setting of the scaling factor is
@@ -472,15 +482,15 @@ public:
 			This function just prints one node into a .graphml file, to print the hole
 			triangulation use the print functions of the Triangulation class
 	*/
-	void print(FILE * const f, double factor) const;
+	void write(FILE * const f, double factor) const;
 
 	/*
-		The function printToDat() writes the coordinates of a vertex to a .dat file such that it
+		The function writeToDat() writes the coordinates of a vertex to a .dat file such that it
 		can be interpreted by gnuplot.
 
 		@param 	f 	A handle for the .dat file
 	*/
-	void printToDat(FILE * const f) const;
+	void writeToDat(FILE * const f) const;
 
 	/*
 		The function print() prints the basic information of a vertex to standard out.
@@ -489,7 +499,7 @@ public:
 	void print() const;
 
 	/*
-		The function printEnvironment() prints a local part of the triangulation around
+		The function writeEnvironment() writes a local part of the triangulation around
 		the vertex to a -graphml file. It collects the data recursivelly by the function
 		getEnvironment().
 
@@ -498,15 +508,15 @@ public:
 							are included
 		@param 	filename 	The name of the file to write to
 	*/
-	void printEnvironment(const int depth, const char *filename) const;
+	void writeEnvironment(const int depth, const char *filename) const;
 
 	/*
-		The function printSurroundingTriangulation() writes a vertex and all vertices and
+		The function writeSurroundingTriangulation() writes a vertex and all vertices and
 		edges of its adjacent triangles into a .graphml file.
 
 		@param 	filename 	The name of the .graphml file
 	*/
-	void printSurroundingTriangulation(const char *filename) const;
+	void writeSurroundingTriangulation(const char *filename) const;
 
 	/*
 		The function printStats() prints an overview of created, deleted and still existing

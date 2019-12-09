@@ -83,6 +83,11 @@ public:
     return false;
   }
 
+  bool operator <= (const Point& s) const {
+    if (x == s.x) return (y <= s.y);
+    return (x <= s.x);
+  }
+
 /*
   friend bool operator==(const Point & lhs, const Point & rhs) {
     if ((abs(lhs.x - rhs.x) < EPSILON) && (abs(lhs.y - rhs.y)) < EPSILON) return true;

@@ -451,6 +451,10 @@ public:
 		else {p1=P2; p2=P1;}
     l_idx=0;curve_id=0;bin=false;
 	}
+  D_Edge(Edge e) {
+    p1 = e.p1; p2 = e.p2;
+    l_idx = e.l_idx;curve_id=0;bin=false;
+  }
 
   // returns true if the point is on the side of the edge that is 'inside' the polygon.
   bool check_side (Point p) {
@@ -470,7 +474,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const D_Edge& e) {
 		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
     << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
-    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id << "]";
+    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : b : " << e.bin << "";
 		return os;
 	}
 };
@@ -479,98 +483,57 @@ class E_Edge: public D_Edge {
 private:
 protected:
 public:
+  double angle; // default value '8' as it's larger than +/- 2*pi which is the max/min possible value.
   std::vector<D_Edge> closest; // of all the incidental edges, these were the closest that weren't intersecting others.
 
-  E_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0; bin=false;}
+  E_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0; bin=false; angle=0;}
   E_Edge(Point *P1, Point *P2) {
 		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
 		else {p1=P2; p2=P1;}
-    l_idx=0;curve_id=0;bin=false;
+    l_idx=0;curve_id=0;bin=false;angle=8;
 	}
   E_Edge(D_Edge e) {
     p1 = e.p1; p2 = e.p2;
-    l_idx = e.l_idx; curve_id = e.curve_id;bin=false;
+    l_idx = e.l_idx; curve_id = e.curve_id;bin=e.bin;angle=8;
+  }
+  E_Edge(Edge e) {
+    p1 = e.p1; p2 = e.p2;
+    l_idx = e.l_idx;curve_id=0;bin=false;angle=8;
   }
 /*
-  // this shouldn't be here... better as a standalone function.
-  bool check_visibility(Point p, bool check_lex_low) {
-    // first check if the point is on the right side of the edge
-    if ((*this).check_side(p)) {
-      // then make the slope from this edge to 'p' to compare to 'smallest_slope':
-      // first make the slope for the edge, given lex. lower point of edge is the origin and the line goes through the origin.
-      double e_x, e_y, p_x, p_y, e_slope, p_slope;
-      Point e1, e2;
-      if (check_lex_low) {e1=(*this.p1);e2=(*this.p2);}
-      else {e1=(*this.p2);e2=(*this.p1);}
-
-      e_x = e2.x-e1.x;
-      e_y = e2.x-e1.y;
-      p_x = p.x-(*this.p1).x;
-      p_y = p.y-(*this.p1).y;
-      e_slope = e_y/e_x;
-      p_slope = p_y/p_x;
-      p_slope = p_slope - e_slope;
-      if (fabs(p_slope) < fabs(smallest_slope)) return true;
-      else return false;
-
-      // then make the line from the origin to 'p'
-      // deduct the edge line from the p line and check if it's small enough
+  // function to update the angle property based on the last edge in 'this.closest'.
+  // 'use_p1' is true when origin should be 'this.p1', false when origin should be 'this.p2'
+  void update_angle (bool use_p1) {
+    double ang1;
+    Point P0, P1, P2;
+    if(use_p1) {
+      P0 = *p1;
+      P1 = *p2;
+      P2 = *closest[closest.size()-1].p1;
     }
+    else {
+      P0 = *p2;
+      P1 = *p1;
+      P2 = *closest[closest.size()-1].p2;
+    }
+
+    ang1 = fabs(atan2(P1.y - P0.y, P1.x - P0.x));
+    if (!use_p1) ang1 = PI - ang1;
+    if (ang1 < angle) angle = ang1;
+  }
+*/
+  friend bool operator==(const E_Edge lhs, const D_Edge rhs) {
+    if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
     else return false;
   }
 
-  // same as 'check_visibility', but updates the 'closest' edge and the 'smallest_slope' variable.
-  bool update_closest(E_Edge e, bool check_lex_low) {
-    // first check if the edges are facing each other.
-    bool face;
-    if ((*this) < e) {
-      if (!(*this).bin && e.bin) face = true;
-      else face = false;
-    }
-    else {
-      if((*this).bin && !e.bin) face = true;
-      else face = false;
-    }
-
-    if (face) {
-      Point p;
-      if (check_lex_low) p = *e.p1;
-      else p = *e.p2;
-      // then make the slope from this edge to 'p' to compare to 'smallest_slope':
-      // first make the slope for the edge, given lex. lower point of edge is the origin and the line goes through the origin.
-      double e_x, e_y, p_x, p_y, e_slope, p_slope;
-      Point p1, p2;
-      if (check_lex_low) {p1=*(this->p1);p2=*(this->p2);}
-      else {p1=*(this->p2);p2=*(this->p1);}
-
-      e_x = p2.x-p1.x;
-      e_y = p2.y-p1.y;
-      p_x = p.x-(*this->p1).x;
-      p_y = p.y-(*this->p1).y;
-      e_slope = e_y/e_x;
-      p_slope = p_y/p_x;
-      p_slope = p_slope - e_slope;
-      if (fabs(p_slope) < fabs(smallest_slope)) {
-        this.smallest_slope = p_slope;
-        this.closest = e;
-        return true;
-      }
-      else return false;
-
-      // then make the line from the origin to 'p'
-      // deduct the edge line from the p line and check if it's small enough
-      }
-      else return false;
-
-  }
-*/
   // to print out an edge, gives the format:
   // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
 	friend std::ostream& operator<<(std::ostream& os, const E_Edge& e) {
 		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
     << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
     << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id
-    << "], cl: " << e.closest.size() << ", b : " << e.bin;
+    << "], cl: " << e.closest.size() << ", b : " << e.bin << ", angle: " << e.angle;
 		return os;
 	}
 };
@@ -591,6 +554,9 @@ void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Po
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void doFlip(unsigned int i1, unsigned int i2, std::vector<Point>& points);
 void flip2(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon);
+double get_angle(Edge e, Point p, bool use_p1);
+double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1);
+double get_larger_angle(E_Edge& e1, E_Edge& e2, bool use_p1);
 void poldisplay (std::vector<unsigned int>& p);
 
 #endif

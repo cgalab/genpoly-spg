@@ -28,9 +28,9 @@ int transformPolygonByMoves(Triangulation * const T, const int iterations){
 	enum Executed ex;
 	int div;
 
-	printf("n: %d\n", n);
-
 	div = 0.01 * iterations;
+	if(div == 0)
+		div = 1;
 
 	// Try the given number of moves
 	for(int i = 0; i < iterations; i++){
@@ -75,7 +75,7 @@ int transformPolygonByMoves(Triangulation * const T, const int iterations){
 
 		delete trans;
 
-		if(i % div == 0 && Settings::feedback != FeedbackMode::LACONIC)
+		if(i % div == 0 && Settings::executionInfo)
 			printf("%f%% of %d translations performed after %f seconds \n", (double)i / (double)iterations * 100, iterations, (*Settings::timer).elapsedTime());
 	}
 
@@ -139,7 +139,7 @@ void growPolygonBy(Triangulation * const T, const unsigned int pID, const int n)
 		// Just increase the iteration count if a vertex has really been inserted
 		i++;
 
-		if(i % div == 0 && Settings::feedback != FeedbackMode::LACONIC)
+		if(i % div == 0 && Settings::executionInfo)
 			printf("%f%% of %d insertions performed after %f seconds \n", (double)i / (double)n * 100,
 				n, (*Settings::timer).elapsedTime());
 	}
@@ -153,9 +153,11 @@ void strategyNoHoles0(Triangulation * const T){
 	int performed;
 
 	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
-	printf("Transformed initial polygon with %d of %d translations in %f \
-		seconds\n\n", performed, Settings::initialTranslationNumber,
-		(*Settings::timer).elapsedTime());
+
+	if(Settings::executionInfo)
+		printf("Transformed initial polygon with %d of %d translations in %f \
+			seconds\n\n", performed, Settings::initialTranslationNumber,
+			(*Settings::timer).elapsedTime());
 
 	if(!(*T).check()){
 		printf("Triangulation error: something is wrong in the triangulation at the \
@@ -163,12 +165,11 @@ void strategyNoHoles0(Triangulation * const T){
 		exit(9);
 	}
 
-	(*T).print("triangulation_init.graphml");
-	(*T).printPolygonToDat("polygon_init.dat");
-
 	growPolygonBy(T, 0, Settings::outerSize - Settings::initialSize);
-	printf("Grew initial polygon to %d vertices afters %f seconds \n\n",
-		Settings::outerSize, (*Settings::timer).elapsedTime());
+
+	if(Settings::executionInfo)
+		printf("Grew initial polygon to %d vertices afters %f seconds \n\n",
+			Settings::outerSize, (*Settings::timer).elapsedTime());
 
 	if(!(*T).check()){
 		printf("Triangulation error: something is wrong in the triangulation after growing the \
@@ -177,15 +178,15 @@ void strategyNoHoles0(Triangulation * const T){
 	}
 
 	performed = transformPolygonByMoves(T, Settings::outerSize);
-	printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed,
-		Settings::outerSize, (*Settings::timer).elapsedTime());
+
+	if(Settings::executionInfo)
+		printf("Transformed polygon with %d of %d translations in %f seconds\n\n", performed,
+			Settings::outerSize, (*Settings::timer).elapsedTime());
 
 	if(!(*T).check()){
 		printf("Triangulation error: something is wrong in the triangulation at the end\n");
 		exit(9);
 	}
-
-	(*T).printPolygonToDat("polygon.dat");
 }
 
 
@@ -195,12 +196,14 @@ void strategyNoHoles0(Triangulation * const T){
 void strategyWithHoles0(Triangulation * const T){
 	int performed;
 	int nrInsertions;
-	int i, k;
+	unsigned int i, k;
 	int actualN;
 
 	performed = transformPolygonByMoves(T, Settings::initialTranslationNumber);
-	printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n",
-		performed, Settings::initialTranslationNumber, (*Settings::timer).elapsedTime());
+
+	if(Settings::executionInfo)
+		printf("Transformed initial polygon with %d of %d translations in %f seconds\n\n",
+			performed, Settings::initialTranslationNumber, (*Settings::timer).elapsedTime());
 
 	if(!(*T).check()){
 		printf("Triangulation error: something is wrong in the triangulation at the \
@@ -209,6 +212,8 @@ void strategyWithHoles0(Triangulation * const T){
 	}
 
 	performed = 1;
+	// TODO:
+	// What the hell is this k doing?
 	k = 0;
 	while(performed != 0 && k < 20){
 		performed = 0;
@@ -227,7 +232,7 @@ void strategyWithHoles0(Triangulation * const T){
 
 			performed = performed + nrInsertions;
 
-			if(nrInsertions != 0)
+			if(nrInsertions != 0 && Settings::executionInfo)
 				printf("Grew the inner polygon with ID %d by %d vertices to %d vertices\n\n",
 					i, nrInsertions, nrInsertions + actualN);
 		}
@@ -244,7 +249,7 @@ void strategyWithHoles0(Triangulation * const T){
 
 		performed = performed + nrInsertions;
 
-		if(nrInsertions != 0)
+		if(nrInsertions != 0 && Settings::executionInfo)
 			printf("Grew outer polygon by %d vertices to %d vertices\n\n", nrInsertions,
 				nrInsertions + actualN);
 
@@ -256,9 +261,4 @@ void strategyWithHoles0(Triangulation * const T){
 			growing the initial polygon\n");
 		exit(9);
 	}
-
-	(*T).print("triangulation_init.graphml");
-	(*T).printPolygonToDat("polygon_init.dat");
-
-	(*T).printPolygonToDat("polygon.dat");
 }

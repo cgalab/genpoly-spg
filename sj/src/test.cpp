@@ -648,10 +648,20 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   std::cerr << "=== Determinant test ===" << std::endl;
 
+  p1.set(-0.4410479999999999956,0.30967199999999989179);
+  p2.set(-0.43791999999999997595,0.30967199999999989179);
+  e1.set(p1,p2);
+  p3.set(-0.45356000000000001871,0.31280000000000002247);
+  double area = det(e1, p3);
+  std::cerr << "e1: " << e1 << ", p3: " << p3 << std::endl;
+  std::cerr << "det: " << area  << ", det != 0: " << ((area != 0) ? "true" : "false") << std::endl;
+
+
+
   bool detBool = false;
 
   if (detBool) {
-    double max=0, current=0.0, area=0;
+    double max=0, current=0.0;
     unsigned int counter = 0;
 
     p1.set(current, current);
@@ -835,6 +845,19 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "reldist(e1, p4): " << reldist(e1, p4) << std::endl;
   std::cerr << "reldist(e2, p1): " << reldist(e2, p1) << std::endl;
   std::cerr << "reldist(e2, p2): " << reldist(e2, p2) << std::endl;
+
+  std::cerr << std::endl;
+  std::cerr << "=== angle tests ===" << std::endl;
+
+  p1.set(0, 0);
+  p2.set(-1, 0);
+  p3.set(1, 1);
+
+  double ang1 = atan2(p2.y - p1.y, p2.x - p1.x);
+  double ang2 = atan2(p3.y - p1.y, p3.x - p1.x);
+  double delta = ang2 - ang1;
+  std::cerr << "ang1: " << ang1 << ", ang2: " << ang2 << ", delta: " << delta << std::endl;
+
 
   // test the time difference between det and orient2d
   //for (unsigned int i = 0; i < 100000000 ; ++i) orient2d(pa,pb,pc);

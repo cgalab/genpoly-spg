@@ -121,13 +121,14 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
     fout = fopen(outFile, "r");
 
     if(fout != NULL) {
-      //fprintf(stderr, "outFile already exists, need to create a new file\n");
+//      fprintf(stderr, "outFile already exists, need to create a new file\n");
 
       int counter = 0;
       char tempOutFile[255];
 
       do {
         snprintf(tempOutFile, sizeof(tempOutFile), "%s%d", outFile, counter);
+//        std::cerr << tempOutFile << std::endl;
         fout = fopen(tempOutFile, "r");
         ++counter;
       } while (fout != NULL);

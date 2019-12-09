@@ -1,4 +1,8 @@
 #include <vector>
+#include <stdio.h>
+#include <string.h>
+#include <fstream>
+#include <iostream>
 
 #include "timer.h"
 #include "randomGenerator.h"
@@ -75,6 +79,12 @@ public:
 	// out of its surrounding polygon (just with double arithmetics)
 	static constexpr double minDetInsertion = 0.000000000001; // 10⁻¹²
 
+	// Enable local correctness checking after aborted translations
+	static bool localChecking;
+
+	// Enable global correctness checking between stages
+	static bool globalChecking;
+
 
 	/*
 		Insertion parameters
@@ -84,7 +94,7 @@ public:
 	static int insertionTries;
 
 	// Minimal allowed edge length for insertions
-	static double minLength;	
+	static double minLength;
 
 
 	/*
@@ -116,9 +126,54 @@ public:
 	// Feedback mode
 	static FeedbackMode feedback;
 
-	// Function for initialising the settings
-	static void initSettings();
+	// Flag whether execution info should be printed
+	static bool executionInfo;
 
+	// Flag whether info an numerical correction should be printed
+	static bool correctionInfo;
+
+	// Flag to mute all output
+	static bool mute;
+
+	// Filename for polygon output file
+	static char *polygonFile;
+
+	// A flag whether the triangulation is required
+	static bool triangulationOutputRequired;
+
+	// Filename for triangulation file
+	static char *triangulationFile;
+
+	// Filename for statistics file
+	static char *statisticsFile;
+
+
+
+
+
+	// Function for reading the configuration file
+	static void readConfigFile(char *filename);
+
+	// Function for printing the settings
+	static void printSettings();
+
+	// cast string to char*
+	static char* stringToChar(std::string str);
+
+	// Reads booleans
+	static bool readBoolean(bool &found);
+
+	// Read arithmetic type
+	static Arithmetics readArithmeticType(bool &found);
+
+	// Checks whether all necessary settings are given
+	static void checkAndApplySettings();
+
+	// Get hole sizes
+	static void readHoleSizes(bool &found);
+
+	//Print a dummy configuration file
+	static void printDummyFile();
 
 	/*
 		Check

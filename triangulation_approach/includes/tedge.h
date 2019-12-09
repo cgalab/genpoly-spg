@@ -123,7 +123,7 @@ public:
 
 		PRINTER:
 
-		void 				print(FILE * const f) const
+		void 				write(FILE * const f) const
 		void 				print() const
 
 		OTHERS:
@@ -285,7 +285,7 @@ public:
 	*/
 
 	/*
-		The function print() prints the edge to a .graphml file.
+		The function write() writes the edge to a .graphml file.
 		Edges of type POLYGON get the weight 5 plus the number of assigned triangles, of type
 		FRAME gets the weight 10 plus the number of assigned triangles and edges oftype
 		triangulation get as weight the number of assigned triangles (2 for a correct
@@ -293,7 +293,7 @@ public:
 
 		@param 	f 	Pointer to the file to print in
 	*/
-	void print(FILE * const f) const;
+	void write(FILE * const f) const;
 
 	/*
 		The function print() prints the the edge ID, the IDs of its vertices and its edge type

@@ -25,19 +25,33 @@ code 	name						meaning
 11 		Not simple					The check for simplicity found an intersection
 12 		Vertex insertion error 		The pID passed to Triangulation::addVertex() exceeds the number of inner
 									polygons
+13 		Parameter error				A parameter given in the configuration file has a wrong type
+14 		Setting error				Some mandatory settings are not given or settings are conflicting
 */
 
-int main(){
+int main(int argc, char *argv[]){
 	Triangulation* T;
 
-	Settings::initSettings();
+	if(argc != 2){
+		printf("Usage: fpg <CONFIG FILE>\n");
+		Settings::printDummyFile();
+		printf("Printed a dummy config file named dummy.fpg\n");
+		exit(14);
+	}else{
+		Settings::readConfigFile(argv[1]);
+		Settings::checkAndApplySettings();
+		
+		if(!Settings::mute)
+			Settings::printSettings();
+	}
 
 	T = generateRegularPolygon();
 
 	(*T).check();
 
-	printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n",
-		Settings::initialSize, (*Settings::timer).elapsedTime());
+	if(Settings::executionInfo)
+		printf("Initial polygon with %d vertices in regular shape computed after %f seconds\n",
+			Settings::initialSize, (*Settings::timer).elapsedTime());
 
 	if(Settings::nrInnerPolygons == 0)
 		strategyNoHoles0(T);
@@ -46,7 +60,16 @@ int main(){
 	else
 		strategyWithHoles0(T);
 
-	calculateDistanceDistribution(T, 0.25);
+	(*T).writePolygonToDat(Settings::polygonFile);
+	(*T).writePolygon("polygon.graphml");
+
+	if(Settings::triangulationOutputRequired)
+		(*T).writeTriangulation(Settings::triangulationFile);
+
+	calculateRadialDistanceDistribution(T, 0.25);
+	calculateMaxTwist(T);
+	countOrientationChanges(T);
+	calculateRadialDistanceDeviation(T);
 	
 	exit(0);
 }

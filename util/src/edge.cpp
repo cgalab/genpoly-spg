@@ -146,6 +146,9 @@ unsigned int getLowestLexIdx(const Edge e1, const Edge e2) {
 }
 
 enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
+	// is e1 and e2 the same edge?
+	if (e1 == e2) return IS_SAME_EDGE;
+
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;
 	bool same11 = false, same12 = false, same21 = false, same22 = false;
@@ -180,9 +183,6 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 		if (*(e1.p1) == *(e2.p2)) same12 = true;
 		if (*(e1.p2) == *(e2.p1)) same21 = true;
 		if (*(e1.p2) == *(e2.p2)) same22 = true;
-
-		// is e1 and e2 the same edge?
-		if (e1 == e2) return IS_SAME_EDGE;
 
 		// some determinant was 0, need to check if it's inside an edge or outside.
 		dp_1 = reldist(e1, *e2.p1);
@@ -461,4 +461,90 @@ void poldisplay (std::vector<unsigned int>& p) {
 		std::cout << p[i] << " ";
 	}
 	std::cout  << std::endl;
+}
+
+// function to get the angle between an edge and a point, where the origin is one of the points of the edge,
+// controlled by the boolean 'use_p1' and the x-axis is along the edge.
+double get_angle(Edge e, Point p, bool use_p1) {
+	double a1, a2;
+	Point p1 = *e.p1, p2 = *e.p2;
+	if (use_p1) {
+		a1 = atan2(p2.y - p1.y, p2.x - p1.x);
+		a2 = atan2(p.y - p1.y, p.x - p1.x);
+	}
+	else {
+		a1 = atan2(p1.y - p2.y, p1.x - p2.x);
+		if (a1 < 0) a1 = -PI - a1;
+		else a1 = PI - a1;
+		a2 = atan2(p.y - p2.y, p.x - p2.x);
+		if (a2 < 0) a2 = -PI - a2;
+		else a2 = PI - a2;
+	}
+	// angles must always be [-180°, 180°]
+	double sum = a2 - a1;
+	if (sum < -PI) sum = sum + 2*PI;
+	if (sum > PI) sum = sum - 2*PI;
+	return sum;
+}
+
+// function that returns the smaller angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
+// use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
+double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
+	std::cerr << "=== get_smaller_angle function ===" << std::endl;
+  double a1 = get_angle(e1, *e2.p1, use_p1);
+  double a2 = get_angle(e1, *e2.p2, use_p1);
+	std::cerr << "a1: " << a1 << ", a2: " << a2 << std::endl;
+	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << ", use_p1: " << ((use_p1) ? "true" : "false") << std::endl;
+	std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+
+	if (e1.bin) {
+		if (a1 < 0) {
+			if (a2 < 0) return (fabs(a1) < fabs(a2) ? a1 : a2);
+			return a1;
+		}
+		if (a2 < 0) return a2;
+		std::cerr << "Possible error, bin was true, and neither angle was negative." << std::endl;
+		return (a1 < a2 ? a1 : a2);
+	}
+	else {
+		if (a1 > 0) {
+			if (a2 > 0) return (a1 < a2 ? a1 : a2);
+			return a1;
+		}
+		if (a2 > 0) return a2;
+		std::cerr << "Possible error, bin was false, and neither angle was positive." << std::endl;
+		return (fabs(a1) < fabs(a2) ? a1 : a2);
+	}
+}
+
+// function that returns the larger angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
+// there is a restriction that the returned angle is of the point on the side of 'e1'
+// which 'e1.bin' designates.
+// use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
+double get_larger_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
+	std::cerr << "=== get_larger_angle function ===" << std::endl;
+  double a1 = get_angle(e1, *e2.p1, use_p1);
+  double a2 = get_angle(e1, *e2.p2, use_p1);
+	std::cerr << "a1: " << a1 << ", a2: " << a2 << std::endl;
+	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << ", use_p1: " << ((use_p1) ? "true" : "false") << std::endl;
+	std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+
+	if (e1.bin) {
+		if (a1 < 0) {
+			if (a2 < 0) return (fabs(a1) < fabs(a2) ? a2 : a1);
+			return a1;
+		}
+		if (a2 < 0) return a2;
+		std::cerr << "Possible error, bin was true, and neither angle was negative." << std::endl;
+		return (a1 < a2 ? a2 : a1);
+	}
+	else {
+		if (a1 > 0) {
+			if (a2 > 0) return (a1 < a2 ? a2 : a1);
+			return a1;
+		}
+		if (a2 > 0) return a2;
+		std::cerr << "Possible error, bin was false, and neither angle was positive." << std::endl;
+		return (fabs(a1) < fabs(a2) ? a2 : a1);
+	}
 }
