@@ -846,6 +846,19 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "reldist(e2, p1): " << reldist(e2, p1) << std::endl;
   std::cerr << "reldist(e2, p2): " << reldist(e2, p2) << std::endl;
 
+  std::cerr << std::endl;
+  std::cerr << "=== angle tests ===" << std::endl;
+
+  p1.set(0, 0);
+  p2.set(-1, 0);
+  p3.set(1, 1);
+
+  double ang1 = atan2(p2.y - p1.y, p2.x - p1.x);
+  double ang2 = atan2(p3.y - p1.y, p3.x - p1.x);
+  double delta = ang2 - ang1;
+  std::cerr << "ang1: " << ang1 << ", ang2: " << ang2 << ", delta: " << delta << std::endl;
+
+
   // test the time difference between det and orient2d
   //for (unsigned int i = 0; i < 100000000 ; ++i) orient2d(pa,pb,pc);
 /*

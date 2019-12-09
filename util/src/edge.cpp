@@ -463,183 +463,88 @@ void poldisplay (std::vector<unsigned int>& p) {
 	std::cout  << std::endl;
 }
 
+// function to get the angle between an edge and a point, where the origin is one of the points of the edge,
+// controlled by the boolean 'use_p1' and the x-axis is along the edge.
+double get_angle(Edge e, Point p, bool use_p1) {
+	double a1, a2;
+	Point p1 = *e.p1, p2 = *e.p2;
+	if (use_p1) {
+		a1 = atan2(p2.y - p1.y, p2.x - p1.x);
+		a2 = atan2(p.y - p1.y, p.x - p1.x);
+	}
+	else {
+		a1 = atan2(p1.y - p2.y, p1.x - p2.x);
+		if (a1 < 0) a1 = -PI - a1;
+		else a1 = PI - a1;
+		a2 = atan2(p.y - p2.y, p.x - p2.x);
+		if (a2 < 0) a2 = -PI - a2;
+		else a2 = PI - a2;
+	}
+	// angles must always be [-180°, 180°]
+	double sum = a2 - a1;
+	if (sum < -PI) sum = sum + 2*PI;
+	if (sum > PI) sum = sum - 2*PI;
+	return sum;
+}
+
 // function that returns the smaller angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
 // use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
 double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
 	std::cerr << "=== get_smaller_angle function ===" << std::endl;
-  Point p0, p1, p2, p3;
-  if(use_p1) {
-    p0 = *e1.p1;p1 = *e1.p2;
-    p2 = *e2.p1;p3 = *e2.p2;
-  }
-  else {
-    p0 = *e1.p2;p1 = *e1.p1;
-    p2 = *e2.p1;p3 = *e2.p2;
-  }
-	std::cerr << "e1: " << e1 << std::endl;
-	std::cerr << "e2: " << e2 << std::endl;
-	std::cerr << "p0: " << p0 << std::endl;
-	std::cerr << "p1: " << p1 << std::endl;
-	std::cerr << "p2: " << p2 << std::endl;
-	std::cerr << "p3: " << p3 << std::endl;
-	double ang1 = atan2(p1.y - p0.y, p1.x - p0.x);
-  double ang2 = atan2(p2.y - p0.y, p2.x - p0.x);
-  double ang3 = atan2(p3.y - p0.y, p3.x - p0.x);
-	std::cerr << "ang1: " << ang1 << ", ang2: " << ang2 << ", ang3: " << ang3 << std::endl;
-
-	//in case either angle is pi, the sign of the pi is set to the same as the other angle.
-	if ((ang2 <= PI + EPSILON) && (PI - EPSILON < ang2)) {
-		if (signbit(ang3) ^ signbit(ang2)) {
-			ang2 = ang2*(-1);
-			std::cerr << "ang2 changed signs." << std::endl;
-		}
-	}
-	if (ang2 == 0) {
-		if (signbit(ang3) ^ signbit(ang2)) {
-			ang2 = ang2*(-1);
-			std::cerr << "ang2 changed signs." << std::endl;
-		}
-	}
-	if ((ang3 <= PI + EPSILON) && (PI - EPSILON < ang3)) {
-		if (signbit(ang3) ^ signbit(ang2)) {
-			ang3 = ang3*(-1);
-			std::cerr << "ang3 changed signs." << std::endl;
-		}
-	}
-	if (ang3 == 0) {
-		if (signbit(ang3) ^ signbit(ang2))
-		{
-			ang3 = ang3*(-1);
-			std::cerr << "ang3 changed signs." << std::endl;
-		}
-	}
-	if ((ang1 <= PI + EPSILON) && (PI - EPSILON < ang1)) {
-		if (signbit(ang1) ^ signbit(ang2)) {
-			ang1 = ang1*(-1);
-			std::cerr << "ang1 changed signs." << std::endl;
-		}
-	}
-	if (ang1 == 0) {
-		if (signbit(ang1) ^ signbit(ang2)) {
-			ang1 = ang1*(-1);
-			std::cerr << "ang1 changed signs." << std::endl;
-		}
-	}
-	double delta1 = ang2 - ang1;
-	double delta2 = ang3 - ang1;
-
-	if (delta1 == 0) {
-		if (signbit(delta1) ^ signbit(delta2)) delta1 = delta1*(-1);
-	}
-	if (delta2 == 0) {
-		if (signbit(delta1) ^ signbit(delta2)) delta2 = delta2*(-1);
-	}
-
-  std::cerr << "ang1: " << ang1 << ", ang2: " << ang2 << ", ang3: " << ang3 << ", delta1: " << delta1 << ", delta2: " << delta2 << std::endl;
-
+  double a1 = get_angle(e1, *e2.p1, use_p1);
+  double a2 = get_angle(e1, *e2.p2, use_p1);
+	std::cerr << "a1: " << a1 << ", a2: " << a2 << std::endl;
 	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << ", use_p1: " << ((use_p1) ? "true" : "false") << std::endl;
 	std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
-	std::cerr << "sign(d1): " << signbit(delta1) << ", sign(d2): " << signbit(delta2) << std::endl;
-	if (e1.p1 == e2.p1) {
-		std::cerr << "e1.p1 == e2.p1, returning delta2: " << std::endl;
-		return delta2;
+
+	if (e1.bin) {
+		if (a1 < 0) {
+			if (a2 < 0) return (fabs(a1) < fabs(a2) ? a1 : a2);
+			return a1;
+		}
+		if (a2 < 0) return a2;
+		std::cerr << "Possible error, bin was true, and neither angle was negative." << std::endl;
+		return (a1 < a2 ? a1 : a2);
 	}
-	if (e1.p2 == e2.p2) {
-		std::cerr << "e1.p2 == e2.p2, returning delta1: " << std::endl;
-		return delta1;
+	else {
+		if (a1 > 0) {
+			if (a2 > 0) return (a1 < a2 ? a1 : a2);
+			return a1;
+		}
+		if (a2 > 0) return a2;
+		std::cerr << "Possible error, bin was false, and neither angle was positive." << std::endl;
+		return (fabs(a1) < fabs(a2) ? a1 : a2);
 	}
-	if (signbit(delta1) != signbit(delta2)) {
-		std::cerr << "Angles have different signs, need to check which angle to return." << std::endl;
-		std::cerr << "delta1: " << delta1 << ", delta2: " << delta2 << std::endl;
-		if (use_p1 && (e2.p1 < e1.p1)) return delta2;
-		if (!use_p1 && (e1.p2 < e2.p2)) return delta1;
-		return (fabs(delta1) < fabs(delta2)) ? delta1 : delta2;
-	}
-	if (fabs(delta1) < fabs(delta2)) return delta1;
-	else return delta2;
 }
 
 // function that returns the larger angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
+// there is a restriction that the returned angle is of the point on the side of 'e1'
+// which 'e1.bin' designates.
 // use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
 double get_larger_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
 	std::cerr << "=== get_larger_angle function ===" << std::endl;
-  Point p0, p1, p2, p3;
-  if(use_p1) {
-    p0 = *e1.p1;p1 = *e1.p2;
-    p2 = *e2.p1;p3 = *e2.p2;
-  }
-  else {
-    p0 = *e1.p2;p1 = *e1.p1;
-    p2 = *e2.p1;p3 = *e2.p2;
-  }
-
-	std::cerr << "e1: " << e1 << std::endl;
-	std::cerr << "e2: " << e2 << std::endl;
-	std::cerr << "p0: " << p0 << std::endl;
-	std::cerr << "p1: " << p1 << std::endl;
-	std::cerr << "p2: " << p2 << std::endl;
-	std::cerr << "p3: " << p3 << std::endl;
-	double ang1 = atan2(p1.y - p0.y, p1.x - p0.x);
-  double ang2 = atan2(p2.y - p0.y, p2.x - p0.x);
-  double ang3 = atan2(p3.y - p0.y, p3.x - p0.x);
-	std::cerr << "ang1: " << ang1 << ", ang2: " << ang2 << ", ang3: " << ang3 << std::endl;
-
-	//in case either angle is pi, the sign of the pi is set to the same as the other angle.
-	if ((ang2 <= PI + EPSILON) && (PI - EPSILON < ang2)) {
-		if (signbit(ang3) ^ signbit(ang2)) {
-			ang2 = ang2*(-1);
-			std::cerr << "ang2 changed signs." << std::endl;
-		}
-	}
-	if (ang2 == 0) {
-		if (signbit(ang3) ^ signbit(ang2)) {
-			ang2 = ang2*(-1);
-			std::cerr << "ang2 changed signs." << std::endl;
-		}
-	}
-	if ((ang3 <= PI + EPSILON) && (PI - EPSILON < ang3)) {
-		if (signbit(ang3) ^ signbit(ang2)) {
-			ang3 = ang3*(-1);
-			std::cerr << "ang3 changed signs." << std::endl;
-		}
-	}
-	if (ang3 == 0) {
-		if (signbit(ang3) ^ signbit(ang2))
-		{
-			ang3 = ang3*(-1);
-			std::cerr << "ang3 changed signs." << std::endl;
-		}
-	}
-	if ((ang1 <= PI + EPSILON) && (PI - EPSILON < ang1)) {
-		if (signbit(ang1) ^ signbit(ang2)) {
-			ang1 = ang1*(-1);
-			std::cerr << "ang1 changed signs." << std::endl;
-		}
-	}
-	if (ang1 == 0) {
-		if (signbit(ang1) ^ signbit(ang2)) {
-			ang1 = ang1*(-1);
-			std::cerr << "ang1 changed signs." << std::endl;
-		}
-	}
-	double delta1 = ang2 - ang1;
-	double delta2 = ang3 - ang1;
-
-	if (delta1 == 0) {
-		if (signbit(delta1) ^ signbit(delta2)) delta1 = delta1*(-1);
-	}
-	if (delta2 == 0) {
-		if (signbit(delta1) ^ signbit(delta2)) delta2 = delta2*(-1);
-	}
-
-  std::cerr << "ang1: " << ang1 << ", ang2: " << ang2 << ", ang3: " << ang3 << ", delta1: " << delta1 << ", delta2: " << delta2 << std::endl;
+  double a1 = get_angle(e1, *e2.p1, use_p1);
+  double a2 = get_angle(e1, *e2.p2, use_p1);
+	std::cerr << "a1: " << a1 << ", a2: " << a2 << std::endl;
 	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << ", use_p1: " << ((use_p1) ? "true" : "false") << std::endl;
 	std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
-	if (signbit(delta1) != signbit(delta2)) {
-		std::cerr << "Error!  Angles have different signs!" << std::endl;
-		std::cerr << "delta1: " << delta1 << ", delta2: " << delta2 << std::endl;
-		return 0.0;
+
+	if (e1.bin) {
+		if (a1 < 0) {
+			if (a2 < 0) return (fabs(a1) < fabs(a2) ? a2 : a1);
+			return a1;
+		}
+		if (a2 < 0) return a2;
+		std::cerr << "Possible error, bin was true, and neither angle was negative." << std::endl;
+		return (a1 < a2 ? a2 : a1);
 	}
-	if (fabs(delta1) < fabs(delta2)) return delta2;
-	else return delta1;
+	else {
+		if (a1 > 0) {
+			if (a2 > 0) return (a1 < a2 ? a2 : a1);
+			return a1;
+		}
+		if (a2 > 0) return a2;
+		std::cerr << "Possible error, bin was false, and neither angle was positive." << std::endl;
+		return (fabs(a1) < fabs(a2) ? a2 : a1);
+	}
 }

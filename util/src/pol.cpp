@@ -2552,7 +2552,7 @@ bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& po
 // A hole must be 2D on both sides of the edges.
 bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole) {
   std::cerr << "=== is_2D function ===" << std::endl;
-  assert(polygon.size() > 2);
+  if (polygon.size() < 3) return false;
 
   unsigned int a, b;
   bool is2d = false;
@@ -2561,7 +2561,6 @@ bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Poi
 
   // get the edge that is lex. lower in the polygon (easier to compare to [0,last] later)
   if (candidate.getVLow() < candidate.closest[0].getVLow()) {
-
     e1 = Edge(candidate.p1, candidate.p2);
     e2 = Edge(candidate.closest[0].p1, candidate.closest[0].p2);
   }
@@ -2578,7 +2577,10 @@ bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Poi
     a = e1.getVHigh();
     b = e2.getVLow();
     std::cerr << "a: " << a << ", b: " << b << std::endl;
-    if ((b-a) < 2) return false;
+    if ((b-a) < 2) {
+      std::cerr << "not 2D" << std::endl;
+      return false;
+    }
 
     e3 = Edge(&points[polygon[(a)%polygon.size()]], &points[polygon[(a+1)%polygon.size()]]);
     std::cerr << "e3: " << e3 << std::endl;
@@ -2625,14 +2627,17 @@ bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Poi
       a = e1.getVHigh();
       b = e2.getVLow();
       std::cerr << "a: " << a << ", b: " << b << std::endl;
-      if ((b-a) < 2) return false;
+      if ((b-a) < 2) {
+        std::cerr << "not 2D." << std::endl;
+        return false;
+      }
 
       e3 = Edge(&points[polygon[(a)%polygon.size()]], &points[polygon[(a+1)%polygon.size()]]);
       std::cerr << "e3: " << e3 << std::endl;
       for (unsigned int i = (a+2)%polygon.size(); i != (b+1)%polygon.size(); i = (i+1)%polygon.size()) {
         p = points[polygon[i]];
-        std::cerr << "p: " << p << std::endl;
-        std::cerr << "det: " << det(e3,p) << ", det != 0: " << ((det(e3,p) != 0) ? "true" : "false") << std::endl;
+//        std::cerr << "p: " << p << std::endl;
+//        std::cerr << "det: " << det(e3,p) << ", det != 0: " << ((det(e3,p) != 0) ? "true" : "false") << std::endl;
         if (det(e3,p) != 0) {
           return true;
         }
@@ -2653,10 +2658,11 @@ void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned 
   bool inside = false;
   Edge e1 = Edge(e.p1, e.p2);
   Edge e2 = Edge(e.closest[e.closest.size()-1].p1, e.closest[e.closest.size()-1].p2);
+
   std::cerr << "edge 1: " << e1 << std::endl;
   std::cerr << "edge 2: " << e2 << std::endl;
-  std::cerr << "current polygon: " << std::endl;
-  pdisplay(polygon, points);
+//  std::cerr << "current polygon: " << std::endl;
+//  pdisplay(polygon, points);
 
   Point p, prev;
   prev = points[polygon[polygon.size()-1]];
@@ -2706,6 +2712,73 @@ void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned 
 //  pdisplay(new_polygon, points);
 //  std::cerr << "hole:" << std::endl;
 //  pdisplay(hole, points);
+}
+
+// same as above, except it accepts a boolean 'is_hole' which, if false,
+// changes the edges, if either is the edge of the c.h. which is [0,last]
+void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole) {
+  std::cerr << "=== get_hole_and_new_pol function ===" << std::endl;
+  assert(hole.size() == 0);
+  assert(new_polygon.size() == 0);
+
+  std::vector<unsigned int> pol1, pol2;
+  bool inside = false;
+  Edge e1, e2;
+  if (!is_hole && ((e.getVLow() == polygon.size()-1 && e.getVHigh() == 0) || (e.closest[0].getVLow() == polygon.size()-1 && e.closest[0].getVHigh() == 0))) {
+    e1 = Edge(&points[polygon[0]], &points[polygon[1]]);
+    e2 = Edge(&points[polygon[polygon.size()-2]], &points[polygon[polygon.size()-1]]);
+  }
+  else {
+    e1 = Edge(e.p1, e.p2);
+    e2 = Edge(e.closest[e.closest.size()-1].p1, e.closest[e.closest.size()-1].p2);
+  }
+  std::cerr << "edge 1: " << e1 << std::endl;
+  std::cerr << "edge 2: " << e2 << std::endl;
+//  std::cerr << "current polygon: " << std::endl;
+//  pdisplay(polygon, points);
+
+  Point p, prev;
+  prev = points[polygon[polygon.size()-1]];
+  for (unsigned int i = 0; i < polygon.size(); ++i) {
+//    std::cerr << "i: " << i << ", polygon[i]: " << polygon[i] << ", point: " << points[polygon[i]];
+    p = points[polygon[i]];
+    Edge i_e = Edge (&prev, &p);
+
+    if (i_e == e1 || i_e == e2) inside = !inside;
+
+    if (inside) pol1.push_back(p.i);//std::cerr<<", inside"<<std::endl;}
+    else pol2.push_back(p.i);//std::cerr<<", not inside"<<std::endl;}
+    prev = p;
+  }
+
+  // to make sure "polygon" is the polygon, find the polygon with a c.h. point.
+  Point end = points[polygon[0]];
+  if (pol1.size() < pol2.size()) {
+    for (unsigned int i = 0; i < pol1.size(); ++i) {
+      if (points[pol1[i]] == end) {
+        hole = pol2;
+        new_polygon = pol1;
+        return;
+      }
+    }
+    hole = pol1;
+    new_polygon = pol2;
+  }
+  else {
+    for (unsigned int i = 0; i < pol2.size(); ++i) {
+      if (points[pol2[i]] == end) {
+        hole = pol1;
+        new_polygon = pol2;
+        return;
+      }
+    }
+    hole = pol2;
+    new_polygon = pol1;
+  }
+  std::cerr << "polygon:" << std::endl;
+  pdisplay(new_polygon, points);
+  std::cerr << "hole:" << std::endl;
+  pdisplay(hole, points);
 }
 
 void get_new_inner_polygon(Ends& end, std::vector<unsigned int>& new_inner_polygon, std::vector<unsigned int>& new_polygon, std::vector<Point>& points) {
@@ -2894,7 +2967,21 @@ void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& 
     }
   }
 }
+/*
+// Function to return the degrees of "in" vs. "out" given the sidedness is defined
+// by 'e.bin' value.
+std::pair<double, double> check_sidedness (E_Edge e, std::vector<Point>& points) {
+  double angle_sum1, angle_sum2;
+  bool is_sum1;
+  Point p, prev2 = points[points.size()-1], prev1 = points[0];
+  for (unsigned int i = 1; i < points.size(); ++i) {
+    p = points[i];
+    E_Edge temp1 = E_Edge(&prev2, &prev1);
+    E_Edge temp2 = E_Edge(&prev1, &p);
 
+  }
+}
+*/
 // really slow version to check whether a polygon has an intersection.
 // Better to use a form of the line-sweep to check.
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points) {
