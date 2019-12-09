@@ -1,16 +1,111 @@
-1. Distance (to origin) distribution of vertices
-	Why:
-		- start polygon should not be recognizable at the end of the processing
-	How:
-		- Measure point density relative to distance to origin
-		- Use area rings around the origin
-		- Outer ring will contain the corners of the bounding box
-		- Vertices of holes can maybe just be treated like the other vertices,
-			otherwise we get a decrease of density in the rings the holes live in
-	Expactation:
-		- uniform distribution over all rings
-		- no higher density in the ring the start polygon lived in
-		- possibly lower density in the corner ring
+1. Verteilung der Entfernungen zum Urpsrung:
+
+	Warum:
+		- Zur Überprüfung wie gut das Startpolygon noch zu "sehen" ist.
+
+	Wie:
+		- Für jeden Punkt Abstand zum Urpsrung berechnen
+		- Startpolygon hatte eine Mittelwert, der dem Radius r des Kreises entspricht
+			und Standardabweichung 0
+		- Abweichung s vom Startkreis berechnen, dh Standardabweichung mit Mittelwert r
+		- Verteilung von s über viele Polygone betrachten
+
+	Erwartung:
+		- 0 <= s <= b - r (b ist die halbe Seitenlänge der Bounding Box)
+		- Etwas annähernd normal verteiltes innerhalb des gegebenen Intervals, definitiv keine
+			starke Anhäufung in der Nähe von 0
+
+	Problem:
+		- Wenn man das Startpolygon insgesamt in eine Richtung verschiebt, würde dieses
+			Kriterium ein gutes Ergebnis anzeigen, dh. das Kriterium betrachtet absolut
+			nicht die Form des Polygons, sondern nur die Lage
+		- Möglicherweise könnte man statt des Abstands zum Ursprung den Abstand zum Massen-
+			schwerpunkt verwenden
+
+
+2. Maximale Eindrehung:
+
+	Warum:
+		- Misst wie stark die Form des Polygons maximal von einem regelmäßigen Polygon abweicht
+
+	Wie:
+		- Durchschnittlicher Innenwinkel µ = pi (1 - 2 / n) für ein n-gon (entspricht dem Innen-
+			winkel des regelmäßigen Polygons)
+		- Innenwinkel alpha_i am Vertex i
+		- Abweichung des Innenwinkels vom Schnitt beta_i = alpha_i - µ
+		- Akkumulierte Abweichung am Vertex i: phi_i = summe(1, i, beta_i)
+		- Maximale Abweichung: a = (abs(max(phi_i)) + abs(min(phi_i))) / 2
+
+	Erwartung:
+		- a = 0 bedeutet, dass das Polygon regelmäßig ist (zumindest in Bezug auf Winkel)
+		- 0 <= a < pi (n / 2 - 2 / n) !? (Spirale, die auf eine Linie konvergiert)
+		- Möglichst breite Verteilung, nicht nahe an 0
+		- Breite der Verteilung sollte mit steigendem n auch steigen
+
+	Problem:
+		- Genaue Interpretation eines Wertes ist schwierig
+
+
+3. Anzahl an Orientierungswechsel:
+
+	Warum:
+		- Gibt Einsicht in die Anzahl der Verdrehung (im Gegensazt zu K2, welches nur die maximale
+			Verdrehung betrachtet)
+
+	Wie:
+		- Untersuchung wie oft die polygonal chain zwischen Uhrzeigersinn und gegen den Uhrzeiger-
+			sinn wechselt
+		- Innenwinkel kleiner pi bedeutet Uhrzeigersinn, größer pi gegen Uhrzeigersinn (oder anders-
+			rum je nach Orientierung)
+		- Solange Winkel in dieselbe Richtung aufeinander folgen findet kein Wechsel der Orientierung
+			statt, sobald ein Winkel in die andere Richtung geht, findet ein Wechsel statt
+		- Anzahl kann durch einfaches gehen um das Polygon abgezählt werden
+
+	Erwartung:
+		- Die Anzahl ist durch 0 nach unten beschränkt (konvexes Polygon) und durch n nach oben (zB
+			richtige Sterne)
+		- Was wir sehen wollen: etwas näherungsweise normal verteiltes zwischen den Schranken?!
+
+
+4. Veränderung pro k Versuche:
+
+	Warum:
+		- Es könnte sein, dass irgendwann das Polygon so verdreht ist, dass weitere Verschiebungen
+			kaum mehr möglich sind, dh. eine sehr große Menge von Verschiebungen wird abgelehnt oder
+			ist nur noch wintzig klein
+
+	Wie:
+		- Messung über eine Spanne von k Verschiebungsversuche
+		- Summiere die Längen aller ausgeführter Verschiebungen auf
+
+	Erwartung:
+		- Die Summe sollte mit zunehmender Anzahl an Vertices abnehmen
+		- Bei gleichbleibender Vertex Anzahl sollte die Summe im Laufe der Zeit abnehmen, dh. weitere
+			Verschiebungen führen nur noch zu sehr geringen Veränderungen
+
+
+5. Sinuosität:
+
+	Warum:
+		- Maß dafür, wie weit das Polygon von einem Kreis abweicht
+
+	Wie:
+		- Quotient aus Umfang des Polygons und möglicherweise dem Umfang des Startpolygons bzw des
+			zugehörigen Kreises
+		- Alternativ könnte man den Schwerpunkt berechnen und die mittlere Abwechung der Vertices
+			vom Schwerpunkt und diesen Wert als Radius verwenden
+
+	Erwartung:
+		- Bei Methode mit Schwerpunkt wäre 1 die untere Schranke, andernfalls existiert keine untere
+			Schranke (bzw ein bisschen weniger als 1)
+		- Es existiert keine obere Schranke
+		- Irgendwas näherungsweise normal verteiltes?!
+
+
+
+
+
+
 
 
 2. Filling of the bounding box
@@ -58,7 +153,6 @@
 		- also includes area of polygon parts which are far away from the holes
 
 
-4. Convolutedness
 
 5. Distribution of angles
 	Why:
@@ -70,15 +164,4 @@
 			standard deviation for larger n)
 		- Compute angle standard deviation for each polygon
 		- Standard deviations for more polygons should roughly yield a single-sided normal distribution around 0
-	
 
-
-What others did:
-	1. "Generating Random Polygons", J. O'Rourke
-		- 1. method: pretty similar to my first method with the expectation of a uniform distribution
-		- 2. method: partition the area in 8 angular sectors and count the number of edges which fell
-			in each sector with the expectation of a uniform distribution
-		- Suggested: It seems that random polygons should have a certain "convoluted
-			ness." .". precise measure of this suggests itself: define the convolutedness of a
-			polygon to be maximum link distance of a path from any point in the plane exterior
-			to the polygon to infinity.
