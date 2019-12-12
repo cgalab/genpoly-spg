@@ -548,3 +548,14 @@ double get_larger_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
 		return (fabs(a1) < fabs(a2) ? a2 : a1);
 	}
 }
+
+// Function to modify the 'bin' value of 'e2'
+// input: 2 E_Edges that must share exactly one point
+// assumption: e1 has a valid 'bin' value
+// output: the 'bin' value of 'e2' is modified
+bool get_sidedness(E_Edge e1, E_Edge e2) {
+  if ((*e1.p1 == *e2.p1) || (*e1.p2 == *e2.p2)) return !e1.bin;
+  if ((*e1.p1 == *e2.p2) || (*e1.p2 == *e2.p1)) return e1.bin;
+	std::cerr << "Error!  Fallthrough in get_sidedness check!" << std::endl;
+	return false;
+}

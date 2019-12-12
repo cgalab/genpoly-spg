@@ -83,7 +83,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       // get a simple polygon to work with.
       if (generate_polygons) {
         std::cerr << "generating a new polygon." << std::endl;
-        opt2g(polygon, points, randseed);
+        opt2g(polygon, points, randseed+count_iterations);
       }
       // assign the polygon to sph[0] as sph[0] should always contain the simple polygon, and any/all holes are pushed below it.
       sph.push_back(polygon);
@@ -203,6 +203,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
               sph[0] = new_polygon;
               sph.push_back(hole);
               ++count_holes;
+              std::cerr << "holes so far: " << count_holes << std::endl;
 
 //              std::cerr << "new polygon" << std:: endl;
 //              pdisplay (sph[0], points);
@@ -265,8 +266,11 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       //
 
 
+
       ++count_iterations;
-      std::cerr << "gen_pol: " << ((generate_polygons) ? "true" : "false") << ", iter: " << count_iterations << std::endl;
+      std::cerr << "generate polygons?: " << ((generate_polygons) ? "true" : "false") << std::endl;
+      std::cerr << "iteration: " << count_iterations << std::endl;
+      std::cerr << "found holes: " << count_holes << std::endl;
     } while (generate_polygons && (count_iterations < max_iterations) && (count_holes < nr_holes));
 
     std::cerr << "wanted holes:" << nr_holes << ", found holes: " << count_holes << std::endl;
@@ -420,11 +424,21 @@ E_Edge get_inc_edge_from_set(E_Edge& e, std::vector<Curve>& curves, std::set<E_E
 
 // function to update edge in set, i.e. find it, remove it and insert it again.
 void update_edge_in_set(E_Edge& e, std::pair<std::set<E_Edge>::iterator, bool>& retval, std::set<E_Edge>& y_set) {
-  assert(e == *retval.first);
-  y_set.erase(retval.first);
-  retval = y_set.insert(e);
-  assert(*retval.first == e);
-  assert(retval.second == true);
+//  std::cerr << "=== update_edge_in_set ===" << std::endl;
+  if (e == *retval.first) {
+    y_set.erase(retval.first);
+    retval = y_set.insert(e);
+    if ((*retval.first != e) || (retval.second != true)) {
+      std::cerr << "Error!  update_edge_in_set failed to insert edge!" << std::endl;
+      std::cerr << "e: " << e << std::endl;
+      std::cerr << "iterator: " << *retval.first << std::endl;
+    }
+  }
+  else {
+    std::cerr << "Error.  update_edge_in_set got an edge and iterator that did not match" << std::endl;
+    std::cerr << "e: " << e << std::endl;
+    std::cerr << "iterator: " << *retval.first << std::endl;
+  }
 //  std::cerr << "r: e1: " << (*retval1.first) << ", e1.closest: " << (*retval1.first).closest << std::endl;
 }
 
@@ -809,7 +823,6 @@ E_Edge inner_holes2(std::vector<Point>& points, bool is_hole) {
       std::cerr << "e1: " << e1 << ", found: " << *(retval1.first) << std::endl;
       e1 = (*retval1.first); // there are properties in the edge in the set that are needed.
       find_update_closest(e1, retval1.first, y_set);
-      y_set.erase(e1);
 
       // find 'e2' in 'y_set'
       retval2.first = y_set.find(e2);
@@ -817,6 +830,7 @@ E_Edge inner_holes2(std::vector<Point>& points, bool is_hole) {
       std::cerr << "e2: " << e2 << ", found: " << *(retval2.first) << std::endl;
       e2 = (*retval2.first);
       find_update_closest(e2, retval2.first, y_set);
+      y_set.erase(e1);
       y_set.erase(e2);
 
       std::cerr << "e1: " << e1 << std::endl;
@@ -906,6 +920,8 @@ E_Edge inner_holes2(std::vector<Point>& points, bool is_hole) {
   for (unsigned int i = 0; i < valid_edges.size(); ++i) std::cerr << valid_edges[i] << std::endl;
 
   // clear all non-2D edges and non-simple holes
+  // TODO: make it pick a random edges to check, as the code below technically
+  // just removes the non-valid edges and then picks a random edge.
   int j, i = valid_edges.size() -1;
   E_Edge ends_e = E_Edge(&points[0], &points[points.size()-1]);
   while (i > -1) {
@@ -934,16 +950,23 @@ E_Edge inner_holes2(std::vector<Point>& points, bool is_hole) {
             enum error simple = simple_pol_check(p_hol);
             if (simple == SUCCESS) {
               std::cerr << "hole is simple" << std::endl;
-              std::vector<Point> p_pol;
-              for (unsigned int i = 0; i < pol.size(); ++i) {
-                p_pol.push_back(points[pol[i]]);
-                p_pol[i].v = i;
+              // with the 'bin_edge' check that 'p_hol' is oriented with correct "in" inside.
+              if (check_in_orientation(return_edge, p_hol)) {
+                std::cerr << "hole has correct orientation of 'in'" << std::endl;
+                std::vector<Point> p_pol;
+                for (unsigned int i = 0; i < pol.size(); ++i) {
+                  p_pol.push_back(points[pol[i]]);
+                  p_pol[i].v = i;
+                }
+                std::cerr << "p_pol: " << std::endl;
+                pdisplay(p_pol);
+                enum error simple = simple_pol_check(p_pol);
+                if (simple != SUCCESS) {
+                  std::cerr << "pol is not simple" << std::endl;
+                  valid_edges[i].closest.erase(valid_edges[i].closest.begin()+j);
+                }
               }
-              std::cerr << "p_pol: " << std::endl;
-              pdisplay(p_pol);
-              enum error simple = simple_pol_check(p_pol);
-              if (simple != SUCCESS) {
-                std::cerr << "pol is not simple" << std::endl;
+              else {
                 valid_edges[i].closest.erase(valid_edges[i].closest.begin()+j);
               }
             }
@@ -1073,9 +1096,9 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
   if (y_set.size() < 2) return;
   E_Edge inc_e;
   double angle_right;
-  std::pair<std::set<E_Edge>::iterator, bool> retval;
-  retval.first = iter;
-  retval.second = true;
+  std::pair<std::set<E_Edge>::iterator, bool> retval_e, retval_i;
+  retval_e.first = iter;
+  retval_e.second = true;
   std::cerr << "current edge: " << e << std::endl;
   for (unsigned int i = 0; i < e.closest.size(); ++i) std::cerr << "closest[" << i << "]: " << e.closest[i] << std::endl;
   if (y_set.size() > 2) {
@@ -1086,12 +1109,26 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
 
   // find the correct incidental edge
   if (e.bin) {
-    if (iter != y_set.begin()) inc_e = *(std::prev(iter));
-    else return;
+    if (iter != y_set.begin()) {
+      retval_i.first = std::prev(iter);
+      retval_i.second = true;
+      inc_e = *(retval_i.first);
+    }
+    else {
+      std::cerr << "Error!  No valid incidental edge was found!" << std::endl;
+      return;
+    }
   }
   else {
-    if (iter != std::prev(y_set.end())) inc_e = *(std::next(iter));
-    else return;
+    if (iter != std::prev(y_set.end())) {
+      retval_i.first = std::next(iter);
+      retval_i.second = true;
+      inc_e = *(retval_i.first);
+    }
+    else {
+      std::cerr << "Error!  No valid incidental edge was found!" << std::endl;
+      return;
+    }
   }
   std::cerr << "inc_e: " << inc_e << std::endl;
   for (unsigned int i = 0; i < inc_e.closest.size(); ++i) std::cerr << "closest[" << i << "]: " << inc_e.closest[i] << std::endl;
@@ -1105,60 +1142,61 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
     std::cerr << "pushing inc_e to e.closest" << std::endl;
     e.closest.push_back(inc_e);
     e.angle = get_smaller_angle(e, inc_e, true);
-    update_edge_in_set(e, retval, y_set);
+    update_edge_in_set(e, retval_e, y_set);
   }
   // else the incidental edge only gets added if the smaller angle 'e' makes with the latest 'closest' edge
   // is larger than the larger angle 'e' makes with the incidental edge.
   else if (e.closest[e.closest.size()-1] != inc_e) {
-    // if inc_e is already e.closest[last], skip.
-    if (inc_e != e.closest[e.closest.size()-1]) {
       // 'e.angle' are older calculations of edges in 'closest', where 'angle' should be the smallest angle seen so far.
       std::cerr << "checking 'e.angle' vs. angles of 'inc_e'" << std::endl;
+      std::cerr << "e:     " << e << std::endl;
+      std::cerr << "inc_e: " << inc_e << std::endl;
       angle_right = get_smaller_angle(e, inc_e, true);
-      std::cerr << "angle: " << e.angle << ", angle_right (p1): " << angle_right << std::endl;
+      std::cerr << "e.angle: " << e.angle << ", angle_right (p1): " << angle_right << std::endl;
       if (fabs(angle_right) <= fabs(e.angle)) {
         std::cerr << "e: right is smaller" << std::endl;
         e.closest.push_back(inc_e);
         e.angle = angle_right;
-        update_edge_in_set(e, retval, y_set);
+        update_edge_in_set(e, retval_e, y_set);
       }
-    }
   }
   // checking if 'e' needs to be in 'inc_e.closest'
   if ((inc_e.closest.size() == 0) || ((*e.p2 == *inc_e.p2) && (e != inc_e.closest[inc_e.closest.size()-1]))) {
     std::cerr << "pushing e to inc_e.closest" << std::endl;
     inc_e.closest.push_back(e);
     inc_e.angle = get_smaller_angle(inc_e, e, true);
-    retval.first = (e.bin) ? std::prev(iter) : std::next(iter);
-    update_edge_in_set(inc_e, retval, y_set);
+    //retval.first = (e.bin) ? std::prev(iter) : std::next(iter);
+    update_edge_in_set(inc_e, retval_i, y_set);
   }
   else if (inc_e.closest[inc_e.closest.size()-1] != e) {
+    std::cerr << "checking 'inc_e.angle' vs. inc_e-e" << std::endl;
     // 'e' is being inserted, which means there is a possibility that inc_e closest is on the other side of 'e'
     // if inc_e.closest[last] is on other side of e, remove inc_e.closest, then continue
     E_Edge other_side;
     //bool check_other_side = false;
     // 'iter' is a iterator to 'e', so 'next(iter)' should be the other side, if it exists.
-    if (e.bin && (std::next(iter) != y_set.end()) && (*(std::next(iter)) == inc_e.closest[inc_e.closest.size()-1])) {
+    if (!e.bin && (std::next(iter) != y_set.end()) && (*(std::next(iter)) == inc_e.closest[inc_e.closest.size()-1])) {
       std::cerr << "other side is next(iter): " << *(std::next(iter)) << std::endl;
       std::cerr << "inc_e.closest[last] is : " << inc_e.closest[inc_e.closest.size()-1] << std::endl;
       inc_e.closest.erase(inc_e.closest.end()-1);
     }
-    else if (!e.bin && (iter != y_set.begin()) && (*(std::prev(iter)) == inc_e.closest[inc_e.closest.size()-1])) {
+    else if (e.bin && (iter != y_set.begin()) && (*(std::prev(iter)) == inc_e.closest[inc_e.closest.size()-1])) {
       std::cerr << "other side is prev(iter): " << *(std::prev(iter)) << std::endl;
       std::cerr << "inc_e.closest[last] is : " << inc_e.closest[inc_e.closest.size()-1] << std::endl;
       inc_e.closest.erase(inc_e.closest.end()-1);
     }
 
-    std::cerr << "checking 'inc_e.angle' vs. inc_e-e" << std::endl;
-    E_Edge temp = inc_e.closest[inc_e.closest.size()-1];
+
+    std::cerr << "e:     " << e << std::endl;
+    std::cerr << "inc_e: " << inc_e << std::endl;
     angle_right = get_smaller_angle(inc_e, e, true);
     std::cerr << "angle: " << inc_e.angle << ", inc_e angle_right (p1): " << angle_right << std::endl;
     if (fabs(angle_right) <= fabs(inc_e.angle)) {
       std::cerr << "inc_e: right is smaller" << std::endl;
       inc_e.closest.push_back(e);
       inc_e.angle = angle_right;
-      retval.first = (e.bin) ? std::prev(iter) : std::next(iter);
-      update_edge_in_set(inc_e, retval, y_set);
+      //retval.first = (e.bin) ? std::prev(iter) : std::next(iter);
+      update_edge_in_set(inc_e, retval_i, y_set);
     }
   }
 

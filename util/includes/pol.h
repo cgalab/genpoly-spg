@@ -71,6 +71,7 @@ void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsign
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
 void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
 void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+bool check_in_orientation (E_Edge e1, std::vector<Point>& points);
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points);
 
 #endif
