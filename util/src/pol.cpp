@@ -2967,21 +2967,38 @@ void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& 
     }
   }
 }
-/*
-// Function to return the degrees of "in" vs. "out" given the sidedness is defined
-// by 'e.bin' value.
-std::pair<double, double> check_sidedness (E_Edge e, std::vector<Point>& points) {
-  double angle_sum1, angle_sum2;
-  bool is_sum1;
-  Point p, prev2 = points[points.size()-1], prev1 = points[0];
-  for (unsigned int i = 1; i < points.size(); ++i) {
-    p = points[i];
-    E_Edge temp1 = E_Edge(&prev2, &prev1);
-    E_Edge temp2 = E_Edge(&prev1, &p);
 
-  }
+// Function to return if "in" orientation of the closed edge that makes the hole,
+// i.e. edge(a,b) given a hole defined by a vector of points: [a,...,b],
+// matches the "in" orientation of the rest of the edges.
+// "true" means the hole is a correctly oriented hole
+// "false" means the hole is flipped and a part of the outer simple polygon could intersect the hole.
+bool check_in_orientation (E_Edge e1, std::vector<Point>& points) {
+  std::cerr << "=== check_in_orientation ===" << std::endl;
+  E_Edge e;
+  // check if e1 or e1.closest[0] is the edge with the first point in 'points'
+  if ((*e1.p1 == points[0]) || (*e1.p2 == points[0])) e = e1;
+  else e = e1.closest[0];
+  std::cerr << "e: " << e << std::endl;
+  bool use_p1;
+  if (*e1.p1 == points[0]) use_p1 = true;
+  else use_p1 = false;
+  Point p1 = points[1];
+  Point p2 = points[points.size()-1];
+
+  // get the angle between 'e' and p1;
+  double angle_e = get_angle(e, p1, use_p1);
+  std::cerr << "angle_e: " << angle_e << std::endl;
+  // get the convex angle
+  double angle_c = get_angle(e, p2, use_p1);
+  std::cerr << "angle_c: " << angle_c << std::endl;
+
+  // if the hole is flipped, all points lie inside the c.h. of the 2 edges that make the hole
+  // which means if fabs(angle2) is smaller than fabs(angle1) all is good.
+  std::cerr << "a_c < a_e: " << ((fabs(angle_c) < fabs(angle_e)) ? "true" : "false") << std::endl;
+  return (fabs(angle_c) < fabs(angle_e));
 }
-*/
+
 // really slow version to check whether a polygon has an intersection.
 // Better to use a form of the line-sweep to check.
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points) {

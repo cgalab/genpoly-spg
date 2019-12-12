@@ -526,6 +526,10 @@ public:
     if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
     else return false;
   }
+  friend bool operator==(const E_Edge lhs, const E_Edge rhs) {
+    if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
+    else return false;
+  }
 
   // to print out an edge, gives the format:
   // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
@@ -558,5 +562,6 @@ double get_angle(Edge e, Point p, bool use_p1);
 double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1);
 double get_larger_angle(E_Edge& e1, E_Edge& e2, bool use_p1);
 void poldisplay (std::vector<unsigned int>& p);
+bool get_sidedness(E_Edge e1, E_Edge e2);
 
 #endif
