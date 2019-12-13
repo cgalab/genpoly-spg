@@ -16,9 +16,7 @@
 
 
 
-enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
-  ++randseed;
-
+enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   //start with creating a vector for the lexicographically sorted indexes of 'points'
   std::vector<unsigned int> lex (points.size());
   fill_lex(lex, points); // fill 'lex' with the indexes
@@ -32,7 +30,7 @@ enum error curve(std::vector<unsigned int>& polygon, std::vector<Point>& points,
 // Theorem of inner curves:  Every point on the convex hull is either connected to its incidental c.h. point directly,
 // or via an inner curve that ends in the incidental c.h. point.
 // This means we can traverse the c.h. points and find hole candidates from the start of all inner curves.
-enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, std::vector<unsigned int>& polygon, unsigned int randseed, unsigned int nr_holes) {
+enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, std::vector<unsigned int>& polygon, unsigned int nr_holes) {
   assert(sph.size() == 0);
   // variable for how many times you should generate a polygon to check for holes, skipped if a polygon is given.
   unsigned int max_iterations = 500;
@@ -47,7 +45,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
 //  std::cerr << "convex hull: " << std::endl;
 //  pdisplay(ch, points);
 
-	std::cerr << "holes: " << nr_holes << ", pol.size: " << polygon.size() << ", randseed: " << randseed << std::endl;
+	std::cerr << "holes: " << nr_holes << ", pol.size: " << polygon.size() << std::endl;
   unsigned int nr_inner = points.size()-ch.size();
   std::cerr << "c.h. points: " << ch.size() << ", inner points: " << nr_inner << ", sph: " << sph.size() << std::endl;
 
@@ -83,7 +81,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       // get a simple polygon to work with.
       if (generate_polygons) {
         std::cerr << "generating a new polygon." << std::endl;
-        opt2g(polygon, points, randseed+count_iterations);
+        opt2g(polygon, points);
       }
       // assign the polygon to sph[0] as sph[0] should always contain the simple polygon, and any/all holes are pushed below it.
       sph.push_back(polygon);
@@ -129,7 +127,6 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
 
         // select a random end
         unsigned int r_end = 0;
-        if (randseed) mt.seed(randseed);
         UniformRandomI(r_end, 0, ends.size()-1);
         std::cerr << "random index: " << r_end << std::endl;
         std::cerr << "Random end: " << ends[r_end] << std::endl;
@@ -295,7 +292,6 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       std::vector<unsigned int> new_polygon;
       // select a random end
       unsigned int r_end = 0;
-      if (randseed) mt.seed(randseed);
       UniformRandomI(r_end, 0, ends.size()-1);
       std::cerr << "random index: " << r_end << std::endl;
       std::cerr << "Random end: " << ends[r_end] << std::endl;

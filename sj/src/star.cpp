@@ -11,13 +11,10 @@
 INPUT:
   polygon: a vector of indices (unsigned int) into a vector of 'Point's
   points:   vector of class 'Point'
-  randseed:  an unsigned integer needed to determine where the 'center' should be within the convex hull.
 
 */
-enum error star(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+enum error star(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
-
-  if (randseed) mt.seed(randseed);
 
   // To pick a random point inside for the 'center' point:
   // I need the convex hull

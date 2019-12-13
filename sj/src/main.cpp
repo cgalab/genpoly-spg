@@ -9,6 +9,7 @@
 #include "string.h" // for strcpy
 #include "basicDefinitions.h"
 #include "basicFunctions.h"
+#include "rand.h"
 #include "inits.h"
 #include "io.h"
 #include "point.h"
@@ -66,6 +67,7 @@ int main(int argc, char *argv[]) {
     test();
     return returnValue;
   }
+  if (randseed) mt.seed(randseed);
   // initialize Shewchuks' predicates
   //exactinit();
 
@@ -105,34 +107,34 @@ int main(int argc, char *argv[]) {
 // std::cerr << "point set verified." << std::endl;
   // get a simple polygon with a given method
   if (alg == A_2OPT) {
-    returnValue = opt2(polygon, points, randseed);
+    returnValue = opt2(polygon, points);
   }
   else if (alg == A_2OPT_A) {
-    returnValue = opt2a(polygon, points, randseed);
+    returnValue = opt2a(polygon, points);
   }
   else if (alg == A_2OPT_B) {
-    returnValue = opt2b(polygon, points, randseed);
+    returnValue = opt2b(polygon, points);
   }
   else if (alg == A_2OPT_C) {
-    returnValue = opt2c(polygon, points, randseed);
+    returnValue = opt2c(polygon, points);
   }
   else if (alg == A_2OPT_D) {
-    returnValue = opt2d(polygon, points, randseed);
+    returnValue = opt2d(polygon, points);
   }
   else if (alg == A_2OPT_E) {
-    returnValue = opt2e(polygon, points, randseed);
+    returnValue = opt2e(polygon, points);
   }
   else if (alg == A_2OPT_F) {
-    returnValue = opt2f(polygon, points, randseed);
+    returnValue = opt2f(polygon, points);
   }
   else if (alg == A_2OPT_G) {
-    returnValue = opt2g(polygon, points, randseed);
+    returnValue = opt2g(polygon, points);
   }
   else if (alg == A_STAR) {
-    returnValue = star(polygon, points, randseed);
+    returnValue = star(polygon, points);
   }
   else if (alg == A_HOLE) {
-    returnValue = holes2(sph, points, polygon, randseed, nr_holes);
+    returnValue = holes2(sph, points, polygon, nr_holes);
   }
   else if (alg == A_ALLSP) {
     returnValue = allsp(points, outFile, outFormat, writeNew);

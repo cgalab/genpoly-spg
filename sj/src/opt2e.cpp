@@ -17,11 +17,11 @@
 #include "elapsed.h"
 
 // 2 opt that doesn't restart in the same point if a intersection or a collinearity is found, but runs through the whole thing then repeats.
-enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
   double duration = 0;
 	// initialise and create a random permutation for the polygon
-	createRandPol(polygon, points, randseed);
+	createRandPol(polygon, points);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'

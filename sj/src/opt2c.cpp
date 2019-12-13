@@ -18,12 +18,12 @@
 
 // Version of BO-2opt that reverses to a lower index as well as saves the sweep-line status in case no intersections occurred going back.
 
-enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
   double duration = 0;
   enum planesweep_t p_status = P_CLEAN;
 	// initialise and create a random permutation for the polygon
-	createRandPol(polygon, points, randseed);
+	createRandPol(polygon, points);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'

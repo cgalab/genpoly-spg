@@ -17,12 +17,12 @@
 #include "elapsed.h"
 
 // 2opt that restarts at index 0 when an intersection is found.
-enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
   double duration = 0;
 	// initialise and create a random permutation for the polygon
-	createRandPol(polygon, points, randseed);
-  //createCHRandPol(polygon, points, randseed);
+	createRandPol(polygon, points);
+  //createCHRandPol(polygon, points);
   //pdisplay(polygon, points);
   //assert(1 == 0);
 

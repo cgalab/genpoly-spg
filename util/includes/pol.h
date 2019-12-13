@@ -68,8 +68,8 @@ void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned 
 void get_new_inner_polygon(Ends& end, std::vector<unsigned int>& new_inner_polygon, std::vector<unsigned int>& new_polygon, std::vector<Point>& points);
 bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std::vector<unsigned int>& polygon);
 void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsigned int>& inner_polygon, std::vector<Point>& points);
-void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
-void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
+void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points);
+void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool check_in_orientation (E_Edge e1, std::vector<Point>& points);
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points);

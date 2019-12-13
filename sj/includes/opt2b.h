@@ -6,6 +6,6 @@
 #include "point.h"
 #include "edge.h"
 
-enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed);
+enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 
 #endif

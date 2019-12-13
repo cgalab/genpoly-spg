@@ -2844,8 +2844,7 @@ void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsign
 }
 
 // creates a random polygon from a given pointset and random seed.
-void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
-	if (randseed) mt.seed(randseed);
+void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 
 	unsigned int randpos, temp;
 	polygon.resize(points.size());
@@ -2869,8 +2868,7 @@ void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& point
 }
 
 // function to create a random polygon where the convex hull points are in relative CCW order.
-void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
-	if (randseed) mt.seed(randseed);
+void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	unsigned int randpos;
 
 	// start with getting all c.h. points.
