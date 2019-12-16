@@ -267,13 +267,14 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << " -a, --alg <arg> |Optional" << std::endl;
 				std::cerr << "           <arg> is the algorithm to be run:" << std::endl;
 				std::cerr << "           2opt : calculates a simple random polygon based on Bentley-Ottman linesweep and the 2opt algorithm." << std::endl;
+				std::cerr << "           5 : a faster calculation of a simple random polygon based on Bentley-Ottman linesweep and the 2opt algorithm." << std::endl;
 				std::cerr << "           star : calculates a simple random polygon that is a star-shaped polygon." << std::endl;
 				std::cerr << "           holes : returns a simple polygon with simple holes." << std::endl;
 				std::cerr << "           convert : converts a point set from one file format to another." << std::endl;
 				std::cerr << "           verify : checks whether a permutation of a point set is simple." << std::endl << std::endl;
 
 				std::cerr << " -h, --holes <arg> |Optional*" << std::endl;
-				std::cerr << "             <arg> is the number of holes desired, '0' selects a random number of holes." << std::endl << std::endl;
+				std::cerr << "             <arg> is the number of holes desired, '0' selects a random number of holes." << std::endl;
 				std::cerr << " *By using '-h' you are free to select the simple polygon generation algorithm with the '-a' command*" << std::endl << std::endl;
 
 				std::cerr << " -p, --polfile <string> |Optional" << std::endl;
