@@ -6,18 +6,21 @@
 #include "point.h"
 
 
-enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& points) {
+enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& points, std::vector<std::vector<unsigned int>>& sph) {
   enum error returnValue = SUCCESS;
 
   FILE *fin = fopen(inFile, "r");
   if ((fin != NULL) && (inFormat != IF_UNDEFINED)) {
     char aLine[256];
     double x, y, xmin, xmax, ymin, ymax;
-    unsigned int i=0, nrOfPoints=0, counter=0;
+    unsigned int i=0, nrOfPoints=0, counter=0, sph_index = 0, points_index = 0;
+    int return_value;
+    bool points_flag = false;
     Point p;
 
     while (fgets(aLine, sizeof(aLine), fin) != NULL) {
       if(aLine[0] == '#') continue; // ignore lines beginning with #
+      if(aLine[0] == '\n') continue;
 /*
       std::cerr.precision(24);
       std::cerr << "x: " << x << ", y: " << y << std::endl;
@@ -34,8 +37,9 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
       switch (inFormat) {
         case IF_POINTS:  // each line has only "x y" on it
           sscanf(aLine,"%lf %lf",&x,&y);
-          p.set(x,y,counter);
+          p.set(x,y,counter,counter);
           points.push_back(p);
+          sph[sph_index].push_back(counter);
           break;
         case IF_POLY:
           if (counter == 0) {
@@ -46,16 +50,49 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
           }
           else {
             sscanf(aLine,"%lf %lf",&x,&y);
-            p.set(x,y,i);
-            std::cerr << "point: " << p << std::endl;
+            p.set(x,y,i,i);
+            //std::cerr << "point: " << p << std::endl;
             points.push_back(p);
+            sph[sph_index].push_back(i);
             ++i;
           }
           break;
         case IF_COMP:    // each line has "i x y" on it
           sscanf(aLine,"%u %lf %lf",&i,&x,&y);
-          p.set(x,y,i);
+          p.set(x,y,i,i);
           points.push_back(p);
+          sph[sph_index].push_back(i);
+          break;
+        case IF_LINE:
+          return_value = sscanf(aLine,"%lf %lf",&x,&y);
+          //std::cerr << "return value: " << return_value << std::endl;
+          p.set(x,y,i,i);
+          if (return_value < 2) { // only 1 variable was filled
+            if (counter > 0) {
+              ++sph_index;
+            }
+          }
+          else if (return_value == 2) {
+            if (i == 0) {
+              points.push_back(p);
+              if (sph.size() == sph_index) sph.push_back(std::vector<unsigned int>());
+              sph[sph_index].push_back(i);
+              ++i;
+            }
+            else if (p != points[points_index]) {
+              if (points_flag) {
+                points_index = points.size();
+                points_flag = false;
+              }
+              points.push_back(p);
+              if (sph.size() == sph_index) sph.push_back(std::vector<unsigned int>());
+              sph[sph_index].push_back(i);
+              ++i;
+            }
+            else if (p == points[points_index]) {
+              points_flag = true;
+            }
+          }
           break;
         case IF_UNDEFINED:
         default:
@@ -152,6 +189,12 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
     case OF_DAT:
       fprintf(fout, "# X   Y\n");
       for (unsigned int i = 0; i < points.size(); ++i)
+        fprintf(fout, "  %lf   %lf\n", points[polygon[i]].x, points[polygon[i]].y);
+      fprintf(fout, "  %lf   %lf\n", points[polygon[0]].x, points[polygon[0]].y);
+      break;
+    case OF_LINE:
+      fprintf(fout, "%lu\n", polygon.size());
+      for (unsigned int i = 0; i < polygon.size(); ++i)
         fprintf(fout, "  %lf   %lf\n", points[polygon[i]].x, points[polygon[i]].y);
       fprintf(fout, "  %lf   %lf\n", points[polygon[0]].x, points[polygon[0]].y);
       break;
@@ -280,6 +323,12 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
           fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
         fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
         fprintf(fout, "\n\n");
+        break;
+      case OF_LINE:
+        fprintf(fout, "%lu\n", sph[j].size());
+        for (unsigned int i = 0; i < sph[j].size(); ++i)
+          fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
         break;
       case OF_PURE:
         for (unsigned int i = 0; i < sph[j].size(); ++i)

@@ -69,7 +69,8 @@ enum out_format_t {
   OF_POLY,
   OF_DAT,
   OF_PURE,
-  OF_PURE_AND_PERM
+  OF_PURE_AND_PERM,
+  OF_LINE
 };
 
 // the input format of the point set.
@@ -77,7 +78,8 @@ enum in_format_t {
   IF_UNDEFINED,
   IF_POINTS,
   IF_POLY,
-  IF_COMP
+  IF_COMP,
+  IF_LINE
 };
 
 enum point_format_t {
