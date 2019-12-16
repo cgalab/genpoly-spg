@@ -165,12 +165,10 @@ int main(int argc, char *argv[]) {
   // writing to outfile
   if (outFile[0] == 0) {
     std::cout << "No outfile entered." << std::endl;
-//    std::cout << "points:" << std::endl;
-//    pdisplay(points);
-//    for (unsigned int i = 0; i < sph.size(); ++i) {
-//      std::cout << "polygon " << i << ":" << std::endl;
-//      pdisplay(sph[i], points);
-//    }
+    for (unsigned int i = 0; i < sph.size(); ++i) {
+      std::cout << "polygon " << i << ":" << std::endl;
+      pdisplay(sph[i], points);
+    }
     return NO_OUT_FILE;
   }
   else {
