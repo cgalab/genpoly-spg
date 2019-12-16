@@ -292,8 +292,7 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << " -e, --area |Optional" << std::endl;
 				std::cerr << "    option to print the area of the polygon to cout." << std::endl;
 				std::cerr << " -f, --circumference |Optional" << std::endl;
-				std::cerr << "    option to print the circumference of the polygon to cout." << std::endl << std::endl;
-
+				std::cerr << "    option to print the circumference of the polygon to cout." << std::endl;
 				std::cerr << " -t" << std::endl;
 				std::cerr << "    ignores all other arguments and runs the test-bed." << std::endl;
 				break;
