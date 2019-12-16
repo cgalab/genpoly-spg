@@ -490,12 +490,12 @@ double get_angle(Edge e, Point p, bool use_p1) {
 // function that returns the smaller angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
 // use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
 double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
-	std::cerr << "=== get_smaller_angle function ===" << std::endl;
+//	std::cerr << "=== get_smaller_angle function ===" << std::endl;
   double a1 = get_angle(e1, *e2.p1, use_p1);
   double a2 = get_angle(e1, *e2.p2, use_p1);
-	std::cerr << "a1: " << a1 << ", a2: " << a2 << std::endl;
-	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << ", use_p1: " << ((use_p1) ? "true" : "false") << std::endl;
-	std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+//	std::cerr << "a1: " << a1 << ", a2: " << a2 << std::endl;
+//	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << ", use_p1: " << ((use_p1) ? "true" : "false") << std::endl;
+//	std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
 
 	if (e1.bin) {
 		if (a1 < 0) {
@@ -503,7 +503,7 @@ double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
 			return a1;
 		}
 		if (a2 < 0) return a2;
-		std::cerr << "Possible error, bin was true, and neither angle was negative." << std::endl;
+//		std::cerr << "Possible error, bin was true, and neither angle was negative." << std::endl;
 		return (a1 < a2 ? a1 : a2);
 	}
 	else {
@@ -522,12 +522,12 @@ double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
 // which 'e1.bin' designates.
 // use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
 double get_larger_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
-	std::cerr << "=== get_larger_angle function ===" << std::endl;
+//	std::cerr << "=== get_larger_angle function ===" << std::endl;
   double a1 = get_angle(e1, *e2.p1, use_p1);
   double a2 = get_angle(e1, *e2.p2, use_p1);
-	std::cerr << "a1: " << a1 << ", a2: " << a2 << std::endl;
-	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << ", use_p1: " << ((use_p1) ? "true" : "false") << std::endl;
-	std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+//	std::cerr << "a1: " << a1 << ", a2: " << a2 << std::endl;
+//	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << ", use_p1: " << ((use_p1) ? "true" : "false") << std::endl;
+//	std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
 
 	if (e1.bin) {
 		if (a1 < 0) {

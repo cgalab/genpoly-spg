@@ -13,10 +13,11 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
   if ((fin != NULL) && (inFormat != IF_UNDEFINED)) {
     char aLine[256];
     double x, y, xmin, xmax, ymin, ymax;
-    unsigned int i=0, nrOfPoints=0, counter=0, sph_index = 0, points_index = 0;
+    unsigned int i=0, nrOfPoints=0, counter=0, sph_index = 0, points_index = 0, v_index = 0;
     int return_value;
     bool points_flag = false;
     Point p;
+    if (sph.size() == 0) sph.push_back(std::vector<unsigned int>());
 
     while (fgets(aLine, sizeof(aLine), fin) != NULL) {
       if(aLine[0] == '#') continue; // ignore lines beginning with #
@@ -35,13 +36,7 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
       // Should I do regex matching instead of this ?
       // It would catch any errors when the format of the file doesn't match the command line argument for inFormat
       switch (inFormat) {
-        case IF_POINTS:  // each line has only "x y" on it
-          sscanf(aLine,"%lf %lf",&x,&y);
-          p.set(x,y,counter,counter);
-          points.push_back(p);
-          sph[sph_index].push_back(counter);
-          break;
-        case IF_POLY:
+        case IF_POLY: // only accepts a single polygon
           if (counter == 0) {
             sscanf(aLine,"%lf %lf %lf %lf",&xmin,&xmax,&ymin,&ymax);
           }
@@ -50,34 +45,31 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
           }
           else {
             sscanf(aLine,"%lf %lf",&x,&y);
-            p.set(x,y,i,i);
-            //std::cerr << "point: " << p << std::endl;
+            p.set(x,y,i,i,sph_index);
             points.push_back(p);
             sph[sph_index].push_back(i);
             ++i;
           }
           break;
-        case IF_COMP:    // each line has "i x y" on it
+        case IF_COMP:    // each line has "i x y" on it, only accepts a single polygon
           sscanf(aLine,"%u %lf %lf",&i,&x,&y);
-          p.set(x,y,i,i);
+          p.set(x,y,i,i,sph_index);
           points.push_back(p);
           sph[sph_index].push_back(i);
           break;
-        case IF_LINE:
+        case IF_POINTS:  // each line has only "x y" on it
+        case IF_DAT:
+        case IF_LINE:    // each polygon has a header which can be ignored
           return_value = sscanf(aLine,"%lf %lf",&x,&y);
-          //std::cerr << "return value: " << return_value << std::endl;
-          p.set(x,y,i,i);
-          if (return_value < 2) { // only 1 variable was filled
-            if (counter > 0) {
-              ++sph_index;
-            }
-          }
-          else if (return_value == 2) {
+          p.set(x,y,i,v_index,0,sph_index);
+//          std::cerr << "io: p: " << p << std::endl;
+          if (return_value == 2) {
             if (i == 0) {
               points.push_back(p);
               if (sph.size() == sph_index) sph.push_back(std::vector<unsigned int>());
               sph[sph_index].push_back(i);
               ++i;
+              ++v_index;
             }
             else if (p != points[points_index]) {
               if (points_flag) {
@@ -88,9 +80,12 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
               if (sph.size() == sph_index) sph.push_back(std::vector<unsigned int>());
               sph[sph_index].push_back(i);
               ++i;
+              ++v_index;
             }
             else if (p == points[points_index]) {
               points_flag = true;
+              ++sph_index;
+              v_index = 0;
             }
           }
           break;
@@ -122,8 +117,14 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
 }
 
 
-enum error readvFile(char *vFile, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+enum error readvFile(char *vFile, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
   enum error returnValue = SUCCESS;
+  unsigned int sph_index = 0;
+  if (sph.size() == 0) sph.push_back(std::vector<unsigned int>());
+  else {
+    sph.resize(0);
+    sph.push_back(std::vector<unsigned int>());
+  }
 
   FILE *fin = fopen(vFile, "r");
   if (fin != NULL) {
@@ -132,12 +133,22 @@ enum error readvFile(char *vFile, std::vector<unsigned int>& polygon, std::vecto
 
     while (fgets(aLine, sizeof(aLine), fin) != NULL) {
       if(aLine[0] == '#') continue; // ignore lines beginning with #
+      if(aLine[0] == '\n') continue; // ignore lines beginning with \newline
 
       sscanf(aLine,"%u",&i);
-      polygon.push_back(i);
-      points[i].v = counter;
-
-      ++counter;
+      if (sph[sph_index].size() == 0) {
+        sph[sph_index].push_back(i);
+        points[i].v = counter;
+        ++counter;
+      }
+      else {
+        if (i == sph[sph_index][0]) ++sph_index;
+        else {
+          sph[sph_index].push_back(i);
+          points[i].v = counter;
+          ++counter;
+        }
+      }
     }
   }
   else if (fin == NULL) {

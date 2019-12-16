@@ -77,20 +77,23 @@ int main(int argc, char *argv[]) {
   // 'sph' is a vector of polygons, [0] is a polygon of points in 'points' containing
   // at minimum the convex hull points, subsequent polygons are holes in it.
   std::vector<std::vector<unsigned int>> sph;
+
   returnValue = readInFile(inFile, inFormat, points, sph);
   if (returnValue != SUCCESS) {
     std::cerr << "Error reading file with points!" << std::endl;
     return returnValue;
   }
   // verify that the point set is valid, i.e. no points are equal and the whole set isn't collinear.
-  returnValue = verify_point_set(points);
-  if(returnValue != SUCCESS) {
-    std::cerr << "Error verifying point set!" << std::endl;
-    return returnValue;
+  if (alg != A_CONVERT_FORMAT) {
+    returnValue = verify_point_set(points);
+    if(returnValue != SUCCESS) {
+      std::cerr << "Error verifying point set!" << std::endl;
+      return returnValue;
+    }
   }
 
   if (vFile[0] != 0) {
-    returnValue = readvFile(vFile, sph[0], points);
+    returnValue = readvFile(vFile, sph, points);
     if (returnValue != SUCCESS) {
       std::cerr << "Error reading file with polygon!" << std::endl;
       return returnValue;
@@ -102,6 +105,8 @@ int main(int argc, char *argv[]) {
     returnValue = simple_pol_check(sph[0], points);
     if (returnValue != SUCCESS) return returnValue;
   }
+//  std::cerr << "points:" << std::endl;
+//  pdisplay(sph, points);
 
 // std::cerr << "point set verified." << std::endl;
   // get a simple polygon with a given method
@@ -133,13 +138,13 @@ int main(int argc, char *argv[]) {
     returnValue = star(sph[select_polygon], points);
   }
   else if (alg == A_HOLE) {
-    returnValue = holes2(sph, points, sph[select_polygon], nr_holes);
+    returnValue = holes2(sph, points, nr_holes);
   }
   else if (alg == A_ALLSP) {
     returnValue = allsp(points, outFile, outFormat, writeNew);
   }
   else if (alg == A_VERIFY) {
-    returnValue = simple_pol_check(sph[select_polygon], points);
+    returnValue = simple_pol_check(sph, points);
   }
   else if (alg == A_VERIFY_LONG) {
     if(checkAllIntersections(sph[select_polygon], points)) returnValue = INTERSECTING_POINTS;
@@ -148,7 +153,6 @@ int main(int argc, char *argv[]) {
     std::cerr << "Error running the algorithm!" << std::endl;
     return returnValue;
   }
-  //if (checkSimple) checkAllIntersections(sph[select_polygon], points);
   if (calcArea) {
     double area = pol_calc_area(sph[select_polygon], points);
     if(area < 0) {
@@ -160,13 +164,13 @@ int main(int argc, char *argv[]) {
   if (calcCircumference) std::cout << "Circumference: " << pol_calc_circumference(sph[select_polygon], points) << std::endl;
   // writing to outfile
   if (outFile[0] == 0) {
-    std::cerr << "No outfile entered." << std::endl;
-    std::cerr << "points:" << std::endl;
-    pdisplay(points);
-    for (unsigned int i = 0; i < sph.size(); ++i) {
-      std::cerr << "polygon " << i << ":" << std::endl;
-      pdisplay(sph[i], points);
-    }
+    std::cout << "No outfile entered." << std::endl;
+//    std::cout << "points:" << std::endl;
+//    pdisplay(points);
+//    for (unsigned int i = 0; i < sph.size(); ++i) {
+//      std::cout << "polygon " << i << ":" << std::endl;
+//      pdisplay(sph[i], points);
+//    }
     return NO_OUT_FILE;
   }
   else {
@@ -183,7 +187,7 @@ int main(int argc, char *argv[]) {
       case A_HOLE:
       case A_VERIFY:
       case A_CONVERT_FORMAT:
-        if (outFormat == OF_PURE_AND_PERM){
+        if (outFormat == OF_PURE_AND_PERM) {
           char tempFileName[255];
           snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-pure");
           returnValue = writeOutIntFile(tempFileName, OF_PURE, writeNew, sph[select_polygon], points);

@@ -65,7 +65,7 @@ bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& po
 bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole);
 void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole);
-void get_new_inner_polygon(Ends& end, std::vector<unsigned int>& new_inner_polygon, std::vector<unsigned int>& new_polygon, std::vector<Point>& points);
+//void get_new_inner_polygon(Ends& end, std::vector<unsigned int>& new_inner_polygon, std::vector<unsigned int>& new_polygon, std::vector<Point>& points);
 bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std::vector<unsigned int>& polygon);
 void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsigned int>& inner_polygon, std::vector<Point>& points);
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points);

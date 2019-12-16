@@ -350,6 +350,7 @@ std::pair<E_Edge, enum edge_t> processEdge2(Edge& e, std::set<Edge>& edgeS) {
 
 // Function that verifies whether a point set is simple.
 // Input: a vector of <Point> which is a point set in a simple polygon order.
+// Assumption:  all points in point set is a part of the same polygon.
 enum error simple_pol_check(std::vector<Point>& points) {
   enum error retval = SUCCESS;
 
@@ -360,7 +361,7 @@ enum error simple_pol_check(std::vector<Point>& points) {
 	fill_lex(lex, points); // fill 'lex' with the indexes
 //  pdisplay(lex, points);
 
-  // Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
+  // Given a lexicographical sort, we can go through the vector and check for intersections.
 	unsigned int index=0, before=0, after=0;
   enum edge_t val1 = E_VALID, val2 = E_VALID;
   double val3=1.0;
@@ -626,4 +627,86 @@ std::pair<E_Edge, enum error> simple_pol_check2(std::vector<unsigned int>& polyg
   }
 //  std::cerr << "no intersections" << std::endl;
   return retval2;
+}
+
+
+// function that checks all the polygons in sph for simplicity.
+enum error simple_pol_check(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
+  enum error retval = SUCCESS;
+
+  std::vector<unsigned int> lex (points.size());
+	fill_lex(lex, points); // fill 'lex' with the indexes
+//  pdisplay(lex, points);
+
+  // Given a lexicographical sort, we can go through the vector and check for intersections.
+	unsigned int index=0, before=0, after=0;
+  enum edge_t val1 = E_VALID, val2 = E_VALID;
+  double val3=1.0;
+	Point *p1, *p2, *p3;
+	Edge e1, e2;
+  std::set<Edge> edgeS; // a sweep-line-status object.
+
+  while (index < points.size()) {
+//      std::cerr << std::endl << "i: " << index << std::endl;
+//      std::cout << "edges in 'edgeS':" << std::endl;
+//      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+
+    // get the current point at 'index'
+    p1 = &points[lex[index]];
+
+    // get the 2 points it is connected to in 'polygon', treating the edge case when the point 'p1' is on the ends
+    before = ((*p1).v + sph[(*p1).p].size() -1) % sph[(*p1).p].size();
+    after =  ((*p1).v + sph[(*p1).p].size() +1) % sph[(*p1).p].size();
+
+    p2 = &points[sph[(*p1).p][before]];
+    p3 = &points[sph[(*p1).p][after]];
+
+    // construct the edges
+//    std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
+    if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
+      e1 = Edge (p1, p2, index);
+      e2 = Edge (p1, p3, index);
+      val3 = det(e1, *p3);
+    }
+    else {
+      e1 = Edge (p1, p3, index);
+      e2 = Edge (p1, p2, index);
+      val3 = det(e1, *p2);
+    }
+//    std::cerr << "e1: " << e1 << std::endl;
+//    std::cerr << "e2: " << e2 << std::endl;
+
+    //process first edge
+    if (*e1.p2 == *p1) {
+//      std::cerr << std::endl << "removing e1: " << e1 << std::endl;
+      val1 = removeEdgeFromSet(e1, edgeS);
+      if (val1 != E_VALID) {
+        retval = UNEXPECTED_ERROR; break;}
+    }
+    else {
+      // if the earlier edge was allowed, then the later edge is also allowed
+      if (fabs(val3) == 0) {
+//        std::cerr << "Intersection found: collinearity between: " << e1 << " and " << e2 << std::endl;
+        retval = UNEXPECTED_ERROR; break;}
+//      std::cerr << std::endl << "processing e1: " << e1 << std::endl;
+      val1 = processEdge(e1, edgeS);
+      if (val1 != E_VALID) {retval = UNEXPECTED_ERROR; break;}
+    }
+
+    // process second edge
+    if (*e2.p2 == *p1) {
+//      std::cerr << std::endl << "removing e2: " << e2 << std::endl;
+      val2 = removeEdgeFromSet(e2, edgeS);
+      if (val2 != E_VALID) {retval = UNEXPECTED_ERROR; break;}
+    }
+    else {
+//      std::cerr << std::endl << "processing e2: " << e2 << std::endl;
+      val2 = processEdge(e2, edgeS);
+      if (val2 != E_VALID) {retval = UNEXPECTED_ERROR; break;}
+    }
+
+    ++index;
+  }
+
+  return retval;
 }

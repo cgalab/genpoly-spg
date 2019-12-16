@@ -3,6 +3,7 @@
 
 enum error simple_pol_check(std::vector<Point>& points);
 enum error simple_pol_check(std::vector<unsigned int>& polygon, std::vector<Point>& points);
+enum error simple_pol_check(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points);
 std::pair<E_Edge, enum error> simple_pol_check2(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 
 #endif

@@ -79,7 +79,8 @@ enum in_format_t {
   IF_POINTS,
   IF_POLY,
   IF_COMP,
-  IF_LINE
+  IF_LINE,
+  IF_DAT
 };
 
 enum point_format_t {

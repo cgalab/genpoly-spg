@@ -377,7 +377,7 @@ public:
   // to print out an edge, gives the format:
   // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
 	friend std::ostream& operator<<(std::ostream& os, const Edge& e) {
-		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "]";
+		os << *e.p1 << " , " << *e.p2;
 		return os;
 	}
 };
@@ -403,9 +403,7 @@ public:
 
   // the '*' is to see better which direction the c.h. is.
   friend std::ostream& operator<<(std::ostream& os, const I_Edge& e) {
-    os << (e.l2ch ? "*" : "") << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
-    << "," << (*e.p1).v << "," << (*e.p1).l << "] , " << (e.l2ch ? "" : "*") << "(" << (*e.p2).x << "," << (*e.p2).y
-    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "]";
+    os << *e.p1 << " , " << *e.p2;
     return os;
   }
 };
@@ -431,9 +429,7 @@ public:
   // to print out an edge, gives the format:
   // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
 	friend std::ostream& operator<<(std::ostream& os, const C_Edge& e) {
-		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
-    << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
-    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [" << e.sc << "," << e.par << "]";
+		os << *e.p1 << " , " << *e.p2 << " : [" << e.sc << "," << e.par << "]";
 		return os;
 	}
 };
@@ -472,9 +468,7 @@ public:
   // to print out an edge, gives the format:
   // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
 	friend std::ostream& operator<<(std::ostream& os, const D_Edge& e) {
-		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
-    << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
-    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : b : " << e.bin << "";
+		os << *e.p1 << " , " << *e.p2 << " : b : " << e.bin << "";
 		return os;
 	}
 };
@@ -534,9 +528,7 @@ public:
   // to print out an edge, gives the format:
   // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
 	friend std::ostream& operator<<(std::ostream& os, const E_Edge& e) {
-		os << "(" << (*e.p1).x << "," << (*e.p1).y << "),[" << (*e.p1).i
-    << "," << (*e.p1).v << "," << (*e.p1).l << "] , (" << (*e.p2).x << "," << (*e.p2).y
-    << "),[" << (*e.p2).i << "," << (*e.p2).v << "," << (*e.p2).l << "] : [c" << e.curve_id
+    os << *e.p1 << " , " << *e.p2 << " : [c" << e.curve_id
     << "], cl: " << e.closest.size() << ", b : " << e.bin << ", angle: " << e.angle;
 		return os;
 	}
