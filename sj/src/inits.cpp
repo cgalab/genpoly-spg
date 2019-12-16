@@ -92,7 +92,7 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	else if(strcmp(optarg,"verify_long") == 0) {
 		*alg = A_VERIFY_LONG;
 	}
-	else if(strcmp(optarg,"convert_format") == 0) {
+	else if(strcmp(optarg,"convert") == 0) {
 		*alg = A_CONVERT_FORMAT;
 	}
 	else {
@@ -108,6 +108,7 @@ enum error ifInit(enum in_format_t *inFormat, char *optarg) {
 			 if (strcmp(optarg,"points") == 0) *inFormat = IF_POINTS;
 	else if (strcmp(optarg,"poly") == 0) *inFormat = IF_POLY;
 	else if (strcmp(optarg,"comp") == 0) *inFormat = IF_COMP;
+	else if (strcmp(optarg,"line") == 0) *inFormat = IF_LINE;
 	else {
 		*inFormat = IF_UNDEFINED;
 		std::cerr << "Error:  --informat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'points', 'poly', or 'comp'." << std::endl;
@@ -121,6 +122,7 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 	if (strcmp(optarg,"perm") == 0) *outFormat = OF_PERM;
 	else if (strcmp(optarg,"poly") == 0) *outFormat = OF_POLY;
 	else if (strcmp(optarg,"dat") == 0) *outFormat = OF_DAT;
+	else if (strcmp(optarg,"line") == 0) *outFormat = OF_LINE;
 	else if (strcmp(optarg,"pure") == 0) *outFormat = OF_PURE;
 	else if (strcmp(optarg,"pp") == 0) *outFormat = OF_PURE_AND_PERM; // pp for pure and perm
 	else {
@@ -153,7 +155,7 @@ enum error argInit(	int argc, char *argv[],
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
 										bool& writeNew, bool& area,	bool& circumference,
 										unsigned int& randseed, bool& checkSimple, unsigned int& holes,
-										char *vFile, bool& run_tests, bool& help) {
+										unsigned int& select_polygon, char *vFile, bool& run_tests, bool& help) {
 	enum error returnValue = SUCCESS;
 	int comm;
 
@@ -165,8 +167,10 @@ enum error argInit(	int argc, char *argv[],
 		{"informat", required_argument, NULL, 'b'},
 		{"outformat", required_argument, NULL, 'c'},
 		{"holes", required_argument, NULL, 'h'},
-		{"pfile", required_argument, NULL, 'p'},
+		{"polygonfile", required_argument, NULL, 'p'},
 		{"randseed", required_argument, NULL, 'r'},
+		{"selectpolygon", required_argument, NULL, 's'},
+		{"checksimple", no_argument, NULL, 'u'},
 		{"area", no_argument, NULL, 'e'},
 		{"circumference", no_argument, NULL, 'f'},
 		{"writenew", no_argument, NULL, 'w'},
@@ -175,7 +179,7 @@ enum error argInit(	int argc, char *argv[],
 		{0, 0, 0, 0}
 	};
 
-	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:efwt?", long_options, NULL)) != -1) && returnValue == SUCCESS) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:s:efwtu?", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -210,6 +214,9 @@ enum error argInit(	int argc, char *argv[],
 				randseed = atoi(optarg);
 				break;
 			case 's':
+				select_polygon = atoi(optarg);
+				break;
+			case 'u':
 				checkSimple = true;
 				break;
 			case 't':
