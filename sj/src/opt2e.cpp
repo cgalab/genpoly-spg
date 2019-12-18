@@ -37,7 +37,7 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
   bool loop = false, e1_found;
-  bool debug=false;
+//  bool debug=false;
   unsigned int count_intersections=0, count_coll=0, count_total_passes=0;
   std::set<Edge> edgeS; // a set of edges.
   double circumference;
@@ -47,10 +47,10 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
   duration = elapsed();
   do {
     ++count_total_passes;
-    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
+//    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
     circumference = pol_calc_circumference(polygon, points);
     c_it = circ.find(circumference);
-    std::cerr << "c: " << circumference << std::endl;
+//    std::cerr << "c: " << circumference << std::endl;
     if (c_it != circ.end()) {
 //      std::cerr << "circ[c]: " << circ[circumference] << std::endl;
       if ((*c_it).second == MAX_NO_OF_LOOPS) {std::cerr<<"Error!  Infinite loop!"<<std::endl;retval=INFINITE_LOOP; break;}
