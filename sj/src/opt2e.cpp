@@ -37,7 +37,7 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 	Point *p1, *p2, *p3;
 	Edge e1, e2, old_e1, old_e2;
   bool loop = false, e1_found;
-  //bool debug=false;
+//  bool debug=false;
   unsigned int count_intersections=0, count_coll=0, count_total_passes=0;
   std::set<Edge> edgeS; // a set of edges.
   double circumference;
@@ -66,7 +66,7 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 
   	while (index < points.size()) {
 //      std::cerr << "i: " << index << std::endl;
-//      if (17155 < index && index < 17162) {
+//      if (966 < index && index < 975) {
 //        std::cerr << "i: " << index << std::endl;
 //        debug = true;
 //        std::cerr << "edges in 'edgeS':" << std::endl;

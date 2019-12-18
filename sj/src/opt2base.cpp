@@ -1432,8 +1432,8 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, Point *id
       	Edge new_edge;
       	for (unsigned int i = 0; i < vertices.size();++i) {
       		if (points[polygon[vertices[i]]].l == (*idx).l) {
-      			if (i < 2) new_edge.set(points[polygon[2]], points[polygon[3]]);
-      			else new_edge.set(points[polygon[0]], points[polygon[1]]);
+      			if (i < 2) new_edge.set(points[polygon[vertices[2]]], points[polygon[vertices[3]]]);
+      			else new_edge.set(points[polygon[vertices[0]]], points[polygon[vertices[1]]]);
       			break;
       		}
       	}
@@ -1480,8 +1480,8 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdged(Edge& e, Point *id
       	Edge new_edge;
       	for (unsigned int i = 0; i < vertices.size();++i) {
       		if (points[polygon[vertices[i]]].l == (*idx).l) {
-      			if (i < 2) new_edge.set(points[polygon[2]], points[polygon[3]]);
-      			else new_edge.set(points[polygon[0]], points[polygon[1]]);
+      			if (i < 2) new_edge.set(points[polygon[vertices[2]]], points[polygon[vertices[3]]]);
+      			else new_edge.set(points[polygon[vertices[0]]], points[polygon[vertices[1]]]);
       			break;
       		}
       	}
@@ -1536,8 +1536,6 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
      valid = E_NOT_VALID;
    }
 
-  assert(*retval.first == e);
-
   //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
   if (retval.first != edgeS.begin()) {
     before = *(std::prev(retval.first));
@@ -1568,6 +1566,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
       }
       else {
 //        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+//        std::cerr << "idx: " << *idx << std::endl;
 
         //preparing for insertion of the edge not connected to 'idx' into 'edgeS'
         std::vector<unsigned int> vertices {(*e.p1).v, (*e.p2).v, (*before.p1).v, (*before.p2).v};
@@ -1582,18 +1581,24 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
       	Edge new_edge;
       	for (unsigned int i = 0; i < vertices.size();++i) {
       		if (points[polygon[vertices[i]]].l == (*idx).l) {
-      			if (i < 2) new_edge.set(points[polygon[2]], points[polygon[3]]);
-      			else new_edge.set(points[polygon[0]], points[polygon[1]]);
+      			if (i < 2) new_edge.set(points[polygon[vertices[2]]], points[polygon[vertices[3]]]);
+      			else new_edge.set(points[polygon[vertices[0]]], points[polygon[vertices[1]]]);
       			break;
       		}
       	}
+
       	if (((*new_edge.p1).l < (*idx).l) && ((*idx).l < (*new_edge.p2).l)) {
 //      		std::cerr << "'before' flip insertion: " << new_edge << std::endl;
 //      		std::cerr << "at idx: " << *idx << std::endl;
+//          std::cerr << "edges in 'edgeS':" << std::endl;
+//          for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+
       		std::pair<std::set<Edge>::iterator,bool> retval;
           retval.first = edgeS.find(new_edge);
           if (retval.first == edgeS.end()) {
             retval = edgeS.insert(new_edge);
+//            std::cerr << "edge added to 'edgeS':" << std::endl;
+//            for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
         		if (*retval.first != new_edge) {
         			std::cerr << "Error!  inserting: " << new_edge << ", returned: " << *retval.first << std::endl;
         		}
@@ -1617,9 +1622,14 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
       }
       else {
 //        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
+//        std::cerr << "idx: " << *idx << std::endl;
 
-        //preparing for insertion of the edge not connected to 'idx' into 'edgeS'
+        // preparing for insertion of the edge not connected to 'idx' into 'edgeS'
+        // the vertices do not change, the lower 2 vertices are still connected together
+        // and the higher 2 vertices are still connected together.
         std::vector<unsigned int> vertices {(*e.p1).v, (*e.p2).v, (*after.p1).v, (*after.p2).v};
+//        std::cerr << "vertices before flip:" << std::endl;
+//        for (unsigned int i = 0; i < vertices.size();++i) std::cerr << "i:" << i << " : " << vertices[i] << std::endl;
 
         edgeS.erase(retval.first);
         eraseEdgeFromSet(after, edgeS);
@@ -1633,22 +1643,25 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
       	Edge new_edge;
       	for (unsigned int i = 0; i < vertices.size();++i) {
       		if (points[polygon[vertices[i]]].l == (*idx).l) {
-      			if (i < 2) new_edge.set(points[polygon[2]], points[polygon[3]]);
-      			else new_edge.set(points[polygon[0]], points[polygon[1]]);
+      			if (i < 2) new_edge.set(points[polygon[vertices[2]]], points[polygon[vertices[3]]]);
+      			else new_edge.set(points[polygon[vertices[0]]], points[polygon[vertices[1]]]);
       			break;
       		}
       	}
+
       	if (((*new_edge.p1).l < (*idx).l) && ((*idx).l < (*new_edge.p2).l)) {
 //      		std::cerr << "'after' flip insertion: " << new_edge << std::endl;
 //      		std::cerr << "at idx: " << *idx << std::endl;
 //          std::cerr << "edges in 'edgeS':" << std::endl;
 //          for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+
       		std::pair<std::set<Edge>::iterator,bool> retval;
           retval.first = edgeS.find(new_edge);
           if(retval.first == edgeS.end()) {
             retval = edgeS.insert(new_edge);
 //            std::cerr << "edge added to 'edgeS':" << std::endl;
 //            for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+
       		  if (*retval.first != new_edge) {
       			  std::cerr << "Error!  inserting: " << new_edge << ", returned: " << *retval.first << std::endl;
       		  }
@@ -1742,8 +1755,8 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
       	Edge new_edge;
       	for (unsigned int i = 0; i < vertices.size();++i) {
       		if (points[polygon[vertices[i]]].l == (*idx).l) {
-      			if (i < 2) new_edge.set(points[polygon[2]], points[polygon[3]]);
-      			else new_edge.set(points[polygon[0]], points[polygon[1]]);
+      			if (i < 2) new_edge.set(points[polygon[vertices[2]]], points[polygon[vertices[3]]]);
+      			else new_edge.set(points[polygon[vertices[0]]], points[polygon[vertices[1]]]);
       			break;
       		}
       	}
@@ -1791,8 +1804,8 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *id
       	Edge new_edge;
       	for (unsigned int i = 0; i < vertices.size();++i) {
       		if (points[polygon[vertices[i]]].l == (*idx).l) {
-      			if (i < 2) new_edge.set(points[polygon[2]], points[polygon[3]]);
-      			else new_edge.set(points[polygon[0]], points[polygon[1]]);
+      			if (i < 2) new_edge.set(points[polygon[vertices[2]]], points[polygon[vertices[3]]]);
+      			else new_edge.set(points[polygon[vertices[0]]], points[polygon[vertices[1]]]);
       			break;
       		}
       	}
@@ -1893,8 +1906,8 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeg(Edge& e, Point *id
       	Edge new_edge;
       	for (unsigned int i = 0; i < vertices.size();++i) {
       		if (points[polygon[vertices[i]]].l == (*idx).l) {
-      			if (i < 2) new_edge.set(points[polygon[2]], points[polygon[3]]);
-      			else new_edge.set(points[polygon[0]], points[polygon[1]]);
+      			if (i < 2) new_edge.set(points[polygon[vertices[2]]], points[polygon[vertices[3]]]);
+      			else new_edge.set(points[polygon[vertices[0]]], points[polygon[vertices[1]]]);
       			break;
       		}
       	}
@@ -1942,8 +1955,8 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeg(Edge& e, Point *id
       	Edge new_edge;
       	for (unsigned int i = 0; i < vertices.size();++i) {
       		if (points[polygon[vertices[i]]].l == (*idx).l) {
-      			if (i < 2) new_edge.set(points[polygon[2]], points[polygon[3]]);
-      			else new_edge.set(points[polygon[0]], points[polygon[1]]);
+      			if (i < 2) new_edge.set(points[polygon[vertices[2]]], points[polygon[vertices[3]]]);
+      			else new_edge.set(points[polygon[vertices[0]]], points[polygon[vertices[1]]]);
       			break;
       		}
       	}

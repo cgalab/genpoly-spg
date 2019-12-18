@@ -1963,7 +1963,9 @@ bool coll4Swap3 (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned
   return retval;
 }
 
-// same as coll4swap but uses coll3Sort2, and does a distance metric to decide where to add the edges into the polygonal chains.
+// Function: coll4Swap4: uses coll3Sort2 (doesn't add edges back into 'edgeS'),
+// grabs all collinear points of the 2 chains defined by the 2 edges and sorts them lexicographically,
+// the lowest lex. point gets put in lowest vertex index, and so on until highest lex. points goes into highest vertex index.
 bool coll4Swap4 (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int& lowest_index) {
   std::vector<Point> cp;
   double value;
