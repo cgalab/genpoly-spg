@@ -102,11 +102,11 @@ int main(int argc, char *argv[]) {
       std::cerr << "Error: Number of points mismatch between points file and polygon file." << std::endl;
       return SIZE_NOT_EQUAL;
     }
+//    std::cerr << "points:" << std::endl;
+//    pdisplay(sph, points);
     returnValue = simple_pol_check(sph[0], points);
     if (returnValue != SUCCESS) return returnValue;
   }
-//  std::cerr << "points:" << std::endl;
-//  pdisplay(sph, points);
 
 // std::cerr << "point set verified." << std::endl;
   // get a simple polygon with a given method
@@ -162,13 +162,14 @@ int main(int argc, char *argv[]) {
     std::cout << "Area: " << area << std::endl;
   }
   if (calcCircumference) std::cout << "Circumference: " << pol_calc_circumference(sph[select_polygon], points) << std::endl;
+
   // writing to outfile
   if (outFile[0] == 0) {
-    std::cout << "No outfile entered." << std::endl;
-    for (unsigned int i = 0; i < sph.size(); ++i) {
-      std::cout << "polygon " << i << ":" << std::endl;
-      pdisplay(sph[i], points);
-    }
+    //std::cout << "No outfile entered." << std::endl;
+    //for (unsigned int i = 0; i < sph.size(); ++i) {
+    //  std::cout << "polygon " << i << ":" << std::endl;
+    //  pdisplay(sph[i], points);
+    //}
     return NO_OUT_FILE;
   }
   else {

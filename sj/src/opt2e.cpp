@@ -135,6 +135,7 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
           loop=true;
           e1_found=true;
         }
+        else if (val1.first != E_VALID) {std::cerr << "val1: "; print_enum(val1.first);loop=true;}
       }
       else {
 
@@ -145,7 +146,9 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
           if (val2.first == E_INTERSECTION) ++count_intersections;
           else ++count_coll;
-          loop=true;e1_found=true;}
+          loop=true;e1_found=true;
+        }
+        else if (val1.first != E_VALID) {std::cerr << "val1: "; print_enum(val1.first);loop=true;}
       }
 
       if(!e1_found) {
@@ -160,6 +163,7 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
             else ++count_coll;
             loop=true;
           } // if this happens, e1 was guaranteed removed as e1 < e2 and e2.p2 > e2.p1 > e1.p1
+          else if (val2.first != E_VALID) {std::cerr << "val2: "; print_enum(val2.first);loop=true;}
         }
         else {
 //          (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
@@ -175,6 +179,7 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
             if (val2_1 == E_NOT_VALID) break;
             loop=true;
           }
+          else if (val2.first != E_VALID) {std::cerr << "val2: "; print_enum(val2.first);loop=true;}
         }
       }
 

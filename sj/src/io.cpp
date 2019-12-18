@@ -317,7 +317,7 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
       case OF_PERM:
         fprintf(fout, "#Polygon: %u\n", j+1);
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "%u\n", points[sph[j][i]].v);
+          fprintf(fout, "%u\n", sph[j][i]);
         fprintf(fout, "\n");
         break;
       case OF_POLY:
