@@ -659,7 +659,7 @@ bool coll3Sort2(Point *a, Point *b, Point *c, Point *idx, std::set<Edge>& edgeS,
     }
     else break;
   } while (true);
-//  std::cerr << "after upper:" << std::endl;
+//  std::cerr << "after upper loop:" << std::endl;
 //  std::cerr << "lower: " << lower << ", upper: " << upper << std::endl;
 //  for (unsigned int i = 0; i<cp.size();++i) std::cerr << "cp[" << i << "]: " << cp[i] << std::endl;
 
@@ -674,7 +674,7 @@ bool coll3Sort2(Point *a, Point *b, Point *c, Point *idx, std::set<Edge>& edgeS,
     }
     else break;
   } while (true);
-//  std::cerr << "after lower:" << std::endl;
+//  std::cerr << "after lower loop:" << std::endl;
 //  std::cerr << "lower: " << lower << ", upper: " << upper << std::endl;
 //  for (unsigned int i = 0; i<cp.size();++i) std::cerr << "cp[" << i << "]: " << cp[i] << std::endl;
 
@@ -707,8 +707,9 @@ bool coll3Sort2(Point *a, Point *b, Point *c, Point *idx, std::set<Edge>& edgeS,
     }
   }
 
-
+//  std::cerr << "after erasing:" << std::endl;
 //  for(unsigned int v = (points.size()+lower-1)%points.size(); v != (upper+2)%points.size(); v = (v+1)%points.size()) std::cerr << "p[p[" << v << "]]: " << points[polygon[v]] << std::endl;
+//  for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
 
   // To make sure that the circumference of the polygon is always shrinking, check 2 things:
   // 1) check the distance between [lower-1,lower] + [upper,upper+1]
@@ -719,7 +720,7 @@ bool coll3Sort2(Point *a, Point *b, Point *c, Point *idx, std::set<Edge>& edgeS,
   double dist12 = get_length(points[polygon[upper]], points[polygon[(upper+1)%points.size()]]);
   double dist21 = get_length(points[polygon[(points.size()+lower-1)%points.size()]], points[polygon[upper]]);
   double dist22 = get_length(points[polygon[lower]], points[polygon[(upper+1)%points.size()]]);
-//  std::cerr << "d1: " << dist11+dist12 << ", d2: " << dist21+dist22 << std::endl;
+//  std::cerr << "dist1: " << dist11+dist12 << ", dist2: " << dist21+dist22 << std::endl;
 //  std::cerr << "lower: " << lower << ", upper: " << upper << std::endl;
   bool flip;
   if ((dist11+dist12) == (dist21 + dist22)) {
@@ -731,7 +732,7 @@ bool coll3Sort2(Point *a, Point *b, Point *c, Point *idx, std::set<Edge>& edgeS,
   if (flip) {
     doFlip(lower, upper, polygon, points);
   }
-
+//  std::cerr << "after distance flip:" << std::endl;
 //  for(unsigned int v = (points.size()+lower-1)%points.size(); v != (upper+2)%points.size(); v = (v+1)%points.size()) std::cerr << "p[p[" << v << "]]: " << points[polygon[v]] << std::endl;
 
   // code to check the edges on the ends of the collinear points and add them if they cross the 'l_idx' x coordinate.
@@ -847,7 +848,7 @@ bool coll3Sort2(Point *a, Point *b, Point *c, Point *idx, std::set<Edge>& edgeS,
       ++index;
     }
   }
-
+//  std::cerr << "after erasing:" << std::endl;
 //  for(unsigned int v = (points.size()+lower-1)%points.size(); v != (upper+2)%points.size(); v = (v+1)%points.size()) std::cerr << "p[p[" << v << "]]: " << points[polygon[v]] << std::endl;
 
   // To make sure that the circumference of the polygon is always shrinking, check 2 things:
@@ -872,9 +873,11 @@ bool coll3Sort2(Point *a, Point *b, Point *c, Point *idx, std::set<Edge>& edgeS,
     doFlip(lower, upper, polygon, points);
   }
 
+//  std::cerr << "after flip:" << std::endl;
 //  for(unsigned int v = (points.size()+lower-1)%points.size(); v != (upper+2)%points.size(); v = (v+1)%points.size()) std::cerr << "p[p[" << v << "]]: " << points[polygon[v]] << std::endl;
 
   // code to check the edges on the ends of the collinear points and add them if they cross the 'l_idx' x coordinate.
+  // There must be a check that makes sure the vertex indices are 1 apart.
   if (changed) {
 //    std::cerr << "current index: " << *idx << std::endl;
     Edge new_edge1, new_edge2;
@@ -886,7 +889,7 @@ bool coll3Sort2(Point *a, Point *b, Point *c, Point *idx, std::set<Edge>& edgeS,
 //      std::cerr << "inserting1: " << new_edge1 << std::endl;
       retval = edgeS.insert(new_edge1);
       if (*retval.first != new_edge1) {
-        std::cerr << "Error!  inserting: " << new_edge1 << ", returned: " << *retval.first << std::endl;
+//        std::cerr << "Error!  inserting: " << new_edge1 << ", returned: " << *retval.first << std::endl;
       }
       if ((*new_edge1.p1).l < lowest_index) lowest_index = (*new_edge1.p1).l;
     }
@@ -894,7 +897,7 @@ bool coll3Sort2(Point *a, Point *b, Point *c, Point *idx, std::set<Edge>& edgeS,
 //      std::cerr << "inserting2: " << new_edge2 << std::endl;
       retval = edgeS.insert(new_edge2);
       if (*retval.first != new_edge2) {
-        std::cerr << "Error!  inserting: " << new_edge2 << ", returned: " << *retval.first << std::endl;
+//        std::cerr << "Error!  inserting: " << new_edge2 << ", returned: " << *retval.first << std::endl;
       }
       if ((*new_edge2.p1).l < lowest_index) lowest_index = (*new_edge2.p1).l;
     }
@@ -1967,32 +1970,35 @@ bool coll4Swap3 (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned
 // grabs all collinear points of the 2 chains defined by the 2 edges and sorts them lexicographically,
 // the lowest lex. point gets put in lowest vertex index, and so on until highest lex. points goes into highest vertex index.
 bool coll4Swap4 (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int& lowest_index) {
+//  std::cerr << "=== coll4Swap4 function ===" << std::endl;
   std::vector<Point> cp;
   double value;
   unsigned int lower1, upper1, lower2, upper2; // this is where the lowest lex. point will be placed in the polygon.
   unsigned int index;
 
+
 //  std::cerr << "same point: e1p1: " << *e1.p1 << " == e2p1: " << *e2.p1 << ", is: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << std::endl;
 //  std::cerr << "same point: e1p1: " << *e1.p1 << " == e2p2: " << *e2.p2 << ", is: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << std::endl;
 //  std::cerr << "same point: e1p2: " << *e1.p2 << " == e2p1: " << *e2.p1 << ", is: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << std::endl;
 //  std::cerr << "same point: e1p2: " << *e1.p2 << " == e2p2: " << *e2.p2 << ", is: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << std::endl;
-    if (*e1.p1 == *e2.p1) {
-//      std::cerr << "hi1"<<std::endl;
-      return coll3Sort3(e1.p1, e1.p2, e2.p2, edgeS, polygon, points, lowest_index);
-    }
-    if (*e1.p1 == *e2.p2) {
-//      std::cerr << "hi2"<<std::endl;
-      return coll3Sort3(e1.p1, e1.p2, e2.p1, edgeS, polygon, points, lowest_index);
-    }
-    if (*e1.p2 == *e2.p1) {
-//      std::cerr << "hi3"<<std::endl;
-      return coll3Sort3(e1.p1, e1.p2, e2.p2, edgeS, polygon, points, lowest_index);
-    }
-    if (*e1.p2 == *e2.p2) {
-//      std::cerr << "hi4"<<std::endl;
-      return coll3Sort3(e1.p1, e1.p2, e2.p1, edgeS, polygon, points, lowest_index);
-    }
+  if (*e1.p1 == *e2.p1) {
+//    std::cerr << "hi1"<<std::endl;
+    return coll3Sort3(e1.p1, e1.p2, e2.p2, edgeS, polygon, points, lowest_index);
+  }
+  if (*e1.p1 == *e2.p2) {
+//    std::cerr << "hi2"<<std::endl;
+    return coll3Sort3(e1.p1, e1.p2, e2.p1, edgeS, polygon, points, lowest_index);
+  }
+  if (*e1.p2 == *e2.p1) {
+//    std::cerr << "hi3"<<std::endl;
+    return coll3Sort3(e1.p1, e1.p2, e2.p2, edgeS, polygon, points, lowest_index);
+  }
+  if (*e1.p2 == *e2.p2) {
+//    std::cerr << "hi4"<<std::endl;
+    return coll3Sort3(e1.p1, e1.p2, e2.p1, edgeS, polygon, points, lowest_index);
+  }
 
+//  std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
 
   // add points in 'e1' to 'cp' and any extra collinear points in the polygon
   cp.emplace_back(*e1.p1);

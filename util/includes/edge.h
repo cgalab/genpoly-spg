@@ -256,7 +256,7 @@ public:
       return (*p1).v < (*p2).v;
   }
 
-  // check if the edge crosses an value on the x-axis 'x'
+  // check if the edge crosses a value on the x-axis 'x'
   // An edge already has p1 and p2 in lex. order.
   enum intersect_t checkCrossing(double x) {
     if (fabs((*p1).x - x) == 0) return IS_VERTEX11;
@@ -274,7 +274,6 @@ public:
     // *Problem 1: if the comparison was true at p1, it might be false at p2 if there is
     //            an intersection between the first comparison at p1 and at p2 when the edge will be removed.
     // possible solution: always compare at higher p1 value(?)
-//    std::cerr << "lhs: " << lhs << " < rhs: " << rhs << std::endl;
     Yval yl, yr;
     double s;
     // comparison always starts at lex. higher of the P1 points.
@@ -289,7 +288,7 @@ public:
     else {s = (*p1).x;}
     yl = (*this).getYatX(s);
     yr = e.getYatX(s);
-//    std::cerr << "this: " << *this << ", e: " << e << std::endl;
+//    std::cerr << std::endl << "this: " << *this << ", e: " << e << std::endl;
 //    std::cerr << "s: " << s << ", yl: " << yl << ", yr: " << yr << std::endl;
 
     if (yl == yr) {
@@ -323,25 +322,50 @@ public:
       }
       // 3P coll.  Some determinant wasn't 0
       else {
+//        std::cerr << "3pc or no det == 0" << std::endl;
         // when one determinant is 0, the other (so to speak) completely describes the relationship between the edges
-        if (fabs(det1) + fabs(det2) == 0) { // possibly not needed as if count > 1, it's 4pc.
-          if (fabs(det3) == 0) return  std::signbit(det4);
-          if (fabs(det4) == 0) return  std::signbit(det3);
+        //if (fabs(det1) + fabs(det2) == 0) { // possibly not needed as if count > 1, it's 4pc.
+        //  if (fabs(det3) == 0) return  std::signbit(det4);
+        //  if (fabs(det4) == 0) return  std::signbit(det3);
+        //}
+        //if (fabs(det3) + fabs(det4) == 0) { // possibly not needed as if count > 1, it's 4pc.
+        //  if (fabs(det1) == 0) return !std::signbit(det2);
+        //  if (fabs(det2) == 0) return !std::signbit(det1);
+        //}
+        if (fabs(det1) == 0) {
+//          std::cerr << "|det1| == 0" << std::endl;
+          return !std::signbit(det2);
         }
-        if (fabs(det3) + fabs(det4) == 0) { // possibly not needed as if count > 1, it's 4pc.
-          if (fabs(det1) == 0) return !std::signbit(det2);
-          if (fabs(det2) == 0) return !std::signbit(det1);
+        if (fabs(det2) == 0) {
+//          std::cerr << "|det2| == 0" << std::endl;
+          return !std::signbit(det1);
         }
-        if (fabs(det1) == 0) return !std::signbit(det2);
-        if (fabs(det2) == 0) return !std::signbit(det1);
-        if (fabs(det3) == 0) return  std::signbit(det4);
-        if (fabs(det4) == 0) return  std::signbit(det3);
+        if (fabs(det3) == 0) {
+//          std::cerr << "|det3| == 0" << std::endl;
+          return  std::signbit(det4);
+        }
+        if (fabs(det4) == 0) {
+//          std::cerr << "|det4| == 0" << std::endl;
+          return  std::signbit(det3);
+        }
         // if yl == yr, but no determinants are 0, but a pair of determinants for one edge has the same sign.
-        if (!(std::signbit(det1) ^ std::signbit(det2))) return !(std::signbit(det1));
-        if (!(std::signbit(det3) ^ std::signbit(det4))) return  (std::signbit(det3));
+        if (!(std::signbit(det1) ^ std::signbit(det2))) {
+//          std::cerr << "det1 & det2 same sign" << std::endl;
+          return !(std::signbit(det1));
+        }
+        if (!(std::signbit(det3) ^ std::signbit(det4))) {
+//          std::cerr << "det3 & det4 same sign" << std::endl;
+          return  (std::signbit(det3));
+        }
         // if yl == yr, but the edges intersect
-        if (*p1 < *e.p1) return !std::signbit(det1);
-        else return std::signbit(det3);
+        if (*p1 < *e.p1) {
+//          std::cerr << "p1 < e.p1" << std::endl;
+          return !std::signbit(det1);
+        }
+        else {
+//          std::cerr << "else..." << std::endl;
+          return std::signbit(det3);
+        }
 
         std::cerr << "ERROR: Unexpected fallthrough in comparison!  yl == yr, this: " << *this << ", e: " << e << std::endl;
         std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;

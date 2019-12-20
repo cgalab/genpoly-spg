@@ -24,19 +24,19 @@ bool eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS) {
 //  std::cerr << "edge being erased: " << e << std::endl;
   it = edgeS.find(e);
 
-  if (it != edgeS.end()) {
-    assert(e == *it);
-    edgeS.erase(it);
-    return true;
-  } else {
+  if ((it == edgeS.end()) || (*it != e)) {
     // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
-    // this is technically a crutch because there's a problem with the comparator function.
     for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) {
-      if (*it == e) {
+      if (*it != e) continue;
+			else {
         edgeS.erase(it);
         return true;
       }
     }
+  }
+	else {
+    edgeS.erase(it);
+    return true;
   }
   return false;
 }
@@ -47,6 +47,7 @@ void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned i
   unsigned int before, after;
   Point *p2, *p3;
   Edge e1, e2;
+	std::set<Edge>::iterator it1;
 
   before = ((*p1).v + points.size() -1) % points.size();
   after =  ((*p1).v + points.size() +1) % points.size();
@@ -63,8 +64,29 @@ void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned i
   }
 
 //  std::cerr << "erasing vertexes: e1: " << e1 << ", e2: " << e2 << std::endl;
-  edgeS.erase(e1); // even if I get the wrong iterator for e1, it's an iterator to e2, so ok to be removed.
-  edgeS.erase(e2); // same should be fine with e2.
+	it1 = edgeS.find(e1);
+	if ((it1 == edgeS.end()) || (*it1 != e1)) { // e1 not found
+		for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) {
+			if (e1 != *it) continue;
+			else {
+				edgeS.erase(it);
+				break;
+			}
+		}
+	}
+	else edgeS.erase(it1);
+
+	it1 = edgeS.find(e2);
+	if ((it1 == edgeS.end()) || (*it1 != e2)) { // e2 not found
+		for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) {
+			if (e2 != *it) continue;
+			else {
+				edgeS.erase(it);
+				break;
+			}
+		}
+	}
+	else edgeS.erase(it1);
 }
 
 // returns relative distance of a point to an edge.
@@ -333,13 +355,13 @@ void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Po
 		Edge lower, higher;
 		lower = (e1.getPHigh().v < e2.getPLow().v) ? e1 : e2;
 		higher = (lower == e1) ? e2 : e1;
-		//std::cout << "lower: " << lower << std::endl;
-		//std::cout << "higher: " << higher << std::endl;
+//		std::cout << "lower: " << lower << std::endl;
+//		std::cout << "higher: " << higher << std::endl;
 
 		unsigned int inner, outer;
 		inner = higher.getPLow().v - lower.getPHigh().v +1;
 		outer = (points.size() - higher.getPHigh().v) + lower.getPLow().v +1;
-		//std::cout << "inner: " << inner << ", outer: " << outer << std::endl;
+//		std::cout << "inner: " << inner << ", outer: " << outer << std::endl;
 
 		if (inner < outer) doFlip(lower.getPHigh().v, higher.getPLow().v, polygon, points);
 		else doFlip(higher.getPHigh().v, lower.getPLow().v, polygon, points);
@@ -349,25 +371,32 @@ void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Po
 // flip a polygon from index: i1 to index: i2.
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 	//std::cout << "inside doFlip" << std::endl;
-	//std::cout << "flipping: i1: " << i1 << ", i2: " << i2 << std::endl;
+//	if (i1 == 15675) {
+//		std::cerr << "flipping: i1: " << i1 << ", i2: " << i2 << std::endl;
+//		std::cerr << "points[23845]: " << points[23845] << std::endl;
+//		std::cerr << "poi[pol[poi[23845]]]: " << points[polygon[points[23845].v]] << std::endl;
+//		std::cerr << "points[27925]: " << points[27925] << std::endl;
+//		std::cerr << "poi[pol[poi[27925].v]]: " << points[polygon[points[27925].v]] << std::endl;
+//	}
+
 
 	unsigned int t;
 	if (i1 < i2) {
 		while (i1 < i2) {
-			//std::cout << "i1: " << i1 << ", i2: " << i2 << std::endl;
-			//std::cout << "p[i1]: " << polygon[i1] << ", p[i2]: " << polygon[i2] << std::endl;
-			//std::cout << "p[p[i1]].v: " << points[polygon[i1]].v << ", p[p[i2]].v: " << points[polygon[i2]].v << std::endl;
+//			std::cout << "i1: " << i1 << ", i2: " << i2 << std::endl;
+//			std::cout << "p[i1]: " << polygon[i1] << ", p[i2]: " << polygon[i2] << std::endl;
+//			std::cout << "p[p[i1]].v: " << points[polygon[i1]].v << ", p[p[i2]].v: " << points[polygon[i2]].v << std::endl;
 			t = polygon[i1];
 			polygon[i1] = polygon[i2];
 			polygon[i2] = t;
-			//std::cout << "p[i1]:" << polygon[i1] << ", p[i2]:" << polygon[i2] << std::endl;
+//			std::cout << "p[i1]:" << polygon[i1] << ", p[i2]:" << polygon[i2] << std::endl;
 			points[polygon[i1]].v = i1;
 			points[polygon[i2]].v = i2;
-			//std::cout << "p[p[i1]].v:" << points[polygon[i1]].v << ", p[p[i2]].v:" << points[polygon[i2]].v << std::endl;
+//			std::cout << "p[p[i1]].v:" << points[polygon[i1]].v << ", p[p[i2]].v:" << points[polygon[i2]].v << std::endl;
 			++i1;
 			--i2;
-			//std::cout << "new i1:" << i1 << std::endl;
-			//std::cout << "new i2:" << i2 << std::endl;
+//			std::cout << "new i1:" << i1 << std::endl;
+//			std::cout << "new i2:" << i2 << std::endl;
 		}
 	}
 	else { // if i1 is higher than i2 we flip the outer polygonal chain
@@ -393,6 +422,13 @@ void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon
 			//std::cout << "new i2:" << i2 << std::endl;
 		}
 	}
+//	if (i1 == 15675) {
+//		std::cerr << "flipping: i1: " << i1 << ", i2: " << i2 << std::endl;
+//		std::cerr << "points[23845]: " << points[23845] << std::endl;
+//		std::cerr << "poi[pol[poi[23845]]]: " << points[polygon[points[23845].v]] << std::endl;
+//		std::cerr << "points[27925]: " << points[27925] << std::endl;
+//		std::cerr << "poi[pol[poi[27925].v]]: " << points[polygon[points[27925].v]] << std::endl;
+//	}
 }
 
 // flip a prat of point set 'points' from index: i1 to index: i2 .
