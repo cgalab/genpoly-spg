@@ -23,6 +23,7 @@
 #include "opt2e.h"
 #include "opt2f.h"
 #include "opt2g.h"
+#include "opt2h.h"
 #include "curve.h"
 #include "simple_pol_check.h"
 #include "star.h"
@@ -134,6 +135,9 @@ int main(int argc, char *argv[]) {
   else if (alg == A_2OPT_G) {
     returnValue = opt2g(sph[select_polygon], points);
   }
+  else if (alg == A_2OPT_H) {
+    returnValue = opt2h(sph[select_polygon], points);
+  }
   else if (alg == A_STAR) {
     returnValue = star(sph[select_polygon], points);
   }
@@ -182,6 +186,7 @@ int main(int argc, char *argv[]) {
       case A_2OPT_E:
       case A_2OPT_F:
       case A_2OPT_G:
+      case A_2OPT_H:
       case A_STAR:
       case A_HOLE:
       case A_VERIFY:
