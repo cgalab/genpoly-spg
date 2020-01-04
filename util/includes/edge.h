@@ -9,7 +9,7 @@
 #include <math.h>  // for signbit
 #include "basicDefinitions.h"
 #include "point.h"
-#include "predicates.h"
+#include "predicates.h" // for orient2d
 
 // class for when an edge is vertical on the x axis
 class Yval {
@@ -242,6 +242,16 @@ public:
     return ans;
   }
 
+  // using shewchuks determinant.
+  double cdet(const Point p) const {
+    point pa, pb, pc;
+    pa.x = (*p1).x; pa.y = (*p1).y;
+  	pb.x = (*p2).x; pb.y = (*p2).y;
+  	pc.x = p.x; pc.y = p.y;
+
+  	return orient2d(pa,pb,pc);
+  }
+
   // check for if p1 is a 'left' vertex compared to p2
   bool checkPolLoHi() {
     if ((*p1).v == 0) {
@@ -406,6 +416,238 @@ public:
 	}
 };
 
+class Edge2 {
+public:
+	Point *p1;
+	Point *p2;
+
+	Edge2() {p1=NULL; p2=NULL;}
+	Edge2(const Edge2& e) {p1=e.p1; p2=e.p2;}
+	Edge2(Point *P1, Point *P2) {
+		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
+		else {p1=P2; p2=P1;}
+	}
+
+  bool isNull() {
+    return ((p1 == NULL) || (p2 == NULL));
+  }
+
+	void set(Point* v1, Point* v2) {
+    if ((*v1) < (*v2)) {p1=v1; p2=v2;}
+		else {p1=v2; p2=v1;}
+	}
+  void set(Point& v1, Point& v2) {
+    if ((v1) < (v2)) {p1=&v1; p2=&v2;}
+		else {p1=&v2; p2=&v1;}
+	}
+
+  void set(Edge2 val) {
+    p1 = val.p1;
+    p2 = val.p2;
+  }
+
+  unsigned int getPLow() const {
+    if ((*p1).v < (*p2).v)
+      return (*p1).v;
+    else
+      return (*p2).v;
+  }
+  unsigned int getPHigh() const {
+    if ((*p1).v < (*p2).v)
+      return (*p2).v;
+    else
+      return (*p1).v;
+  }
+
+  unsigned int getVLow() const {
+    if ((*p1).v == 0) {
+      if ((*p2).v != 1) return (*p2).v;
+      else return (*p1).v;
+    }
+    if ((*p2).v == 0) {
+      if ((*p1).v != 1) return (*p1).v;
+      else return (*p2).v;
+    }
+    if ((*p1).v < (*p2).v)
+      return (*p1).v;
+    else
+      return (*p2).v;
+  }
+  unsigned int getVHigh() const {
+    if ((*p1).v == 0) {
+      if ((*p2).v != 1) return (*p1).v;
+      else return (*p2).v;
+    }
+    if ((*p2).v == 0) {
+      if ((*p1).v != 1) return (*p2).v;
+      else return (*p1).v;
+    }
+    if ((*p1).v < (*p2).v)
+      return (*p2).v;
+    else
+      return (*p1).v;
+  }
+
+  double getxMin() const {
+    if ((*p1).x < (*p2).x) return (*p1).x;
+    else return (*p2).x;
+  }
+  double getxMax() const {
+    if ((*p1).x < (*p2).x) return (*p2).x;
+    else return (*p1).x;
+  }
+  double getyMin() const {
+    if ((*p1).y < (*p2).y) return (*p1).y;
+    else return (*p2).y;
+  }
+  double getyMax() const {
+    if ((*p1).y < (*p2).y) return (*p2).y;
+    else return (*p1).y;
+  }
+  double getLowerLexIdx() const { // not necessary as p1 is always the lower lex. index.
+    if ((*p1).l < (*p2).l) return (*p1).l;
+    else return (*p2).l;
+  }
+  Yval getYatX(const double s) const {
+  	Yval y;
+  	// calculate the y-axis order of the 2 edges at idx
+  	// use Yval in case of x1-x2 = 0
+  	Point P1 = *p1;
+  	Point P2 = *p2;
+
+  	if (fabs(P2.x - P1.x) == 0) {
+  		y.set(P1.y, P2.y);
+  		y.setX(P1.x);
+  	}
+    else if (s == P1.x) {y.set(P1.y); y.setX(s);}
+    else if (s == P2.x) {y.set(P2.y); y.setX(s);}
+  	else {
+      // there's a problem with how I create the 'bias' and thus the 'value' (solved with the 'else if' statements)
+      // when the slope is really steep, the bias is very sensitive.
+      y.set(P1.y, P2.y);
+  		double slope = (P2.y-P1.y) / (P2.x-P1.x);
+      double bias, val;
+      bias = P1.y - slope*P1.x;
+      val = slope * s + bias;
+
+      if (!y.isIn(val)) {
+        bias = P2.y - slope*P2.x;
+        val = slope * s + bias;
+      }
+      y.set(val);
+  		y.setX(s);
+  	}
+  	return y;
+  }
+
+  double det(const Point p) const {
+    Point pa = Point(*p1);
+  	Point pb = Point(*p2);
+  	Point pc = Point(p);
+  	pa.x = pa.x - pb.x;pa.y = pa.y - pb.y;
+  	pc.x = pc.x - pb.x;pc.y = pc.y - pb.y;
+  	double ans = pc.x * pa.y - pc.y * pa.x;
+    return ans;
+  }
+
+  // using shewchuks determinant.
+  double cdet(const Point p) const {
+    point pa, pb, pc;
+    pa.x = (*p1).x; pa.y = (*p1).y;
+  	pb.x = (*p2).x; pb.y = (*p2).y;
+  	pc.x = p.x; pc.y = p.y;
+
+  	return orient2d(pa,pb,pc);
+  }
+
+  // check if p1 is a 'left' vertex compared to p2
+  bool checkPolLoHi() {
+    if ((*p1).v == 0) {
+      if ((*p2).v != 1) return false;
+      else return true;
+    }
+    if ((*p2).v == 0) {
+      if ((*p1).v == 1) return false;
+      else return true;
+    }
+    else
+      return (*p1).v < (*p2).v;
+  }
+
+  // check if the edge crosses a value on the x-axis 'x'
+  // An edge already has p1 and p2 in lex. order.
+  enum intersect_t checkCrossing(double x) {
+    if (fabs((*p1).x - x) == 0) return IS_VERTEX11;
+    if (fabs((*p2).x - x) == 0) return IS_VERTEX22;
+    if ((*p1).x < x) {
+      if (x < (*p2).x) return IS_TRUE;
+    }
+    else return IS_FALSE;
+  }
+
+  bool operator < (const Edge2& e) const {
+    // new operator, i.e. the reason for this class.
+    // std::set uses this operator to compare edges.
+    // Given that intersecting edges do not have transitive property, we return false right away.
+    // the set then returns the particular edge that was intersecting the edge we're interested in inserting.
+    // We can then verify that it intersects that edge.
+    // if edge actually gets inserted properly because the edges aren't intersecting, we can do a normal above/below comparison
+
+    // if there's an intersection, return false.
+    // need to do the intersection check here, CAN'T USE FUNCTIONS IN EDGES.CPP..
+    //std::cerr << "comparing: " << std::endl;
+    //std::cerr << "this: " << *this << std::endl;
+    //std::cerr << "e:    " << e << std::endl;
+    if ((*(*this).p1 == *e.p1) && (*(*this).p2 == *e.p2)) return false; // same edge
+    if (*(*this).p1 == *e.p2) return false; // lex. higher point of 'e' is lower than lex. lower point of 'this'
+    if (*(*this).p2 == *e.p1) return true;  // and vice versa.
+    if (*(*this).p1 == *e.p1) return signbit((*this).cdet(*e.p2)); //same lex. lower point
+    if (*(*this).p2 == *e.p2) return signbit((*this).cdet(*e.p1)); // same lex. higher point
+
+    double det1, det2, det3, det4;
+    det1 = (*this).cdet(*e.p1);
+    det2 = (*this).cdet(*e.p2);
+    det3 = e.cdet(*p1);
+    det4 = e.cdet(*p2);
+    //std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
+    // in case a det is 0, it needs to be the same sign as the other det
+    if (det1 == 0) {if (det2 < 0) det1 = -0.0;}
+    if (det2 == 0) {if (det1 < 0) det2 = -0.0;}
+    if (det3 == 0) {if (det4 < 0) det3 = -0.0;}
+    if (det4 == 0) {if (det3 < 0) det4 = -0.0;}
+    //std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
+    if ((signbit(det1) ^ signbit(det2)) && (signbit(det3) ^ signbit(det4))) return false; // an intersection
+    if (!(signbit(det1) ^ signbit(det2))) return signbit(det1); // 'e' is on one side of 'this'
+    if (!(signbit(det3) ^ signbit(det4))) return !signbit(det3); // 'this' is on one side of 'e'
+
+    return signbit(det1); // both dets should be the same, so either should be fine.
+  }
+
+  bool operator == (const Edge2 e) const {
+//    std::cerr << "lhs: " << *this << ", rhs: " << e << std::endl;
+		if ((*p1 == *e.p1) && (*p2 == *e.p2)) return true;
+		else return false;
+  }
+/*
+	friend bool operator==(const Edge lhs, const Edge rhs) {
+    std::cerr << "lhs: " << lhs << ", rhs: " << rhs << std::endl;
+		if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
+		else return false;
+	}
+*/
+  friend bool operator!=(const Edge2 lhs, const Edge2 rhs) {
+		if ((*lhs.p1 != *rhs.p1) || (*lhs.p2 != *rhs.p2)) return true;
+		else return false;
+	}
+
+  // to print out an edge, gives the format:
+  // (x-coord, y-coord),[original_index, polygonal_index, _lexicographical_index]
+	friend std::ostream& operator<<(std::ostream& os, const Edge2& e) {
+		os << *e.p1 << " , " << *e.p2;
+		return os;
+	}
+};
+
 class I_Edge: public Edge {
 private:
 protected:
@@ -564,13 +806,18 @@ void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned i
 //void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points, unsigned int randseed);
 double reldist(const Point& pa, const Point& pb, const Point& p);
 double reldist(const Edge& e, const Point& p);
+double reldist(const Edge2& e, const Point& p);
 double det(const Edge e, const Point p);
+double cdet(const Point p1, const Point p2, const Point p);
+double cdet(const Edge2 e, const Point p);
 double dety(const Edge e, const Point p);
 Yval getYatX(const Edge& e, const double x);
 unsigned int getLowestLexIdx(const Edge e1, const Edge e2);
 enum intersect_t checkIntersection(const Edge e1, const Edge e2);
 enum intersect_t checkIntersection2(const Edge e1, const Edge e2);
+enum intersect_t checkIntersection2(const Edge2 e1, const Edge2 e2);
 void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+void flip(Edge2& e1, Edge2& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void doFlip(unsigned int i1, unsigned int i2, std::vector<Point>& points);
 void flip2(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon);

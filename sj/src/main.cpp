@@ -31,8 +31,8 @@
 #include "predicates.h"
 
 int main(int argc, char *argv[]) {
-  std::cout << std::setprecision(20);
-  std::cerr << std::setprecision(20);
+  std::cout << std::setprecision(3);
+  std::cerr << std::setprecision(3);
   // final return value
   enum error returnValue = SUCCESS;
   // time measurement variables
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
   }
   if (randseed) mt.seed(randseed);
   // initialize Shewchuks' predicates
-  //exactinit();
+  exactinit();
 
   // points from input file saved in a vector
   std::vector<Point> points;

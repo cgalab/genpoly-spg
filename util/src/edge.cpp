@@ -11,7 +11,6 @@
 #include "point.h"
 #include "predicates.h"
 
-
 // function to remove edges from 'edgeS' up to and including value of 'index'
 void decrementEdges(std::set<Edge>& edgeS) {
 	edgeS.clear();
@@ -98,6 +97,9 @@ double reldist(const Point& pa, const Point& pb, const Point& p) {
 double reldist(const Edge& e, const Point& p) {
 	return reldist(*e.p1, *e.p2, p);
 }
+double reldist(const Edge2& e, const Point& p) {
+	return reldist(*e.p1, *e.p2, p);
+}
 
 /*
 // calculates the determinant of the vertices of 'e' and the point p (similar function in point.cpp for 3 points)
@@ -122,6 +124,25 @@ double det(const Edge e, const Point p) {
 	//std::cerr << "det: " << ans << std::endl;
 	//return (fabs(ans) < EPSILON) ? 0 : ans;
 	return ans;
+}
+
+// using shewchuks determinant.
+double cdet(const Point p1, const Point p2, const Point p) {
+	point pa, pb, pc;
+	pa.x = p1.x; pa.y = p1.y;
+	pb.x = p2.x; pb.y = p2.y;
+	pc.x = p.x; pc.y = p.y;
+
+	return orient2d(pa,pb,pc);
+}
+
+double cdet(const Edge2 e, const Point p) {
+	point pa, pb, pc;
+	pa.x = (*e.p1).x; pa.y = (*e.p1).y;
+	pb.x = (*e.p2).x; pb.y = (*e.p2).y;
+	pc.x = p.x; pc.y = p.y;
+
+	return orient2d(pa,pb,pc);
 }
 
 double dety(const Edge e, const Point p) {
@@ -247,6 +268,9 @@ enum intersect_t checkIntersection(const Edge e1, const Edge e2) {
 
 // uses shewchuks predicates for the determinant.
 enum intersect_t checkIntersection2(const Edge e1, const Edge e2) {
+	// is e1 and e2 the same edge?
+	if (e1 == e2) return IS_SAME_EDGE;
+
 	double det_a, det_b, det_c, det_d;
 	double dp_1, dp_2, dp_3, dp_4;
 	point pa, pb, pc, pd;
@@ -289,9 +313,6 @@ enum intersect_t checkIntersection2(const Edge e1, const Edge e2) {
 		if (*(e1.p2) == *(e2.p1)) same21 = true;
 		if (*(e1.p2) == *(e2.p2)) same22 = true;
 
-		// is e1 and e2 the same edge?
-		if (e1 == e2) return IS_SAME_EDGE;
-
 		// some determinant was 0, need to check if it's inside an edge or outside.
 		dp_1 = reldist(e1, *e2.p1);
 		dp_2 = reldist(e1, *e2.p2);
@@ -318,6 +339,91 @@ enum intersect_t checkIntersection2(const Edge e1, const Edge e2) {
 
 		else if (col) return IS_3P_COLLINEAR;
 		else return IS_FALSE;
+	}
+	else {
+		// none of the determinants were 0, so just need to check the sign for intersection.
+		if ( (std::signbit(det_a) ^ std::signbit(det_b)) && (std::signbit(det_c) ^ std::signbit(det_d)) ) {
+ 			return IS_TRUE;
+		}
+		else return IS_FALSE;
+	}
+}
+
+// uses shewchuks predicates for the determinant.
+enum intersect_t checkIntersection2(const Edge2 e1, const Edge2 e2) {
+	// is e1 and e2 the same edge?
+	if (e1 == e2) return IS_SAME_EDGE;
+
+	double det_a, det_b, det_c, det_d;
+	double dp_1, dp_2, dp_3, dp_4;
+	point pa, pb, pc, pd;
+	bool same11 = false, same12 = false, same21 = false, same22 = false;
+
+//	std::cout << "e1.p1 == e2.p1: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << ", e1.p1: " << *e1.p1 << std::endl;
+//	std::cout << "e1.p1 == e2.p2: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << ", e1.p2: " << *e1.p2 << std::endl;
+//	std::cout << "e1.p2 == e2.p1: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << ", e2.p1: " << *e2.p1 << std::endl;
+//	std::cout << "e1.p2 == e2.p2: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << ", e2.p2: " << *e2.p2 << std::endl;
+
+	// converting to 'point' class from 'predicates'
+	pa.x = (*e1.p1).x; pa.y = (*e1.p1).y;
+	pb.x = (*e1.p2).x; pb.y = (*e1.p2).y;
+	pc.x = (*e2.p1).x; pc.y = (*e2.p1).y;
+	pd.x = (*e2.p2).x; pd.y = (*e2.p2).y;
+
+	// determinant between edge 1 and a point in edge 2
+	det_a = orient2d(pa, pb, pc);
+	det_b = orient2d(pa, pb, pd);
+	// determinant between edge 2 and a point in edge 1
+	det_c = orient2d(pc, pd, pa);
+	det_d = orient2d(pc, pd, pb);
+
+	//std::cerr.precision(24);
+	//int sig,ex;
+	//sig = frexp(det_d, &ex);
+	//std::cerr << "sig: " << sig << ", exp: " << ex << std::endl;
+//	std::cerr.precision(17);
+//	std::cerr << "det_a: " << det_a << std::endl;
+//	std::cerr << "det_b: " << det_b << std::endl;
+//	std::cerr << "det_c: " << det_c << std::endl;
+//	std::cerr << "det_d: " << det_d << std::endl;
+
+	if (det_a*det_b*det_c*det_d == 0) {
+		bool col = false;
+
+		//quick check if the edges share a vertex
+		if (*(e1.p1) == *(e2.p1)) same11 = true;
+		if (*(e1.p1) == *(e2.p2)) same12 = true;
+		if (*(e1.p2) == *(e2.p1)) same21 = true;
+		if (*(e1.p2) == *(e2.p2)) same22 = true;
+
+		// some determinant was 0, need to check if it's inside an edge or outside.
+		dp_1 = reldist(e1, *e2.p1);
+		dp_2 = reldist(e1, *e2.p2);
+		dp_3 = reldist(e2, *e1.p1);
+		dp_4 = reldist(e2, *e1.p2);
+
+		//std::cerr.precision(17);
+//		std::cerr << "det_a: " << det_a << ", dp1: " << dp_1 << ", same11: " << ((*e1.p1 == *e2.p1) ? "true" : "false") << std::endl;
+//		std::cerr << "det_b: " << det_b << ", dp2: " << dp_2 << ", same12: " << ((*e1.p1 == *e2.p2) ? "true" : "false") << std::endl;
+//		std::cerr << "det_c: " << det_c << ", dp3: " << dp_3 << ", same21: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << std::endl;
+//		std::cerr << "det_d: " << det_d << ", dp4: " << dp_4 << ", same22: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << std::endl;
+
+		if ( (det_a == 0) && (dp_1 > 0) && (dp_1 < 1) ) col = true;
+		if ( (det_b == 0) && (dp_2 > 0) && (dp_2 < 1) ) col = true;
+		if ( (det_c == 0) && (dp_3 > 0) && (dp_3 < 1) ) col = true;
+		if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) ) col = true;
+
+		// 2opt function only cares about collinearity when it's 4 point and the points intercept in some way.
+		if ((fabs(det_a)+fabs(det_b)+fabs(det_c)+fabs(det_d) == 0) && col) return IS_4P_COLLINEAR;
+		// 3P collinearity assumes the 3 vertices are incidental in polygon and the 3 points are collinear.
+		if ((same11 || same12 || same21 || same22) && col) return IS_3P_COLLINEAR;
+		if (col) return IS_TRUE; // 3 points being collinear (and not inc. vert.) is best solved with a 2opt flip.
+		if (same11) return IS_VERTEX11; // not collinear, but are incidental vertices.
+		if (same12) return IS_VERTEX12;
+		if (same21) return IS_VERTEX21;
+		if (same22) return IS_VERTEX22;
+
+		return IS_FALSE;
 	}
 	else {
 		// none of the determinants were 0, so just need to check the sign for intersection.
@@ -366,6 +472,13 @@ void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Po
 		if (inner < outer) doFlip(lower.getPHigh().v, higher.getPLow().v, polygon, points);
 		else doFlip(higher.getPHigh().v, lower.getPLow().v, polygon, points);
 	}
+}
+
+// wrapper around flip for Edge2 class
+void flip(Edge2& e1, Edge2& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+	Edge te1 = Edge(e1.p1, e1.p2);
+	Edge te2 = Edge(e2.p1, e2.p2);
+	flip(te1, te2, polygon, points);
 }
 
 // flip a polygon from index: i1 to index: i2.
@@ -431,7 +544,7 @@ void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon
 //	}
 }
 
-// flip a prat of point set 'points' from index: i1 to index: i2 .
+// flip a part of point set 'points' from index: i1 to index: i2 .
 void doFlip(unsigned int i1, unsigned int i2, std::vector<Point>& points) {
 	//std::cout << "inside doFlip" << std::endl;
 	//std::cout << "flipping: i1: " << i1 << ", i2: " << i2 << std::endl;

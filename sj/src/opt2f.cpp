@@ -73,8 +73,8 @@ enum error opt2f(std::vector<unsigned int>& polygon, std::vector<Point>& points)
     loop = false;
     reverse_flag = false;
     revert = false;
-    index = 0;
     lowest_index = points.size();
+    index = 0;
     decrementEdges(edgeS);
 
   	while (index < points.size()) {
