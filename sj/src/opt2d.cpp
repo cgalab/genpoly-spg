@@ -17,11 +17,11 @@
 #include "elapsed.h"
 
 // Version of BO-2opt that only flips the edges and not the whole chain. //NOT WORKING.
-enum error opt2d(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+enum error opt2d(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
   double duration = 0;
 	// initialise and create a random permutation for the polygon
-	createRandPol(polygon, points, randseed);
+	createRandPol(polygon, points);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'

@@ -14,8 +14,8 @@ add_definitions(-O3 -DNDEBUG -std=c++11 -DCPUTIME_IN_MILLISECONDS)
 #set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wextra -Warray-bounds" )
 #set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -pedantic" )
 
-
 add_executable(spg
+                    src/allsp.cpp
                     src/curve.cpp
                     src/heap.cpp
 					          src/inits.cpp
@@ -38,6 +38,5 @@ target_include_directories(spg PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/includes>
   $<INSTALL_INTERFACE:includes>
   PRIVATE src)
-
 
 target_link_libraries(spg util)

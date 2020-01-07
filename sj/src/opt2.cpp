@@ -17,12 +17,12 @@
 #include "elapsed.h"
 
 // 2opt that was used for the competition.
-enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
   double duration = 0;
 	// initialise and create a random permutation for the polygon
-	createRandPol(polygon, points, randseed);
-  //createCHRandPol(polygon, points, randseed);
+	createRandPol(polygon, points);
+  //createCHRandPol(polygon, points);
   //pdisplay(polygon, points);
   //assert(0);
 

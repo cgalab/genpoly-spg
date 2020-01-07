@@ -6,18 +6,22 @@
 #include "point.h"
 
 
-enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& points) {
+enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& points, std::vector<std::vector<unsigned int>>& sph) {
   enum error returnValue = SUCCESS;
 
   FILE *fin = fopen(inFile, "r");
   if ((fin != NULL) && (inFormat != IF_UNDEFINED)) {
     char aLine[256];
     double x, y, xmin, xmax, ymin, ymax;
-    unsigned int i=0, nrOfPoints=0, counter=0;
+    unsigned int i=0, nrOfPoints=0, counter=0, sph_index = 0, points_index = 0, v_index = 0;
+    int return_value;
+    bool points_flag = false;
     Point p;
+    if (sph.size() == 0) sph.push_back(std::vector<unsigned int>());
 
     while (fgets(aLine, sizeof(aLine), fin) != NULL) {
       if(aLine[0] == '#') continue; // ignore lines beginning with #
+      if(aLine[0] == '\n') continue;
 /*
       std::cerr.precision(24);
       std::cerr << "x: " << x << ", y: " << y << std::endl;
@@ -32,12 +36,7 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
       // Should I do regex matching instead of this ?
       // It would catch any errors when the format of the file doesn't match the command line argument for inFormat
       switch (inFormat) {
-        case IF_POINTS:  // each line has only "x y" on it
-          sscanf(aLine,"%lf %lf",&x,&y);
-          p.set(x,y,counter);
-          points.push_back(p);
-          break;
-        case IF_POLY:
+        case IF_POLY: // only accepts a single polygon
           if (counter == 0) {
             sscanf(aLine,"%lf %lf %lf %lf",&xmin,&xmax,&ymin,&ymax);
           }
@@ -46,16 +45,49 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
           }
           else {
             sscanf(aLine,"%lf %lf",&x,&y);
-            p.set(x,y,i);
-            std::cerr << "point: " << p << std::endl;
+            p.set(x,y,i,i,sph_index);
             points.push_back(p);
+            sph[sph_index].push_back(i);
             ++i;
           }
           break;
-        case IF_COMP:    // each line has "i x y" on it
+        case IF_COMP:    // each line has "i x y" on it, only accepts a single polygon
           sscanf(aLine,"%u %lf %lf",&i,&x,&y);
-          p.set(x,y,i);
+          p.set(x,y,i,i,sph_index);
           points.push_back(p);
+          sph[sph_index].push_back(i);
+          break;
+        case IF_POINTS:  // each line has only "x y" on it
+        case IF_DAT:
+        case IF_LINE:    // each polygon has a header which can be ignored
+          return_value = sscanf(aLine,"%lf %lf",&x,&y);
+          p.set(x,y,i,v_index,0,sph_index);
+//          std::cerr << "io: p: " << p << std::endl;
+          if (return_value == 2) {
+            if (i == 0) {
+              points.push_back(p);
+              if (sph.size() == sph_index) sph.push_back(std::vector<unsigned int>());
+              sph[sph_index].push_back(i);
+              ++i;
+              ++v_index;
+            }
+            else if (p != points[points_index]) {
+              if (points_flag) {
+                points_index = points.size();
+                points_flag = false;
+              }
+              points.push_back(p);
+              if (sph.size() == sph_index) sph.push_back(std::vector<unsigned int>());
+              sph[sph_index].push_back(i);
+              ++i;
+              ++v_index;
+            }
+            else if (p == points[points_index]) {
+              points_flag = true;
+              ++sph_index;
+              v_index = 0;
+            }
+          }
           break;
         case IF_UNDEFINED:
         default:
@@ -85,8 +117,14 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
 }
 
 
-enum error readvFile(char *vFile, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+enum error readvFile(char *vFile, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
   enum error returnValue = SUCCESS;
+  unsigned int sph_index = 0;
+  if (sph.size() == 0) sph.push_back(std::vector<unsigned int>());
+  else {
+    sph.resize(0);
+    sph.push_back(std::vector<unsigned int>());
+  }
 
   FILE *fin = fopen(vFile, "r");
   if (fin != NULL) {
@@ -95,12 +133,22 @@ enum error readvFile(char *vFile, std::vector<unsigned int>& polygon, std::vecto
 
     while (fgets(aLine, sizeof(aLine), fin) != NULL) {
       if(aLine[0] == '#') continue; // ignore lines beginning with #
+      if(aLine[0] == '\n') continue; // ignore lines beginning with \newline
 
       sscanf(aLine,"%u",&i);
-      polygon.push_back(i);
-      points[i].v = counter;
-
-      ++counter;
+      if (sph[sph_index].size() == 0) {
+        sph[sph_index].push_back(i);
+        points[i].v = counter;
+        ++counter;
+      }
+      else {
+        if (i == sph[sph_index][0]) ++sph_index;
+        else {
+          sph[sph_index].push_back(i);
+          points[i].v = counter;
+          ++counter;
+        }
+      }
     }
   }
   else if (fin == NULL) {
@@ -152,6 +200,12 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
     case OF_DAT:
       fprintf(fout, "# X   Y\n");
       for (unsigned int i = 0; i < points.size(); ++i)
+        fprintf(fout, "  %lf   %lf\n", points[polygon[i]].x, points[polygon[i]].y);
+      fprintf(fout, "  %lf   %lf\n", points[polygon[0]].x, points[polygon[0]].y);
+      break;
+    case OF_LINE:
+      fprintf(fout, "%lu\n", polygon.size());
+      for (unsigned int i = 0; i < polygon.size(); ++i)
         fprintf(fout, "  %lf   %lf\n", points[polygon[i]].x, points[polygon[i]].y);
       fprintf(fout, "  %lf   %lf\n", points[polygon[0]].x, points[polygon[0]].y);
       break;
@@ -263,7 +317,7 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
       case OF_PERM:
         fprintf(fout, "#Polygon: %u\n", j+1);
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "%u\n", points[sph[j][i]].v);
+          fprintf(fout, "%u\n", sph[j][i]);
         fprintf(fout, "\n");
         break;
       case OF_POLY:
@@ -280,6 +334,12 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
           fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
         fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
         fprintf(fout, "\n\n");
+        break;
+      case OF_LINE:
+        fprintf(fout, "%lu\n", sph[j].size());
+        for (unsigned int i = 0; i < sph[j].size(); ++i)
+          fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
         break;
       case OF_PURE:
         for (unsigned int i = 0; i < sph[j].size(); ++i)

@@ -78,7 +78,7 @@ enum error heap2(std::vector<unsigned int>& polygon, int n, bool& intersects,
       if (it != seen.end()) return SUCCESS;
       std::pair<E_Edge, enum error> result = simple_pol_check2(polygon, points);
       if (result.second == SUCCESS) {
-        //std::cerr << "simple polygon: ";
+        std::cerr << "simple polygon: ";
         //for(unsigned int i = 0; i < polygon.size(); ++i) std::cerr << polygon[i] << ",";
         //std::cerr << "\n";
         char tempOutFile[255];
@@ -87,6 +87,7 @@ enum error heap2(std::vector<unsigned int>& polygon, int n, bool& intersects,
         if (returnValue != SUCCESS) std::cerr << "Error writing polygon file!" << std::endl;
         counter++;
       }
+      //else std::cerr << "check: non-simple" << std::endl;
       //std::cerr << "inserting: " << polygon[polygon.size()-2] << std::endl;
       seen.insert(polygon[polygon.size()-2]);
     }

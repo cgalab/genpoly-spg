@@ -17,12 +17,12 @@
 #include "elapsed.h"
 
 // 2opt that restarts at index 0 when an intersection is found.
-enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
   double duration = 0;
 	// initialise and create a random permutation for the polygon
-	createRandPol(polygon, points, randseed);
-  //createCHRandPol(polygon, points, randseed);
+	createRandPol(polygon, points);
+  //createCHRandPol(polygon, points);
   //pdisplay(polygon, points);
   //assert(1 == 0);
 
@@ -126,14 +126,14 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       //process first edge
       if (*e1.p2 == *p1) {
 //        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
-        val1.first = removeEdgeFromSetf(e1, lowest_index, edgeS, polygon, points);
+        val1.first = removeEdgeFromSetf(e1, p1, lowest_index, edgeS, polygon, points);
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
           if (val1.first == E_INTERSECTION) ++count_intersections;
           else ++count_coll;
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if (*e2.p2 == *p1) {
-            val1_2 = removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
+            val1_2 = removeEdgeFromSetf(e2, p1, lowest_index, edgeS, polygon, points);
             if (val1_2 == E_NOT_VALID) break;
           }
           loop=true;break;
@@ -154,7 +154,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
       // process second edge
       if (*e2.p2 == *p1) {
 //        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
-        val2.first = removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
+        val2.first = removeEdgeFromSetf(e2, p1, lowest_index, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
         if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
           if (val2.first == E_INTERSECTION) ++count_intersections;
@@ -168,7 +168,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         if ((val2.first == E_INTERSECTION) || (val2.first == E_COLLINEAR)) {
           if (val2.first == E_INTERSECTION) ++count_intersections;
           else ++count_coll;
-          val2_1 = removeEdgeFromSetf(e1, lowest_index, edgeS, polygon, points);
+          val2_1 = removeEdgeFromSetf(e1, p1, lowest_index, edgeS, polygon, points);
           if (val2_1 == E_NOT_VALID) break;
           loop=true;break;
         }

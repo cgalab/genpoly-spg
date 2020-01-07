@@ -465,21 +465,29 @@ void fill_lex(std::vector<unsigned int>& lex, std::vector<unsigned int>& polygon
 // simple function to display points in a Point vector.
 void pdisplay (const std::vector<Point>& p) {
   for (unsigned int i = 0; i < p.size(); ++i) {
-    std::cerr << p[i] << std::endl;
+    std::cout << p[i] << std::endl;
   }
 }
 
 // simple function to display points in a Point vector.
 void pdisplay (const std::vector<unsigned int>& ind, const std::vector<Point>& p) {
   for (unsigned int i = 0; i < ind.size(); ++i) {
-    std::cerr << p[ind[i]] << std::endl;
+    std::cout << p[ind[i]] << std::endl;
+  }
+}
+
+// simple function to display points in a Point vector.
+void pdisplay (const std::vector<std::vector<unsigned int>>& sph, const std::vector<Point>& p) {
+  for (unsigned int i = 0; i < sph.size(); ++i) {
+    for (unsigned int j = 0; j < sph[i].size(); ++j)
+      std::cout << p[sph[i][j]] << std::endl;
   }
 }
 
 // function to display points from one vertex to another
 void pdisplay (unsigned int start, unsigned int stop, const std::vector<unsigned int>& ind, const std::vector<Point>& p) {
   for (unsigned int i = start; i != (stop+1)%p.size(); i = (i+1)%p.size()) {
-    std::cerr << p[ind[i]] << std::endl;
+    std::cout << p[ind[i]] << std::endl;
   }
 }
 

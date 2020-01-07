@@ -13,72 +13,49 @@ public:
   unsigned int i; // index in input file
   unsigned int v; // index in polygon
   unsigned int l; // index in lexicographical order.
+  unsigned int p; // index in 'sph'
 
-  Point() {x=0; y=0; i=0; v=0;l=0;}
-  Point(const Point& p) {x=p.x;y=p.y;i=p.i;v=p.v;l=p.l;}
-  Point(double X, double Y) {x=X;y=Y;i=0;v=0;l=0;}
-  Point(double X, double Y, unsigned int I) {x=X;y=Y;i=I;v=0;l=0;}
-  Point(double X, double Y, unsigned int I, unsigned int V) {x=X;y=Y;i=I;v=V;l=0;}
-  Point(double X, double Y, unsigned int I, unsigned int V, unsigned int L) {x=X;y=Y;i=I;v=V;l=L;}
-  void set(Point p) {x=p.x; y=p.y; i=p.i; v=p.v;l=p.l;}
+  Point() {x=0; y=0; i=0; v=0;l=0;p=0;}
+  Point(const Point& P) {x=P.x;y=P.y;i=P.i;v=P.v;l=P.l;p=P.p;}
+  Point(double X, double Y) {x=X;y=Y;i=0;v=0;l=0;p=0;}
+  Point(double X, double Y, unsigned int I) {x=X;y=Y;i=I;v=0;l=0;p=0;}
+  Point(double X, double Y, unsigned int I, unsigned int V) {x=X;y=Y;i=I;v=V;l=0;p=0;}
+  Point(double X, double Y, unsigned int I, unsigned int V, unsigned int L) {x=X;y=Y;i=I;v=V;l=L;p=0;}
+  Point(double X, double Y, unsigned int I, unsigned int V, unsigned int L, unsigned int P) {x=X;y=Y;i=I;v=V;l=L;p=P;}
+  void set(Point P) {x=P.x; y=P.y; i=P.i; v=P.v;l=P.l;p=P.p;}
   void set(double X, double Y) {x=X; y=Y;}
   void set(double X, double Y, unsigned int I) {x=X; y=Y; i=I;}
   void set(double X, double Y, unsigned int I, unsigned int V) {x=X; y=Y; i=I; v=V;}
   void set(double X, double Y, unsigned int I, unsigned int V, unsigned int L) {x=X; y=Y; i=I; v=V;l=L;}
+  void set(double X, double Y, unsigned int I, unsigned int V, unsigned int L, unsigned int P) {x=X; y=Y; i=I; v=V;l=L;p=P;}
   void setX(double X) {x=X;}
   void setY(double Y) {y=Y;}
   void setI(unsigned int I) {i=I;}
   void setV(unsigned int V) {v=V;}
   void setL(unsigned int L) {l=L;}
+  void setP(unsigned int P) {p=P;}
   //void printCoord(){
   //  printf("x=%f y=%f \n", x, y);
   //}
 
   // function to compare 2 points based on y axis first, then x.
   bool lessY (const Point& s) const {
-/*
-    if (fabs(y - s.y) < EPSILON) {
-      if (fabs(x - s.x) < EPSILON) return false;
-      else return (x < s.x);
-    }
-    else return (y < s.y);
-*/
     if (y == s.y) return (x < s.x);
     return (y < s.y);
   }
 
   // first priority is the x axis comparison, then y.
   bool operator < (const Point& s) const {
-//    std::cerr << "in < comparison" << std::endl;
-//    if (fabs(x - s.x) < EPSILON) {
-//      if (fabs(y - s.y) < EPSILON) return false;
-//      else return (y < s.y);
-//    }
-//    else return (x < s.x);
     if (x == s.x) return (y < s.y);
     return (x < s.x);
   }
 
   bool operator > (const Point& s) const {
-/*
-    if (fabs(x - s.x) < EPSILON) {
-      if (fabs(y - s.y) < EPSILON) return false;
-      else return (y > s.y);
-    }
-    else return (x > s.x);
-*/
     if (x == s.x) return (y > s.y);
     return (x > s.x);
   }
 
   bool operator == (const Point& s) const {
-//    std::cerr << "x comp: abs(" << x << " - " << s.x << ") = " <<  fabs(x - s.x) << std::endl;
-//    std::cerr << "y comp: abs(" << y << " - " << s.y << ") = " <<  fabs(y - s.y) << std::endl;
-
-/*
-    if ((fabs(x - s.x) < EPSILON) && (fabs(y - s.y)) < EPSILON) return true;
-    else return false;
-*/
     if ((x == s.x) && (y == s.y)) return true;
     return false;
   }
@@ -88,23 +65,13 @@ public:
     return (x <= s.x);
   }
 
-/*
-  friend bool operator==(const Point & lhs, const Point & rhs) {
-    if ((abs(lhs.x - rhs.x) < EPSILON) && (abs(lhs.y - rhs.y)) < EPSILON) return true;
-    else return false;
-  }
-*/
   friend bool operator!=(const Point & lhs, const Point & rhs) {
-/*
-    if ((fabs(lhs.x - rhs.x) > EPSILON) || (fabs(lhs.y - rhs.y)) > EPSILON) return true;
-    else return false;
-*/
     if ((lhs.x == rhs.x) && (lhs.y == rhs.y)) return false;
     return true;
   }
 
-  friend std::ostream& operator<<(std::ostream& os, const Point& p) {
-  os << "(" << p.x << "," << p.y << "), [" << p.i << "," << p.v << "," << p.l << "]";
+  friend std::ostream& operator<<(std::ostream& os, const Point& P) {
+  os << "(" << P.x << "," << P.y << "), [" << P.i << "," << P.v << "," << P.l << "," << P.p << "]";
   return os;
   }
 };
@@ -139,6 +106,7 @@ void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points);
 void fill_lex(std::vector<unsigned int>& lex, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void pdisplay (const std::vector< Point >& vy);
 void pdisplay (const std::vector<unsigned int>& ind, const std::vector<Point>& p);
+void pdisplay (const std::vector<std::vector<unsigned int>>& sph, const std::vector<Point>& p);
 void pdisplay (unsigned int start, unsigned int stop, const std::vector<unsigned int>& ind, const std::vector<Point>& p);
 double getXmin(const std::vector<Point>& p);
 double getXmax(const std::vector<Point>& p);

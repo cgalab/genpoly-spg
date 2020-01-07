@@ -18,12 +18,12 @@
 
 // Version of BO-2opt that reverses to a lower index as well as saves the sweep-line status in case no intersections occurred going back.
 
-enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
   double duration = 0;
   enum planesweep_t p_status = P_CLEAN;
 	// initialise and create a random permutation for the polygon
-	createRandPol(polygon, points, randseed);
+	createRandPol(polygon, points);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'
@@ -148,7 +148,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e1.p1)) )
       {
 //        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
-        val1.first = removeEdgeFromSetf(e1, lowest_index, edgeS, polygon, points);
+        val1.first = removeEdgeFromSetf(e1, p1, lowest_index, edgeS, polygon, points);
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) { // intersection found in the removal, skip the rest and restart.
           if (val1.first == E_INTERSECTION) ++count_intersections;
@@ -160,7 +160,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
             || ((p_status == P_DIRTY_RIGHT) && (*p1 == *e2.p2))
             || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e2.p1)) )
           {
-            val1_2 = removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
+            val1_2 = removeEdgeFromSetf(e2, p1, lowest_index, edgeS, polygon, points);
             if (val1_2 == E_NOT_VALID) break; // the other conditions would be handled when handling 'e2' properly.  This error though has priority.
           }
           if (val1.first == E_COLLINEAR) {
@@ -211,8 +211,8 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
           loop=true;
           if ((p_status == P_CLEAN) &&  revert) rev_found = true;
           if ((p_status == P_CLEAN) && !revert) {
-            removeEdgeFromSetf(e1, lowest_index, edgeS, polygon, points);
-            removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
+            removeEdgeFromSetf(e1, p1, lowest_index, edgeS, polygon, points);
+            removeEdgeFromSetf(e2, p1, lowest_index, edgeS, polygon, points);
             edgeS_old = edgeS;rev_found=false;old_index=index;
             revert=true;
             ++count_reversals;
@@ -228,7 +228,7 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
         || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e2.p1)) )
       {
 //        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
-        val2.first = removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
+        val2.first = removeEdgeFromSetf(e2, p1, lowest_index, edgeS, polygon, points);
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_COLLINEAR) {
           ++count_coll;
@@ -261,13 +261,13 @@ enum error opt2c(std::vector<unsigned int>& polygon, std::vector<Point>& points,
           //  || ((p_status == P_DIRTY_LEFT)  && (*p1 == *e1.p2)) )
           //{
           //std::cerr << "removing e1: " << e1 << std::endl;
-          val2_1 = removeEdgeFromSetf(e1, lowest_index, edgeS, polygon, points);
+          val2_1 = removeEdgeFromSetf(e1, p1, lowest_index, edgeS, polygon, points);
           if (val2_1 == E_NOT_VALID) break;
           //}
           loop=true;
           if ((p_status == P_CLEAN) &&  revert) rev_found = true;
           if ((p_status == P_CLEAN) && !revert) {
-            removeEdgeFromSetf(e2, lowest_index, edgeS, polygon, points);
+            removeEdgeFromSetf(e2, p1, lowest_index, edgeS, polygon, points);
             edgeS_old = edgeS;rev_found=false;old_index=index;
             revert=true;
             ++count_reversals;

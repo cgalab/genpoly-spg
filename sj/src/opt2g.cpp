@@ -18,12 +18,12 @@
 
 // 2opt version that reverses if an intersection is found.
 // If a 3 point collinearity is found, it solves those independently from intersections and 4 point collinearities.
-enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int randseed) {
+enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
   double duration = 0;
   enum planesweep_t p_status = P_CLEAN;
 	// initialise and create a random permutation for the polygon
-	createRandPol(polygon, points, randseed);
+	createRandPol(polygon, points);
 
 	// the point set 'points' now has x/y coordinates as well as
 	// original input index of points in 'i' and polygon index in 'v'

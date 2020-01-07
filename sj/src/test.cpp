@@ -261,6 +261,83 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
   std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
 
+  p1.set(-0.048828125000000,  0.4865722656250000,23769,0,0);
+  p2.set(-0.046386718750000,  0.4807128906250000,23865,0,0);
+  p3.set(-0.048828125000000,  0.4865722656250000,23769,0,0);
+  p4.set(0.3793945312500000,  0.1247558593750000,40967,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.048828125000000,  0.4865722656250000,23769,0,0);
+  p2.set(-0.046386718750000,  0.4807128906250000,23865,0,0);
+  p3.set(-0.046875000000000,  0.4846191406250000,23845,0,0);
+  p4.set(-0.044921875000000,  0.4797363281250000,23919,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.048828125000000,  0.4865722656250000,23769,0,0);
+  p2.set(0.3793945312500000,  0.1247558593750000,40967,0,0);
+  p3.set(-0.046875000000000,  0.4846191406250000,23845,0,0);
+  p4.set(-0.044921875000000,  0.4797363281250000,23919,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.048828125000000,  0.4865722656250000,23769,0,0);
+  p2.set(-0.046386718750000,  0.4807128906250000,23865,0,0);
+  p3.set(-0.046875000000000,  0.4846191406250000,23845,0,0);
+  p4.set(-0.046386718750000,  0.4841308593750000,23866,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.048828125000000,  0.4865722656250000,23769,0,0);
+  p2.set(0.3793945312500000,  0.1247558593750000,40967,0,0);
+  p3.set(-0.046875000000000,  0.4846191406250000,23845,0,0);
+  p4.set(-0.046386718750000,  0.4841308593750000,23866,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.55224609375,0.006103515625, 26,0,0);
+  p2.set(-0.1552734375,0.259033203125, 18195,0,0);
+  p3.set(-0.552734375,0.006103515625, 21,0,0);
+  p4.set(-0.001953125,0.371337890625, 25348,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.55224609375,0.006103515625, 26,0,0);
+  p2.set(-0.1552734375,0.259033203125, 18195,0,0);
+  p3.set(-0.552734375,0.006103515625, 21,0,0);
+  p4.set(0.22705078125,-0.086181640625, 36131,0,0);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
   std::cerr << std::endl;
   std::cerr << "=== checkIntersection tests ===" << std::endl;
   std::cerr << "=== 'should be true' is a comparison 'itest >= IS_TRUE' : true when intersection exists ===" << std::endl;
@@ -795,16 +872,65 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
   std::cerr << "det(e2, p1)       : " << det(e2, p1) << std::endl;
-  std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
+  std::cerr << "orient2d(pd,pc,pa): " << orient2d(pd,pc,pa) << std::endl;
 
   std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
   std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
-  std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
+  std::cerr << "orient2d(pd,pc,pb): " << orient2d(pd,pc,pb) << std::endl;
 
   std::cerr << "reldist(e1, p3): " << reldist(e1, p3) << std::endl;
   std::cerr << "reldist(e1, p4): " << reldist(e1, p4) << std::endl;
   std::cerr << "reldist(e2, p1): " << reldist(e2, p1) << std::endl;
   std::cerr << "reldist(e2, p2): " << reldist(e2, p2) << std::endl;
+
+
+  pa.x = 1; pa.y = 1;
+  pb.x = 2; pb.y = 2;
+  pc.x = 1; pc.y = 1;
+  pd.x = 1; pd.y = 2;
+  p1.set(1, 1);
+  p2.set(2, 2);
+  p3.set(1, 1);
+  p4.set(1, 2);
+
+  e1.set(p1,p2);
+  e2.set(p3,p4);
+
+  std::cerr << "pa.x: " << pa.x << ", pa.y: " << pa.y << std::endl;
+  std::cerr << "pb.x: " << pb.x << ", pb.y: " << pb.y << std::endl;
+  std::cerr << "pc.x: " << pc.x << ", pc.y: " << pc.y << std::endl;
+  std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
+
+  std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+  std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
+  std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
+  std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
+
+  pa.x = 1; pa.y = 1;
+  pb.x = 2; pb.y = 2;
+  pc.x = 1; pc.y = 2;
+  pd.x = 2; pd.y = 2;
+  p1.set(1, 1);
+  p2.set(2, 2);
+  p3.set(1, 2);
+  p4.set(2, 2);
+
+  e1.set(p1,p2);
+  e2.set(p3,p4);
+
+  std::cerr << "pa.x: " << pa.x << ", pa.y: " << pa.y << std::endl;
+  std::cerr << "pb.x: " << pb.x << ", pb.y: " << pb.y << std::endl;
+  std::cerr << "pc.x: " << pc.x << ", pc.y: " << pc.y << std::endl;
+  std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
+
+  std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+  std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
+  std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
+  std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
 
   //========================
 
@@ -816,6 +942,44 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p2.set(-0.3623046875,  0.21240234371874361);
   p3.set(-0.36328125,    0.21240234371874361);
   p4.set(-0.361328125,   0.21240234371874361);
+
+  e1.set(p1,p2);
+  e2.set(p3,p4);
+
+  std::cerr << "pa.x: " << pa.x << ", pa.y: " << pa.y << std::endl;
+  std::cerr << "pb.x: " << pb.x << ", pb.y: " << pb.y << std::endl;
+  std::cerr << "pc.x: " << pc.x << ", pc.y: " << pc.y << std::endl;
+  std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
+
+  std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+
+  std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
+  std::cerr << "det(e1, p4)       : " << det(e1, p4) << std::endl;
+  std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
+
+  std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
+  std::cerr << "det(e2, p1)       : " << det(e2, p1) << std::endl;
+  std::cerr << "orient2d(pd,pc,pa): " << orient2d(pd,pc,pa) << std::endl;
+
+  std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
+  std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
+  std::cerr << "orient2d(pd,pc,pb): " << orient2d(pd,pc,pb) << std::endl;
+
+  std::cerr << "reldist(e1, p3): " << reldist(e1, p3) << std::endl;
+  std::cerr << "reldist(e1, p4): " << reldist(e1, p4) << std::endl;
+  std::cerr << "reldist(e2, p1): " << reldist(e2, p1) << std::endl;
+  std::cerr << "reldist(e2, p2): " << reldist(e2, p2) << std::endl;
+
+  pa.x = 0; pa.y = 0.4;
+  pb.x = 0.8;  pb.y = 0.9;
+  pc.x = 0;    pc.y = 0.6;
+  pd.x = 0;   pd.y = 1;
+  p1.set(0, 0.4);
+  p2.set(0.8,  0.9);
+  p3.set(0,    0.6);
+  p4.set(0,   1);
 
   e1.set(p1,p2);
   e2.set(p3,p4);
@@ -857,6 +1021,11 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   double ang2 = atan2(p3.y - p1.y, p3.x - p1.x);
   double delta = ang2 - ang1;
   std::cerr << "ang1: " << ang1 << ", ang2: " << ang2 << ", delta: " << delta << std::endl;
+
+  std::cerr << "=== misc tests ===" << std::endl;
+
+  std::cerr << 0*-1 << " == " << 0 << " : " << ((0*-1 == 0) ? "true" : "false") << std::endl;
+  std::cerr << -0.0 << " == " << 0 << " : " << ((0*-1 == 0) ? "true" : "false") << std::endl;
 
 
   // test the time difference between det and orient2d
