@@ -1,0 +1,167 @@
+1. Verteilung der Entfernungen zum Urpsrung:
+
+	Warum:
+		- Zur Überprüfung wie gut das Startpolygon noch zu "sehen" ist.
+
+	Wie:
+		- Für jeden Punkt Abstand zum Urpsrung berechnen
+		- Startpolygon hatte eine Mittelwert, der dem Radius r des Kreises entspricht
+			und Standardabweichung 0
+		- Abweichung s vom Startkreis berechnen, dh Standardabweichung mit Mittelwert r
+		- Verteilung von s über viele Polygone betrachten
+
+	Erwartung:
+		- 0 <= s <= b - r (b ist die halbe Seitenlänge der Bounding Box)
+		- Etwas annähernd normal verteiltes innerhalb des gegebenen Intervals, definitiv keine
+			starke Anhäufung in der Nähe von 0
+
+	Problem:
+		- Wenn man das Startpolygon insgesamt in eine Richtung verschiebt, würde dieses
+			Kriterium ein gutes Ergebnis anzeigen, dh. das Kriterium betrachtet absolut
+			nicht die Form des Polygons, sondern nur die Lage
+		- Möglicherweise könnte man statt des Abstands zum Ursprung den Abstand zum Massen-
+			schwerpunkt verwenden
+
+
+2. Maximale Eindrehung:
+
+	Warum:
+		- Misst wie stark die Form des Polygons maximal von einem regelmäßigen Polygon abweicht
+
+	Wie:
+		- Durchschnittlicher Innenwinkel µ = pi (1 - 2 / n) für ein n-gon (entspricht dem Innen-
+			winkel des regelmäßigen Polygons)
+		- Innenwinkel alpha_i am Vertex i
+		- Abweichung des Innenwinkels vom Schnitt beta_i = alpha_i - µ
+		- Akkumulierte Abweichung am Vertex i: phi_i = summe(1, i, beta_i)
+		- Maximale Abweichung: a = (abs(max(phi_i)) + abs(min(phi_i))) / 2
+
+	Erwartung:
+		- a = 0 bedeutet, dass das Polygon regelmäßig ist (zumindest in Bezug auf Winkel)
+		- 0 <= a < pi (n / 2 - 2 / n) !? (Spirale, die auf eine Linie konvergiert)
+		- Möglichst breite Verteilung, nicht nahe an 0
+		- Breite der Verteilung sollte mit steigendem n auch steigen
+
+	Problem:
+		- Genaue Interpretation eines Wertes ist schwierig
+
+
+3. Anzahl an Orientierungswechsel:
+
+	Warum:
+		- Gibt Einsicht in die Anzahl der Verdrehung (im Gegensazt zu K2, welches nur die maximale
+			Verdrehung betrachtet)
+
+	Wie:
+		- Untersuchung wie oft die polygonal chain zwischen Uhrzeigersinn und gegen den Uhrzeiger-
+			sinn wechselt
+		- Innenwinkel kleiner pi bedeutet Uhrzeigersinn, größer pi gegen Uhrzeigersinn (oder anders-
+			rum je nach Orientierung)
+		- Solange Winkel in dieselbe Richtung aufeinander folgen findet kein Wechsel der Orientierung
+			statt, sobald ein Winkel in die andere Richtung geht, findet ein Wechsel statt
+		- Anzahl kann durch einfaches gehen um das Polygon abgezählt werden
+
+	Erwartung:
+		- Die Anzahl ist durch 0 nach unten beschränkt (konvexes Polygon) und durch n nach oben (zB
+			richtige Sterne)
+		- Was wir sehen wollen: etwas näherungsweise normal verteiltes zwischen den Schranken?!
+
+
+4. Veränderung pro k Versuche:
+
+	Warum:
+		- Es könnte sein, dass irgendwann das Polygon so verdreht ist, dass weitere Verschiebungen
+			kaum mehr möglich sind, dh. eine sehr große Menge von Verschiebungen wird abgelehnt oder
+			ist nur noch wintzig klein
+
+	Wie:
+		- Messung über eine Spanne von k Verschiebungsversuche
+		- Summiere die Längen aller ausgeführter Verschiebungen auf
+
+	Erwartung:
+		- Die Summe sollte mit zunehmender Anzahl an Vertices abnehmen
+		- Bei gleichbleibender Vertex Anzahl sollte die Summe im Laufe der Zeit abnehmen, dh. weitere
+			Verschiebungen führen nur noch zu sehr geringen Veränderungen
+
+
+5. Sinuosität:
+
+	Warum:
+		- Maß dafür, wie weit das Polygon von einem Kreis abweicht
+
+	Wie:
+		- Quotient aus Umfang des Polygons und möglicherweise dem Umfang des Startpolygons bzw des
+			zugehörigen Kreises
+		- Alternativ könnte man den Schwerpunkt berechnen und die mittlere Abwechung der Vertices
+			vom Schwerpunkt und diesen Wert als Radius verwenden
+
+	Erwartung:
+		- Bei Methode mit Schwerpunkt wäre 1 die untere Schranke, andernfalls existiert keine untere
+			Schranke (bzw ein bisschen weniger als 1)
+		- Es existiert keine obere Schranke
+		- Irgendwas näherungsweise normal verteiltes?!
+
+
+
+
+
+
+
+
+2. Filling of the bounding box
+	Why:
+		- it should be possible to generate polygons with convex hulls that are not close
+			to the bounding box
+	How:
+		1. Idea:
+			- simply compute the mean of all vertex coordinates and take a look at the distance
+				to the origin
+			- advantage: really simple to compute
+			- disadvantage: even if most points are in the first and the third quadrant, a few points in
+				in the second and no points (and also no edges) are in the fourth quadrant, the mean
+				of the coordinates could be very close to the origin
+		2. Idea:
+			- compute the center of gravity of the polygon and take a look at the distances to the origin
+			- can potentially be done by computing the center of gravity of all triangles inside the polygon
+				and then computing the area weighted sum of these centers
+			- advantages: at least in cases like the above mentioned the center of gravity will diverge from
+				the origin
+			- disadvantages: it could be hard to find all triangles inside the polygon; maybe this measure
+				also tends to the origin
+		3. Idea:
+			- compute the area inside the polygon and outside the polygon for each quadrant
+			- could easily be done by giving each triangle a property which determines, whether it lives inside
+				or outside the polygon
+			- expectation: hugh differences between the quadrants should be possible
+			- advantages: basically easy to determine in linear time
+			- disadvantages: does not rdirectly give information concerning the convex hull; what about
+				partially living in multiple quandrants?
+
+
+3. Enclosure of the holes
+	Why: 
+		- the holes should be well enclosed by the polygon, i.e. the polygon should be very close to the holes
+			(at least at some points) and should also fill some of the inconvexities of the holes
+	How:
+		- measure area between polygon and holes
+		- therefore label triangles with outside, inside and in hole
+
+	Expectation:
+		- maybe small area compared to the area of the holes?!
+
+	Disadvantage:
+		- also includes area of polygon parts which are far away from the holes
+
+
+
+5. Distribution of angles
+	Why:
+		- A broad distribution of the angles is far away from the start polygon and makes interlacing likely
+		- Also maybe a broad distribution might be interesting for testing
+	How:
+		- Sum of inside angles is pi * (n - 2)
+		- Mean angle and angles of the startpolygon are pi * (1 - 2 / n) (also roughly the upper bound for the
+			standard deviation for larger n)
+		- Compute angle standard deviation for each polygon
+		- Standard deviations for more polygons should roughly yield a single-sided normal distribution around 0
+
