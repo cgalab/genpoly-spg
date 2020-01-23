@@ -10,7 +10,7 @@
 #include "edge.h"
 #include "curve.h"
 #include "pol.h"
-#include "opt2g.h" //needed to create polygons.
+#include "opt2.h" //needed to create polygons.
 #include "rand.h"
 #include "simple_pol_check.h"
 
@@ -64,12 +64,9 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
   if (nr_inner > 3) {
     //std::vector<unsigned int> polygon;
     std::vector<Ends> ends;
-
-    bool generate_polygons;
     unsigned int total_holes = 0;
 
-    if (sph[0].size() == 0) generate_polygons = true;
-    else generate_polygons = false;
+    if (sph[0].size() == 0) return UNEXPECTED_ERROR;
 //    std::cerr << "generate polygons: " << ((generate_polygons) ? "true" : "false") << std::endl;
 
     // loop that would iterate over seeds to generate different simple polygons until nr_holes is reached,
@@ -77,10 +74,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
     do {
       //if (sph.size() > 0) sph.clear();
       // get a simple polygon to work with.
-      if (generate_polygons) {
-//        std::cerr << "generating a new polygon." << std::endl;
-        opt2g(sph[0], points);
-      }
+
       // assign the polygon to sph[0] as sph[0] should always contain the simple polygon, and any/all holes are pushed below it.
       //sph.push_back(polygon);
 //      std::cerr << "=== The points in the simple polygon permutation ===" << std::endl;
@@ -258,7 +252,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
 //      std::cerr << "generate polygons?: " << ((generate_polygons) ? "true" : "false") << std::endl;
 //      std::cerr << "iteration: " << count_iterations << std::endl;
 //      std::cerr << "found holes: " << count_holes << std::endl;
-    } while (generate_polygons && (count_iterations < max_iterations) && (count_holes < nr_holes));
+    } while ((count_iterations < max_iterations) && (count_holes < nr_holes));
 
 //    std::cerr << "wanted holes:" << nr_holes << ", found holes: " << count_holes << std::endl;
 //    std::cerr << "backup holes: " << backup_holes.size() << std::endl;

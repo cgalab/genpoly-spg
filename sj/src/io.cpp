@@ -116,7 +116,7 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
   return returnValue;
 }
 
-
+// Function to handle '-p <string>' argument which imports the polygons from the filename in <string> to 'sph'
 enum error readvFile(char *vFile, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
   enum error returnValue = SUCCESS;
   unsigned int sph_index = 0;
@@ -290,73 +290,84 @@ enum error writeOutIntFile(char *outFile, out_format_t outFormat, bool writeNew,
 }
 
 enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, std::vector< std::vector<unsigned int> >& sph, std::vector<Point>& points) {
-  FILE *fout;
+  enum error returnValue = SUCCESS;
+  FILE *fout = NULL;
+  bool writeToFile = false;
 
-  if(writeNew) {
-    fout = fopen(outFile, "r");
+  if (outFile[0] != 0) {
+    writeToFile = true;
+    if(writeNew) { // need to check if the file already exists
+      fout = fopen(outFile, "r");
 
-    if(fout != NULL) {
-      //fprintf(stderr, "outFile already exists, need to create a new file\n");
+      if(fout != NULL) {
+        //fprintf(stderr, "outFile already exists, need to create a new file\n");
 
-      int counter = 0;
-      char tempOutFile[255];
+        int counter = 0;
+        char tempOutFile[255];
 
-      do {
-        snprintf(tempOutFile, sizeof(tempOutFile), "%s%d", outFile, counter);
-        fout = fopen(tempOutFile, "r");
-        ++counter;
-      } while (fout != NULL);
-          strcpy(outFile, tempOutFile);
+        do {
+          snprintf(tempOutFile, sizeof(tempOutFile), "%s%d", outFile, counter);
+          fout = fopen(tempOutFile, "r");
+          ++counter;
+        } while (fout != NULL);
+            strcpy(outFile, tempOutFile);
+      }
     }
+    fout = fopen(outFile, "w");
   }
-
-  fout = fopen(outFile, "w");
 
   for (unsigned int j = 0; j < sph.size(); ++j) {
     switch(outFormat) {
       case OF_PERM:
-        fprintf(fout, "#Polygon: %u\n", j+1);
+        writeToFile ? fprintf(fout, "#Polygon: %u\n", j+1) : fprintf(stdout, "#Polygon: %u\n", j+1);
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "%u\n", sph[j][i]);
-        fprintf(fout, "\n");
+          writeToFile ? fprintf(fout, "%u\n", sph[j][i]) : fprintf(stdout, "%u\n", sph[j][i]);
+        writeToFile ? fprintf(fout, "\n") : fprintf(stdout, "\n");
         break;
       case OF_POLY:
-        if (j == 0) fprintf(fout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
-        fprintf(fout, "%lu\n", sph[j].size());
+        if (j == 0) {
+          writeToFile ? fprintf(fout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points)) : fprintf(stdout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
+        }
+        writeToFile ? fprintf(fout, "%lu\n", sph[j].size()) : fprintf(stdout, "%lu\n", sph[j].size());
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
-        fprintf(fout, "\n");
+          writeToFile ? fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        writeToFile ? fprintf(fout, "\n") : fprintf(stdout, "\n");
         break;
       case OF_DAT:
-        fprintf(fout, "# (index %u)\n", j);
-        fprintf(fout, "# X   Y\n");
+        writeToFile ? fprintf(fout, "# (index %u)\n", j) : fprintf(stdout, "# (index %u)\n", j);
+        writeToFile ? fprintf(fout, "# X   Y\n") : fprintf(stdout, "# X   Y\n");
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
-        fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
-        fprintf(fout, "\n\n");
+          writeToFile ? fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        writeToFile ? fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y) : fprintf(stdout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
+        writeToFile ? fprintf(fout, "\n\n") : fprintf(stdout, "\n\n");
         break;
       case OF_LINE:
-        fprintf(fout, "%lu\n", sph[j].size());
+        writeToFile ? fprintf(fout, "%lu\n", sph[j].size()) : fprintf(stdout, "%lu\n", sph[j].size());
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
-        fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
+          writeToFile ? fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        writeToFile ? fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y) : fprintf(stdout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
         break;
       case OF_PURE:
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
-        fprintf(fout, "\n");
+          writeToFile ? fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        writeToFile ? fprintf(fout, "\n") : fprintf(stdout, "\n");
         break;
       case OF_PURE_AND_PERM:
         std::cerr << "Should not be handled by this function." << std::endl;
+        returnValue = UNEXPECTED_ERROR;
         break;
       case OF_UNDEFINED:
-        std::cerr << "output format undefined.  Use -? for help." << std::endl;
+        //std::cerr << "output format undefined.  Use -H for help." << std::endl;
+        returnValue = READ_ERROR_OFORMAT;
         break;
       default:
         std::cerr << "unknown error writing output" << std::endl;
+        returnValue = WRITE_ERROR;
         break;
     }
   }
-  fclose(fout);
-  return SUCCESS;
+  if (writeToFile) {
+    fclose(fout);
+  }
+  return returnValue;
 }

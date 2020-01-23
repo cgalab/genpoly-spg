@@ -230,7 +230,7 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
       if (bef) {
         isval = checkIntersection(e, before);
         if (isval >= IS_TRUE) {
-          std::cerr << "Processing: Intersection found between: " << e << " and " << before << std::endl;
+//          std::cerr << "Processing: Intersection found between: " << e << " and " << before << std::endl;
           valid = E_NOT_VALID;
         }
       }
@@ -238,7 +238,7 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
       if (af && (valid == E_VALID)) {
         isval = checkIntersection(e, after);
         if (isval >= IS_TRUE) {
-          std::cerr << "Processing: Intersection found between: " << e << " and " << after << std::endl;
+//          std::cerr << "Processing: Intersection found between: " << e << " and " << after << std::endl;
           valid = E_NOT_VALID;
         }
       }
@@ -247,15 +247,15 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
       // edge already existed in set.
       // this can happen if an index is going backwards through the lex. order of points.
       // but if it's reversing and it hits an edge already in, earlier code should have caught it and removed it.
-      std::cerr << "Error: Edge already exists in set!" << std::endl;
-      std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
+//      std::cerr << "Error: Edge already exists in set!" << std::endl;
+//      std::cerr << "edge: " << e << ", returned: " << *retval.first << std::endl;
       valid = E_NOT_VALID;
     }
   }
   else {
-    std::cerr << "Error: Iterator did not return same edge." << std::endl;
-    std::cerr << "Edge: " << e << std::endl;
-    std::cerr << "*it" << *retval.first << std::endl;
+//    std::cerr << "Error: Iterator did not return same edge." << std::endl;
+//    std::cerr << "Edge: " << e << std::endl;
+//    std::cerr << "*it" << *retval.first << std::endl;
     valid = E_NOT_VALID;
   }
 
