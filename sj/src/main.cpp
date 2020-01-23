@@ -48,6 +48,7 @@ int main(int argc, char *argv[]) {
   bool calcArea = false;  // calculate and return the area
   bool calcCircumference = false; // calculate and return the circumference.
   bool checkSimple = false; // only verify a given point set and polygon is simple.
+  bool generate_holes = false;
   bool run_tests = false, help = false;
   //bool shew_pred = false; // enable shewchucks' predicates
   unsigned int randseed = 0;
@@ -57,7 +58,7 @@ int main(int argc, char *argv[]) {
   // parse command line arguments
   returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat,
                         writeNew, calcArea, calcCircumference, randseed, checkSimple,
-                        nr_holes, select_polygon, vFile, run_tests, help);
+                        generate_holes, nr_holes, select_polygon, vFile, run_tests, help);
 //  std::cerr << "returnvalue: " << returnValue << std::endl;
 
   if (help) return SUCCESS;
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) {
   }
   if (randseed) mt.seed(randseed);
   // initialize Shewchuks' predicates
-  exactinit();
+  //exactinit();
 
   // points from input file saved in a vector
   std::vector<Point> points;
@@ -88,7 +89,7 @@ int main(int argc, char *argv[]) {
   if (alg != A_CONVERT_FORMAT) {
     returnValue = verify_point_set(points);
     if(returnValue != SUCCESS) {
-      std::cerr << "Error verifying point set!" << std::endl;
+      std::cerr << "Error verifying point set!  Point set must have unique points as well as be non-collinear." << std::endl;
       return returnValue;
     }
   }
@@ -141,9 +142,6 @@ int main(int argc, char *argv[]) {
   else if (alg == A_STAR) {
     returnValue = star(sph[select_polygon], points);
   }
-  else if (alg == A_HOLE) {
-    returnValue = holes2(sph, points, nr_holes);
-  }
   else if (alg == A_ALLSP) {
     returnValue = allsp(points, outFile, outFormat, writeNew);
   }
@@ -152,6 +150,9 @@ int main(int argc, char *argv[]) {
   }
   else if (alg == A_VERIFY_LONG) {
     if(checkAllIntersections(sph[select_polygon], points)) returnValue = INTERSECTING_POINTS;
+  }
+  if (generate_holes) {
+    returnValue = holes2(sph, points, nr_holes);
   }
   if (returnValue != SUCCESS) {
     std::cerr << "Error running the algorithm!" << std::endl;
@@ -168,44 +169,13 @@ int main(int argc, char *argv[]) {
   if (calcCircumference) std::cout << "Circumference: " << pol_calc_circumference(sph[select_polygon], points) << std::endl;
 
   // writing to outfile
-  if (outFile[0] == 0) {
-    //std::cout << "No outfile entered." << std::endl;
-    //for (unsigned int i = 0; i < sph.size(); ++i) {
-    //  std::cout << "polygon " << i << ":" << std::endl;
-    //  pdisplay(sph[i], points);
-    //}
-    return NO_OUT_FILE;
+  if (outFormat == OF_PURE_AND_PERM) {
+    char tempFileName[255];
+    snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-pure");
+    returnValue = writeOutIntFile(tempFileName, OF_PURE, writeNew, sph[select_polygon], points);
+    snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-perm");
+    if (returnValue == SUCCESS) returnValue = writeOutIntFile(tempFileName, OF_PERM, writeNew, sph[select_polygon], points);
   }
-  else {
-    switch(alg) {
-      case A_2OPT:
-      case A_2OPT_A:
-      case A_2OPT_B:
-      case A_2OPT_C:
-      case A_2OPT_D:
-      case A_2OPT_E:
-      case A_2OPT_F:
-      case A_2OPT_G:
-      case A_2OPT_H:
-      case A_STAR:
-      case A_HOLE:
-      case A_VERIFY:
-      case A_CONVERT_FORMAT:
-        if (outFormat == OF_PURE_AND_PERM) {
-          char tempFileName[255];
-          snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-pure");
-          returnValue = writeOutIntFile(tempFileName, OF_PURE, writeNew, sph[select_polygon], points);
-          snprintf(tempFileName, sizeof(tempFileName), "%s%s", outFile, "-perm");
-          if (returnValue == SUCCESS) returnValue = writeOutIntFile(tempFileName, OF_PERM, writeNew, sph[select_polygon], points);
-        }
-        else returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);
-        break;
-      case A_CURVE:
-      case A_IDLE:
-      case A_UNDEFINED:
-      default:
-        returnValue = UNEXPECTED_ERROR;
-        break;
-    }
-  }
+  else returnValue = writeOutFile(outFile, outFormat, writeNew, sph, points);
+  return returnValue;
 }

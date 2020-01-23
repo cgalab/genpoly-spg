@@ -38,7 +38,8 @@ enum error {
   INFINITE_LOOP = 24,
   SIZE_NOT_EQUAL = 25,
   HOLES_INADEQUATE = 26,
-  HELP = 27
+  HELP = 27,
+  WRITE_ERROR = 28
 };
 
 // the algorithms that should be selectable.
@@ -55,7 +56,6 @@ enum alg_t {
   A_2OPT_G,
   A_2OPT_H,
   A_CURVE,
-  A_HOLE,
   A_STAR,
   A_ALLSP,
   A_CONVERT_FORMAT,

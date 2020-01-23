@@ -15,11 +15,11 @@
 enum error inFileInit(char *inFile, char *optarg) {
 	enum error returnValue = SUCCESS;
 	if(optarg[0] == 0) {
-		std::cerr << "Error: no input entered for inFile. Use -? for help." << std::endl;
+		std::cerr << "Error: no input entered for inFile. Use -H for help." << std::endl;
 		returnValue = NO_IN_FILE;
 	}
 	else if (optarg[0] == '-') {
-		std::cerr << "Error: another command set as input <string> for --infile. Use -? for help." << std::endl;
+		std::cerr << "Error: another command set as input <string> for --infile. Use -H for help." << std::endl;
 		returnValue = READ_ERROR_IFILE;
 	}
 	else {
@@ -33,12 +33,12 @@ enum error outFileInit(char *outFile, char *optarg) {
 	enum error returnValue = SUCCESS;
 	/*
 	if(optarg[0] == 0) {
-		std::cerr << "Error: no input entered for outFile. Use -? for help." << std::endl;
+		std::cerr << "Error: no input entered for outFile. Use -H for help." << std::endl;
 		returnValue = NO_OUT_FILE;
 	}
 	else */
 	if (optarg[0] == '-') {
-		std::cerr << "Error: another command set as input <string> for --outfile. Use -? for help." << std::endl;
+		std::cerr << "Error: another command set as input <string> for --outfile. Use -H for help." << std::endl;
 		returnValue = READ_ERROR_OFILE;
 	}
 	else {
@@ -80,9 +80,6 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	else if(strcmp(optarg,"curve") == 0) {
 		*alg = A_CURVE;
 	}
-	else if(strcmp(optarg,"hole") == 0) {
-		*alg = A_HOLE;
-	}
 	else if(strcmp(optarg,"star") == 0) {
 		*alg = A_STAR;
 	}
@@ -100,7 +97,7 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	}
 	else {
 		*alg = A_UNDEFINED;
-		std::cerr << "Error:  --alg input incorrect.  Use -? for help. Input: '" << optarg << "', should be '2opt'." << std::endl;
+		std::cerr << "Error:  --alg input incorrect.  Use -H for help. Input: '" << optarg << "', should be '2opt'." << std::endl;
 		returnValue = NO_ALGORITHM;
 	}
 	return returnValue;
@@ -108,14 +105,14 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 
 enum error ifInit(enum in_format_t *inFormat, char *optarg) {
 	enum error returnValue = SUCCESS;
-			 if (strcmp(optarg,"points") == 0) *inFormat = IF_POINTS;
+			 if (strcmp(optarg,"point") == 0) *inFormat = IF_POINTS;
 	else if (strcmp(optarg,"poly") == 0) *inFormat = IF_POLY;
 	else if (strcmp(optarg,"comp") == 0) *inFormat = IF_COMP;
 	else if (strcmp(optarg,"line") == 0) *inFormat = IF_LINE;
 	else if (strcmp(optarg,"dat") == 0) *inFormat = IF_DAT;
 	else {
 		*inFormat = IF_UNDEFINED;
-		std::cerr << "Error:  --informat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'points', 'poly', or 'comp'." << std::endl;
+		std::cerr << "Error:  --informat input incorrect.  Use -H for help. Input: '" << optarg << "', should be 'points', 'poly', or 'comp'." << std::endl;
 		returnValue = READ_ERROR_IFORMAT;
 	}
 	return returnValue;
@@ -131,7 +128,7 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 	else if (strcmp(optarg,"pp") == 0) *outFormat = OF_PURE_AND_PERM; // pp for pure and perm
 	else {
 		*outFormat = OF_UNDEFINED;
-		std::cerr << "Error:  --outformat input incorrect.  Use -? for help. Input: '" << optarg << "', should be 'perm', 'dat', or 'poly'." << std::endl;
+		std::cerr << "Error:  --outformat input incorrect.  Use -H for help. Input: '" << optarg << "', should be 'perm', 'dat', or 'poly'." << std::endl;
 		returnValue = READ_ERROR_OFORMAT;
 	}
 	return returnValue;
@@ -140,11 +137,11 @@ enum error ofInit(enum out_format_t *outFormat, char *optarg) {
 enum error vFileInit(char *vFile, char *optarg) {
 	enum error returnValue = SUCCESS;
 	if(optarg[0] == 0) {
-		std::cerr << "Error: no input file with polygonal data. Use -? for help." << std::endl;
+		std::cerr << "Error: no input file with polygonal data. Use -H for help." << std::endl;
 		returnValue = NO_VERIFY_FILE;
 	}
 	else if (optarg[0] == '-') {
-		std::cerr << "Error: another command set as input <string> for --verify. Use -? for help." << std::endl;
+		std::cerr << "Error: another command set as input <string> for --verify. Use -H for help." << std::endl;
 		returnValue = READ_ERROR_IFILE;
 	}
 	else {
@@ -158,7 +155,7 @@ enum error argInit(	int argc, char *argv[],
 										char *inFile, char *outFile, enum alg_t *alg,
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
 										bool& writeNew, bool& area,	bool& circumference,
-										unsigned int& randseed, bool& checkSimple, unsigned int& holes,
+										unsigned int& randseed, bool& checkSimple, bool& generate_holes, unsigned int& holes,
 										unsigned int& select_polygon, char *vFile, bool& run_tests, bool& help) {
 	enum error returnValue = SUCCESS;
 	int comm;
@@ -179,11 +176,11 @@ enum error argInit(	int argc, char *argv[],
 		{"test", no_argument, NULL, 't'},
 		{"checksimple", no_argument, NULL, 'u'},
 		{"writenew", no_argument, NULL, 'w'},
-		{"help", no_argument, NULL, '?'},
+		{"help", no_argument, NULL, 'H'},
 		{0, 0, 0, 0}
 	};
 
-	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:s:eftuw?", long_options, NULL)) != -1) && returnValue == SUCCESS) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:s:eftuwH", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -206,6 +203,7 @@ enum error argInit(	int argc, char *argv[],
 //				std::cerr << "outFormat returnValue: " << returnValue << std::endl;
 				break;
 			case 'h':
+				generate_holes = true;
 				holes = atoi(optarg);
 				break;
 			case 'e':
@@ -232,60 +230,62 @@ enum error argInit(	int argc, char *argv[],
 			case 'w':
 				writeNew = true;
 				break;
-			case '?':
+			case 'H':
 				help = true;
 				std::cerr << "Command line arguments:" << std::endl;
-				std::cerr << " -?, --help" << std::endl;
+				std::cerr << " -H, --help" << std::endl;
 				std::cerr << "             ignores any other argument and just prints this helpful information." << std::endl << std::endl;
 
-				std::cerr << " -i, --infile <string> |Required" << std::endl;
+				std::cerr << " -i, --infile <string> | (argument and string required)" << std::endl;
 				std::cerr << "              <string> is the filename of a file containing a set of points." << std::endl;
 				std::cerr << "assumptions:  The file contains a point set where each point must be unique." << std::endl;
-				std::cerr << "However, some formats (line, points) allow for multiple polygons, defined by repeating the first point of the polygon" << std::endl;
-				std::cerr << "after the last point in the polygon before then starting a new polygon." << std::endl << std::endl;
+				std::cerr << "Exception: Some formats (line, points) allow for multiple polygons, which are defined by repeating the first point of the polygon" << std::endl;
+				std::cerr << "after the last point in the polygon before then starting a new polygon, this is allowed." << std::endl << std::endl;
 
-				std::cerr << " -b, --informat <arg> |Required" << std::endl;
-				std::cerr << "                <arg> can be:"  << std::endl;
-				std::cerr << "                poly   : header with 'x_min x_max y_min y_max' in first line and number of points in 2nd" << std::endl;
+				std::cerr << " -b, --informat <string> | (argument and string required)" << std::endl;
+				std::cerr << "                <string> can be:"  << std::endl;
+				std::cerr << "                poly   : header with 'x_min x_max y_min y_max' in first line and number of points in 2nd line" << std::endl;
 				std::cerr << "                         each subsequent line: 'x y'" << std::endl;
 				std::cerr << "                comp   : each line: 'enumeration x y'" << std::endl;
-				std::cerr << "                line   : header with no. of points in the following polygon on a single line." << std::endl;
+				std::cerr << "                line   : header with number of points in the following polygon on a single line." << std::endl;
 				std::cerr << "                         each subsequent line: ' x  y', supports multiple polygons." << std::endl;
 				std::cerr << "                dat    : a gnuplot data file, header with # comments allowed." << std::endl;
 				std::cerr << "                         each subsequent line: ' x  y', supports multiple polygons." << std::endl;
-				std::cerr << "                points : no header, each line: 'x y', supports multiple polygons." << std::endl << std::endl;
+				std::cerr << "                point :  no header, each line: 'x y', supports multiple polygons." << std::endl << std::endl;
 
-				std::cerr << " -o. --outfile <string> |Optional*" << std::endl;
+				std::cerr << " -o. --outfile <string> | (argument optional*, if used then string required)" << std::endl;
 				std::cerr << "               <string> is the filename of a file with the processed output of the program." << std::endl;
-				std::cerr << " *if option skipped, will send point set and then subsequent polygons to std::cout." << std::endl << std::endl;
+				std::cerr << " *if option skipped, will send polygons to stdout in the format given by '-c'." << std::endl << std::endl;
 
-				std::cerr << " -c, --outformat <arg> |Optional*" << std::endl;
-				std::cerr << "                 <arg> can be:" << std::endl;
-				std::cerr << "                 perm : each line as an index into the point set that was used." << std::endl;
+				std::cerr << " -c, --outformat <string> | (argument optional, if used then string required)" << std::endl;
+				std::cerr << "                 <string> can be:" << std::endl;
+				std::cerr << "                 perm : each line as an index/enumeration into the point set that was used." << std::endl;
 				std::cerr << "                 poly : see description in 'informat'" << std::endl;
 				std::cerr << "                 line : see description in 'informat'" << std::endl;
 				std::cerr << "                 dat  : format that gnuplot understands and can plot." << std::endl;
-				std::cerr << " *Required if an outfile is given.*" << std::endl << std::endl;
+				std::cerr << "*If this argument is missing, the program will do any/all calculations, but will not write to file or stdout." << std::endl << std::endl;
 
-				std::cerr << " -a, --alg <arg> |Optional" << std::endl;
-				std::cerr << "           <arg> is the algorithm to be run:" << std::endl;
+				std::cerr << " -a, --alg <string> | (argument optional, if used then string required)" << std::endl;
+				std::cerr << "           <string> is the algorithm to be run:" << std::endl;
 				std::cerr << "           2opt : calculates a simple random polygon based on Bentley-Ottman linesweep and the 2opt algorithm." << std::endl;
 				std::cerr << "           5 : a faster calculation of a simple random polygon based on Bentley-Ottman linesweep and the 2opt algorithm." << std::endl;
 				std::cerr << "           star : calculates a simple random polygon that is a star-shaped polygon." << std::endl;
-				std::cerr << "           holes : returns a simple polygon with simple holes." << std::endl;
 				std::cerr << "           convert : converts a point set from one file format to another." << std::endl;
-				std::cerr << "           verify : checks whether a permutation of a point set is simple." << std::endl << std::endl;
+				std::cerr << "           verify : only checks whether a permutation of a point set is simple." << std::endl << std::endl;
 
-				std::cerr << " -h, --holes <arg> |Optional*" << std::endl;
-				std::cerr << "             <arg> is the number of holes desired, '0' selects a random number of holes." << std::endl;
-				std::cerr << " *By using '-h' you are free to select the simple polygon generation algorithm with the '-a' command*" << std::endl << std::endl;
+				std::cerr << " -h, --hole <string> | (argument optional*, if used then string required)" << std::endl;
+				std::cerr << "             <string> is the number of holes desired, '0' selects a random number of holes." << std::endl;
+				std::cerr << " *By using '-h' you are free to either:" << std::endl;
+				std::cerr << "  a) use the polygon as defined in the --infile (must be arranged as a simple polygon)." << std::endl;
+				std::cerr << "  b) use --algorithm to select an algorithm to make a simple polygon on which to generate holes." << std::endl;
+				std::cerr << "  c) use --polfile to give a file with a polygon of the point set defined in --infile (format: perm)" << std::endl << std::endl;
 
-				std::cerr << " -p, --polfile <string> |Optional" << std::endl;
-				std::cerr << "               <string> is the filename of a file where each line is an index into the point set given by infile." << std::endl;
-				std::cerr << " *Overwrites all polygons created by importing the point set from the infile." << std::endl << std::endl;
+				std::cerr << " -p, --polfile <string> | (argument optional, if used then string required)" << std::endl;
+				std::cerr << "               <string> is the filename of a file where each line is an index into the point set given by infile (perm)." << std::endl;
+				std::cerr << " *By using '-p' you overwrite any/all polygons created by importing the point set from the infile." << std::endl << std::endl;
 
-				std::cerr << " -r, --randseed <arg> |Optional" << std::endl;
-				std::cerr << "                <arg> is an unsigned integer above 0." << std::endl;
+				std::cerr << " -r, --randseed <string> | (argument optional*, if used then string required)" << std::endl;
+				std::cerr << "                <string> is an unsigned integer above 0." << std::endl;
 				std::cerr << " *The seed is set at the beginning only and affects all options in this help that describes a random process." << std::endl << std::endl;
 
 				std::cerr << "ON/OFF FLAGS:" << std::endl;
@@ -301,7 +301,7 @@ enum error argInit(	int argc, char *argv[],
 				break;
 
 			default:
-				std::cerr << "Error:  input arguments not formatted correctly.  Use -? for help." << std::endl;
+				std::cerr << "Error:  input arguments not formatted correctly.  Use -H for help." << std::endl;
 				returnValue = UNEXPECTED_ERROR;
 		}
 	}
