@@ -1000,15 +1000,15 @@ void validate_closest(E_Edge& e) {
 
     E_Edge temp = e.closest[i];
 //    std::cerr << "closest: " << temp << std::endl;
-    angle_left = get_smaller_angle(e, temp, false);
+    angle_left = get_larger_angle(e, temp, false);
 //    std::cerr << "angle_left (p1): " << angle_left << ", angle_right: " << angle_right << std::endl;
 
-    if (angle_right < fabs(angle_left)) {
+    if (angle_right <= fabs(angle_left)) {
 //      std::cerr << "erasing edge: " << e.closest[i] << std::endl;
       e.closest.erase(e.closest.begin()+i);
     }
     else {
-      angle_left = fabs(angle_left);
+      angle_left = fabs(get_smaller_angle(e, temp, false));
       if (angle_left < angle_right) angle_right = angle_left;
     }
     --i;
@@ -1093,12 +1093,12 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
 //      std::cerr << "checking 'e.angle' vs. angles of 'inc_e'" << std::endl;
 //      std::cerr << "e:     " << e << std::endl;
 //      std::cerr << "inc_e: " << inc_e << std::endl;
-      angle_right = get_smaller_angle(e, inc_e, true);
+      angle_right = get_larger_angle(e, inc_e, true);
 //      std::cerr << "e.angle: " << e.angle << ", angle_right (p1): " << angle_right << std::endl;
       if (fabs(angle_right) <= fabs(e.angle)) {
 //        std::cerr << "e: right is smaller" << std::endl;
         e.closest.push_back(inc_e);
-        e.angle = angle_right;
+        e.angle = fabs(get_smaller_angle(e, inc_e, true));
         update_edge_in_set(e, retval_e, y_set);
       }
   }
@@ -1131,12 +1131,12 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
 
 //    std::cerr << "e:     " << e << std::endl;
 //    std::cerr << "inc_e: " << inc_e << std::endl;
-    angle_right = get_smaller_angle(inc_e, e, true);
+    angle_right = get_larger_angle(inc_e, e, true);
 //    std::cerr << "angle: " << inc_e.angle << ", inc_e angle_right (p1): " << angle_right << std::endl;
     if (fabs(angle_right) <= fabs(inc_e.angle)) {
 //      std::cerr << "inc_e: right is smaller" << std::endl;
       inc_e.closest.push_back(e);
-      inc_e.angle = angle_right;
+      inc_e.angle = fabs(get_smaller_angle(inc_e, e, true));
       //retval.first = (e.bin) ? std::prev(iter) : std::next(iter);
       update_edge_in_set(inc_e, retval_i, y_set);
     }
