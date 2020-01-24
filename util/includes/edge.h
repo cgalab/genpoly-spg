@@ -596,13 +596,24 @@ public:
     // if there's an intersection, return false.
     // need to do the intersection check here, CAN'T USE FUNCTIONS IN EDGES.CPP..
     //std::cerr << "comparing: " << std::endl;
-    //std::cerr << "this: " << *this << std::endl;
-    //std::cerr << "e:    " << e << std::endl;
+//    std::cerr << "this: " << *this << ", e: " << e << std::endl;
     if ((*(*this).p1 == *e.p1) && (*(*this).p2 == *e.p2)) return false; // same edge
-    if (*(*this).p1 == *e.p2) return false; // lex. higher point of 'e' is lower than lex. lower point of 'this'
-    if (*(*this).p2 == *e.p1) return true;  // and vice versa.
-    if (*(*this).p1 == *e.p1) return signbit((*this).cdet(*e.p2)); //same lex. lower point
-    if (*(*this).p2 == *e.p2) return signbit((*this).cdet(*e.p1)); // same lex. higher point
+    if (*(*this).p1 == *e.p2) {
+//      std::cerr << "this.p1 == e.p2" << std::endl;
+      return false; // lex. higher point of 'e' is lower than lex. lower point of 'this'
+    }
+    if (*(*this).p2 == *e.p1) {
+//      std::cerr << "this.p2 == e.p1" << std::endl;
+      return true;  // and vice versa.
+    }
+    if (*(*this).p1 == *e.p1) {
+//      std::cerr << "returning sign(this.cdet(e.p2)): " << (*this).cdet(*e.p2) << std::endl;
+      return signbit((*this).cdet(*e.p2)); //same lex. lower point
+    }
+    if (*(*this).p2 == *e.p2) {
+//      std::cerr << "returning sign(this.cdet(e.p1)): " << (*this).cdet(*e.p1) << std::endl;
+      return signbit((*this).cdet(*e.p1)); // same lex. higher point
+    }
 
     double det1, det2, det3, det4;
     det1 = (*this).cdet(*e.p1);
@@ -616,9 +627,27 @@ public:
     if (det3 == 0) {if (det4 < 0) det3 = -0.0;}
     if (det4 == 0) {if (det3 < 0) det4 = -0.0;}
     //std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
-    if ((signbit(det1) ^ signbit(det2)) && (signbit(det3) ^ signbit(det4))) return false; // an intersection
-    if (!(signbit(det1) ^ signbit(det2))) return signbit(det1); // 'e' is on one side of 'this'
-    if (!(signbit(det3) ^ signbit(det4))) return !signbit(det3); // 'this' is on one side of 'e'
+    if ((signbit(det1) ^ signbit(det2)) && (signbit(det3) ^ signbit(det4))) {
+//      std::cerr << "this: " << *this << " intersects " << e << std::endl;
+//      std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
+      return false; // an intersection
+    }
+    if (!(signbit(det1) ^ signbit(det2))) { // 'e' is on one side of 'this'
+      if (!(signbit(det3) ^ signbit(det4))) { // 'this' is on one side of 'e'
+        if (signbit(det1) ^ signbit (det3)) return signbit(det1); // different signs means they can be ordered
+        if (!(signbit(det1) ^ signbit(det3))) return (*(*this).p1 < *e.p1); // same sign means need to find the order from the points
+      }
+//      std::cerr << "returning sign(det1): " << signbit(det1) << std::endl;
+//      std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
+      return signbit(det1);
+    }
+    if (!(signbit(det3) ^ signbit(det4))) {
+//      std::cerr << "returning !sign(det3): " << !signbit(det3) << std::endl;
+//      std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
+      return !signbit(det3); // 'this' is on one side of 'e'
+    }
+//    std::cerr << "returning sign(det1): " << signbit(det1) << std::endl;
+//    std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
 
     return signbit(det1); // both dets should be the same, so either should be fine.
   }

@@ -16,7 +16,8 @@
 #include "opt2base.h"
 #include "elapsed.h"
 
-// 2 opt that doesn't restart in the same point if a intersection or a collinearity is found, but runs through the whole thing then repeats.
+// testing a different comparison, where the insertion should return the edge
+// that intersects the edge that is being inserted
 enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
   double duration = 0;

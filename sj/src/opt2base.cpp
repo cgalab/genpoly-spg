@@ -2580,6 +2580,23 @@ enum edge_t processEdgeh(Edge2& e, unsigned int& lowest_index, std::set<Edge2>& 
       std::cerr << "Insertion: insert returned a different edge that did not intersect!" << std::endl;
       std::cerr << "e:   " << e << std::endl;
       std::cerr << "*it: " << *retval.first << std::endl;
+
+      if (retval.first != edgeS.begin()) {
+        ibef = std::prev(retval.first);
+        std::cerr << "edge before insertion: " << *ibef << std::endl;
+        isval = checkIntersection2(e, *ibef);
+        std::cerr << "intersect check: "; printEnum(isval); std::cerr << std::endl;
+      }
+
+      if (retval.first != std::prev(edgeS.end())) {
+        iaft  = std::next(retval.first);
+        std::cerr << "edge after insertion: " << *ibef << std::endl;
+        isval = checkIntersection2(e, *iaft);
+        std::cerr << "intersect check: "; printEnum(isval); std::cerr << std::endl;
+      }
+      std::cerr << "edges in 'edgeS':" << std::endl;
+      for (std::set<Edge2>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+
       valid = E_NOT_VALID;
     }
     else {
