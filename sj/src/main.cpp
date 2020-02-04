@@ -29,10 +29,11 @@
 #include "star.h"
 #include "allsp.h"
 #include "predicates.h"
+#include "statistic.h"
 
 int main(int argc, char *argv[]) {
-  std::cout << std::setprecision(3);
-  std::cerr << std::setprecision(3);
+  std::cout << std::setprecision(7);
+  std::cerr << std::setprecision(7);
   // final return value
   enum error returnValue = SUCCESS;
   // time measurement variables
@@ -150,6 +151,12 @@ int main(int argc, char *argv[]) {
   }
   else if (alg == A_VERIFY_LONG) {
     if(checkAllIntersections(sph[select_polygon], points)) returnValue = INTERSECTING_POINTS;
+  }
+  else if (alg == A_POLSLOPE) {
+    returnValue = polslopecount(sph[select_polygon], points);
+  }
+  else if (alg == A_PNTSLOPE) {
+    returnValue = pntslopecount(points);
   }
   if (generate_holes) {
     returnValue = holes2(sph, points, nr_holes);

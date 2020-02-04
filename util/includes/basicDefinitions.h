@@ -60,7 +60,9 @@ enum alg_t {
   A_ALLSP,
   A_CONVERT_FORMAT,
   A_VERIFY,
-  A_VERIFY_LONG
+  A_VERIFY_LONG,
+  A_POLSLOPE,
+  A_PNTSLOPE
 };
 
 // the output format of the result.

@@ -115,6 +115,7 @@ double getYmax(const std::vector<Point>& p);
 unsigned int get_lowest_v(Point *a, Point *b, Point *c);
 unsigned int get_highest_v(Point *a, Point *b, Point *c);
 double get_length(const Point& p1, const Point& p2);
+double reldist(const Point& pa, const Point& pb, const Point& p);
 bool angleComparator (Point i,Point j);
 
 #endif

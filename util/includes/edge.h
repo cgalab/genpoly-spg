@@ -833,7 +833,6 @@ void decrementEdges(std::set<Edge>& edgeS);
 bool eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS);
 void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 //void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points, unsigned int randseed);
-double reldist(const Point& pa, const Point& pb, const Point& p);
 double reldist(const Edge& e, const Point& p);
 double reldist(const Edge2& e, const Point& p);
 double det(const Edge e, const Point p);

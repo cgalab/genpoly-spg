@@ -63,37 +63,10 @@ void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned i
   }
 
 //  std::cerr << "erasing vertexes: e1: " << e1 << ", e2: " << e2 << std::endl;
-	it1 = edgeS.find(e1);
-	if ((it1 == edgeS.end()) || (*it1 != e1)) { // e1 not found
-		for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) {
-			if (e1 != *it) continue;
-			else {
-				edgeS.erase(it);
-				break;
-			}
-		}
-	}
-	else edgeS.erase(it1);
-
-	it1 = edgeS.find(e2);
-	if ((it1 == edgeS.end()) || (*it1 != e2)) { // e2 not found
-		for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) {
-			if (e2 != *it) continue;
-			else {
-				edgeS.erase(it);
-				break;
-			}
-		}
-	}
-	else edgeS.erase(it1);
+	edgeS.erase(e1);
+	edgeS.erase(e2);
 }
 
-// returns relative distance of a point to an edge.
-double reldist(const Point& pa, const Point& pb, const Point& p) {
-	double ans = ((p.x-pa.x)*(pb.x-pa.x) + (p.y-pa.y)*(pb.y-pa.y)) / ((pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y));
-	//return (fabs(ans) < EPSILON) ? 0 : ans;
-	return ans;
-}
 double reldist(const Edge& e, const Point& p) {
 	return reldist(*e.p1, *e.p2, p);
 }

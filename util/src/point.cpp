@@ -542,6 +542,13 @@ double get_length(const Point& p1, const Point& p2) {
   return length;
 }
 
+// returns relative distance of a point to an edge.
+double reldist(const Point& pa, const Point& pb, const Point& p) {
+	double ans = ((p.x-pa.x)*(pb.x-pa.x) + (p.y-pa.y)*(pb.y-pa.y)) / ((pb.x-pa.x)*(pb.x-pa.x) + (pb.y-pa.y)*(pb.y-pa.y));
+	//return (fabs(ans) < EPSILON) ? 0 : ans;
+	return ans;
+}
+
 // comparison function for the sort algorithm in 'star'
 bool angleComparator (Point i,Point j) {
   double ai = i.y/i.x;

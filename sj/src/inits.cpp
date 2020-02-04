@@ -92,6 +92,12 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	else if(strcmp(optarg,"verify_long") == 0) {
 		*alg = A_VERIFY_LONG;
 	}
+	else if(strcmp(optarg,"polslope") == 0) {
+		*alg = A_POLSLOPE;
+	}
+	else if(strcmp(optarg,"pntslope") == 0) {
+		*alg = A_PNTSLOPE;
+	}
 	else if(strcmp(optarg,"convert") == 0) {
 		*alg = A_CONVERT_FORMAT;
 	}
