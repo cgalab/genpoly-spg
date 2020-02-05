@@ -160,7 +160,7 @@ enum error vFileInit(char *vFile, char *optarg) {
 enum error argInit(	int argc, char *argv[],
 										char *inFile, char *outFile, enum alg_t *alg,
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
-										bool& writeNew, bool& area,	bool& circumference,
+										bool& writeNew, bool& area,	bool& area_ratio, bool& perimeter, bool& norm_perimeter,
 										unsigned int& randseed, bool& checkSimple, bool& generate_holes, unsigned int& holes,
 										unsigned int& select_polygon, char *vFile, bool& run_tests, bool& help) {
 	enum error returnValue = SUCCESS;
@@ -177,8 +177,10 @@ enum error argInit(	int argc, char *argv[],
 		{"polygonfile", required_argument, NULL, 'p'},
 		{"randseed", required_argument, NULL, 'r'},
 		{"selectpolygon", required_argument, NULL, 's'},
+		{"charearatio", no_argument, NULL, 'd'},
 		{"area", no_argument, NULL, 'e'},
-		{"circumference", no_argument, NULL, 'f'},
+		{"perimeter", no_argument, NULL, 'f'},
+		{"normperimeter", no_argument, NULL, 'g'},
 		{"test", no_argument, NULL, 't'},
 		{"checksimple", no_argument, NULL, 'u'},
 		{"writenew", no_argument, NULL, 'w'},
@@ -186,7 +188,7 @@ enum error argInit(	int argc, char *argv[],
 		{0, 0, 0, 0}
 	};
 
-	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:s:eftuwH", long_options, NULL)) != -1) && returnValue == SUCCESS) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:s:defgtuwH", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -212,11 +214,17 @@ enum error argInit(	int argc, char *argv[],
 				generate_holes = true;
 				holes = atoi(optarg);
 				break;
+			case 'd':
+				area_ratio = true;
+				break;
 			case 'e':
 				area = true;
 				break;
 			case 'f':
-				circumference = true;
+				perimeter = true;
+				break;
+			case 'g':
+				norm_perimeter = true;
 				break;
 			case 'r':
 				randseed = atoi(optarg);
@@ -238,17 +246,18 @@ enum error argInit(	int argc, char *argv[],
 				break;
 			case 'H':
 				help = true;
+				std::cerr << "USAGE: ./spg -i in_file -b in_format -o out_file -c out_format -a algorithm" << std::endl;
 				std::cerr << "Command line arguments:" << std::endl;
 				std::cerr << " -H, --help" << std::endl;
 				std::cerr << "             ignores any other argument and just prints this helpful information." << std::endl << std::endl;
 
-				std::cerr << " -i, --infile <string> | (argument and string required)" << std::endl;
+				std::cerr << " -i, --infile <string> | (argument and string REQUIRED)" << std::endl;
 				std::cerr << "              <string> is the filename of a file containing a set of points." << std::endl;
 				std::cerr << "assumptions:  The file contains a point set where each point must be unique." << std::endl;
 				std::cerr << "Exception: Some formats (line, points) allow for multiple polygons, which are defined by repeating the first point of the polygon" << std::endl;
 				std::cerr << "after the last point in the polygon before then starting a new polygon, this is allowed." << std::endl << std::endl;
 
-				std::cerr << " -b, --informat <string> | (argument and string required)" << std::endl;
+				std::cerr << " -b, --informat <string> | (argument and string REQUIRED)" << std::endl;
 				std::cerr << "                <string> can be:"  << std::endl;
 				std::cerr << "                poly   : header with 'x_min x_max y_min y_max' in first line and number of points in 2nd line" << std::endl;
 				std::cerr << "                         each subsequent line: 'x y'" << std::endl;
@@ -295,12 +304,12 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << " *The seed is set at the beginning only and affects all options in this help that describes a random process." << std::endl << std::endl;
 
 				std::cerr << "ON/OFF FLAGS:" << std::endl;
-				std::cerr << " -w, --writenew |Optional" << std::endl;
+				std::cerr << " -w, --writenew" << std::endl;
 				std::cerr << "    option to not overwrite the output file if it already exists," << std::endl;
 				std::cerr << "    a new file is created with an increment number added to the end." << std::endl;
-				std::cerr << " -e, --area |Optional" << std::endl;
+				std::cerr << " -e, --area" << std::endl;
 				std::cerr << "    option to print the area of the polygon to cout." << std::endl;
-				std::cerr << " -f, --circumference |Optional" << std::endl;
+				std::cerr << " -f, --perimeter" << std::endl;
 				std::cerr << "    option to print the circumference of the polygon to cout." << std::endl;
 				std::cerr << " -t" << std::endl;
 				std::cerr << "    ignores all other arguments and runs the test-bed." << std::endl;

@@ -2602,9 +2602,9 @@ bool collSwap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned i
   return true;
 }
 
-// function to calculate the circumference of the polygon
-double pol_calc_circumference(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
-  double circumference=0, x, y;
+// function to calculate the perimeter of the polygon
+double pol_calc_perimeter(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  double perimeter=0, x, y;
   Point prev, p;
 
   prev = points[polygon[polygon.size()-1]];
@@ -2612,11 +2612,35 @@ double pol_calc_circumference(std::vector<unsigned int>& polygon, std::vector<Po
     p = points[polygon[i]];
     x = p.x - prev.x;
     y = p.y - prev.y;
-    circumference = circumference + sqrt(x*x + y*y);
+    perimeter = perimeter + sqrt(x*x + y*y);
     prev = p;
   }
-  return circumference;
+  return perimeter;
 }
+
+// function to return the perimeter after recalculating it based on finding the
+// factor needed to resize the point set such that max([xmin, xmax], [ymin,ymax]) = [0,1]
+double pol_calc_normalised_perimeter(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  double perimeter = 0, xmax, xmin, ymax, ymin, xlen, ylen, ratio;
+
+  xmin = getXmin(points);
+  xmax = getXmax(points);
+  ymin = getYmin(points);
+  ymax = getYmax(points);
+
+  xlen = xmax - xmin;
+  ylen = ymax - ymin;
+
+  if(xlen < ylen) {
+    ratio = 1/ylen;
+  }
+  else {
+    ratio = 1/xlen;
+  }
+  perimeter = pol_calc_perimeter(polygon, points);
+  return perimeter * ratio;
+}
+
 
 // function to calculate the area of a polygon given by points in 'points' and the permutation in 'polygon'.
 double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
@@ -2655,6 +2679,26 @@ double pol_calc_area(std::vector<Point>& points) {
 
   Area = Area / 2;
   return Area;
+}
+
+// function to calculate the area of a polygon given by points in 'points' and the permutation in 'polygon'.
+double ch_calc_area_ratio(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  double Area = 0, ch_Area = 0, ratio = 0;
+
+  // start with getting all c.h. points.
+  std::vector<unsigned int> ch;
+  get_convex_hull(ch, points);
+
+  ch_Area = pol_calc_area(ch, points);
+  Area = pol_calc_area(polygon, points);
+  if(Area < 0) {
+    doFlip(0, polygon.size()-1, polygon, points);
+    Area = pol_calc_area(polygon, points);
+  }
+//  std::cerr << "ch area: " << ch_Area << ", area: " << Area << std::endl;
+
+  ratio = Area / ch_Area;
+  return ratio;
 }
 
 // function that calculates the sum of the edges from the 2 edges connected to vertex 'start' to the 2 edges connected to vertex 'stop'

@@ -48,7 +48,7 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
   do {
     ++count_total_passes;
 //    (debug) ? std::cerr << "looping" << std::endl : std::cerr;
-    circumference = pol_calc_circumference(polygon, points);
+    circumference = pol_calc_perimeter(polygon, points);
     c_it = circ.find(circumference);
 //    std::cerr << "c: " << circumference << std::endl;
     if (c_it != circ.end()) {

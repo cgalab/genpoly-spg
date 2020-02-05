@@ -47,7 +47,9 @@ int main(int argc, char *argv[]) {
   enum out_format_t outFormat = OF_UNDEFINED;
   bool writeNew = false; // whether to write a new file instead of saving over an existing file.
   bool calcArea = false;  // calculate and return the area
-  bool calcCircumference = false; // calculate and return the circumference.
+  bool calcChAreaRatio = false;
+  bool calcPerimeter = false; // calculate and return the perimeter of the polygon.
+  bool calcNormalisedPerimeter = false; // calculate and return the normalised perimeter of the polygon.
   bool checkSimple = false; // only verify a given point set and polygon is simple.
   bool generate_holes = false;
   bool run_tests = false, help = false;
@@ -58,7 +60,7 @@ int main(int argc, char *argv[]) {
 
   // parse command line arguments
   returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat,
-                        writeNew, calcArea, calcCircumference, randseed, checkSimple,
+                        writeNew, calcArea, calcChAreaRatio, calcPerimeter, calcNormalisedPerimeter, randseed, checkSimple,
                         generate_holes, nr_holes, select_polygon, vFile, run_tests, help);
 //  std::cerr << "returnvalue: " << returnValue << std::endl;
 
@@ -173,7 +175,12 @@ int main(int argc, char *argv[]) {
     }
     std::cout << "Area: " << area << std::endl;
   }
-  if (calcCircumference) std::cout << "Circumference: " << pol_calc_circumference(sph[select_polygon], points) << std::endl;
+  if (calcChAreaRatio) {
+    double area = ch_calc_area_ratio(sph[select_polygon], points);
+    std::cout << "Area: " << area << std::endl;
+  }
+  if (calcPerimeter) std::cout << "Perimeter: " << pol_calc_perimeter(sph[select_polygon], points) << std::endl;
+  if (calcNormalisedPerimeter) std::cout << "Normalised Perimeter: " << pol_calc_normalised_perimeter(sph[select_polygon], points) << std::endl;
 
   // writing to outfile
   if (outFormat == OF_PURE_AND_PERM) {

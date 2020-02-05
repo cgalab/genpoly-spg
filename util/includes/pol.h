@@ -54,9 +54,11 @@ bool coll4Swap3 (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned
 bool coll4Swap4 (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int& lowest_index);
 bool coll4Swap5 (Edge2& e1, Edge2& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int& lowest_index);
 bool collSwap (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
-double pol_calc_circumference(std::vector<unsigned int>& polygon, std::vector<Point>& points);
+double pol_calc_perimeter(std::vector<unsigned int>& polygon, std::vector<Point>& points);
+double pol_calc_normalised_perimeter(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 double pol_calc_area(std::vector<Point>& points);
+double ch_calc_area_ratio(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool is_ascending(I_Edge e);
 bool is_ascending(unsigned int start, unsigned int stop, unsigned int cycle);
 unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle);
