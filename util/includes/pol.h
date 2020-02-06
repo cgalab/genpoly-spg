@@ -58,7 +58,8 @@ double pol_calc_perimeter(std::vector<unsigned int>& polygon, std::vector<Point>
 double pol_calc_normalised_perimeter(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 double pol_calc_area(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 double pol_calc_area(std::vector<Point>& points);
-double ch_calc_area_ratio(std::vector<unsigned int>& polygon, std::vector<Point>& points);
+double calc_ch_area(std::vector<Point>& points);
+double calc_ch_area_ratio(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool is_ascending(I_Edge e);
 bool is_ascending(unsigned int start, unsigned int stop, unsigned int cycle);
 unsigned int get_lower_cyclic_difference(unsigned int a, unsigned int b, unsigned int cycle);

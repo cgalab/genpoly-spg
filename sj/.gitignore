@@ -7,6 +7,7 @@ tkn
 .atom-dbg.cson
 obj/
 build/
+build2/
 app
 ver*
 ver*

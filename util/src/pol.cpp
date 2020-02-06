@@ -2681,8 +2681,20 @@ double pol_calc_area(std::vector<Point>& points) {
   return Area;
 }
 
+//function to calculate the area of the convex hull.
+double calc_ch_area(std::vector<Point>& points) {
+  double ch_Area = 0;
+
+  // start with getting all c.h. points.
+  std::vector<unsigned int> ch;
+  get_convex_hull(ch, points);
+
+  ch_Area = pol_calc_area(ch, points);
+  return ch_Area;
+}
+
 // function to calculate the area of a polygon given by points in 'points' and the permutation in 'polygon'.
-double ch_calc_area_ratio(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+double calc_ch_area_ratio(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   double Area = 0, ch_Area = 0, ratio = 0;
 
   // start with getting all c.h. points.

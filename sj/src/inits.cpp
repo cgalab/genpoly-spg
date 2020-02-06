@@ -160,7 +160,7 @@ enum error vFileInit(char *vFile, char *optarg) {
 enum error argInit(	int argc, char *argv[],
 										char *inFile, char *outFile, enum alg_t *alg,
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
-										bool& writeNew, bool& area,	bool& area_ratio, bool& perimeter, bool& norm_perimeter,
+										bool& writeNew, bool& area,	bool& ch_area, bool& area_ratio, bool& perimeter, bool& norm_perimeter,
 										unsigned int& randseed, bool& checkSimple, bool& generate_holes, unsigned int& holes,
 										unsigned int& select_polygon, char *vFile, bool& run_tests, bool& help) {
 	enum error returnValue = SUCCESS;
@@ -177,10 +177,11 @@ enum error argInit(	int argc, char *argv[],
 		{"polygonfile", required_argument, NULL, 'p'},
 		{"randseed", required_argument, NULL, 'r'},
 		{"selectpolygon", required_argument, NULL, 's'},
-		{"charearatio", no_argument, NULL, 'd'},
-		{"area", no_argument, NULL, 'e'},
-		{"perimeter", no_argument, NULL, 'f'},
-		{"normperimeter", no_argument, NULL, 'g'},
+		{"area", no_argument, NULL, 'd'},
+		{"charea", no_argument, NULL, 'e'},
+		{"charearatio", no_argument, NULL, 'f'},
+		{"perimeter", no_argument, NULL, 'k'},
+		{"normperimeter", no_argument, NULL, 'l'},
 		{"test", no_argument, NULL, 't'},
 		{"checksimple", no_argument, NULL, 'u'},
 		{"writenew", no_argument, NULL, 'w'},
@@ -188,7 +189,7 @@ enum error argInit(	int argc, char *argv[],
 		{0, 0, 0, 0}
 	};
 
-	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:s:defgtuwH", long_options, NULL)) != -1) && returnValue == SUCCESS) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:s:defkltuwH", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
 			case 'i':
 				returnValue = inFileInit(inFile, optarg);
@@ -215,15 +216,18 @@ enum error argInit(	int argc, char *argv[],
 				holes = atoi(optarg);
 				break;
 			case 'd':
-				area_ratio = true;
-				break;
-			case 'e':
 				area = true;
 				break;
+			case 'e':
+				ch_area = true;
+				break;
 			case 'f':
+				area_ratio = true;
+				break;
+			case 'k':
 				perimeter = true;
 				break;
-			case 'g':
+			case 'l':
 				norm_perimeter = true;
 				break;
 			case 'r':
@@ -307,10 +311,16 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << " -w, --writenew" << std::endl;
 				std::cerr << "    option to not overwrite the output file if it already exists," << std::endl;
 				std::cerr << "    a new file is created with an increment number added to the end." << std::endl;
-				std::cerr << " -e, --area" << std::endl;
+				std::cerr << " -d, --area" << std::endl;
 				std::cerr << "    option to print the area of the polygon to cout." << std::endl;
-				std::cerr << " -f, --perimeter" << std::endl;
-				std::cerr << "    option to print the circumference of the polygon to cout." << std::endl;
+				std::cerr << " -e, --charea" << std::endl;
+				std::cerr << "    option to print the area of the convex hull to cout." << std::endl;
+				std::cerr << " -f, --charearatio" << std::endl;
+				std::cerr << "    option to print the ratio of (area of the polygon)/(area of convex hull) to cout." << std::endl;
+				std::cerr << " -k, --perimeter" << std::endl;
+				std::cerr << "    option to print the perimeter of the polygon to cout." << std::endl;
+				std::cerr << " -l, --normperimeter" << std::endl;
+				std::cerr << "    option to print the normalised perimeter of the polygon to cout. max([xmin,xmax],[ymin,ymax]) = [0,1]" << std::endl;
 				std::cerr << " -t" << std::endl;
 				std::cerr << "    ignores all other arguments and runs the test-bed." << std::endl;
 				break;
