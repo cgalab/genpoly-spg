@@ -1024,8 +1024,8 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   std::cerr << "=== misc tests ===" << std::endl;
 
-  std::cerr << 0*-1 << " == " << 0 << " : " << ((0*-1 == 0) ? "true" : "false") << std::endl;
-  std::cerr << -0.0 << " == " << 0 << " : " << ((0*-1 == 0) ? "true" : "false") << std::endl;
+  std::cerr << "0*-1" << " == " << 0 << " : " << ((0*-1 == 0) ? "true" : "false") << std::endl;
+  std::cerr << "-0.0" << " == " << 0 << " : " << ((-0.0 == 0) ? "true" : "false") << std::endl;
 
 
   // test the time difference between det and orient2d
