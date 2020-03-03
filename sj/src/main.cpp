@@ -32,8 +32,8 @@
 #include "statistic.h"
 
 int main(int argc, char *argv[]) {
-  std::cout << std::setprecision(7);
-  std::cerr << std::setprecision(7);
+  std::cout << std::setprecision(15);
+  std::cerr << std::setprecision(15);
   // final return value
   enum error returnValue = SUCCESS;
   // time measurement variables

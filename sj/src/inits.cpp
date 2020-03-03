@@ -118,7 +118,7 @@ enum error ifInit(enum in_format_t *inFormat, char *optarg) {
 	else if (strcmp(optarg,"dat") == 0) *inFormat = IF_DAT;
 	else {
 		*inFormat = IF_UNDEFINED;
-		std::cerr << "Error:  --informat input incorrect.  Use -H for help. Input: '" << optarg << "', should be 'points', 'poly', or 'comp'." << std::endl;
+		std::cerr << "Error:  --informat input incorrect.  Use -H for help. Input: '" << optarg << "', should be 'point', 'poly', or 'comp'." << std::endl;
 		returnValue = READ_ERROR_IFORMAT;
 	}
 	return returnValue;
