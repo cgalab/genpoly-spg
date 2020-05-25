@@ -45,7 +45,7 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 	Point *p1, *p2, *p3;
 	Edge2 e1, e2;
   bool loop=true, loop_check=true, revert=false;
-  bool debug=true;
+//  bool debug=false;
   unsigned int count_intersections=0, count_coll=0, count_reversals=0, count_total_passes=0;
   std::set<Edge2> edgeS; // a set of edges.
 //  double circumference;
@@ -80,7 +80,7 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
       loop = false;}
     else {index = 0;loop_check=false;revert=false;}
     edgeS.clear();
-    std::cerr << "new i: " << index << ", loop: " << loop << ", loop_check: " << loop_check << ", revert: " << revert << std::endl;
+//    std::cerr << "new i: " << index << ", loop: " << loop << ", loop_check: " << loop_check << ", revert: " << revert << std::endl;
   	while (index < points.size()) {
 //      if (966 < index && index < 975) {
 //        std::cerr << "i: " << index << std::endl;
@@ -106,7 +106,7 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
   		p3 = &points[polygon[after]];
 
       // construct the edges
-      (debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
+//      (debug) ? std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl : std::cerr;
 //      std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
       if ((!revert && (*p2 < *p3)) || (revert && (*p3 < *p2))) {  // make sure the earlier edge gets processed first.
         e1 = Edge2 (p1, p2);
@@ -139,16 +139,16 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 
       //process first edge
       if (!(revert ^ (*p1 == *e1.p1))) {
-        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
+//        (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
         val1.first = removeEdgeFromSeth(e1, lowest_index, edgeS, polygon, points);
-        if (debug) {std::cerr << "val1: "; print_enum(val1.first);}
+//        if (debug) {std::cerr << "val1: "; print_enum(val1.first);}
         if (val1.first == E_NOT_VALID) break;
         if (val1.first == E_INTERSECTION) { // intersection found in the removal, skip the rest and restart.
           ++count_intersections;
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if (!(revert ^ (*p1 == *e2.p1))) {
             val1_2 = removeEdgeFromSeth(e2, lowest_index, edgeS, polygon, points);
-            if (debug) {std::cerr << "val1_2: "; print_enum(val1_2);}
+//            if (debug) {std::cerr << "val1_2: "; print_enum(val1_2);}
             if (val1_2 == E_NOT_VALID) break; // the other conditions would be handled when handling 'e2' properly.  This error though has priority.
           }
           loop=true;
@@ -162,7 +162,7 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if (!(revert ^ (*p1 == *e2.p1))) {
             val1_2 = removeEdgeFromSeth(e2, lowest_index, edgeS, polygon, points);
-            if (debug) {std::cerr << "val1_2: "; print_enum(val1_2);}
+//            if (debug) {std::cerr << "val1_2: "; print_enum(val1_2);}
             if (val1_2 == E_NOT_VALID) break; // the other conditions would be handled when handling 'e2' properly.  This error though has priority.
           }
           loop=true;
@@ -172,9 +172,9 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
         }
       }
       else {
-        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
+//        (debug) ? std::cerr << "processing e1: " << e1 << std::endl : std::cerr;
         val1 = processEdgeh(e1, lowest_index, edgeS, polygon, points);
-        if (debug) {std::cerr << "val1: "; print_enum(val1.first);}
+//        if (debug) {std::cerr << "val1: "; print_enum(val1.first);}
         if (val1.first == E_NOT_VALID) break;
         if (val1.first == E_INTERSECTION) {
           ++count_intersections;
@@ -192,9 +192,9 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 
       // process second edge
       if (!(revert ^ (*p1 == *e2.p1))) {
-        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
+//        (debug) ? std::cerr << "removing e2: " << e2 << std::endl : std::cerr;
         val2.first = removeEdgeFromSeth(e2, lowest_index, edgeS, polygon, points);
-        if (debug) {std::cerr << "val2: "; print_enum(val2.first);}
+//        if (debug) {std::cerr << "val2: "; print_enum(val2.first);}
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_INTERSECTION) {
           ++count_intersections;
@@ -210,17 +210,17 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
         }
       }
       else {
-        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
+//        (debug) ? std::cerr << "processing e2: " << e2 << std::endl : std::cerr;
         val2 = processEdgeh(e2, lowest_index, edgeS, polygon, points);
-        if (debug) {std::cerr << "val2: "; print_enum(val2.first);}
+//        if (debug) {std::cerr << "val2: "; print_enum(val2.first);}
         if (val2.first == E_NOT_VALID) break;
         if (val2.first == E_INTERSECTION) {
           ++count_intersections;
           // if e1 was inserted "in front of" the index, it needs to be removed.
           if (revert ^ (*p1 == *e1.p1)) {
-            (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
+//            (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
             val2_1 = removeEdgeFromSeth(e1, lowest_index, edgeS, polygon, points);
-            if (debug) {std::cerr << "val2_1: "; print_enum(val2_1);}
+//            if (debug) {std::cerr << "val2_1: "; print_enum(val2_1);}
             if (val2_1 == E_NOT_VALID) break;
           }
           loop=true;
@@ -232,9 +232,9 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
           // when a collinearity is found, the current index is restarted, but no reversal.
           // if e1 was inserted "in front of" the index, it needs to be removed.
           if (revert ^ (*p1 == *e1.p1)) {
-            (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
+//            (debug) ? std::cerr << "removing e1: " << e1 << std::endl : std::cerr;
             val2_1 = removeEdgeFromSeth(e1, lowest_index, edgeS, polygon, points);
-            if (debug) {std::cerr << "val2_1: "; print_enum(val2_1);}
+//            if (debug) {std::cerr << "val2_1: "; print_enum(val2_1);}
             if (val2_1 == E_NOT_VALID) break;
           }
           loop=true;
@@ -248,7 +248,7 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
         else --index;
       }
       else ++index;
-      std::cerr << "i: " << index << ", l_i: " << lowest_index << std::endl;
+//      std::cerr << "i: " << index << ", l_i: " << lowest_index << std::endl;
 //      std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
 //      std::cerr << "lowest_index: " << lowest_index << std::endl;
       //if (loop == true) std::cerr << "i: " << index << ", l_i: " << lowest_index << std::endl;
