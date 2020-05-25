@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
   }
   if (calcChArea) {
     double area = calc_ch_area(points);
-    std::cout << "C.H. Area Ratio: " << area << std::endl;
+    std::cout << "C.H. Area: " << area << std::endl;
   }
   if (calcChAreaRatio) {
     double area = calc_ch_area_ratio(sph[select_polygon], points);
