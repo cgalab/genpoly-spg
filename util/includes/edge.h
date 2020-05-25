@@ -596,7 +596,7 @@ public:
     // if there's an intersection, return false.
     // need to do the intersection check here, CAN'T USE FUNCTIONS IN EDGES.CPP..
     //std::cerr << "comparing: " << std::endl;
-//    std::cerr << "this: " << *this << ", e: " << e << std::endl;
+    std::cerr << "this: " << *this << ", e: " << e << std::endl;
     bool use_p2 = false;
 
     // same edge
@@ -618,15 +618,25 @@ public:
     if (*(*this).p1 == *e.p1) {
       use_p2 = true;
     }
+    std::cerr << "use_p2: " << use_p2 << std::endl;
 
     // intersection case
     Edge2 e_l(e);
     Edge2 e_h (*this);
     bool this_lower = false;
-    if (*(*this).p1 < *e.p1) {
+    if (use_p2) {
+      if (*(*this).p2 < *e.p2) {
+        e_l.set(*this);
+        e_h.set(e);
+        this_lower = true;
+      }
+    }
+    else if (*(*this).p1 < *e.p1) {
       e_l.set(*this);
       e_h.set(e);
-      this_lower = true;}
+      this_lower = true;
+    }
+
 
     // determinant check
     bool check = 0;

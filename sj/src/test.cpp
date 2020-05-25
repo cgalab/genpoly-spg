@@ -107,6 +107,17 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "(*e1.p2): " << *e1.p1 << " == *p2: " << p2 << " : " <<  ((*e1.p2 == p2) ? "true" : "false") << std::endl;
   std::cerr << std::endl;
 
+  p1.set(6,4,0,0,0);
+  p2.set(6,6,1,1,1);
+  p3.set(6,4,0,0,0);
+  p4.set(6,7,2,2,2);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
   p1.set(0.1776512115938656,0.59801348903157514,3008,2320,3010);
   p2.set(0.32086761784458201,0.58090142848487081,3415,2321,3415);
   p3.set(0.17057308659368181,0.59801348903163565,2985,2317,2985);
