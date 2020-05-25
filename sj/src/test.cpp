@@ -101,8 +101,8 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p2.set(118532,978866,32578,48379,32578);
   p3.set(2,2,2,2,2);
   p4.set(3,3,3,3,3);
-  Edge e1 = Edge(&p1, &p2);
-  Edge e2 = Edge(&p3, &p4);
+  Edge2 e1 = Edge2(&p1, &p2);
+  Edge2 e2 = Edge2(&p3, &p4);
   std::cerr << "(*e1.p1): " << *e1.p1 << " == *p1: " << p1 << " : " <<  ((*e1.p1 == p1) ? "true" : "false") << std::endl;
   std::cerr << "(*e1.p2): " << *e1.p1 << " == *p2: " << p2 << " : " <<  ((*e1.p2 == p2) ? "true" : "false") << std::endl;
   std::cerr << std::endl;
@@ -443,7 +443,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(1,0);
   e2.set(p3,p4);
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -524,7 +524,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   e2.set(p3,p4);
 
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";
   printEnum(itest);
   std::cerr << std::endl;
 
@@ -547,26 +547,27 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p4.set(0.2120000000000000,  -0.3400000000000000, 1063, 0, 0);
   e2.set(p3,p4);
 
-  itest = checkIntersection(e1, e2);
+  itest = checkIntersection(e1, e2);;
   std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
   itest = checkIntersection(e2, e1);
   std::cout << "intersection: " << e2 << " with " << e1 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
-  itest = checkIntersection2(e1, e2);
-  std::cout << "intersection2: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
-  itest = checkIntersection2(e2, e1);
-  std::cout << "intersection2: " << e2 << " with " << e1 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
 
-  p1.set(-0.0640000000000000, 0.1240000000000001, 490, 0, 0);
-  p2.set( 0.0320000000000000, 0.0280000000000000, 717, 0, 0);
+  p1.set(-0.0640000000000000, 0.124000000000000, 490, 0, 0);
+  p2.set( 0.0320000000000000, 0.028000000000000, 717, 0, 0);
   e1.set(p1,p2);
-  p3.set(-0.0680000000000000, 0.1280000000000001, 482,0,0);
-  p4.set( 0.0120000000000000, 0.0480000000000000, 665,0,0);
+  p3.set(-0.0680000000000000, 0.128000000000000, 482,0,0);
+  p4.set( 0.0120000000000000, 0.048000000000000, 665,0,0);
   e2.set(p3,p4);
   std::cerr << std::endl;
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
-  itest = checkIntersection(e2, e1);
+//  std::cout << "*************************" << std::endl;
+//  std::cout << "e1.cdet(*e2.p1): " << e1.cdet(*e2.p1) << std::endl;
+//  std::cout << "e1.cdet(*e2.p2): " << e1.cdet(*e2.p2) << std::endl;
+//  std::cout << "e2.cdet(*e1.p1): " << e2.cdet(*e1.p1) << std::endl;
+//  std::cout << "e2.cdet(*e1.p2): " << e2.cdet(*e1.p2) << std::endl;
   std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+  itest = checkIntersection(e2, e1);
+  std::cout << "intersection: " << e2 << " with " << e1 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
 
   p1.set(0.5566406250000000, 0.1640625000000000, 2504, 0, 0);
   p2.set(0.5605468750000000, 0.1562500000000000, 2508, 0, 0);
@@ -576,9 +577,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   e2.set(p3,p4);
   std::cerr << std::endl;
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
-  itest = checkIntersection2(e2, e1);
-  std::cout << "intersection2: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
 
   p1.set(0.5488281250000000, 0.1523437500000000, 2496, 0, 0);
   p2.set(0.5605468750000000, 0.1562500000000000, 2508, 0, 0);
@@ -588,10 +587,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   e2.set(p3,p4);
   std::cerr << std::endl;
   itest = checkIntersection(e1, e2);
-  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
-  itest = checkIntersection2(e2, e1);
-  std::cout << "intersection2: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
-
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
 
 /*
   Testing Yval class in edge.h
@@ -645,9 +641,9 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p2.set(76260,670);
   p3.set(49720,4342);
   p4.set(66520,4596);
-  y1 = getYatX(e1, 49720);
-  y2 = getYatX(e2, 49720);
-  std::cerr << std::setprecision(15) << y1 << " == " << y2 << " should be true : " << ((y1 == y2) ? "true" : "false") << std::endl;
+  //y1 = getYatX(e1, 49720);
+  //y2 = getYatX(e2, 49720);
+  //std::cerr << std::setprecision(15) << y1 << " == " << y2 << " should be true : " << ((y1 == y2) ? "true" : "false") << std::endl;
 
   std::cerr << std:: endl;
 
@@ -681,16 +677,14 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p2.set(1,2);
   p3.set(1,1);
   p4.set(1,2);
-  e1.l_idx = 1;
-  e2.l_idx = 1;
 
   std::cerr << e1 << " == " << e2 << " should be true : " << ((e1 == e2) ? "true" : "false") << std::endl;
 
   std::cerr << std::endl;
   std::cerr << "=== Edge set tests ===" << std::endl;
 
-  std::set<Edge> edgeS; // a set of edges
-  std::pair<std::set<Edge>::iterator,bool> retval; // return value
+  std::set<Edge2> edgeS; // a set of edges
+  std::pair<std::set<Edge2>::iterator,bool> retval; // return value
 
   p1.set(0,0.6);
   p2.set(1,0);
@@ -712,14 +706,14 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   Point p5 = Point(2,0,5,5);
   Point p6 = Point(2,3,6,6);
 
-  Edge e3 = Edge(&p5, &p6);
+  Edge2 e3 = Edge2(&p5, &p6);
 
   std::cerr << "inserting e3:" << e3 << std::endl;
   retval = edgeS.insert(e3);
   std::cerr << "r.1: " << (*retval.first) << std::endl;
   std::cerr << "r.2 should be true for a correct insertion: " << (retval.second ? "true" : "false") << std::endl;
   std::cerr << "edges in set" << std::endl;
-  for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+  for (std::set<Edge2>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
 
   std::cerr << std::endl;
 
@@ -729,7 +723,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   p2.set(-0.43791999999999997595,0.30967199999999989179);
   e1.set(p1,p2);
   p3.set(-0.45356000000000001871,0.31280000000000002247);
-  double area = det(e1, p3);
+  double area = e1.cdet(p3);
   std::cerr << "e1: " << e1 << ", p3: " << p3 << std::endl;
   std::cerr << "det: " << area  << ", det != 0: " << ((area != 0) ? "true" : "false") << std::endl;
 
@@ -749,7 +743,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
     while (fabs(current - 1.0) > EPSILON) {
       current = nextafter(current, 1.0);
       p1.set(current, current);
-      area = det(e1, p1);
+      area = e1.cdet(p1);
       if (area > max) max = area;
       ++counter;
       if (counter % 1000000 == 0) std::cerr << "max: " << max << std::endl;
@@ -828,19 +822,19 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
 
   std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
-  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << e1.cdet(p3) << std::endl;
   std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
 
   std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
-  std::cerr << "det(e1, p4)       : " << det(e1, p4) << std::endl;
+  std::cerr << "det(e1, p4)       : " << e1.cdet(p4) << std::endl;
   std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
 
   std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
-  std::cerr << "det(e2, p1)       : " << det(e2, p1) << std::endl;
+  std::cerr << "det(e2, p1)       : " << e2.cdet(p1) << std::endl;
   std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
 
   std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
-  std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
+  std::cerr << "det(e2, p2)       : " << e2.cdet(p2) << std::endl;
   std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
 
   std::cerr << "======= Shewchuks Predicates test 2 ===============" << std::endl;
@@ -863,19 +857,19 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
 
   std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
-  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << e1.cdet(p3) << std::endl;
   std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
 
   std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
-  std::cerr << "det(e1, p4)       : " << det(e1, p4) << std::endl;
+  std::cerr << "det(e1, p4)       : " << e1.cdet(p4) << std::endl;
   std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
 
   std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
-  std::cerr << "det(e2, p1)       : " << det(e2, p1) << std::endl;
+  std::cerr << "det(e2, p1)       : " << e2.cdet(p1) << std::endl;
   std::cerr << "orient2d(pd,pc,pa): " << orient2d(pd,pc,pa) << std::endl;
 
   std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
-  std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
+  std::cerr << "det(e2, p2)       : " << e2.cdet(p2) << std::endl;
   std::cerr << "orient2d(pd,pc,pb): " << orient2d(pd,pc,pb) << std::endl;
 
   std::cerr << "reldist(e1, p3): " << reldist(e1, p3) << std::endl;
@@ -902,7 +896,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
 
   std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
-  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << e1.cdet(p3) << std::endl;
   std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
   std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
   std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
@@ -926,7 +920,7 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
 
   std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
-  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << e1.cdet(p3) << std::endl;
   std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
   std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
   std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
@@ -952,19 +946,19 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
 
   std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
-  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << e1.cdet(p3) << std::endl;
   std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
 
   std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
-  std::cerr << "det(e1, p4)       : " << det(e1, p4) << std::endl;
+  std::cerr << "det(e1, p4)       : " << e1.cdet(p4) << std::endl;
   std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
 
   std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
-  std::cerr << "det(e2, p1)       : " << det(e2, p1) << std::endl;
+  std::cerr << "det(e2, p1)       : " << e2.cdet(p1) << std::endl;
   std::cerr << "orient2d(pd,pc,pa): " << orient2d(pd,pc,pa) << std::endl;
 
   std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
-  std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
+  std::cerr << "det(e2, p2)       : " << e2.cdet(p2) << std::endl;
   std::cerr << "orient2d(pd,pc,pb): " << orient2d(pd,pc,pb) << std::endl;
 
   std::cerr << "reldist(e1, p3): " << reldist(e1, p3) << std::endl;
@@ -972,13 +966,13 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "reldist(e2, p1): " << reldist(e2, p1) << std::endl;
   std::cerr << "reldist(e2, p2): " << reldist(e2, p2) << std::endl;
 
-  pa.x = 0; pa.y = 0.4;
-  pb.x = 0.8;  pb.y = 0.9;
-  pc.x = 0;    pc.y = 0.6;
+  pa.x = 0;   pa.y = 0.4;
+  pb.x = 0.8; pb.y = 0.9;
+  pc.x = 0;   pc.y = 0.6;
   pd.x = 0;   pd.y = 1;
-  p1.set(0, 0.4);
-  p2.set(0.8,  0.9);
-  p3.set(0,    0.6);
+  p1.set(0,   0.4);
+  p2.set(0.8, 0.9);
+  p3.set(0,   0.6);
   p4.set(0,   1);
 
   e1.set(p1,p2);
@@ -990,19 +984,19 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
 
   std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
-  std::cerr << "det(e1, p3)       : " << det(e1, p3) << std::endl;
+  std::cerr << "det(e1, p3)       : " << e1.cdet(p3) << std::endl;
   std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
 
   std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
-  std::cerr << "det(e1, p4)       : " << det(e1, p4) << std::endl;
+  std::cerr << "det(e1, p4)       : " << e1.cdet(p4) << std::endl;
   std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
 
   std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
-  std::cerr << "det(e2, p1)       : " << det(e2, p1) << std::endl;
+  std::cerr << "det(e2, p1)       : " << e2.cdet(p1) << std::endl;
   std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
 
   std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
-  std::cerr << "det(e2, p2)       : " << det(e2, p2) << std::endl;
+  std::cerr << "det(e2, p2)       : " << e2.cdet(p2) << std::endl;
   std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
 
   std::cerr << "reldist(e1, p3): " << reldist(e1, p3) << std::endl;

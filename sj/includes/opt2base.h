@@ -25,6 +25,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgee(Edge& e, Point *id
 std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *idx, unsigned int& lowest_index, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 std::pair<enum edge_t, std::set<Edge>::iterator> processEdgef(Edge& e, Point *idx, unsigned int& lowest_index, unsigned int& highest_index, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeg(Edge& e, Point *idx, unsigned int& lowest_index, unsigned int& highest_index, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
-enum edge_t processEdgeh(Edge2& e, unsigned int& lowest_index, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+//enum edge_t processEdgeh(Edge2& e, unsigned int& lowest_index, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+std::pair<enum edge_t, std::set<Edge2>::iterator> processEdgeh(Edge2& e, unsigned int& lowest_index, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 
 #endif

@@ -40,6 +40,15 @@ bool eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS) {
   return false;
 }
 
+// this function should be used to guarantee removal of an edge from the 'edgeS' set.
+void softEraseEdgeFromSet (Edge2 e, std::set<Edge2>& edgeS) {
+  std::set<Edge2>::iterator it;
+
+//  std::cerr << "edge being erased: " << e << std::endl;
+  it = edgeS.find(e);
+  edgeS.erase(it);
+}
+
 // function to remove edges connected to a single vertex from 'edgeS' set.
 // does not care whether it finds an edge or not, just attempts to remove it.
 void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
@@ -60,6 +69,33 @@ void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned i
   } else {
     e1 = Edge(p1, p3);
     e2 = Edge(p1, p2);
+  }
+
+//  std::cerr << "erasing vertexes: e1: " << e1 << ", e2: " << e2 << std::endl;
+	edgeS.erase(e1);
+	edgeS.erase(e2);
+}
+
+// function to remove Edge2 edges connected to a single vertex from 'edgeS' set.
+// does not care whether it finds an edge or not, just attempts to remove it.
+void eraseVertexFromSet(Point *p1, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  unsigned int before, after;
+  Point *p2, *p3;
+  Edge2 e1, e2;
+	std::set<Edge2>::iterator it1;
+
+  before = ((*p1).v + points.size() -1) % points.size();
+  after =  ((*p1).v + points.size() +1) % points.size();
+
+  p2 = &points[polygon[before]];
+  p3 = &points[polygon[after]];
+
+  if (*p2 < *p3) {
+    e1 = Edge2(p1, p2);
+    e2 = Edge2(p1, p3);
+  } else {
+    e1 = Edge2(p1, p3);
+    e2 = Edge2(p1, p2);
   }
 
 //  std::cerr << "erasing vertexes: e1: " << e1 << ", e2: " << e2 << std::endl;
@@ -323,7 +359,7 @@ enum intersect_t checkIntersection2(const Edge e1, const Edge e2) {
 }
 
 // uses shewchuks predicates for the determinant.
-enum intersect_t checkIntersection2(const Edge2 e1, const Edge2 e2) {
+enum intersect_t checkIntersection(const Edge2 e1, const Edge2 e2) {
 	// is e1 and e2 the same edge?
 	if (e1 == e2) return IS_SAME_EDGE;
 
@@ -350,10 +386,10 @@ enum intersect_t checkIntersection2(const Edge2 e1, const Edge2 e2) {
 	det_c = orient2d(pc, pd, pa);
 	det_d = orient2d(pc, pd, pb);
 
-	//std::cerr.precision(24);
-	//int sig,ex;
-	//sig = frexp(det_d, &ex);
-	//std::cerr << "sig: " << sig << ", exp: " << ex << std::endl;
+//	std::cerr.precision(24);
+//	int sig,ex;
+//	sig = frexp(det_d, &ex);
+//	std::cerr << "sig: " << sig << ", exp: " << ex << std::endl;
 //	std::cerr.precision(17);
 //	std::cerr << "det_a: " << det_a << std::endl;
 //	std::cerr << "det_b: " << det_b << std::endl;

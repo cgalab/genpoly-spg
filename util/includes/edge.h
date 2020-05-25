@@ -597,73 +597,58 @@ public:
     // need to do the intersection check here, CAN'T USE FUNCTIONS IN EDGES.CPP..
     //std::cerr << "comparing: " << std::endl;
 //    std::cerr << "this: " << *this << ", e: " << e << std::endl;
-    if ((*(*this).p1 == *e.p1) && (*(*this).p2 == *e.p2)) return false; // same edge
-    if (*(*this).p1 == *e.p2) {
-//      std::cerr << "this.p1 == e.p2" << std::endl;
-      return false; // lex. higher point of 'e' is lower than lex. lower point of 'this'
-    }
+    bool use_p2 = false;
+
+    // same edge
+    if ((*(*this).p1 == *e.p1) && (*(*this).p2 == *e.p2)) return false;
+
+    // non-overlapping line segments
+    if (*e.p2 < *(*this).p1) return false;
+    if (*(*this).p2 < *e.p1) return true;
+
+    // same origin point
     if (*(*this).p2 == *e.p1) {
 //      std::cerr << "this.p2 == e.p1" << std::endl;
       return true;  // and vice versa.
     }
+    if (*(*this).p1 == *e.p2) {
+//      std::cerr << "this.p1 == e.p2" << std::endl;
+      return false; // lex. higher point of 'e' is lower than lex. lower point of 'this'
+    }
     if (*(*this).p1 == *e.p1) {
-//      std::cerr << "returning sign(this.cdet(e.p2)): " << (*this).cdet(*e.p2) << std::endl;
-      return signbit((*this).cdet(*e.p2)); //same lex. lower point
-    }
-    if (*(*this).p2 == *e.p2) {
-//      std::cerr << "returning sign(this.cdet(e.p1)): " << (*this).cdet(*e.p1) << std::endl;
-      return signbit((*this).cdet(*e.p1)); // same lex. higher point
+      use_p2 = true;
     }
 
-    double det1, det2, det3, det4;
-    det1 = (*this).cdet(*e.p1);
-    det2 = (*this).cdet(*e.p2);
-    det3 = e.cdet(*p1);
-    det4 = e.cdet(*p2);
-    //std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
-    // in case a det is 0, it needs to be the same sign as the other det
-    if (det1 == 0) {if (det2 < 0) det1 = -0.0;}
-    if (det2 == 0) {if (det1 < 0) det2 = -0.0;}
-    if (det3 == 0) {if (det4 < 0) det3 = -0.0;}
-    if (det4 == 0) {if (det3 < 0) det4 = -0.0;}
-    //std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
-    if ((signbit(det1) ^ signbit(det2)) && (signbit(det3) ^ signbit(det4))) {
-//      std::cerr << "this: " << *this << " intersects " << e << std::endl;
-//      std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
-      return false; // an intersection
-    }
-    if (!(signbit(det1) ^ signbit(det2))) { // 'e' is on one side of 'this'
-      if (!(signbit(det3) ^ signbit(det4))) { // 'this' is on one side of 'e'
-        if (signbit(det1) ^ signbit (det3)) return signbit(det1); // different signs means they can be ordered
-        if (!(signbit(det1) ^ signbit(det3))) return (*(*this).p1 < *e.p1); // same sign means need to find the order from the points
-      }
-//      std::cerr << "returning sign(det1): " << signbit(det1) << std::endl;
-//      std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
-      return signbit(det1);
-    }
-    if (!(signbit(det3) ^ signbit(det4))) {
-//      std::cerr << "returning !sign(det3): " << !signbit(det3) << std::endl;
-//      std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
-      return !signbit(det3); // 'this' is on one side of 'e'
-    }
-//    std::cerr << "returning sign(det1): " << signbit(det1) << std::endl;
-//    std::cerr << "det1: " << det1 << ", det2: " << det2 << ", det3: " << det3 << ", det4: " << det4 << std::endl;
+    // intersection case
+    Edge2 e_l(e);
+    Edge2 e_h (*this);
+    bool this_lower = false;
+    if (*(*this).p1 < *e.p1) {
+      e_l.set(*this);
+      e_h.set(e);
+      this_lower = true;}
 
-    return signbit(det1); // both dets should be the same, so either should be fine.
+    // determinant check
+    bool check = 0;
+    if (use_p2) check = signbit(e_l.cdet(*e_h.p2));
+    else check = signbit(e_l.cdet(*e_h.p1));
+
+    if (check) {
+      if (this_lower) return false;
+      else return true;
+    }
+    else {
+      if (this_lower) return true;
+      else return false;
+    }
   }
 
-  bool operator == (const Edge2 e) const {
-//    std::cerr << "lhs: " << *this << ", rhs: " << e << std::endl;
-		if ((*p1 == *e.p1) && (*p2 == *e.p2)) return true;
-		else return false;
-  }
-/*
-	friend bool operator==(const Edge lhs, const Edge rhs) {
-    std::cerr << "lhs: " << lhs << ", rhs: " << rhs << std::endl;
-		if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
+	bool operator== (const Edge2 rhs) const {
+//    std::cerr << "lhs: " << *this << ", rhs: " << rhs << std::endl;
+		if ((*(*this).p1 == *rhs.p1) && (*(*this).p2 == *rhs.p2)) return true;
 		else return false;
 	}
-*/
+
   friend bool operator!=(const Edge2 lhs, const Edge2 rhs) {
 		if ((*lhs.p1 != *rhs.p1) || (*lhs.p2 != *rhs.p2)) return true;
 		else return false;
@@ -831,7 +816,9 @@ public:
 
 void decrementEdges(std::set<Edge>& edgeS);
 bool eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS);
+void softEraseEdgeFromSet (Edge2 e, std::set<Edge2>& edgeS);
 void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+void eraseVertexFromSet(Point *p1, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 //void createRandPol(std::vector<unsigned int>& polygon,std::vector<Point>& points, unsigned int randseed);
 double reldist(const Edge& e, const Point& p);
 double reldist(const Edge2& e, const Point& p);
@@ -842,8 +829,8 @@ double dety(const Edge e, const Point p);
 Yval getYatX(const Edge& e, const double x);
 unsigned int getLowestLexIdx(const Edge e1, const Edge e2);
 enum intersect_t checkIntersection(const Edge e1, const Edge e2);
+enum intersect_t checkIntersection(const Edge2 e1, const Edge2 e2);
 enum intersect_t checkIntersection2(const Edge e1, const Edge e2);
-enum intersect_t checkIntersection2(const Edge2 e1, const Edge2 e2);
 void flip(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void flip(Edge2& e1, Edge2& e2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon, std::vector<Point>& points);
