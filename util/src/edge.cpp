@@ -40,13 +40,22 @@ bool eraseEdgeFromSet (Edge e, std::set<Edge>& edgeS) {
   return false;
 }
 
-// this function should be used to guarantee removal of an edge from the 'edgeS' set.
+// this function should be used to remove an edge from the 'edgeS' set if it was found.
 void softEraseEdgeFromSet (Edge2 e, std::set<Edge2>& edgeS) {
   std::set<Edge2>::iterator it;
 
 //  std::cerr << "edge being erased: " << e << std::endl;
-  it = edgeS.find(e);
-  edgeS.erase(it);
+  do {
+	  it = edgeS.find(e);
+	  if (it != edgeS.end()) {
+	    // if the vertex indices are not incidental, remove the edge in it' and find 'e' again
+			if ((*it) == e) {edgeS.erase(it);break;}
+	    else if ((*it).getPHigh() - (*it).getPLow() != 1) {
+	      edgeS.erase(it);
+	    }
+	    else break;
+	  }
+	} while (true);
 }
 
 // function to remove edges connected to a single vertex from 'edgeS' set.
