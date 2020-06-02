@@ -80,9 +80,9 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
       UniformRandomI(revert, 0, 1);
       loop = false;}
     else {
-      UniformRandomI(revert, 0, 1);
-      //if (points.size()-1 - highest_index < lowest_index) revert = true;
-      //else revert = false;
+      //UniformRandomI(revert, 0, 1);
+      if (points.size()-1 - highest_index < lowest_index) revert = true;
+      else revert = false;
       if (revert) {index = points.size()-1;}
       else {index = 0;}
       loop_check=false;
