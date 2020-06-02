@@ -45,17 +45,14 @@ void softEraseEdgeFromSet (Edge2 e, std::set<Edge2>& edgeS) {
   std::set<Edge2>::iterator it;
 
 //  std::cerr << "edge being erased: " << e << std::endl;
-  do {
-	  it = edgeS.find(e);
-	  if (it != edgeS.end()) {
-	    // if the vertex indices are not incidental, remove the edge in it' and find 'e' again
-			if ((*it) == e) {edgeS.erase(it);break;}
-	    else if ((*it).getPHigh() - (*it).getPLow() != 1) {
-	      edgeS.erase(it);
-	    }
-	    else break;
-	  }
-	} while (true);
+  it = edgeS.find(e);
+  if (it != edgeS.end()) {
+    // if the vertex indices are not incidental, remove the edge in it' and find 'e' again
+		if ((*it) == e) edgeS.erase(it);
+    else if ((*it).getPHigh() - (*it).getPLow() != 1) {
+      edgeS.erase(it);
+    }
+  }
 }
 
 // function to remove edges connected to a single vertex from 'edgeS' set.
