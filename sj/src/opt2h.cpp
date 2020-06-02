@@ -48,7 +48,7 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 	Edge2 e1, e2;
   bool loop=true, loop_check=true, revert=false;
 //  bool debug=false;
-  unsigned int count_intersections=0, count_coll=0, count_reversals=0, count_total_passes=0;
+  unsigned int count_intersections=0, count_coll=0, count_total_passes=0;
   std::set<Edge2> edgeS; // a set of edges.
 //  double circumference;
 //  std::map<double, unsigned int> circ, c_counter;
@@ -266,7 +266,6 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
   std::cout << "Total passes: " << count_total_passes << std::endl;
   std::cout << "Intersections: " << count_intersections << std::endl;
   std::cout << "Collinearities: " << count_coll << std::endl;
-  std::cout << "Reversals: " << count_reversals << std::endl;
 
 	return retval;
 }
