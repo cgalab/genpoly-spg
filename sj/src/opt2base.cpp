@@ -105,11 +105,24 @@ void update_lowest_index(Edge2 e1, Edge2 e2, unsigned int& lowest_index) {
 }
 
 void update_highest_index(Edge e1, Edge e2, unsigned int& highest_index) {
-  if (e1.getLowerLexIdx() < e2.getLowerLexIdx()) {
-    if (e1.getLowerLexIdx() > highest_index) highest_index = e1.getLowerLexIdx();
+  unsigned int e1_higher = e1.getHigherLexIdx();
+  unsigned int e2_higher = e2.getHigherLexIdx();
+  if (e1_higher > e2_higher) {
+    if (e1_higher > highest_index) highest_index = e1_higher;
   }
   else {
-    if (e2.getLowerLexIdx() > highest_index) highest_index = e2.getLowerLexIdx();
+    if (e2_higher > highest_index) highest_index = e2_higher;
+  }
+}
+
+void update_highest_index(Edge2 e1, Edge2 e2, unsigned int& highest_index) {
+  unsigned int e1_higher = e1.getHigherLexIdx();
+  unsigned int e2_higher = e2.getHigherLexIdx();
+  if (e1_higher > e2_higher) {
+    if (e1_higher > highest_index) highest_index = e1_higher;
+  }
+  else {
+    if (e2_higher > highest_index) highest_index = e2_higher;
   }
 }
 
@@ -989,7 +1002,7 @@ enum edge_t removeEdgeFromSetg(Edge& e, unsigned int& lowest_index, unsigned int
 }
 
 // function for opt2h.
-enum edge_t removeEdgeFromSeth(Edge2& e, unsigned int& lowest_index, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+enum edge_t removeEdgeFromSeth(Edge2& e, unsigned int& lowest_index, unsigned int& highest_index, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum edge_t valid = E_VALID;
 
   Edge2 before, after;
@@ -1030,7 +1043,7 @@ enum edge_t removeEdgeFromSeth(Edge2& e, unsigned int& lowest_index, std::set<Ed
     else {
       if ((isval == IS_4P_COLLINEAR) || (isval == IS_3P_COLLINEAR)) {
         Edge2 temp_e (*it);
-        coll4Swap5(e, temp_e, edgeS, polygon, points, lowest_index);
+        coll4Swap5(e, temp_e, edgeS, polygon, points, lowest_index, highest_index);
 //        std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
         valid = E_COLLINEAR;
       }
@@ -1038,6 +1051,7 @@ enum edge_t removeEdgeFromSeth(Edge2& e, unsigned int& lowest_index, std::set<Ed
         Edge2 temp_e = Edge2(*it);
         flip(e, temp_e, polygon, points);
         update_lowest_index(e, temp_e, lowest_index);
+        update_highest_index(e, temp_e, highest_index);
         valid = E_INTERSECTION;
       }
       edgeS.erase(it);
@@ -1085,7 +1099,7 @@ enum edge_t removeEdgeFromSeth(Edge2& e, unsigned int& lowest_index, std::set<Ed
   //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
         Edge2 t_bef = Edge2((*ibef).p1, (*ibef).p2);
         Edge2 t_aft = Edge2((*iaft).p1, (*iaft).p2);
-        coll4Swap5(t_bef, t_aft, edgeS, polygon, points, lowest_index);
+        coll4Swap5(t_bef, t_aft, edgeS, polygon, points, lowest_index, highest_index);
   //        std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
         valid = E_COLLINEAR;
         edgeS.erase(ibef);
@@ -1097,6 +1111,7 @@ enum edge_t removeEdgeFromSeth(Edge2& e, unsigned int& lowest_index, std::set<Ed
         Edge2 t_aft = Edge2((*iaft).p1, (*iaft).p2);
         flip(t_bef, t_aft, polygon, points);
         update_lowest_index(*ibef, *iaft, lowest_index);
+        update_highest_index(*ibef, *iaft, highest_index);
         valid = E_INTERSECTION;
         edgeS.erase(ibef);
         edgeS.erase(iaft);
@@ -2558,7 +2573,7 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdgeg(Edge& e, Point *id
 
 // for reversal algorithm opt2f, when it finds an intersection, it inserts the flipped edge that does not connect to the current point.
 // as the edge connected to the current point is handled in the index restart.
-std::pair<enum edge_t, std::set<Edge2>::iterator> processEdgeh(Edge2& e, unsigned int& lowest_index, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+std::pair<enum edge_t, std::set<Edge2>::iterator> processEdgeh(Edge2& e, unsigned int& lowest_index, unsigned int& highest_index, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum edge_t valid = E_VALID;
   enum intersect_t isval;
   bool bef = false, af = false;
@@ -2599,7 +2614,7 @@ std::pair<enum edge_t, std::set<Edge2>::iterator> processEdgeh(Edge2& e, unsigne
       }
       else if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << e << " and before: " << before << std::endl;
-        if (coll4Swap5(e, before, edgeS, polygon, points, lowest_index)) {
+        if (coll4Swap5(e, before, edgeS, polygon, points, lowest_index, highest_index)) {
 //          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
           valid = E_COLLINEAR;
         }
@@ -2611,7 +2626,8 @@ std::pair<enum edge_t, std::set<Edge2>::iterator> processEdgeh(Edge2& e, unsigne
         softEraseEdgeFromSet(before, edgeS);
         flip(e, before, polygon, points);
         valid = E_INTERSECTION;
-        //update_lowest_index(e, before, lowest_index);
+        update_lowest_index(e, before, lowest_index);
+        update_highest_index(e, before, highest_index);
       }
     }
     // check incidental edge 'after' if it intersects with 'e'
@@ -2623,7 +2639,7 @@ std::pair<enum edge_t, std::set<Edge2>::iterator> processEdgeh(Edge2& e, unsigne
       }
       else if (isval == IS_4P_COLLINEAR) {
 //        std::cerr << "4P collinearity between:" << e << " and after: " << after << std::endl;
-        if (coll4Swap5(e, after, edgeS, polygon, points, lowest_index)) {
+        if (coll4Swap5(e, after, edgeS, polygon, points, lowest_index, highest_index)) {
 //          std::cerr << "coll. after swap: " << e << " and " << after << std::endl;
           valid = E_COLLINEAR;
         }
@@ -2642,7 +2658,8 @@ std::pair<enum edge_t, std::set<Edge2>::iterator> processEdgeh(Edge2& e, unsigne
         softEraseEdgeFromSet(after, edgeS);
         flip(e, after, polygon, points);
         valid = E_INTERSECTION;
-        //update_lowest_index(e, after, lowest_index);
+        update_lowest_index(e, after, lowest_index);
+        update_highest_index(e, after, highest_index);
 //        std::cerr << "after flip: e: " << e << ", after: " << after << std::endl;
       }
     }

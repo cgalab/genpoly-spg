@@ -194,6 +194,10 @@ public:
     if ((*p1).l < (*p2).l) return (*p1).l;
     else return (*p2).l;
   }
+  double getHigherLexIdx() const { // not necessary as p1 is always the lower lex. index.
+    if ((*p1).l < (*p2).l) return (*p2).l;
+    else return (*p1).l;
+  }
   Yval getYatX(const double s) const {
   	Yval y;
   	// calculate the y-axis order of the 2 edges at idx
@@ -507,6 +511,10 @@ public:
   double getLowerLexIdx() const { // not necessary as p1 is always the lower lex. index.
     if ((*p1).l < (*p2).l) return (*p1).l;
     else return (*p2).l;
+  }
+  double getHigherLexIdx() const { // not necessary as p1 is always the lower lex. index.
+    if ((*p1).l < (*p2).l) return (*p2).l;
+    else return (*p1).l;
   }
   Yval getYatX(const double s) const {
   	Yval y;

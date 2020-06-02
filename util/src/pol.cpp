@@ -1239,7 +1239,7 @@ bool coll3Sort4(Point *a, Point *b, Point *c, std::vector<unsigned int>& polygon
 // then puts the chain into the polygon in the orientation with smaller length to its adjacent vertices.
 // Removes edges from the set, does not put them back in.
 // updates 'lower_index'.
-bool coll3Sort5(Point *a, Point *b, Point *c, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int& lowest_index) {
+bool coll3Sort5(Point *a, Point *b, Point *c, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int& lowest_index, unsigned int& highest_index) {
   std::vector<Point> cp;
   unsigned int lower, upper, index;
   double value;
@@ -1295,6 +1295,8 @@ bool coll3Sort5(Point *a, Point *b, Point *c, std::set<Edge2>& edgeS, std::vecto
 
   //update the lowest_index
   if (cp[0].l < lowest_index) lowest_index = cp[0].l;
+  //update the highest_index
+  if (highest_index < cp[cp.size()-1].l) highest_index = cp[cp.size()-1].l;
 
   // from 'lower' to 'upper': add the sorted points in cp in order.
   index = 0;
@@ -2360,7 +2362,7 @@ bool coll4Swap4 (Edge& e1, Edge& e2, std::set<Edge>& edgeS, std::vector<unsigned
 // function removes edges from the set.
 // grabs all collinear points of the 2 chains defined by the 2 edges and sorts them lexicographically,
 // the lowest lex. point gets put in lowest vertex index, and so on until highest lex. points goes into highest vertex index.
-bool coll4Swap5 (Edge2& e1, Edge2& e2, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int& lowest_index) {
+bool coll4Swap5 (Edge2& e1, Edge2& e2, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points, unsigned int& lowest_index, unsigned int& highest_index) {
 //  std::cerr << "=== coll4Swap5 function ===" << std::endl;
   std::vector<Point> cp;
   double value;
@@ -2374,19 +2376,19 @@ bool coll4Swap5 (Edge2& e1, Edge2& e2, std::set<Edge2>& edgeS, std::vector<unsig
 //  std::cerr << "same point: e1p2: " << *e1.p2 << " == e2p2: " << *e2.p2 << ", is: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << std::endl;
   if (*e1.p1 == *e2.p1) {
 //    std::cerr << "hi1"<<std::endl;
-    return coll3Sort5(e1.p1, e1.p2, e2.p2, edgeS, polygon, points, lowest_index);
+    return coll3Sort5(e1.p1, e1.p2, e2.p2, edgeS, polygon, points, lowest_index, highest_index);
   }
   if (*e1.p1 == *e2.p2) {
 //    std::cerr << "hi2"<<std::endl;
-    return coll3Sort5(e1.p1, e1.p2, e2.p1, edgeS, polygon, points, lowest_index);
+    return coll3Sort5(e1.p1, e1.p2, e2.p1, edgeS, polygon, points, lowest_index, highest_index);
   }
   if (*e1.p2 == *e2.p1) {
 //    std::cerr << "hi3"<<std::endl;
-    return coll3Sort5(e1.p1, e1.p2, e2.p2, edgeS, polygon, points, lowest_index);
+    return coll3Sort5(e1.p1, e1.p2, e2.p2, edgeS, polygon, points, lowest_index, highest_index);
   }
   if (*e1.p2 == *e2.p2) {
 //    std::cerr << "hi4"<<std::endl;
-    return coll3Sort5(e1.p1, e1.p2, e2.p1, edgeS, polygon, points, lowest_index);
+    return coll3Sort5(e1.p1, e1.p2, e2.p1, edgeS, polygon, points, lowest_index, highest_index);
   }
 
 //  std::cerr << "e1: " << e1 << ", e2: " << e2 << std::endl;
@@ -2474,6 +2476,8 @@ bool coll4Swap5 (Edge2& e1, Edge2& e2, std::set<Edge2>& edgeS, std::vector<unsig
 
   // update the lowest_index if necessary
   if (cp[0].l < lowest_index) lowest_index = cp[0].l;
+  // update the highest_index if necessary
+  if (highest_index < cp[cp.size()-1].l) highest_index = cp[cp.size()-1].l;
 
   //in case the 2 chains are continuous, sort the lower/upper indices among themselves.
 //  std::cerr << "lower1: " << lower1 << ", upper1: " << upper1 << ", lower2: " << lower2 << ", upper2: " << upper2 << std::endl;
