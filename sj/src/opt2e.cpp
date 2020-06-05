@@ -124,7 +124,7 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 //        if (debug) {std::cerr << "val1: "; print_enum(val1.first);}
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
-          if (val2.first == E_INTERSECTION) ++count_intersections;
+          if (val1.first == E_INTERSECTION) ++count_intersections;
           else ++count_coll;
           // before restarting, make sure e2 wasn't supposed to be removed as well, if so, remove it.
           if (*e2.p2 == *p1) {
@@ -144,7 +144,7 @@ enum error opt2e(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 //        if (debug) {std::cerr << "val1: "; print_enum(val1.first);}
         if (val1.first == E_NOT_VALID) break;
         if ((val1.first == E_INTERSECTION) || (val1.first == E_COLLINEAR)) {
-          if (val2.first == E_INTERSECTION) ++count_intersections;
+          if (val1.first == E_INTERSECTION) ++count_intersections;
           else ++count_coll;
           loop=true;e1_found=true;
         }
