@@ -25,6 +25,7 @@
 #include "opt2g.h"
 #include "opt2h.h"
 #include "curve.h"
+#include "hole.h"
 #include "simple_pol_check.h"
 #include "star.h"
 #include "allsp.h"
@@ -110,7 +111,7 @@ int main(int argc, char *argv[]) {
     }
 //    std::cerr << "points:" << std::endl;
 //    pdisplay(sph, points);
-    returnValue = simple_pol_check(sph[0], points);
+    returnValue = simple_pol_check(sph, points);
     if (returnValue != SUCCESS) return returnValue;
   }
 
@@ -162,7 +163,7 @@ int main(int argc, char *argv[]) {
     returnValue = pntslopecount(points);
   }
   if (generate_holes) {
-    returnValue = holes2(sph, points, nr_holes);
+    returnValue = generateHoles(sph, points, nr_holes);
   }
   if (returnValue != SUCCESS) {
     std::cerr << "Error running the algorithm!" << std::endl;

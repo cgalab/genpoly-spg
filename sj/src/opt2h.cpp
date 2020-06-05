@@ -241,18 +241,31 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
         }
       }
 
-      if (revert) {
-        if (index == lowest_index) {
-          index = points.size();
-          if (lowest_index < random_index) lowest_index = random_index;
+      if (loop_check) { // true means it isn't the validation part.
+        if (revert) {
+          if (index == lowest_index) {
+            index = points.size();
+            if (lowest_index < random_index) lowest_index = random_index;
+          }
+          else --index;
         }
-        else --index;
+        else if (index == highest_index) {
+          index = points.size();
+          if (random_index < highest_index) highest_index = random_index;
+        }
+        else ++index;
       }
-      else if (index == highest_index) {
-        index = points.size();
-        if (random_index < highest_index) highest_index = random_index;
+      else { // false means it should check from lowest/highest all the way through
+        if (revert) {
+          if (index == 0) {
+            index = points.size();
+            if (lowest_index < random_index) lowest_index = random_index;
+          }
+          else --index;
+        }
+        else ++index;
       }
-      else ++index;
+
 //      std::cerr << "i: " << index << ", l_i: " << lowest_index << std::endl;
 //      std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
 //      std::cerr << "lowest_index: " << lowest_index << std::endl;

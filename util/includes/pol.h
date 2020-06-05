@@ -1,6 +1,7 @@
 #ifndef __POL_H_
 #define __POL_H_
 
+#include "point.h"
 #include "edge.h"
 
 class Ends {
@@ -18,7 +19,7 @@ public:
   Ends(I_Edge e1, I_Edge e2) {par=std::make_pair(e1,e2);nr_holes=0;}
 
   friend std::ostream& operator << (std::ostream& os, Ends p) {
-    os << "e1: " << p.par.first << ", e2: " << p.par.second << ", holes: " << p.nr_holes;
+    os << "e1: " << p.par.first << ", e2: " << p.par.second << ", inner_points: " << p.nr_holes;
     return os;
   }
 };
@@ -80,5 +81,6 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool check_in_orientation (E_Edge e1, std::vector<Point>& points);
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points);
+void get_convex_hull(std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 
 #endif

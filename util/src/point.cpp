@@ -453,13 +453,27 @@ void fill_lex(std::vector<unsigned int>& lex, std::vector<Point>& points) {
   }
 }
 
+// Input:
+//  lex:     vector for unsigned integers referencing indexes in point set 'points', that are strict-weak sorted.
+//  polygon: vector for unsigned integers referencing indexes in point set 'points', that are in a polygon
+//  points:  vector of 'Point' points.
+// Method:
+//  Function fills 'lex' with the lexicographgically sorted indexes of 'points' that are in 'polygon'
+//  and adds the lexicographical index of each point into '.l' property
 void fill_lex(std::vector<unsigned int>& lex, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
-  assert(lex.size() == polygon.size());
+  if (lex.size() > 0) lex.clear();
   for(unsigned int i = 0; i < polygon.size(); ++i)
-    lex[i] = polygon[i];
+    lex.push_back(polygon[i]);
 
   // sort 'lex' based on lexicographical order of 'points'
 	std::sort(lex.begin(), lex.end(), lexComp(points));
+
+  // add the strict weak order to the points.
+  unsigned int counter = 0;
+  for (std::vector<unsigned int>::iterator it = lex.begin(); it != lex.end(); ++it) {
+    points[(*it)].l = counter;
+    ++counter;
+  }
 }
 
 // simple function to display points in a Point vector.

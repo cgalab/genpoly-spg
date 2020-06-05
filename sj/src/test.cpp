@@ -600,6 +600,16 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   itest = checkIntersection(e1, e2);
   std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
 
+  p1.set(7.000000, 1.000000, 36, 0, 0);
+  p2.set(3.000000, 1.000000, 37, 0, 0);
+  e1.set(p1,p2);
+  p3.set(5.000000, 1.000000, 0,0,0);
+  p4.set(6.000000, 1.000000, 1,0,0);
+  e2.set(p3,p4);
+  std::cerr << std::endl;
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+
 /*
   Testing Yval class in edge.h
 */

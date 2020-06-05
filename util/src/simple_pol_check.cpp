@@ -681,28 +681,40 @@ enum error simple_pol_check(std::vector<std::vector<unsigned int>>& sph, std::ve
 //      std::cerr << std::endl << "removing e1: " << e1 << std::endl;
       val1 = removeEdgeFromSet(e1, edgeS);
       if (val1 != E_VALID) {
-        retval = UNEXPECTED_ERROR; break;}
+        std::cerr << "removing: " << e1 << ", found an intersection!" << std::endl;
+        retval = UNEXPECTED_ERROR;
+        break;}
     }
     else {
       // if the earlier edge was allowed, then the later edge is also allowed
       if (fabs(val3) == 0) {
-//        std::cerr << "Intersection found: collinearity between: " << e1 << " and " << e2 << std::endl;
-        retval = UNEXPECTED_ERROR; break;}
+        std::cerr << "Intersection found: collinearity between: " << e1 << " and " << e2 << std::endl;
+        retval = UNEXPECTED_ERROR;
+        break;}
 //      std::cerr << std::endl << "processing e1: " << e1 << std::endl;
       val1 = processEdge(e1, edgeS);
-      if (val1 != E_VALID) {retval = UNEXPECTED_ERROR; break;}
+      if (val1 != E_VALID) {
+        std::cerr << "processing: " << e1 << ", found an intersection!" << std::endl;
+        retval = UNEXPECTED_ERROR;
+        break;}
     }
 
     // process second edge
     if (*e2.p2 == *p1) {
 //      std::cerr << std::endl << "removing e2: " << e2 << std::endl;
       val2 = removeEdgeFromSet(e2, edgeS);
-      if (val2 != E_VALID) {retval = UNEXPECTED_ERROR; break;}
+      if (val2 != E_VALID) {
+        std::cerr << "removing: " << e2 << ", found an intersection!" << std::endl;
+        retval = UNEXPECTED_ERROR;
+        break;}
     }
     else {
 //      std::cerr << std::endl << "processing e2: " << e2 << std::endl;
       val2 = processEdge(e2, edgeS);
-      if (val2 != E_VALID) {retval = UNEXPECTED_ERROR; break;}
+      if (val2 != E_VALID) {
+        std::cerr << "processing: " << e2 << ", found an intersection!" << std::endl;
+        retval = UNEXPECTED_ERROR;
+        break;}
     }
 
     ++index;
