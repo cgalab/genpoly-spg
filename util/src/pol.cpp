@@ -3378,9 +3378,14 @@ void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& 
   unsigned int diff;
 //  std::cerr << "ch: " << std::endl;
 //  pdisplay(ch, points);
+//  std::cerr << "polygon: " << std::endl;
+//  pdisplay(polygon, points);
 
   // make sure points in 'points' referenced by 'polygon' are ordered same as 'polygon'
-  for (unsigned int i = 0; i < polygon.size(); ++i) points[polygon[i]].v = i;
+  //not sure if this is necessary..
+//  for (unsigned int i = 0; i < polygon.size(); ++i) points[polygon[i]].v = i;
+//  std::cerr << "polygon again: " << std::endl;
+//  pdisplay(polygon, points);
 
   for (unsigned int i = 0; i < ch.size(); ++i) {
     prev = points[ch[(ch.size() + i - 1) % ch.size()]];
@@ -3519,6 +3524,8 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<unsigned int>& p
   //start with creating a vector for the lexicographically sorted indexes of 'points'
   std::vector<unsigned int> lex (points.size());
   fill_lex(lex, polygon, points); // fill 'lex' with the indices of the polygon in strict weak order.
+//  std::cerr << "lex: " << std::endl;
+//  pdisplay(lex, points);
 
   std::vector<unsigned int> lower;
   std::vector<unsigned int> upper;
@@ -3527,7 +3534,7 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<unsigned int>& p
   upper.push_back(lex[0]);
 
   // go through all the points in the polygon in lex. order
-  for (unsigned int i = 1; i < points.size(); ++i) {
+  for (unsigned int i = 1; i < polygon.size(); ++i) {
     // go through the lower points and check if the new point has a higher angle than the next point in lower.
     double x_i = points[lex[i]].x;
     double y_i = points[lex[i]].y;
