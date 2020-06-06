@@ -120,10 +120,8 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
 enum error readvFile(char *vFile, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
   enum error returnValue = SUCCESS;
   unsigned int sph_index = 0;
-  if (sph.size() == 0) sph.push_back(std::vector<unsigned int>());
-  else {
+  if (sph.size() != 0) {
     sph.resize(0);
-    sph.push_back(std::vector<unsigned int>());
   }
 
   FILE *fin = fopen(vFile, "r");
@@ -136,16 +134,25 @@ enum error readvFile(char *vFile, std::vector<std::vector<unsigned int>>& sph, s
       if(aLine[0] == '\n') continue; // ignore lines beginning with \newline
 
       sscanf(aLine,"%u",&i);
-      if (sph[sph_index].size() == 0) {
+      if (counter == 0) {
+//        std::cerr << "create new polygon: " << sph_index << ", at index: " << i << std::endl;
+        sph.push_back(std::vector<unsigned int>());
         sph[sph_index].push_back(i);
         points[i].v = counter;
+        points[i].p = sph_index;
         ++counter;
       }
       else {
-        if (i == sph[sph_index][0]) ++sph_index;
+        if (i == sph[sph_index][0]) {
+//          std::cerr << "found an end: " << i << std::endl;
+          ++sph_index;
+          counter = 0;
+        }
         else {
+//          std::cerr << "adding: " << i << " into sph[" << sph_index << "]" << std::endl;
           sph[sph_index].push_back(i);
           points[i].v = counter;
+          points[i].p = sph_index;
           ++counter;
         }
       }

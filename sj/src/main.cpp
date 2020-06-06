@@ -105,7 +105,13 @@ int main(int argc, char *argv[]) {
       std::cerr << "Error reading file with polygon!" << std::endl;
       return returnValue;
     }
-    if (points.size() != sph[0].size()) {
+    unsigned int count_points = 0;
+    for (unsigned int i=0; i<sph.size();++i) {
+      count_points = count_points + sph[i].size();
+      std::cerr << "polygon: " << i << std::endl;
+      pdisplay(sph[i], points);
+    }
+    if (points.size() != count_points) {
       std::cerr << "Error: Number of points mismatch between points file and polygon file." << std::endl;
       return SIZE_NOT_EQUAL;
     }

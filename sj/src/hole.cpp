@@ -22,21 +22,27 @@ enum error generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vecto
 
   std::vector<unsigned int> ch; // points on the convex hull.
   get_convex_hull(ch, sph[0], points);
+  unsigned int total_inner_points = sph[0].size() - ch.size();
   std::vector<Ends> ends;
   get_inner_chains_to_ch(ends, ch, sph[0], points);
-
   for(unsigned int i = 0; i < ends.size();++i) {
     std::cerr << ends[i] << std::endl;
   }
 
-  
+  // 4) grab all the points in the already generated holes
+  unsigned int total_hole_points = 0;
+  for (unsigned int i = 1; i < sph.size(); ++i) {
+    total_hole_points = total_hole_points + sph[i].size();
+  }
+
+  std::cerr << "Total inner points: " << total_inner_points << ", total hole points: " << total_hole_points << std::endl;
 
   return SUCCESS;
 }
 
 
 
-// 4) grab all the points in the already generated holes
+
 // 5) randomly pick a chain or hole based on the number of points.
 // 6) call a function 'get_hole()' that uses the linesweep on the chain or hole
 // - returns 'true' if it changed sph and added a hole, false if it didn't.
