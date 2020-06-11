@@ -2941,10 +2941,9 @@ unsigned int get_lower_cyclic_difference(unsigned int start, unsigned int stop, 
 // function to get a length of a chain in a cyclic index, such as a polygon
 // given a certain 'lower' index and a 'higher' index and a 'cycle' which is the polygon size.
 // INPUTS:
-//    'par'       : pair of 'I_Edge's which define an inner polygonal chain
-//    'ascending' : boolean that defines to ascend through the polygonal index
-//                  from 'par.first' to 'par.second' or not
-// OUTPUT: length of the inner chain
+//         'ends' is a pair of edges that define edges that are ends.
+//         'cycle' defines the total amount of points in a polygon.
+// OUTPUT: length of the complete inner chain given (not just inner points if ends are c.h. points)
 unsigned int get_chain_length(Ends ends, unsigned int cycle) {
   unsigned int a, b, l;
 
@@ -2954,13 +2953,13 @@ unsigned int get_chain_length(Ends ends, unsigned int cycle) {
 
   if (is_ascending(ends.par.first)) { // ascending from a to b
     // there's a cycle reset inside the chain
-    // -1 because we assume a and b are on the convex hull, so one points needs to be deducted.
-    if (b < a) l = b + cycle -a -1;
-    else l = b -a -1;
+    // +1 because we assume a and b are on the convex hull and those points are counted, so one points needs to be added.
+    if (b < a) l = b + cycle -a +1;
+    else l = b -a +1;
   }
   else { // descending from a to b
-    if (a < b) l = a + cycle -b -1; // there's a cycle reset inside the chain
-    else l = a -b -1;
+    if (a < b) l = a + cycle -b +1; // there's a cycle reset inside the chain
+    else l = a -b +1;
   }
   return l;
 }
@@ -3253,12 +3252,12 @@ void get_new_inner_polygon(Ends& end, std::vector<unsigned int>& new_inner_polyg
 // function to fill the 'inner_polygon' vector with the inner polygonal chain of 'polygon' defined by 'ends'
 // This includes the points on the convex hull as they are a candidate to be used to create the hole.
 bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std::vector<unsigned int>& polygon) {
-  assert(polygon.size() > 2);
+//  std::cerr << "inside get_inner_chain_polygon." << std::endl;
+  if (inner_polygon.size() > 0) inner_polygon.clear();
 
   unsigned int a, b, l;
   bool ascending;
   int it;
-  Edge e;
   Point p;
 
   // 'a' is 'par.first' ch point 'v' value, 'b' is 'par.second' ch point 'v' value
@@ -3279,6 +3278,7 @@ bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& end
   unsigned int i = a;
   b = (polygon.size() + b + it) % polygon.size(); // c.h. point allowed to be a part of the inner polygon.
   while (i != b) {
+//    std::cerr << "pushing index: " << i << ", point: " << polygon[i] << std::endl;
     inner_polygon.push_back(polygon[i]);
     i = (polygon.size() + i + it) % polygon.size();
   }
@@ -3288,23 +3288,24 @@ bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& end
 // function to fill 'inner_polygon' with the points defined by 'ends' from the polygon in 'inner_polygon' with points in 'points'
 // inner_polygon is not changed.
 void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsigned int>& inner_polygon, std::vector<Point>& points) {
-  assert(inner_polygon.size() > 2);
+//  std::cerr << "inside get_inner_chain_points" << std::endl;
+  if (inner_points.size() > 0) inner_points.clear();
 
   Point p;
 
   for (unsigned int i = 0; i < inner_polygon.size(); ++i) {
 //    std::cerr << "inner_polygon[i]: " << inner_polygon[i] << std::endl;
-    p = Point(points[inner_polygon[i]]);
+    p.setX(points[inner_polygon[i]].x);
+    p.setY(points[inner_polygon[i]].y);
     p.setI(i);
     p.setV(i);
     p.setL(0);
+    p.setP(0);
 //    std::cerr << p << std::endl;
     inner_points.push_back(p);
   }
 //  std::cerr << "points after inner chain:" << std::endl;
 //  pdisplay(inner_points);
-//  std::cerr << "polygon after inner chain:" << std::endl;
-//  pdisplay(inner_polygon, inner_points);
 }
 
 // creates a random polygon from a given pointset and random seed.
@@ -3371,8 +3372,8 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 
 // function to return the pairs of edges that are the beginning of a polygonal chain
 // that ends in incidental convex hull points.
-void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
-//  std::cerr << "=== get_inner_chains_to_ch ===" << std::endl;
+void get_valid_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  std::cerr << "=== get_inner_chains_to_ch ===" << std::endl;
   I_Edge e1, e2;
   Point prev, p, next;
   unsigned int diff;
@@ -3444,7 +3445,14 @@ void get_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& 
       Ends par (e1, e2);
       par.nr_holes = diff-1;
 //      std::cerr << "Ends: " << par << std::endl;
-      ends.push_back(par);
+      if (is_2D(par, polygon, points)) {
+//        std::cerr << "is 2D" << std::endl;
+        ends.push_back(par);
+      }
+      else {
+//        std::cerr << "is not 2D" << std::endl;
+      }
+
     }
   }
 }

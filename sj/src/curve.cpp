@@ -83,7 +83,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
       count_holes = 0;
       ends.erase(ends.begin(), ends.end());
       // add the starting edges of all inner curves of the c.h. to 'ends' vector
-      get_inner_chains_to_ch(ends, ch, sph[0], points);
+      get_valid_inner_chains_to_ch(ends, ch, sph[0], points);
       do {
         end_erase_flag = false;
 //        std::cerr << "ends: " << ends.size() << std::endl;
@@ -259,7 +259,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
 
     // in case we are missing some holes, let's use inner chains as holes.
     ends.erase(ends.begin(), ends.end());
-    get_inner_chains_to_ch(ends, ch, sph[0], points);
+    get_valid_inner_chains_to_ch(ends, ch, sph[0], points);
     unsigned int i = 0;
     do {
       if (is_2D(ends[i], sph[0], points)) ++i;
@@ -332,7 +332,7 @@ enum error holes2(std::vector<std::vector<unsigned int>>& sph, std::vector<Point
 //  e2                : the incidental E_Edge being created which is connected to first point in e1.
 //  y_set             : the linesweep structure for edges.
 //  retval1, retval2  : iterators to the edges 'e1' and 'e2' in 'y_set'
-bool get_bin(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& retval1, std::set<E_Edge>::iterator& retval2, std::set<E_Edge>& y_set) {
+bool get_bin_old(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& retval1, std::set<E_Edge>::iterator& retval2, std::set<E_Edge>& y_set) {
   E_Edge before, after;
   bool bef;
   if (e1 < e2) {
@@ -403,19 +403,19 @@ E_Edge get_inc_edge_from_set(E_Edge& e, std::vector<Curve>& curves, std::set<E_E
 }
 
 // function to update edge in set, i.e. find it, remove it and insert it again.
-void update_edge_in_set(E_Edge& e, std::pair<std::set<E_Edge>::iterator, bool>& retval, std::set<E_Edge>& y_set) {
-//  std::cerr << "=== update_edge_in_set ===" << std::endl;
+void update_edge_in_set_old(E_Edge& e, std::pair<std::set<E_Edge>::iterator, bool>& retval, std::set<E_Edge>& y_set) {
+//  std::cerr << "=== update_edge_in_set_old ===" << std::endl;
   if (e == *retval.first) {
     y_set.erase(retval.first);
     retval = y_set.insert(e);
     if ((*retval.first != e) || (retval.second != true)) {
-      std::cerr << "Error!  update_edge_in_set failed to insert edge!" << std::endl;
+      std::cerr << "Error!  update_edge_in_set_old failed to insert edge!" << std::endl;
       std::cerr << "e: " << e << std::endl;
       std::cerr << "iterator: " << *retval.first << std::endl;
     }
   }
   else {
-    std::cerr << "Error.  update_edge_in_set got an edge and iterator that did not match" << std::endl;
+    std::cerr << "Error.  update_edge_in_set_old got an edge and iterator that did not match" << std::endl;
     std::cerr << "e: " << e << std::endl;
     std::cerr << "iterator: " << *retval.first << std::endl;
   }
@@ -627,7 +627,7 @@ E_Edge inner_holes(std::vector<Point>& points) {
       if (check_ix_edges(inc_e, new_e)) {
         std::cerr << "new_e is closer to inc_e than inc_e.closest" << std::endl;
         inc_e.closest[0] = new_e;
-        update_edge_in_set(inc_e, retval1, y_set);
+        update_edge_in_set_old(inc_e, retval1, y_set);
 //        std::cerr << "inc_e: " << inc_e << ", inc_e.closest: " << inc_e.closest << std::endl;
       }
 
@@ -656,8 +656,8 @@ E_Edge inner_holes(std::vector<Point>& points) {
       assert(retval2.second == true);
 
       // as we're still dealing with complexities of "in" in regards to curves, it's still dependent on incidental 'bin' values.
-      new_curve1.bin = get_bin(e1, e2, retval1.first, retval2.first, y_set);
-      new_curve2.bin = get_bin(e2, e1, retval2.first, retval1.first, y_set);
+      new_curve1.bin = get_bin_old(e1, e2, retval1.first, retval2.first, y_set);
+      new_curve2.bin = get_bin_old(e2, e1, retval2.first, retval1.first, y_set);
 //      std::cerr << "curve1: " << new_curve1 << std::endl;
 //      std::cerr << "curve2: " << new_curve2 << std::endl;
       curves.push_back(new_curve1);
@@ -666,10 +666,10 @@ E_Edge inner_holes(std::vector<Point>& points) {
       // dependant on "inside" not being inside the 2 joined edges, we need to find the right 'closest' edges.
       e1.closest[0] = get_inc_edge_from_set(e1, curves, retval1.first, y_set);
       if (e1 == e1.closest[0]) e1.closest[0] = temp;
-      update_edge_in_set(e1, retval1, y_set);
+      update_edge_in_set_old(e1, retval1, y_set);
       e2.closest[0] = get_inc_edge_from_set(e2, curves, retval2.first, y_set);
       if (e1 == e1.closest[0]) e1.closest[0] = temp;
-      update_edge_in_set(e2, retval2, y_set);
+      update_edge_in_set_old(e2, retval2, y_set);
       std::cerr << "e1: " << e1 << std::endl;
       std::cerr << "e2: " << e2 << std::endl;
 
@@ -686,7 +686,7 @@ E_Edge inner_holes(std::vector<Point>& points) {
           inc_e.closest[0] = e1;
           // need to update the inc_e edge in y_set:
           retval1.first = y_set.find(inc_e);
-          update_edge_in_set(inc_e, retval1, y_set);
+          update_edge_in_set_old(inc_e, retval1, y_set);
         }
         // check the closest edge of e2:
         inc_e = get_inc_edge_from_set(e2, curves, retval2.first, y_set);
@@ -698,7 +698,7 @@ E_Edge inner_holes(std::vector<Point>& points) {
           inc_e.closest[0] = e2;
           // need to update the inc_e edge in y_set:
           retval2.first = y_set.find(inc_e);
-          update_edge_in_set(inc_e, retval2, y_set);
+          update_edge_in_set_old(inc_e, retval2, y_set);
         }
       }
       //  I could add a metric if no intersection, which has larger lcd value.. might get confusing with 'closest.closest.p1'
@@ -875,10 +875,10 @@ E_Edge inner_holes2(std::vector<Point>& points, bool is_hole) {
       assert(retval2.second == true);
 
       //after inserting, get the 'bin' value from incidental edges in 'y_set'
-      e1.bin = get_bin(e1, e2, retval1.first, retval2.first, y_set);
-      update_edge_in_set(e1, retval1, y_set);
-      e2.bin = get_bin(e2, e1, retval2.first, retval1.first, y_set);
-      update_edge_in_set(e2, retval2, y_set);
+      e1.bin = get_bin_old(e1, e2, retval1.first, retval2.first, y_set);
+      update_edge_in_set_old(e1, retval1, y_set);
+      e2.bin = get_bin_old(e2, e1, retval2.first, retval1.first, y_set);
+      update_edge_in_set_old(e2, retval2, y_set);
 //      std::cerr << "e1       : " << e1 << std::endl;
 //      std::cerr << "e1 in set: " << *(y_set.find(e1)) << std::endl;
 //      std::cerr << "e2       : " << e2 << std::endl;
@@ -1084,7 +1084,7 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
 //    std::cerr << "pushing inc_e to e.closest" << std::endl;
     e.closest.push_back(inc_e);
     e.angle = get_smaller_angle(e, inc_e, true);
-    update_edge_in_set(e, retval_e, y_set);
+    update_edge_in_set_old(e, retval_e, y_set);
   }
   // else the incidental edge only gets added if the smaller angle 'e' makes with the latest 'closest' edge
   // is larger than the larger angle 'e' makes with the incidental edge.
@@ -1099,7 +1099,7 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
 //        std::cerr << "e: right is smaller" << std::endl;
         e.closest.push_back(inc_e);
         e.angle = fabs(get_smaller_angle(e, inc_e, true));
-        update_edge_in_set(e, retval_e, y_set);
+        update_edge_in_set_old(e, retval_e, y_set);
       }
   }
   // checking if 'e' needs to be in 'inc_e.closest'
@@ -1108,7 +1108,7 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
     inc_e.closest.push_back(e);
     inc_e.angle = get_smaller_angle(inc_e, e, true);
     //retval.first = (e.bin) ? std::prev(iter) : std::next(iter);
-    update_edge_in_set(inc_e, retval_i, y_set);
+    update_edge_in_set_old(inc_e, retval_i, y_set);
   }
   else if (inc_e.closest[inc_e.closest.size()-1] != e) {
 //    std::cerr << "checking 'inc_e.angle' vs. inc_e-e" << std::endl;
@@ -1138,7 +1138,7 @@ void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E
       inc_e.closest.push_back(e);
       inc_e.angle = fabs(get_smaller_angle(inc_e, e, true));
       //retval.first = (e.bin) ? std::prev(iter) : std::next(iter);
-      update_edge_in_set(inc_e, retval_i, y_set);
+      update_edge_in_set_old(inc_e, retval_i, y_set);
     }
   }
 

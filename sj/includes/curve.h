@@ -58,7 +58,7 @@ enum error holes (std::vector<std::vector<unsigned int>>& sph, std::vector<unsig
 bool get_bin(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& retval1, std::set<E_Edge>::iterator& retval2, std::set<E_Edge>& y_set, std::vector<Curve> curves);
 bool check_ix_edges(E_Edge e1, E_Edge e2);
 E_Edge get_inc_edge_from_set(E_Edge& e, std::vector<Curve>& curves, std::set<E_Edge>::iterator it);
-void update_edge_in_set(E_Edge& e, std::pair<std::set<E_Edge>::iterator, bool>& retval, std::set<E_Edge>& y_set);
+void update_edge_in_set_old(E_Edge& e, std::pair<std::set<E_Edge>::iterator, bool>& retval, std::set<E_Edge>& y_set);
 E_Edge inner_holes(std::vector<Point>& points);
 E_Edge inner_holes2(std::vector<Point>& points, bool is_hole);
 void find_update_closest(E_Edge& e, std::set<E_Edge>::iterator& iter, std::set<E_Edge>& y_set);

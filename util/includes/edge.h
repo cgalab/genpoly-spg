@@ -680,43 +680,43 @@ public:
 	}
 };
 
-class I_Edge: public Edge {
+class I_Edge: public Edge2 {
 private:
 protected:
 public:
   // l2ch : "left point (p1) is the direction towards the convex hull"
   bool l2ch;
 
-  I_Edge() {p1=NULL; p2=NULL;l_idx=0; l2ch=false;}
+  I_Edge() {p1=NULL; p2=NULL; l2ch=false;}
   I_Edge(Point *P1, Point *P2) {
 		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
 		else {p1=P2; p2=P1;}
-    l_idx=0;l2ch=false;
+    l2ch=false;
 	}
   I_Edge(Point *P1, Point *P2, bool b) {
 		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
 		else {p1=P2; p2=P1;}
-    l_idx=0;l2ch=b;
+    l2ch=b;
 	}
 
   // the '*' is to see better which direction the c.h. is.
   friend std::ostream& operator<<(std::ostream& os, const I_Edge& e) {
-    os << *e.p1 << " , " << *e.p2;
+    os << ((e.l2ch) ? "*" : "") << *e.p1 << " , " << ((e.l2ch) ? "" : "*") << *e.p2;
     return os;
   }
 };
 
-class C_Edge: public Edge {
+class C_Edge: public Edge2 {
 public:
   unsigned int sc;  // index into a vector of s_curves
   unsigned int par;  // index into a vector of < std::pair<uint, uint> > of curve ends.
   bool lower;       // whether the edge is an upper curve end or lower curve end.
 
-  C_Edge() {p1=NULL; p2=NULL;l_idx=0; sc=0; par=0;}
+  C_Edge() {p1=NULL; p2=NULL; sc=0; par=0;}
   C_Edge(Point *P1, Point *P2) {
 		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
 		else {p1=P2; p2=P1;}
-    l_idx=0;sc=0;par=0;
+    sc=0;par=0;
 	}
 
   friend bool operator==(const C_Edge lhs, const C_Edge rhs) {
@@ -732,22 +732,22 @@ public:
 	}
 };
 
-class D_Edge: public Edge {
+class D_Edge: public Edge2 {
 private:
 protected:
 public:
   unsigned int curve_id; // should be a valid index into a vector of 'Curve's
   bool bin; // variable to tell whether inside the polygon is on the right/bottom side of the edge (going from p1 to p2)
 
-  D_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0;bin=false;}
+  D_Edge() {p1=NULL; p2=NULL; curve_id=0;bin=false;}
   D_Edge(Point *P1, Point *P2) {
 		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
 		else {p1=P2; p2=P1;}
-    l_idx=0;curve_id=0;bin=false;
+    curve_id=0;bin=false;
 	}
   D_Edge(Edge e) {
     p1 = e.p1; p2 = e.p2;
-    l_idx = e.l_idx;curve_id=0;bin=false;
+    curve_id=0;bin=false;
   }
 
   // returns true if the point is on the side of the edge that is 'inside' the polygon.
@@ -778,42 +778,20 @@ public:
   double angle; // default value '8' as it's larger than +/- 2*pi which is the max/min possible value.
   std::vector<D_Edge> closest; // of all the incidental edges, these were the closest that weren't intersecting others.
 
-  E_Edge() {p1=NULL; p2=NULL;l_idx=0; curve_id=0; bin=false; angle=0;}
+  E_Edge() {p1=NULL; p2=NULL; curve_id=0; bin=false; angle=0;}
   E_Edge(Point *P1, Point *P2) {
 		if ((*P1) < (*P2)) {p1=P1; p2=P2;}
 		else {p1=P2; p2=P1;}
-    l_idx=0;curve_id=0;bin=false;angle=8;
+    curve_id=0;bin=false;angle=8;
 	}
   E_Edge(D_Edge e) {
     p1 = e.p1; p2 = e.p2;
-    l_idx = e.l_idx; curve_id = e.curve_id;bin=e.bin;angle=8;
+    curve_id = e.curve_id;bin=e.bin;angle=8;
   }
   E_Edge(Edge e) {
     p1 = e.p1; p2 = e.p2;
-    l_idx = e.l_idx;curve_id=0;bin=false;angle=8;
+    curve_id=0;bin=false;angle=8;
   }
-/*
-  // function to update the angle property based on the last edge in 'this.closest'.
-  // 'use_p1' is true when origin should be 'this.p1', false when origin should be 'this.p2'
-  void update_angle (bool use_p1) {
-    double ang1;
-    Point P0, P1, P2;
-    if(use_p1) {
-      P0 = *p1;
-      P1 = *p2;
-      P2 = *closest[closest.size()-1].p1;
-    }
-    else {
-      P0 = *p2;
-      P1 = *p1;
-      P2 = *closest[closest.size()-1].p2;
-    }
-
-    ang1 = fabs(atan2(P1.y - P0.y, P1.x - P0.x));
-    if (!use_p1) ang1 = PI - ang1;
-    if (ang1 < angle) angle = ang1;
-  }
-*/
   friend bool operator==(const E_Edge lhs, const D_Edge rhs) {
     if ((*lhs.p1 == *rhs.p1) && (*lhs.p2 == *rhs.p2)) return true;
     else return false;
@@ -855,6 +833,8 @@ void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon
 void doFlip(unsigned int i1, unsigned int i2, std::vector<Point>& points);
 void flip2(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon);
 double get_angle(Edge e, Point p, bool use_p1);
+double get_angle(Edge2 e, Edge2 f, bool l2r, bool dbl_rem);
+double get_angle(Edge2 e, Point p, bool use_p1);
 double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1);
 double get_larger_angle(E_Edge& e1, E_Edge& e2, bool use_p1);
 void poldisplay (std::vector<unsigned int>& p);

@@ -1028,9 +1028,9 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << std::endl;
   std::cerr << "=== angle tests ===" << std::endl;
 
-  p1.set(0, 0);
-  p2.set(-1, 0);
-  p3.set(1, 1);
+  p1.set(3, 4);
+  p2.set(1, 5);
+  p3.set(1, 4);
 
   double ang1 = atan2(p2.y - p1.y, p2.x - p1.x);
   double ang2 = atan2(p3.y - p1.y, p3.x - p1.x);

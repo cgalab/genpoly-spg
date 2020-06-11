@@ -651,6 +651,78 @@ double get_angle(Edge e, Point p, bool use_p1) {
 	return sum;
 }
 
+// function to get the angle between an edge and a point, where the origin is one of the points of the edge,
+// controlled by the boolean 'use_p1' and the x-axis is along the edge.
+double get_angle(Edge2 e, Point p, bool l2r) {
+	std::cerr << "inside edge & point get_angle()" << std::endl;
+	double a1, a2;
+	Point p1, p2;
+
+	if (l2r) {p1 = *e.p1; p2 = *e.p2;}
+	else {p1 = *e.p2; p2 = *e.p1;}
+
+	a1 = atan2(p2.y - p1.y, p2.x - p1.x);
+	a2 = atan2(p.y - p1.y, p.x - p1.x);
+	std::cerr << "angle of edge:  " << a1 << ", e: " << e << std::endl;
+	std::cerr << "angle of point: " << a2 << ", p: " << p << std::endl;
+
+	// angles must always be [-180°, 180°]
+	double sum = a2 - a1;
+	std::cerr << "a2 - a1: " << sum << std::endl;
+	if (sum < 0) sum = fabs(sum);
+	if (sum > PI) sum = 2*PI - sum;
+	std::cerr << "return: " << sum << std::endl;
+	return sum;
+}
+
+// function to return an angle:
+// if l2r is true: return angle (e.p1, f.p1)
+// if l2r is false: return angle (e.p2, f.p2)
+// INPUT:
+//			e: the edge with the origin point of the angle
+//			f: the point to get an angle, (l2r) ? f.p1 : f.p2
+//			l2r: true if linesweep is sweeping left2right
+double get_angle(Edge2 e, Edge2 f, bool l2r, bool dbl_rem) {
+	std::cerr << "inside 2 edge get_angle()" << std::endl;
+	double a1, a2;
+	Point p1, p2, p;
+	if (l2r) {
+		p1 = *e.p1; p2 = *e.p2;
+		if (dbl_rem) {
+			if (*f.p2 == *e.p2) p = *f.p1;
+			else p = *f.p2;
+		}
+		else {
+			if (*f.p1 == *e.p1) p = *f.p2;
+			else p = *f.p1;
+		}
+	}
+	else {
+		p1 = *e.p2; p2 = *e.p1;
+		if (dbl_rem) {
+			if (*f.p1 == *e.p1) p = *f.p2;
+			else p = *f.p1;
+		}
+		else {
+			if (*f.p2 == *e.p2) p = *f.p1;
+			else p = *f.p2;
+		}
+	}
+
+	a1 = atan2(p2.y - p1.y, p2.x - p1.x); // value of the angle from p1 point to p2 point.
+	a2 = atan2(p.y - p1.y, p.x - p1.x); // value of angle from p1 point to p point
+	std::cerr << "angle of edge:  " << a1 << ", e: " << e << std::endl;
+	std::cerr << "angle of point: " << a2 << ", p: " << p << std::endl;
+
+	// angles must always be [-180°, 180°]
+	double sum = a2 - a1;
+	std::cerr << "a2 - a1: " << sum << std::endl;
+	if (sum < 0) sum = fabs(sum);
+	if (sum > PI) sum = 2*PI - sum;
+	std::cerr << "return: " << sum << std::endl;
+	return sum;
+}
+
 // function that returns the smaller angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
 // use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
 double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
