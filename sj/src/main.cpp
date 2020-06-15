@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
   if (generate_holes) {
     nr_holes = generateHoles(sph, points, nr_holes);
     if (nr_holes > 0) {
-      std::cerr << "holes left: " << nr_holes << ", swapping axis." << std::endl;
+//      std::cerr << "holes left: " << nr_holes << ", swapping axis." << std::endl;
       double temp;
       for (unsigned int i = 0; i < points.size(); ++i) {
         temp = points[i].x;

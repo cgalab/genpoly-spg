@@ -9,7 +9,7 @@
 #include "point.h"
 
 /*
-	Functions that deal with possible errors in the command line argument parsing
+	Functions that deal with the command line argument parsing
 */
 
 enum error inFileInit(char *inFile, char *optarg) {
@@ -112,7 +112,9 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 enum error ifInit(enum in_format_t *inFormat, char *optarg) {
 	enum error returnValue = SUCCESS;
 			 if (strcmp(optarg,"point") == 0) *inFormat = IF_POINTS;
+	else if (strcmp(optarg,"pnt") == 0) *inFormat = IF_POINTS;
 	else if (strcmp(optarg,"poly") == 0) *inFormat = IF_POLY;
+	else if (strcmp(optarg,"pol") == 0) *inFormat = IF_POLY;
 	else if (strcmp(optarg,"comp") == 0) *inFormat = IF_COMP;
 	else if (strcmp(optarg,"line") == 0) *inFormat = IF_LINE;
 	else if (strcmp(optarg,"dat") == 0) *inFormat = IF_DAT;
@@ -258,19 +260,19 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << " -i, --infile <string> | (argument and string REQUIRED)" << std::endl;
 				std::cerr << "              <string> is the filename of a file containing a set of points." << std::endl;
 				std::cerr << "assumptions:  The file contains a point set where each point must be unique." << std::endl;
-				std::cerr << "Exception: Some formats (line, points) allow for multiple polygons, which are defined by repeating the first point of the polygon" << std::endl;
+				std::cerr << "Exception: Some formats (line, points, dat) allow for multiple polygons, which are defined by repeating the first point of the polygon" << std::endl;
 				std::cerr << "after the last point in the polygon before then starting a new polygon, this is allowed." << std::endl << std::endl;
 
 				std::cerr << " -b, --informat <string> | (argument and string REQUIRED)" << std::endl;
 				std::cerr << "                <string> can be:"  << std::endl;
-				std::cerr << "                poly   : header with 'x_min x_max y_min y_max' in first line and number of points in 2nd line" << std::endl;
-				std::cerr << "                         each subsequent line: 'x y'" << std::endl;
-				std::cerr << "                comp   : each line: 'enumeration x y'" << std::endl;
-				std::cerr << "                line   : header with number of points in the following polygon on a single line." << std::endl;
-				std::cerr << "                         each subsequent line: ' x  y', supports multiple polygons." << std::endl;
-				std::cerr << "                dat    : a gnuplot data file, header with # comments allowed." << std::endl;
-				std::cerr << "                         each subsequent line: ' x  y', supports multiple polygons." << std::endl;
-				std::cerr << "                point :  no header, each line: 'x y', supports multiple polygons." << std::endl << std::endl;
+				std::cerr << "                poly/pol : header with 'x_min x_max y_min y_max' in first line and number of points in 2nd line" << std::endl;
+				std::cerr << "                           each subsequent line: 'x y'" << std::endl;
+				std::cerr << "                comp     : each line: 'enumeration x y'" << std::endl;
+				std::cerr << "                line     : header with number of points in the following polygon on a single line." << std::endl;
+				std::cerr << "                           each subsequent line: ' x  y', supports multiple polygons." << std::endl;
+				std::cerr << "                dat      : a gnuplot data file, header with # comments allowed." << std::endl;
+				std::cerr << "                           each subsequent line: ' x  y', supports multiple polygons." << std::endl;
+				std::cerr << "                point/pnt: no header, each line: 'x y', supports multiple polygons." << std::endl << std::endl;
 
 				std::cerr << " -o. --outfile <string> | (argument optional*, if used then string required)" << std::endl;
 				std::cerr << "               <string> is the filename of a file with the processed output of the program." << std::endl;
@@ -288,6 +290,7 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << "           <string> is the algorithm to be run:" << std::endl;
 				std::cerr << "           2opt : calculates a simple random polygon based on Bentley-Ottman linesweep and the 2opt algorithm." << std::endl;
 				std::cerr << "           5 : a faster calculation of a simple random polygon based on Bentley-Ottman linesweep and the 2opt algorithm." << std::endl;
+				std::cerr << "           7 : the most randomised version of the linesweep algorithm."
 				std::cerr << "           star : calculates a simple random polygon that is a star-shaped polygon." << std::endl;
 				std::cerr << "           convert : converts a point set from one file format to another." << std::endl;
 				std::cerr << "           verify : only checks whether a permutation of a point set is simple." << std::endl << std::endl;

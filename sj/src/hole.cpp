@@ -15,20 +15,28 @@
 #include "simple_pol_check.h"
 
 
-// overarching function:
+// Function to generate holes through adjacent candidates of the linesweep algorithm.
+// INPUT:
+//  sph: Container for a polygon 'sph[0]' and its hole-polygons
+//  points: Container for the points referenced in sph.
+//  nr_holes:  The desired number of holes to generate.
+// OUTPUT:
+//  sph:  sph is modified, sph[0] will be reduced and any holes generated pushed to the back of sph.
 unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int nr_holes) {
-  // 1) polygon in sph[0] is the main polygon that should have holes
-  // 2) any already generated holes should be numbered in sph[i], where i != 0
-  // 3) call function to grab all the inner chains that can make holes and the number of points in them.
-
+  enum error result;
   std::vector<unsigned int> ch; // points on the convex hull.
-  unsigned int total_inner_points, total_hole_points;;
+  unsigned int total_inner_points, total_hole_points;
   std::vector<Ends> ends;
   std::vector<std::pair<unsigned int, unsigned int>> holes;
   get_convex_hull(ch, sph[0], points);
+
+  // generate a random number of holes between 1 and 'total inner points'/6 if nr_holes is already 0
+  if ( ((points.size()-ch.size())/6.0) > 1.0) {UniformRandomI(nr_holes, 1, (points.size()-ch.size())/6);}
+  else nr_holes = 1;
+
   // 'valid' means it threw out ends if: is_2D == false, for the chain between the ends
   get_valid_inner_chains_to_ch(ends, ch, sph[0], points);
-  //if there are holes in sph, add them to 'holes'
+  //if there are holes in sph, add them to 'holes' as viable to be split in two.
   for (unsigned int i = 1; i < sph.size(); ++i) {
     if (sph[i].size() > 5) {holes.push_back(std::make_pair(i, sph[i].size()));}
   }
@@ -51,11 +59,10 @@ unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vec
 //    std::cerr << "Total inner points: " << total_inner_points << ", total hole points: " << total_hole_points << std::endl;
     if (total_inner_points+total_hole_points == 0) break;
 
-
     // randomly pick a chain or hole based on the number of points.
     unsigned int selection=0, hole_i=0;
     bool is_end = false;
-    // [0, total inner points] is a specific end, [total_inner_points+1, total_hole_points] is a specific hole
+    // [1, total inner points] is a specific end, [total_inner_points+1, total_hole_points] is a specific hole
     UniformRandomI(selection, 1, total_inner_points+total_hole_points);
 //    std::cerr << "randomly selected: " << selection << std::endl;
 
@@ -88,16 +95,9 @@ unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vec
     // selection is now the index into either 'sph' or 'ends', is_end tells you which is which.
 //    std::cerr << "selection: " << selection << ", is_end: " << is_end << std::endl;
 
-    // 6) call a function 'get_hole()' that uses the linesweep on the chain or hole
-    // - returns 'true' if it changed sph and added a hole, false if it didn't.
-    // - returns 'false' if no candidate was found that was valid, which invalidates splitting the chain/hole, so it can be discarded.
-    // - 2 different functions whether it's a chain or polygon
-    enum error result;
     if(is_end) {
       result = get_hole(ends[selection], sph, points);
-      if (result == HOLES_INADEQUATE) {
-        ends.erase(ends.begin()+selection);
-      }
+      if (result == HOLES_INADEQUATE) {ends.erase(ends.begin()+selection);}
       else {
         --nr_holes;
         update_end(selection, ends, ch, sph[0], points);
@@ -109,9 +109,7 @@ unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vec
     }
     else {
       result = get_hole(selection, sph, points);
-      if (result == HOLES_INADEQUATE) {
-        holes.erase(holes.begin()+hole_i);
-      }
+      if (result == HOLES_INADEQUATE) {holes.erase(holes.begin()+hole_i);}
       else {
         --nr_holes;
         if (sph[selection].size() < 6) holes.erase(holes.begin()+hole_i);
@@ -128,11 +126,14 @@ unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vec
   return nr_holes;
 }
 
-// 7) repeat the random pick until number of holes desired has been fulfilled.
-
-// get_hole() function
-// - needs to know whether it's a chain or a closed chain so it can properly deal with the fictional c.h. edge of a chain.
-// - needs the polygon, or the polygon and the points that define the inner chain, i.e. 2 functions.
+// function to set up containers for the sweep line algorithm, do a sweep,
+// then pick from valid candidates, and generate a hole
+// INPUT:
+//  end: a pair of edges that define an inner polygonal chain between 2 adjacent convex hull points.
+//  sph: a container for polygons and polygon-holes.
+//  points:  The points referenced by indices in 'sph'.
+// OUTPUT:
+//  sph is modified if a hole is found, sph[0] is reduced and a polygon-hole is added to the back of sph.
 enum error get_hole(Ends end, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
 //  std::cerr << "in get_hole, ends version: " << end << ", sph.size: " << sph.size() << ", p.size: " << points.size() << std::endl;
 
@@ -150,7 +151,7 @@ enum error get_hole(Ends end, std::vector<std::vector<unsigned int>>& sph, std::
 
   // 1) set up a linesweep that populates valid_candidates vector.
   std::vector<E_Edge> candidates, valid_candidates;
-  //                                                is_chain, l2r
+  //                                          is_chain, l2r
   sweep_polygonal_chain(candidates, inner_points, true, true);
   sweep_polygonal_chain(candidates, inner_points, true, false);
   std::sort(candidates.begin(), candidates.end(), candidate_compare);
@@ -184,7 +185,7 @@ enum error get_hole(Ends end, std::vector<std::vector<unsigned int>>& sph, std::
 //    }
 //  }
   // at this point I have valid candidates that split the chain into 2 good pieces.
-
+  // picking a random candidate to generate a hole.
   if (valid_candidates.size() > 0) {
     unsigned int r_cand = 0;
     UniformRandomI(r_cand, 0, valid_candidates.size()-1);
@@ -205,6 +206,14 @@ enum error get_hole(Ends end, std::vector<std::vector<unsigned int>>& sph, std::
   }
 }
 
+// function, same as above, to set up containers for the sweep line algorithm, do a sweep,
+// then pick from valid candidates, and split a hole into 2 hole-polygons.
+// INPUT:
+//  selection:  an index into 'sph'
+//  sph: a container for polygons and polygon-holes.
+//  points:  The points referenced by indices in 'sph'.
+// OUTPUT:
+//  sph is modified if a hole is found, sph[selection] is reduced and a polygon-hole is added to the back of sph.
 enum error get_hole(unsigned int& selection, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
 //  std::cerr << "in get_hole, hole version: " << ", sph.size: " << sph.size() << ", p.size: " << points.size() << std::endl;
 
@@ -268,11 +277,13 @@ enum error get_hole(unsigned int& selection, std::vector<std::vector<unsigned in
   else {
     return HOLES_INADEQUATE;
   }
-
-
-  return SUCCESS;
 }
 
+// function that is a strict-weak comparison function of 2 candidates based on the coordinate values of the points.
+// INPUT:
+//  e1, e2:  Two E_Edge edges that each represent a quadrilateral candidate.
+// OUTPUT:
+// bool value that returns 'e1 < e2' for sorting candidate edges.
 bool candidate_compare(E_Edge e1, E_Edge e2) {
   if (*e1.p1 == *e2.p1) {
     if (*e1.p2 == *e2.p2) {
@@ -285,7 +296,7 @@ bool candidate_compare(E_Edge e1, E_Edge e2) {
   return (*e1.p1 < *e2.p1);
 }
 
-// Function that sweeps over points and finds candidates to split the polygon in points into 2,
+// Function that sweeps over points and finds candidates to split the polygon in 'points' into 2,
 // for valid candidates it checks if the 2 polygons would be valid.
 // INPUT:
 //        valid_candidates: empty vector of E_Edge that represents a valid candidate.
@@ -294,6 +305,8 @@ bool candidate_compare(E_Edge e1, E_Edge e2) {
 //        points: the points of a chain or a closed chain that is to be sweeped.
 //        is_chain: if the polygon is an open chain or not.
 //        l2r: if we should sweep left2right or right2left.
+// OUTPUT:
+//  modifies valid_candidates.
 enum error sweep_polygonal_chain(std::vector<E_Edge>& valid_candidates, std::vector<Point>& points, bool is_chain, bool l2r) {
 //  std::cerr << "in sweep_polygonal_chain" << std::endl;
   unsigned int end, i;
@@ -410,10 +423,8 @@ enum error sweep_polygonal_chain(std::vector<E_Edge>& valid_candidates, std::vec
       insert_update(e1, retval1.first, ls_edges, true, is_chain, l2r);
       insert_update(e2, retval2.first, ls_edges, true, is_chain, l2r);
     }
-
     i = i + step;
   }
-
   return SUCCESS;
 }
 
