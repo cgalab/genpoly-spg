@@ -324,6 +324,7 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
   }
 
   for (unsigned int j = 0; j < sph.size(); ++j) {
+    if (sph[j].size() == 0) continue;
     switch(outFormat) {
       case OF_PERM:
         writeToFile ? fprintf(fout, "#Polygon: %u\n", j+1) : fprintf(stdout, "#Polygon: %u\n", j+1);

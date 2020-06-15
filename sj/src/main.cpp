@@ -24,7 +24,6 @@
 #include "opt2f.h"
 #include "opt2g.h"
 #include "opt2h.h"
-#include "curve.h"
 #include "hole.h"
 #include "simple_pol_check.h"
 #include "star.h"
@@ -169,7 +168,23 @@ int main(int argc, char *argv[]) {
     returnValue = pntslopecount(points);
   }
   if (generate_holes) {
-    returnValue = generateHoles(sph, points, nr_holes);
+    nr_holes = generateHoles(sph, points, nr_holes);
+    if (nr_holes > 0) {
+      std::cerr << "holes left: " << nr_holes << ", swapping axis." << std::endl;
+      double temp;
+      for (unsigned int i = 0; i < points.size(); ++i) {
+        temp = points[i].x;
+        points[i].x = points[i].y;
+        points[i].y = temp;
+      }
+      nr_holes = generateHoles(sph, points, nr_holes);
+      if (nr_holes > 0) std::cerr << "Could not generate: " << nr_holes << " holes." << std::endl;
+      for (unsigned int i = 0; i < points.size(); ++i) {
+        temp = points[i].x;
+        points[i].x = points[i].y;
+        points[i].y = temp;
+      }
+    }
   }
   if (returnValue != SUCCESS) {
     std::cerr << "Error running the algorithm!" << std::endl;

@@ -16,72 +16,116 @@
 
 
 // overarching function:
-enum error generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int nr_holes) {
+unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int nr_holes) {
   // 1) polygon in sph[0] is the main polygon that should have holes
   // 2) any already generated holes should be numbered in sph[i], where i != 0
   // 3) call function to grab all the inner chains that can make holes and the number of points in them.
 
   std::vector<unsigned int> ch; // points on the convex hull.
-  get_convex_hull(ch, sph[0], points);
-  unsigned int total_inner_points = 0;
+  unsigned int total_inner_points, total_hole_points;;
   std::vector<Ends> ends;
+  std::vector<std::pair<unsigned int, unsigned int>> holes;
+  get_convex_hull(ch, sph[0], points);
   // 'valid' means it threw out ends if: is_2D == false, for the chain between the ends
   get_valid_inner_chains_to_ch(ends, ch, sph[0], points);
-  for(unsigned int i = 0; i < ends.size();++i) {
-    std::cerr << ends[i] << std::endl;
-    total_inner_points = total_inner_points + ends[i].nr_holes;
-  }
-
-  // 4) grab all the points in the already generated holes (min points to make 2 holes = 6)
-  unsigned int total_hole_points = 0;
+  //if there are holes in sph, add them to 'holes'
   for (unsigned int i = 1; i < sph.size(); ++i) {
-    total_hole_points = total_hole_points + (sph[i].size() < 6) ? 0 : sph[i].size();
+    if (sph[i].size() > 5) {holes.push_back(std::make_pair(i, sph[i].size()));}
   }
 
-  std::cerr << "Total inner points: " << total_inner_points << ", total hole points: " << total_hole_points << std::endl;
+  do {
+    total_inner_points = 0;
+    total_hole_points = 0;
 
-  // 5) randomly pick a chain or hole based on the number of points.
-  unsigned int selection = 0;
-  bool is_end = false;
-  // [0, total inner points] is a specific end, [total_inner_points+1, total_hole_points] is a specific hole
-  UniformRandomI(selection, 0, total_inner_points+total_hole_points);
+    std::cerr << "inner chains:" << std::endl;
+    for(unsigned int i = 0; i < ends.size();++i) {
+      std::cerr << ends[i] << std::endl;
+      total_inner_points = total_inner_points + ends[i].nr_holes;
+    }
+    std::cerr << "holes: " << std::endl;
+    // grab all the points in the already generated holes (min points to make 2 holes = 6)
+    for (unsigned int i = 0; i < holes.size(); ++i) {
+      std::cerr << "i: " << holes[i].first << ", size: " << holes[i].second << std::endl;
+      total_hole_points = total_hole_points + ((holes[i].second < 6) ? 0 : holes[i].second);
+    }
+    std::cerr << "Total inner points: " << total_inner_points << ", total hole points: " << total_hole_points << std::endl;
+    if (total_inner_points+total_hole_points == 0) break;
 
-  if (selection <= total_inner_points) {
-    for(unsigned int i = 0; i < ends.size(); ++i) {
-      if (selection < ends[i].nr_holes) {
-        is_end = true;
-        selection = i;
-        break;
-      }
-      else {
-        selection = selection - ends[i].nr_holes;
+
+    // randomly pick a chain or hole based on the number of points.
+    unsigned int selection=0, hole_i=0;
+    bool is_end = false;
+    // [0, total inner points] is a specific end, [total_inner_points+1, total_hole_points] is a specific hole
+    UniformRandomI(selection, 1, total_inner_points+total_hole_points);
+    std::cerr << "randomly selected: " << selection << std::endl;
+
+    if (selection <= total_inner_points) {
+      is_end = true;
+      for(unsigned int i = 0; i < ends.size(); ++i) {
+        if (selection <= ends[i].nr_holes) {
+          selection = i;
+          break;
+        }
+        else {
+          selection = selection - ends[i].nr_holes;
+        }
       }
     }
-  }
-  else {
-    selection = selection - total_inner_points;
-    for (unsigned int i = 1; i < sph.size(); ++i) {
-      if (selection < sph[i].size()) {
-        is_end = false;
-        selection = i;
-        break;
-      }
-      else {
-        selection = selection - sph[i].size();
+    else {
+      is_end = false;
+      selection = selection - total_inner_points;
+      for (unsigned int i = 0; i < holes.size(); ++i) {
+        if (selection <= holes[i].second) {
+          selection = holes[i].first;
+          hole_i = i;
+          break;
+        }
+        else {
+          selection = selection - holes[i].second;
+        }
       }
     }
-  }
-  // selection is now the index into either 'sph' or 'ends', is_end tells you which is which.
-  std::cerr << "selection: " << selection << ", is_end: " << is_end << std::endl;
+    // selection is now the index into either 'sph' or 'ends', is_end tells you which is which.
+    std::cerr << "selection: " << selection << ", is_end: " << is_end << std::endl;
 
-  // 6) call a function 'get_hole()' that uses the linesweep on the chain or hole
-  // - returns 'true' if it changed sph and added a hole, false if it didn't.
-  // - returns 'false' if no candidate was found that was valid, which invalidates splitting the chain/hole, so it can be discarded.
-  // - 2 different functions whether it's a chain or polygon
-  if(is_end) get_hole(ends[selection], sph, points);
-  else get_hole(selection, sph, points);
-
-  return SUCCESS;
+    // 6) call a function 'get_hole()' that uses the linesweep on the chain or hole
+    // - returns 'true' if it changed sph and added a hole, false if it didn't.
+    // - returns 'false' if no candidate was found that was valid, which invalidates splitting the chain/hole, so it can be discarded.
+    // - 2 different functions whether it's a chain or polygon
+    enum error result;
+    if(is_end) {
+      result = get_hole(ends[selection], sph, points);
+      if (result == HOLES_INADEQUATE) {
+        ends.erase(ends.begin()+selection);
+      }
+      else {
+        --nr_holes;
+        update_end(selection, ends, ch, sph[0], points);
+        if (sph.back().size() > 5) {
+          holes.push_back(std::make_pair(sph.size()-1, sph.back().size()));
+          total_hole_points = total_hole_points + ((sph.back().size() < 6) ? 0 : sph.back().size());
+        }
+      }
+    }
+    else {
+      result = get_hole(selection, sph, points);
+      if (result == HOLES_INADEQUATE) {
+        holes.erase(holes.begin()+hole_i);
+      }
+      else {
+        --nr_holes;
+        if (sph[selection].size() < 6) holes.erase(holes.begin()+hole_i);
+        else holes[hole_i].second = sph[selection].size();
+        if (sph.back().size() > 5) {
+          holes.push_back(std::make_pair(sph.size()-1, sph.back().size()));
+          total_hole_points = total_hole_points + ((sph.back().size() < 6) ? 0 : sph.back().size());
+        }
+      }
+    }
+    std::cerr << "hole result: "  << result << std::endl;
+    std::cerr << "holes left: " << nr_holes << ", ends left: " << ends.size() << ", total hole points:" << total_hole_points << std::endl;
+  } while (nr_holes > 0 && (ends.size() > 0 || total_hole_points > 0));
+  return nr_holes;
 }
 
 // 7) repeat the random pick until number of holes desired has been fulfilled.
@@ -108,22 +152,92 @@ enum error get_hole(Ends end, std::vector<std::vector<unsigned int>>& sph, std::
   std::vector<E_Edge> candidates, valid_candidates;
   //                                                is_chain, l2r
   sweep_polygonal_chain(candidates, inner_points, true, true);
-//  for (unsigned int i = 0; i < valid_candidates.size(); ++i) {
-//    std::cerr << "i: " << i << ", edge: " << valid_candidates[i] << std::endl;
-//  }
   sweep_polygonal_chain(candidates, inner_points, true, false);
-
   std::sort(candidates.begin(), candidates.end(), candidate_compare);
 
   E_Edge last, next_last;
+  std::cerr << "sorting candidates:" << std::endl;
   while (candidates.size() > 1) {
     last = candidates.back();
     next_last = candidates[candidates.size()-2];
+    std::cerr << "last:      " << last << std::endl;
+    std::cerr << "next_last: " << next_last << std::endl;
     if (last != next_last) candidates.pop_back();
     else {
-      
-      valid_candidates.push_back(last);
+      std::cerr << "last.closest: " << last.closest.back() << std::endl;
+      std::cerr << "next_last.cl: " << next_last.closest.back() << std::endl;
+      if (last.closest.back() == next_last.closest.back()) {
+        std::cerr << "found a pair" << std::endl;
+        //                            is_chain
+        if (is_2D(last, inner_points, true)) valid_candidates.push_back(last);
+        candidates.pop_back();
+      }
       candidates.pop_back();
+    }
+  }
+
+  std::cerr << "valid candidates:" << std::endl;
+  for (unsigned int i = 0; i < valid_candidates.size(); ++i) {
+    std::cerr << "i: " << i << ", edge: " << valid_candidates[i] << std::endl;
+    for (unsigned int j = 0; j < valid_candidates[i].closest.size();++j) {
+      std::cerr << "            " << valid_candidates[i].closest[j] << std::endl;
+    }
+  }
+  // at this point I have valid candidates that split the chain into 2 good pieces.
+
+  if (valid_candidates.size() > 0) {
+    unsigned int r_cand = 0;
+    UniformRandomI(r_cand, 0, valid_candidates.size()-1);
+    std::cerr << "random candidate: " << valid_candidates[r_cand] << std::endl;
+
+    E_Edge original = E_Edge(&points[polygonal_chain[(*valid_candidates[r_cand].p1).i]],
+                             &points[polygonal_chain[(*valid_candidates[r_cand].p2).i]]);
+    original.closest.push_back(D_Edge(&points[polygonal_chain[(*valid_candidates[r_cand].closest[0].p1).i]],
+                                      &points[polygonal_chain[(*valid_candidates[r_cand].closest[0].p2).i]]));
+    std::cerr << "original: " << original << std::endl;
+    std::cerr << " closest: " << original.closest[0] << std::endl;
+    //                                 hole_selection, is_chain
+    get_hole_and_new_pol(original, sph, points, 0, false);
+    return SUCCESS;
+  }
+  else {
+    return HOLES_INADEQUATE;
+  }
+}
+
+enum error get_hole(unsigned int& selection, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
+  std::cerr << "in get_hole, hole version: " << ", sph.size: " << sph.size() << ", p.size: " << points.size() << std::endl;
+
+  // vector of 'Point' points for the chain.
+  std::vector<Point> inner_points;
+  get_inner_chain_points(inner_points, sph[selection], points);
+//  std::cerr << "inner_points:" << std::endl;
+//  pdisplay(inner_points);
+
+  // 1) set up a linesweep that populates valid_candidates vector.
+  std::vector<E_Edge> candidates, valid_candidates;
+  //                                           is_chain, l2r
+  sweep_polygonal_chain(candidates, inner_points, false, true);
+  sweep_polygonal_chain(candidates, inner_points, false, false);
+  std::sort(candidates.begin(), candidates.end(), candidate_compare);
+
+  E_Edge last, next_last;
+  std::cerr << "sorting candidates:" << std::endl;
+  while (candidates.size() > 1) {
+    last = candidates.back();
+    next_last = candidates[candidates.size()-2];
+    std::cerr << "last:      " << last << std::endl;
+    std::cerr << "next_last: " << next_last << std::endl;
+    if (last != next_last) candidates.pop_back();
+    else {
+      std::cerr << "last.closest: " << last.closest.back() << std::endl;
+      std::cerr << "next_last.cl: " << next_last.closest.back() << std::endl;
+      if (last.closest.back() == next_last.closest.back()) {
+        std::cerr << "found a pair" << std::endl;
+        //                            is_chain
+        if (is_2D(last, inner_points, false)) valid_candidates.push_back(last);
+        candidates.pop_back();
+      }
       candidates.pop_back();
     }
   }
@@ -134,22 +248,40 @@ enum error get_hole(Ends end, std::vector<std::vector<unsigned int>>& sph, std::
       std::cerr << "            " << valid_candidates[i].closest[j] << std::endl;
     }
   }
+  // at this point I have valid candidates that split the chain into 2 good pieces.
 
+  if (valid_candidates.size() > 0) {
+    unsigned int r_cand = 0;
+    UniformRandomI(r_cand, 0, valid_candidates.size()-1);
+    std::cerr << "random candidate: " << valid_candidates[r_cand] << std::endl;
 
+    E_Edge original = E_Edge(&points[sph[selection][(*valid_candidates[r_cand].p1).i]],
+                             &points[sph[selection][(*valid_candidates[r_cand].p2).i]]);
+    original.closest.push_back(D_Edge(&points[sph[selection][(*valid_candidates[r_cand].closest[0].p1).i]],
+                                      &points[sph[selection][(*valid_candidates[r_cand].closest[0].p2).i]]));
+    std::cerr << "original: " << original << std::endl;
+    std::cerr << " closest: " << original.closest[0] << std::endl;
+    //                                 hole_selection, is_hole
+    get_hole_and_new_pol(original, sph, points, selection, true);
+    return SUCCESS;
+  }
+  else {
+    return HOLES_INADEQUATE;
+  }
 
-
-
-  return SUCCESS;
-}
-
-enum error get_hole(unsigned int& selection, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
-  std::cerr << "in get_hole, hole version: " << ", sph.size: " << sph.size() << ", p.size: " << points.size() << std::endl;
 
   return SUCCESS;
 }
 
 bool candidate_compare(E_Edge e1, E_Edge e2) {
-  if (*e1.p1 == *e2.p1) return (*e1.p2 < *e2.p2);
+  if (*e1.p1 == *e2.p1) {
+    if (*e1.p2 == *e2.p2) {
+      if (*e1.closest.back().p1 == *e2.closest.back().p1)
+        return *e1.closest.back().p2 < *e2.closest.back().p2;
+      return *e1.closest.back().p1 < *e2.closest.back().p1;
+    }
+    return (*e1.p2 < *e2.p2);
+  }
   return (*e1.p1 < *e2.p1);
 }
 
@@ -290,7 +422,7 @@ enum error sweep_polygonal_chain(std::vector<E_Edge>& valid_candidates, std::vec
 // The lex earlier adjacent edge should be checked if it has the later edge as a candidate, remove it if it has it.
 void remove_adjacent_candidate(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& it1, std::set<E_Edge>::iterator& it2,
                                std::set<E_Edge>& ls_edges) {
-//  std::cerr << "inside remove_adjacent_candidate" << std::endl;
+  std::cerr << "inside remove_adjacent_candidate" << std::endl;
 //  std::cerr << "ls_edges:" << std::endl;
 //  for (std::set<E_Edge>::iterator i = ls_edges.begin(); i != ls_edges.end(); ++i) std::cerr << *i << std::endl;
 
@@ -303,22 +435,24 @@ void remove_adjacent_candidate(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterato
   if (e1 < e2) {
     adj_it1 = std::prev(it1);
     adj1 = *adj_it1;
-//    std::cerr << "adj1: " << adj1 << std::endl;
+    std::cerr << "adj1: " << adj1 << std::endl;
     adj_it2 = std::next(it2);
     adj2 = *adj_it2;
-//    std::cerr << "adj2: " << adj2 << std::endl;
+    std::cerr << "adj2: " << adj2 << std::endl;
 
     if (*adj1.p1 < *adj2.p1) {
       if (adj1.closest.size() == 0) return;
-//      std::cerr << "closest removed: " << adj1 << ", closest: " << adj1.closest.back() << std::endl;
+      std::cerr << "closest removed: " << adj1 << ", closest: " << adj1.closest.back() << std::endl;
       E_Edge b = E_Edge(adj1.closest.back());
       if (b == adj2) adj1.closest.pop_back();
+      update_edge_in_set(adj1, adj_it1, ls_edges);
     }
     else {
       if (adj2.closest.size() == 0) return;
-//      std::cerr << "closest removed: " << adj2 << ", closest: " << adj2.closest.back() << std::endl;
+      std::cerr << "closest removed: " << adj2 << ", closest: " << adj2.closest.back() << std::endl;
       E_Edge b = E_Edge(adj2.closest.back());
       if (b == adj1) adj2.closest.pop_back();
+      update_edge_in_set(adj2, adj_it2, ls_edges);
     }
   }
   else {
@@ -329,15 +463,17 @@ void remove_adjacent_candidate(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterato
 
     if (*adj1.p1 < *adj2.p1) {
       if (adj1.closest.size() == 0) return;
-//      std::cerr << "closest removed: " << adj1 << ", closest: " << adj1.closest.back() << std::endl;
+      std::cerr << "closest removed: " << adj1 << ", closest: " << adj1.closest.back() << std::endl;
       E_Edge b = E_Edge(adj1.closest.back());
       if (b == adj2) adj1.closest.pop_back();
+      update_edge_in_set(adj1, adj_it1, ls_edges);
     }
     else {
       if (adj2.closest.size() == 0) return;
-//      std::cerr << "closest removed: " << adj2 << ", closest: " << adj2.closest.back() << std::endl;
+      std::cerr << "closest removed: " << adj2 << ", closest: " << adj2.closest.back() << std::endl;
       E_Edge b = E_Edge(adj2.closest.back());
       if (b == adj1) adj2.closest.pop_back();
+      update_edge_in_set(adj2, adj_it2, ls_edges);
     }
   }
 }
@@ -422,7 +558,11 @@ void insert_update(E_Edge& e, std::set<E_Edge>::iterator& it, std::set<E_Edge>& 
       }
     }
   }
-  else {std::cerr << "end edge, skipping" << std::endl;}
+  else {
+    // this is an inner polygonal chain, and the end is between a fictional edge
+    // between the c.h. points, which cannot be used anyway
+    std::cerr << "end edge, skipping" << std::endl;
+  }
   update_edge_in_set(e, it, ls_edges);
   std::cerr << "after insert:" << std::endl;
   std::cerr << "edge: " << e << std::endl;
@@ -450,7 +590,10 @@ void removal_update(E_Edge& e, std::set<E_Edge>::iterator& it, std::vector<E_Edg
       valid_candidates.push_back(cand_e);
     }
     else {
-      valid_candidates.push_back(e);
+      E_Edge cand_e = E_Edge(e);
+      cand_e.closest.clear();
+      cand_e.closest.push_back(e.closest.back());
+      valid_candidates.push_back(cand_e);
     }
     e.closest.pop_back();
   }

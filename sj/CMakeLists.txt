@@ -16,7 +16,6 @@ add_definitions(-O3 -DNDEBUG -std=c++11 -DCPUTIME_IN_MILLISECONDS)
 
 add_executable(spg
                     src/allsp.cpp
-                    src/curve.cpp
                     src/hole.cpp
                     src/heap.cpp
 					          src/inits.cpp

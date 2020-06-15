@@ -833,8 +833,8 @@ void doFlip(unsigned int i1, unsigned int i2, std::vector<unsigned int>& polygon
 void doFlip(unsigned int i1, unsigned int i2, std::vector<Point>& points);
 void flip2(Edge& e1, Edge& e2, std::vector<unsigned int>& polygon);
 double get_angle(Edge e, Point p, bool use_p1);
-double get_angle(Edge2 e, Edge2 f, bool l2r, bool dbl_rem);
-double get_angle(Edge2 e, Point p, bool use_p1);
+double get_angle(E_Edge e, E_Edge f, bool l2r, bool dbl_rem);
+double get_angle(E_Edge e, Point p, bool use_p1);
 double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1);
 double get_larger_angle(E_Edge& e1, E_Edge& e2, bool use_p1);
 void poldisplay (std::vector<unsigned int>& p);

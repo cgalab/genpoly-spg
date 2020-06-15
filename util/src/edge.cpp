@@ -653,7 +653,7 @@ double get_angle(Edge e, Point p, bool use_p1) {
 
 // function to get the angle between an edge and a point, where the origin is one of the points of the edge,
 // controlled by the boolean 'use_p1' and the x-axis is along the edge.
-double get_angle(Edge2 e, Point p, bool l2r) {
+double get_angle(E_Edge e, Point p, bool l2r) {
 	std::cerr << "inside edge & point get_angle()" << std::endl;
 	double a1, a2;
 	Point p1, p2;
@@ -669,8 +669,28 @@ double get_angle(Edge2 e, Point p, bool l2r) {
 	// angles must always be [-180°, 180°]
 	double sum = a2 - a1;
 	std::cerr << "a2 - a1: " << sum << std::endl;
-	if (sum < 0) sum = fabs(sum);
-	if (sum > PI) sum = 2*PI - sum;
+	sum = fabs(sum);
+	if (l2r) {
+		if (signbit(a1) == signbit(a2)) {
+			if (a2 > a1 &&  e.bin) sum = 2*PI - sum;
+			if (a2 < a1 && !e.bin) sum = 2*PI - sum;
+		}
+		else {
+			if ((a2 > 0) && ( e.bin)) sum = 2*PI - sum;
+			if ((a2 < 0) && (!e.bin)) sum = 2*PI - sum;
+		}
+	}
+	else {
+		if (signbit(a1) == signbit(a2)) {
+			if ((a2 < a1) &&  e.bin) sum = 2*PI - sum;
+			if ((a1 < a2) && !e.bin) sum = 2*PI - sum;
+		}
+		else {
+			if ((a2 < 0) && ( e.bin)) sum = 2*PI - sum;
+			if ((a2 > 0) && (!e.bin)) sum = 2*PI - sum;
+		}
+	}
+
 	std::cerr << "return: " << sum << std::endl;
 	return sum;
 }
@@ -682,7 +702,7 @@ double get_angle(Edge2 e, Point p, bool l2r) {
 //			e: the edge with the origin point of the angle
 //			f: the point to get an angle, (l2r) ? f.p1 : f.p2
 //			l2r: true if linesweep is sweeping left2right
-double get_angle(Edge2 e, Edge2 f, bool l2r, bool dbl_rem) {
+double get_angle(E_Edge e, E_Edge f, bool l2r, bool dbl_rem) {
 	std::cerr << "inside 2 edge get_angle()" << std::endl;
 	double a1, a2;
 	Point p1, p2, p;
@@ -717,8 +737,22 @@ double get_angle(Edge2 e, Edge2 f, bool l2r, bool dbl_rem) {
 	// angles must always be [-180°, 180°]
 	double sum = a2 - a1;
 	std::cerr << "a2 - a1: " << sum << std::endl;
-	if (sum < 0) sum = fabs(sum);
-	if (sum > PI) sum = 2*PI - sum;
+	sum = fabs(sum);
+	if (l2r) {
+		if (a2 > 0 &&  e.bin) sum = 2*PI - sum;
+		if (a2 < 0 && !e.bin) sum = 2*PI - sum;
+	}
+	else {
+		if (signbit(a1) == signbit(a2)) {
+			if ((a2 < a1) &&  e.bin) sum = 2*PI - sum;
+			if ((a1 < a2) && !e.bin) sum = 2*PI - sum;
+		}
+		else {
+			if ((a2 < 0) && ( e.bin)) sum = 2*PI - sum;
+			if ((a2 > 0) && (!e.bin)) sum = 2*PI - sum;
+		}
+	}
+
 	std::cerr << "return: " << sum << std::endl;
 	return sum;
 }

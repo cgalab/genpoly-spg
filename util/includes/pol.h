@@ -71,14 +71,18 @@ double pol_calc_chain_length(unsigned int start, unsigned int stop, std::vector<
 bool is_2D(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole);
-void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points);
-void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole);
+bool is_2D(E_Edge candidate, std::vector<Point>& points, bool is_chain);
+//void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+//void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon,
+//                        E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole);
+bool get_hole_and_new_pol(E_Edge& e, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int hole_selection, bool is_hole);
 //void get_new_inner_polygon(Ends& end, std::vector<unsigned int>& new_inner_polygon, std::vector<unsigned int>& new_polygon, std::vector<Point>& points);
 bool get_inner_chain_polygon(std::vector<unsigned int>& inner_polygon, Ends& ends, std::vector<unsigned int>& polygon);
 void get_inner_chain_points(std::vector<Point>& inner_points, std::vector<unsigned int>& inner_polygon, std::vector<Point>& points);
 void createRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void get_valid_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+void update_end(unsigned int end_i, std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);
 bool check_in_orientation (E_Edge e1, std::vector<Point>& points);
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void get_convex_hull(std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);

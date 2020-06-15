@@ -4,7 +4,7 @@
 //#include <vector>
 #include "pol.h"
 
-enum error generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int nr_holes);
+unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int nr_holes);
 enum error get_hole(Ends end, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points);
 enum error get_hole(unsigned int& selection, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points);
 bool candidate_compare(E_Edge e1, E_Edge e2);

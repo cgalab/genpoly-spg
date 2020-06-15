@@ -2925,6 +2925,13 @@ bool is_ascending(unsigned int start, unsigned int stop, unsigned int cycle) {
 unsigned int get_lower_cyclic_difference(unsigned int start, unsigned int stop, unsigned int cycle) {
   unsigned int left, right; // 'stop' is considered the center, and 'left' is the number of vertices to 'stop's left until you hit 'start' and v.v.
 
+  if (stop == cycle-1) {
+    if (start == 0) return 1;
+  }
+  if (start == cycle-1) {
+    if (stop == 0) return 1;
+  }
+
   if (start < stop) {
     left = stop-start;
     right = start+cycle-stop;
@@ -2967,8 +2974,8 @@ unsigned int get_chain_length(Ends ends, unsigned int cycle) {
 // function that checks if the chain defined by the 2 edges in 'par' of
 // the polygon in 'polygon' of the points in 'points' is 2 dimensional.
 bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
-  assert(polygon.size() > 2);
-
+  if (polygon.size() < 3) return false;
+  std::cerr << "inside is_2D Ends version" << std::endl;
   unsigned int a, b, l;
   bool ascending;
   int it;
@@ -2981,19 +2988,19 @@ bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& po
 
   // get direction from 'a' to 'b' through the inner chain, whether it is ascending through the index or descending
   ascending = is_ascending(ends.par.first);
-//  std::cerr << "a: " << a << ", b: " << b << ", ascending: " << (ascending ? "true" : "false") << std::endl;
+  std::cerr << "a: " << a << ", b: " << b << ", ascending: " << (ascending ? "true" : "false") << std::endl;
   if (ascending) it = 1;
   else it = -1;
 
   // get length of the inner chain
   l = get_chain_length(ends, polygon.size());
-//  std::cerr << "length: " << l << std::endl;
-  if (l < 3) return false;
+  std::cerr << "length: " << l << std::endl;
+  if (l < 4) return false;
 
   e = Edge (&points[polygon[(polygon.size() + a + it) % polygon.size()]], &points[polygon[(polygon.size() + b - it) % polygon.size()]]);
 //  std::cerr << "inner edge: " << e << std::endl;
   unsigned int i = (polygon.size() + a + 2*it) % polygon.size();
-  b = b-it; // small reduction so that I don't have to calculate (b-it) each iteration in next while loop.
+  b = (b-it)%polygon.size(); // small reduction so that I don't have to calculate (b-it) each iteration in next while loop.
 //  std::cerr << "inner indices: i: " << i << ", b: " << b << std::endl;
 
   while (i != b) {
@@ -3012,7 +3019,7 @@ bool is_2D(Ends ends, std::vector<unsigned int>& polygon, std::vector<Point>& po
 // An inner polygonal chain can have [0,last] as one edge and the rest of the chain as the other
 // A hole must be 2D on both sides of the edges.
 bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole) {
-//  std::cerr << "=== is_2D function ===" << std::endl;
+  std::cerr << "=== is_2D function ===" << std::endl;
   if (polygon.size() < 3) return false;
 
   unsigned int a, b;
@@ -3087,14 +3094,14 @@ bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Poi
       // otherwise we check the chain between e1 and e2.
       a = e1.getVHigh();
       b = e2.getVLow();
-//      std::cerr << "a: " << a << ", b: " << b << std::endl;
+      std::cerr << "a: " << a << ", b: " << b << std::endl;
       if ((b-a) < 2) {
-//        std::cerr << "not 2D." << std::endl;
+        std::cerr << "not 2D." << std::endl;
         return false;
       }
 
       e3 = Edge(&points[polygon[(a)%polygon.size()]], &points[polygon[(a+1)%polygon.size()]]);
-//      std::cerr << "e3: " << e3 << std::endl;
+      std::cerr << "e3: " << e3 << std::endl;
       for (unsigned int i = (a+2)%polygon.size(); i != (b+1)%polygon.size(); i = (i+1)%polygon.size()) {
         p = points[polygon[i]];
 //        std::cerr << "p: " << p << std::endl;
@@ -3109,8 +3116,79 @@ bool is_2D(E_Edge candidate, std::vector<unsigned int>& polygon, std::vector<Poi
 }
 
 
+bool is_2D(E_Edge candidate, std::vector<Point>& points, bool is_chain) {
+  std::cerr << "in is_2D()" << std::endl;
+  if (is_chain && points.size() < 3) return false; // inner chain must have at least 5 points
+  else if (!is_chain && points.size() < 6) return false; // hole must have at least 6 points.
+  Edge2 e = candidate;
+  Edge2 adj = candidate.closest.back();
+  std::cerr << "edge: " << e << std::endl;
+  std::cerr << "adj:  " << adj << std::endl;
+
+  unsigned int plowest, phighest;
+  if (e.getPLow() < adj.getPLow()) {plowest=e.getPLow();}
+  else {plowest=adj.getPLow();}
+  if (e.getPHigh() < adj.getPHigh()) {phighest=adj.getPHigh();}
+  else {phighest=e.getPHigh();}
+  std::cerr << "plowest: " << plowest << ", phighest: " << phighest << std::endl;
+
+  if (!is_chain || !(plowest == 0 && phighest == points.size()-1)) { // it's a hole or a chain that needs to check both sides.
+    unsigned int lowest, lower, higher, highest;
+    if (e.getVLow() < adj.getVLow()) {lowest=e.getVLow(); lower=e.getVHigh();higher=adj.getVLow();highest=adj.getVHigh();}
+    else {lowest=adj.getVLow(); lower=adj.getVHigh();higher=e.getVLow();highest=e.getVHigh();}
+    std::cerr << "lowest: " << lowest << ", lower: " << lower << std::endl;
+    std::cerr << "higher: " << higher << ", highest: " << highest << std::endl;
+    // chain 1 between lower and higher, chain 2 between highest and lowest.
+
+    // check chain 1:
+    bool is2D = false;
+    unsigned int count = 0;
+    Edge2 test = Edge2(&points[lower], &points[higher]);
+    std::cerr << "test edge 1: " << test << std::endl;
+    Point p;
+    for (unsigned int i = lower+1; i != higher;i = (i+1)%points.size()) {
+      ++count;
+      p = points[i];
+      std::cerr << "i: " << i << ", p:" << p << std::endl;
+      if (cdet(test,p) != 0) {is2D = true;break;}
+    }
+    if (count < 1 && is_chain) return false;
+    if (!is2D) return false;
+
+    // check chain 2:
+    count = 0;
+    is2D = false;
+    test.set(&points[highest], &points[lowest]);
+    std::cerr << "test edge 2: " << test << std::endl;
+    for (unsigned int i = lowest+1; i != highest;i = (i+1)%points.size()) {
+      ++count;
+      p = points[i];
+      std::cerr << "i: " << i << ", p:" << p << std::endl;
+      if (cdet(test,p) != 0) {is2D = true;break;}
+    }
+    std::cerr << "is2D: " << ((is2D)?"true":"false") << std::endl;
+    if (count < 1 && is_chain) return false;
+    return is2D;
+  }
+  else {
+    if (plowest == 0 && phighest == points.size()-1) { // only 1 chain needs to be checked.
+      Edge2 test = Edge2 (&points[1], &points[2]);
+      std::cerr << "test: " << test << ", points.size(): " << points.size() << std::endl;
+      Point p;
+      for (unsigned int i = 3; i < points.size()-1; ++i) {
+        p = points[i];
+        std::cerr << "p: " << p << std::endl;
+        if (cdet(test,p) != 0) {return true;}
+      }
+    }
+  }
+  return false;
+}
+
+/*
 // Temporary 'slow' function to fill 'hole' vector with the hole given by 'end' in polygon 'polygon'
-void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon,
+                          E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
 //  std::cerr << "=== get_hole_and_new_pol function ===" << std::endl;
   assert(hole.size() == 0);
   assert(new_polygon.size() == 0);
@@ -3174,10 +3252,13 @@ void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned 
 //  std::cerr << "hole:" << std::endl;
 //  pdisplay(hole, points);
 }
+*/
 
+/*
 // same as above, except it accepts a boolean 'is_hole' which, if false,
 // changes the edges, if either is the edge of the c.h. which is [0,last]
-void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon, E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole) {
+void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned int>& new_polygon,
+                        E_Edge& e, std::vector<unsigned int>& polygon, std::vector<Point>& points, bool is_hole) {
 //  std::cerr << "=== get_hole_and_new_pol function ===" << std::endl;
   assert(hole.size() == 0);
   assert(new_polygon.size() == 0);
@@ -3241,6 +3322,124 @@ void get_hole_and_new_pol(std::vector<unsigned int>& hole, std::vector<unsigned 
 //  std::cerr << "hole:" << std::endl;
 //  pdisplay(hole, points);
 }
+*/
+
+// Function that updates sph by modifying sph[0], removing a chain and adding it as a hole to sph.
+// INPUT:
+//      e: E_Edge that contains 2 edges that define where to split the polygon in sph[0]
+//      sph: a polygon sph[0] and holes in it sph[i], i \in {1,sph.size()-1}
+//      points: the points that indices in sph reference
+//      hole_selection: index into sph, if we're splitting a hole into 2 holes
+//      is_hole: whether it's a chain or a hole
+bool get_hole_and_new_pol(E_Edge& e, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int hole_selection, bool is_hole) {
+  std::cerr << "inside get_hole_and_new_pol()" << std::endl;
+
+  std::vector<unsigned int> chain1, chain2;
+  unsigned int lowest, lower, higher, highest;
+  // chain 1: between lower and higher, chain 2: between highest and lowest
+  if (e.getVLow() < e.closest.back().getVLow()) {
+    lowest = e.getVLow();
+    lower = e.getVHigh();
+    higher = e.closest.back().getVLow();
+    highest = e.closest.back().getVHigh();
+  }
+  else {
+    lowest =  e.closest.back().getVLow();
+    lower = e.closest.back().getVHigh();
+    higher = e.getVLow();
+    highest = e.getVHigh();
+  }
+  std::cerr << "lowest: " << lowest << ", lower: " << lower << std::endl;
+  std::cerr << "higher: " << higher << ", highest: " << highest << std::endl;
+
+  bool in_chain1 = true;
+  bool chain1_ispoly = true;
+  Point p, l = points[sph[hole_selection][0]];
+
+  for (unsigned int i = 0; i < sph[hole_selection].size(); ++i) {
+    // find the strict-weak lowest point to get which chain is the polygon and which the hole.
+    p = points[sph[hole_selection][i]];
+    std::cerr << "p: " << p << ", chain1: " << in_chain1 << std::endl;
+
+    if (p.v == lowest) {
+      std::cerr << "found lowest" << std::endl;
+      if (in_chain1) {chain1.push_back(sph[hole_selection][i]);}
+      else {chain2.push_back(sph[hole_selection][i]);}
+      continue;
+    }
+    else if (p.v == lower) {
+      std::cerr << "found lower" << std::endl;
+      in_chain1 = !in_chain1;
+      if (p < l) {
+        l = p;
+        std::cerr << "new lex" << std::endl;
+        if (in_chain1) chain1_ispoly = true;
+        else chain1_ispoly = false;
+      }
+      if (in_chain1) {chain1.push_back(sph[hole_selection][i]);}
+      else {chain2.push_back(sph[hole_selection][i]);}
+      continue;
+    }
+    else if (p.v == higher) {
+      std::cerr << "found higher" << std::endl;
+      if (in_chain1) {chain1.push_back(sph[hole_selection][i]);}
+      else {chain2.push_back(sph[hole_selection][i]);}
+      continue;
+    }
+    else if (p.v == highest) {
+      std::cerr << "found highest" << std::endl;
+      in_chain1 = !in_chain1;
+      if (p < l) {
+        l = p;
+        std::cerr << "new lex" << std::endl;
+        if (in_chain1) chain1_ispoly = true;
+        else chain1_ispoly = false;
+      }
+      if (in_chain1) {chain1.push_back(sph[hole_selection][i]);}
+      else {chain2.push_back(sph[hole_selection][i]);}
+      continue;
+    }
+
+    if (p < l) {
+      l = p;
+      std::cerr << "new lex" << std::endl;
+      if (in_chain1) chain1_ispoly = true;
+      else chain1_ispoly = false;
+    }
+
+    if (in_chain1) {chain1.push_back(sph[hole_selection][i]);}
+    else {chain2.push_back(sph[hole_selection][i]);}
+  }
+
+  for (unsigned int i = 0; i < chain1.size(); ++i) {
+    points[chain1[i]].v = i;}
+  std::cerr << "chain 1: " << (chain1_ispoly ? "polygon" : "hole") << std::endl;
+  pdisplay(chain1, points);
+
+  for (unsigned int i = 0; i < chain2.size(); ++i) {
+    points[chain2[i]].v = i;}
+  std::cerr << "chain 2: " << (chain1_ispoly ? "hole" : "polygon") << std::endl;
+  pdisplay(chain2, points);
+
+  if (chain1_ispoly) {
+    sph[hole_selection] = chain1;
+    sph.push_back(chain2);
+  }
+  else {
+    sph[hole_selection] = chain2;
+    sph.push_back(chain1);
+  }
+
+  //re-index points in sph[0]
+  if (hole_selection == 0) {
+    for (unsigned int i = 0; i < sph[0].size(); ++i) {
+      points[sph[0][i]].v = i;
+    }
+  }
+
+  return true;
+}
+
 
 /*
 void get_new_inner_polygon(Ends& end, std::vector<unsigned int>& new_inner_polygon, std::vector<unsigned int>& new_polygon, std::vector<Point>& points) {
@@ -3374,11 +3573,12 @@ void createCHRandPol(std::vector<unsigned int>& polygon, std::vector<Point>& poi
 // that ends in incidental convex hull points.
 void get_valid_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   std::cerr << "=== get_inner_chains_to_ch ===" << std::endl;
+  if (ends.size() > 0) ends.clear();
   I_Edge e1, e2;
   Point prev, p, next;
   unsigned int diff;
-//  std::cerr << "ch: " << std::endl;
-//  pdisplay(ch, points);
+  std::cerr << "ch: " << std::endl;
+  pdisplay(ch, points);
 //  std::cerr << "polygon: " << std::endl;
 //  pdisplay(polygon, points);
 
@@ -3392,14 +3592,14 @@ void get_valid_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned 
     prev = points[ch[(ch.size() + i - 1) % ch.size()]];
     p = points[ch[i]];
     next = points[ch[(ch.size() + i + 1) % ch.size()]];
-//    std::cerr << "prev: " << prev << std::endl;
-//    std::cerr << "p:    " << p << std::endl;
-//    std::cerr << "next: " << next << std::endl;
+    std::cerr << "prev: " << prev << std::endl;
+    std::cerr << "p:    " << p << std::endl;
+    std::cerr << "next: " << next << std::endl;
 
     // get the difference in index distance between 'prev' and 'p'
     // it's just a quick check to make sure that the 2 convex hull points aren't connected by a single edge.
     diff = get_lower_cyclic_difference(p.v, prev.v, polygon.size());
-//    std::cerr << "diff: " << diff << std::endl;
+    std::cerr << "diff: " << diff << std::endl;
     //diff = 1 means the 2 c.h. points are connected by an edge.
     if (diff > 1) {
 //      std::cerr << "prev: " << prev << std::endl;
@@ -3449,12 +3649,128 @@ void get_valid_inner_chains_to_ch(std::vector<Ends>& ends, std::vector<unsigned 
 //        std::cerr << "is 2D" << std::endl;
         ends.push_back(par);
       }
-      else {
+//      else {
 //        std::cerr << "is not 2D" << std::endl;
-      }
-
+//      }
     }
   }
+}
+
+// Function to update the number of points in the inner chains inside 'ends' and
+// the new points if the points connected to the ch points of the edge have changed.
+void update_end(unsigned int end_i, std::vector<Ends>& ends, std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  std::cerr << "inside update_end()" << std::endl;
+  Ends end;
+  unsigned int lowest, lower, higher, highest, sum, ch_z;
+  bool is_lowest, first_is_lower=true;
+  Point ch_l, ch_h;
+
+  end = ends[end_i];
+  std::cerr << "end: " << end << std::endl;
+
+  //first check which chain 'ch' lives in
+  if (end.par.first.l2ch) ch_l = *end.par.first.p1;
+  else ch_l = *end.par.first.p2;
+  if (end.par.second.l2ch) ch_h = *end.par.second.p1;
+  else ch_h = *end.par.second.p2;
+  for (unsigned int i = 0; i < ch.size(); ++i) {//just to make sure to pick a c.h. point that isn't either point.
+    if ((ch_l.v == points[ch[i]].v) || (ch_h.v == points[ch[i]].v)) continue;
+    ch_z = i;
+    break;
+  }
+
+  if (ch_h.v < ch_l.v) {
+    Point temp = ch_l;
+    ch_l = ch_h;
+    ch_h = temp;
+    first_is_lower = false;
+  }
+  // all the convex hull points is in one chain and not the other between any 2 c.h. points.
+  if ((ch_l.v < points[ch[ch_z]].v) && (points[ch[ch_z]].v < ch_h.v)) {
+    // inner chain is between lowest and highest
+    if (first_is_lower) {
+      end.par.first.set(points[ch_l.i], points[polygon[(polygon.size() + ch_l.v -1)%polygon.size()]]);
+      end.par.second.set(points[ch_h.i], points[polygon[(polygon.size() + ch_h.v +1)%polygon.size()]]);
+      if (ch_l < points[polygon[(polygon.size() + ch_l.v -1)%polygon.size()]]) end.par.first.l2ch = true;
+      else end.par.first.l2ch = false;
+      if (ch_h < points[polygon[(polygon.size() + ch_h.v +1)%polygon.size()]]) end.par.second.l2ch = true;
+      else end.par.second.l2ch = false;
+    }
+    else {
+      end.par.first.set(points[ch_h.i], points[polygon[(polygon.size() + ch_h.v +1)%polygon.size()]]);
+      end.par.second.set(points[ch_l.i], points[polygon[(polygon.size() + ch_l.v -1)%polygon.size()]]);
+      if (ch_h < points[polygon[(polygon.size() + ch_h.v +1)%polygon.size()]]) end.par.first.l2ch = true;
+      else end.par.first.l2ch = false;
+      if (ch_l < points[polygon[(polygon.size() + ch_l.v -1)%polygon.size()]]) end.par.second.l2ch = true;
+      else end.par.second.l2ch = false;
+    }
+  }
+  else {
+    // inner chain is between lower and higher
+    if (first_is_lower) {
+      end.par.first.set(points[ch_l.i], points[polygon[(polygon.size() + ch_l.v +1)%polygon.size()]]);
+      end.par.second.set(points[ch_h.i], points[polygon[(polygon.size() + ch_h.v -1)%polygon.size()]]);
+      if (ch_l < points[polygon[(polygon.size() + ch_l.v +1)%polygon.size()]]) end.par.first.l2ch = true;
+      else end.par.first.l2ch = false;
+      if (ch_h < points[polygon[(polygon.size() + ch_h.v -1)%polygon.size()]]) end.par.second.l2ch = true;
+      else end.par.second.l2ch = false;
+    }
+    else {
+      end.par.first.set(points[ch_h.i], points[polygon[(polygon.size() + ch_h.v -1)%polygon.size()]]);
+      end.par.second.set(points[ch_l.i], points[polygon[(polygon.size() + ch_l.v +1)%polygon.size()]]);
+      if (ch_h < points[polygon[(polygon.size() + ch_h.v -1)%polygon.size()]]) end.par.first.l2ch = true;
+      else end.par.first.l2ch = false;
+      if (ch_l < points[polygon[(polygon.size() + ch_l.v +1)%polygon.size()]]) end.par.second.l2ch = true;
+      else end.par.second.l2ch = false;
+    }
+  }
+  std::cerr << "new end: " << end << std::endl;
+  if ((*end.par.first.p1 == *end.par.second.p1) ||
+      (*end.par.first.p1 == *end.par.second.p2) ||
+      (*end.par.first.p2 == *end.par.second.p1) ||
+      (*end.par.first.p2 == *end.par.second.p2)) {
+    ends.erase(ends.begin()+end_i);
+    return;
+  }
+
+  if (end.par.first.getVLow() < end.par.second.getVLow()) {
+    lowest = end.par.first.getVLow();
+    lower = end.par.first.getVHigh();
+    higher = end.par.second.getVLow();
+    highest = end.par.second.getVHigh();
+    if (end.par.first.l2ch) {
+      if ((*end.par.first.p1).v == lowest) is_lowest = true;
+      else is_lowest = false;
+    }
+    else {
+      if ((*end.par.first.p2).v == lowest) is_lowest = true;
+      else is_lowest = false;
+    }
+  }
+  else {
+    lowest = end.par.second.getVLow();
+    lower = end.par.second.getVHigh();
+    higher = end.par.first.getVLow();
+    highest = end.par.first.getVHigh();
+    if (end.par.second.l2ch) {
+      if ((*end.par.first.p1).v == lowest) is_lowest = true;
+      else is_lowest = false;
+    }
+    else {
+      if ((*end.par.first.p2).v == lowest) is_lowest = true;
+      else is_lowest = false;
+    }
+  }
+  std::cerr << "lowest: " << lowest << ", lower: " << lower << std::endl;
+  std::cerr << "higher: " << higher << ", highest:" << highest << std::endl;
+
+  if (is_lowest) sum = higher-lower +1;
+  else sum = lowest + polygon.size() - highest +1;
+  std::cerr << "sum: " << sum << std::endl;
+  end.nr_holes = sum;
+
+  if (is_2D(end, polygon, points)) ends[end_i] = end;
+  else ends.erase(ends.begin()+end_i);
 }
 
 // Function to return if "in" orientation of the closed edge that makes the hole,
