@@ -199,26 +199,26 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
         fprintf(fout, "%u\n", polygon[i]);
       break;
     case OF_POLY:
-      fprintf(fout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
+      fprintf(fout, "%.17f %.17f %.17f %.17f\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
       fprintf(fout, "%lu\n", points.size());
       for (unsigned int i = 0; i < points.size(); ++i)
-        fprintf(fout, "%lf %lf\n", points[i].x, points[i].y);
+        fprintf(fout, "%.17f %.17f\n", points[i].x, points[i].y);
       break;
     case OF_DAT:
       fprintf(fout, "# X   Y\n");
       for (unsigned int i = 0; i < points.size(); ++i)
-        fprintf(fout, "  %lf   %lf\n", points[polygon[i]].x, points[polygon[i]].y);
-      fprintf(fout, "  %lf   %lf\n", points[polygon[0]].x, points[polygon[0]].y);
+        fprintf(fout, "  %.17f   %.17f\n", points[polygon[i]].x, points[polygon[i]].y);
+      fprintf(fout, "  %.17f   %.17f\n", points[polygon[0]].x, points[polygon[0]].y);
       break;
     case OF_LINE:
       fprintf(fout, "%lu\n", polygon.size());
       for (unsigned int i = 0; i < polygon.size(); ++i)
-        fprintf(fout, "  %lf   %lf\n", points[polygon[i]].x, points[polygon[i]].y);
-      fprintf(fout, "  %lf   %lf\n", points[polygon[0]].x, points[polygon[0]].y);
+        fprintf(fout, "  %.17f   %.17f\n", points[polygon[i]].x, points[polygon[i]].y);
+      fprintf(fout, "  %.17f   %.17f\n", points[polygon[0]].x, points[polygon[0]].y);
       break;
     case OF_PURE:
       for (unsigned int i = 0; i < points.size(); ++i)
-        fprintf(fout, "%lf %lf\n", points[i].x, points[i].y);
+        fprintf(fout, "%.17f %.17f\n", points[i].x, points[i].y);
       break;
     case OF_PURE_AND_PERM:
       std::cerr << "Should not be handled by this function." << std::endl;
@@ -266,16 +266,16 @@ enum error writeOutIntFile(char *outFile, out_format_t outFormat, bool writeNew,
         fprintf(fout, "%u\n", polygon[i]);
       break;
     case OF_POLY:
-      fprintf(fout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
+      fprintf(fout, "%.17f %.17f %.17f %.17f\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
       fprintf(fout, "%lu\n", points.size());
       for (unsigned int i = 0; i < points.size(); ++i)
-        fprintf(fout, "%lf %lf\n", points[i].x, points[i].y);
+        fprintf(fout, "%.17f %.17f\n", points[i].x, points[i].y);
       break;
     case OF_DAT:
       fprintf(fout, "# X   Y\n");
       for (unsigned int i = 0; i < points.size(); ++i)
-        fprintf(fout, "  %lf   %lf\n", points[polygon[i]].x, points[polygon[i]].y);
-      fprintf(fout, "  %lf   %lf\n", points[polygon[0]].x, points[polygon[0]].y);
+        fprintf(fout, "  %.17f   %.17f\n", points[polygon[i]].x, points[polygon[i]].y);
+      fprintf(fout, "  %.17f   %.17f\n", points[polygon[0]].x, points[polygon[0]].y);
       break;
     case OF_PURE:
       for (unsigned int i = 0; i < points.size(); ++i)
@@ -334,30 +334,30 @@ enum error writeOutFile(char *outFile, out_format_t outFormat, bool writeNew, st
         break;
       case OF_POLY:
         if (j == 0) {
-          writeToFile ? fprintf(fout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points)) : fprintf(stdout, "%lf %lf %lf %lf\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
+          writeToFile ? fprintf(fout, "%.17f %.17f %.17f %.17f\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points)) : fprintf(stdout, "%.17f %.17f %.17f %.17f\n", getXmin(points), getXmax(points), getYmin(points), getYmax(points));
         }
         writeToFile ? fprintf(fout, "%lu\n", sph[j].size()) : fprintf(stdout, "%lu\n", sph[j].size());
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          writeToFile ? fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+          writeToFile ? fprintf(fout, "%.17f %.17f\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "%.17f %.17f\n", points[sph[j][i]].x, points[sph[j][i]].y);
         writeToFile ? fprintf(fout, "\n") : fprintf(stdout, "\n");
         break;
       case OF_DAT:
         writeToFile ? fprintf(fout, "# (index %u)\n", j) : fprintf(stdout, "# (index %u)\n", j);
         writeToFile ? fprintf(fout, "# X   Y\n") : fprintf(stdout, "# X   Y\n");
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          writeToFile ? fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
-        writeToFile ? fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y) : fprintf(stdout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
+          writeToFile ? fprintf(fout, "  %.17f   %.17f\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "  %.17f   %.17f\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        writeToFile ? fprintf(fout, "  %.17f   %.17f\n", points[sph[j][0]].x, points[sph[j][0]].y) : fprintf(stdout, "  %.17f   %.17f\n", points[sph[j][0]].x, points[sph[j][0]].y);
         writeToFile ? fprintf(fout, "\n\n") : fprintf(stdout, "\n\n");
         break;
       case OF_LINE:
         writeToFile ? fprintf(fout, "%lu\n", sph[j].size()) : fprintf(stdout, "%lu\n", sph[j].size());
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          writeToFile ? fprintf(fout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "  %lf   %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
-        writeToFile ? fprintf(fout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y) : fprintf(stdout, "  %lf   %lf\n", points[sph[j][0]].x, points[sph[j][0]].y);
+          writeToFile ? fprintf(fout, "  %.17f   %.17f\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "  %.17f   %.17f\n", points[sph[j][i]].x, points[sph[j][i]].y);
+        writeToFile ? fprintf(fout, "  %.17f   %.17f\n", points[sph[j][0]].x, points[sph[j][0]].y) : fprintf(stdout, "  %.17f   %.17f\n", points[sph[j][0]].x, points[sph[j][0]].y);
         break;
       case OF_PURE:
         for (unsigned int i = 0; i < sph[j].size(); ++i)
-          writeToFile ? fprintf(fout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "%lf %lf\n", points[sph[j][i]].x, points[sph[j][i]].y);
+          writeToFile ? fprintf(fout, "%.17f %.17f\n", points[sph[j][i]].x, points[sph[j][i]].y) : fprintf(stdout, "%.17f %.17f\n", points[sph[j][i]].x, points[sph[j][i]].y);
         writeToFile ? fprintf(fout, "\n") : fprintf(stdout, "\n");
         break;
       case OF_PURE_AND_PERM:

@@ -290,7 +290,7 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << "           <string> is the algorithm to be run:" << std::endl;
 				std::cerr << "           2opt : calculates a simple random polygon based on Bentley-Ottman linesweep and the 2opt algorithm." << std::endl;
 				std::cerr << "           5 : a faster calculation of a simple random polygon based on Bentley-Ottman linesweep and the 2opt algorithm." << std::endl;
-				std::cerr << "           7 : the most randomised version of the linesweep algorithm."
+				std::cerr << "           7 : the most randomised version of the linesweep algorithm." << std::endl;
 				std::cerr << "           star : calculates a simple random polygon that is a star-shaped polygon." << std::endl;
 				std::cerr << "           convert : converts a point set from one file format to another." << std::endl;
 				std::cerr << "           verify : only checks whether a permutation of a point set is simple." << std::endl << std::endl;
