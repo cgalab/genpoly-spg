@@ -3962,3 +3962,71 @@ void get_convex_hull(std::vector<unsigned int>& ch, std::vector<unsigned int>& p
 //  std::cerr << "ch:" << std::endl;
 //  pdisplay(ch, points);
 }
+
+// Function that shifts the polygon so that a a given polygon index is at a specific vertex index.
+// INPUT:
+//      point_index:  The point index that should be as 'vertex_index'
+//      vertex_index: The vertex index that 'point_index' should be at.
+//      polygon:  The polygon being manipulated
+//      points:  The points of the polygon.
+bool shift_polygon(unsigned int point_index, unsigned int vertex_index, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+  if (vertex_index >= polygon.size()) return false;
+  if (point_index >= points.size()) return false;
+  std::vector<unsigned int> chain1, chain2, chain3;
+  bool insert_into_chain1 = true;
+  for (unsigned int i = 0; i < polygon.size(); ++i) {
+    if (polygon[i] == point_index) insert_into_chain1 = false;
+    if (insert_into_chain1) chain1.push_back(polygon[i]);
+    else chain2.push_back(polygon[i]);
+  }
+  // got 2 chains where 'chain2' has 'point_index at [0]', add the chains to a chain3
+  unsigned int new_zero = 0;
+  if (vertex_index > chain1.size()) {
+    new_zero = chain2.size() - (vertex_index - chain1.size());
+    chain3.insert(chain3.end(), chain2.begin()+new_zero, chain2.end());
+    chain3.insert(chain3.end(), chain1.begin(), chain1.end());
+    chain3.insert(chain3.end(), chain2.begin(), chain2.begin()+new_zero);
+  }
+  else {
+    new_zero = chain1.size() - vertex_index;
+    chain3.insert(chain3.end(), chain1.begin()+new_zero, chain1.end());
+    chain3.insert(chain3.end(), chain2.begin(), chain2.end());
+    chain3.insert(chain3.end(), chain1.begin(), chain1.begin()+new_zero);
+  }
+  polygon = chain3;
+  // in case this is used in the future along with the point set, reindex points in 'points'
+  for (unsigned int i = 0; i < polygon.size(); ++i) {
+    points[polygon[i]].v = i;
+  }
+  std::cerr << "after shift: " << std::endl;
+//  pdisplay(polygon, points);
+  return true;
+}
+
+// Function to reorder the polygons in sph such that 1) the lowest indexed point in 'points' is
+// the lowest vertex indexed point in the polygon, and 2) of the 2 adjacent points to
+// the lowest index the higher index is the end point of the polygon.
+void order_polygon(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
+  // For the first polygon we can assume it's points[0] that should be at sph[0][0]
+  if (sph[0][0] != 0) {
+    shift_polygon(0, 0, sph[0], points);
+  }
+  // flip polygon if point index of polygon[1] is higher than polygon[end]
+  if (sph[0][1] > sph[0][sph[0].size()-1]) {
+    doFlip(1, sph[0].size()-1, sph[0], points);
+  }
+  if (sph.size() > 1) {
+    unsigned int lowest_point_index;
+    for (unsigned int i = 1; i < sph.size(); ++i) {
+       lowest_point_index = points.size();
+      // go through the hole sph[i] and find the lowest point index in it.
+      for (unsigned int j = 0; j < sph[i].size(); ++j) {
+        if (sph[i][j] < lowest_point_index) lowest_point_index = sph[i][j];
+      }
+      // shift polygon if lowest_point_index isn't sph[i][0]
+      if (sph[i][0] != lowest_point_index) shift_polygon(lowest_point_index, 0, sph[i], points);
+      // flip polygon if point index of sph[i][1] is higher than sph[i][end]
+      if (sph[i][1] > sph[i][sph[i].size()-1]) doFlip(1, sph[i].size()-1, sph[i], points);
+    }
+  }
+}

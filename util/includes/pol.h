@@ -86,5 +86,7 @@ void update_end(unsigned int end_i, std::vector<Ends>& ends, std::vector<unsigne
 bool check_in_orientation (E_Edge e1, std::vector<Point>& points);
 bool checkAllIntersections (std::vector<unsigned int>& polygon, std::vector<Point>& points);
 void get_convex_hull(std::vector<unsigned int>& ch, std::vector<unsigned int>& polygon, std::vector<Point>& points);
+bool shift_polygon(unsigned int point_index, unsigned int vertex_index, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points);
+void order_polygon(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points);
 
 #endif

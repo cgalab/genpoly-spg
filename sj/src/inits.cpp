@@ -163,7 +163,7 @@ enum error argInit(	int argc, char *argv[],
 										char *inFile, char *outFile, enum alg_t *alg,
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
 										bool& writeNew, bool& area,	bool& ch_area, bool& area_ratio, bool& perimeter, bool& norm_perimeter,
-										unsigned int& randseed, bool& checkSimple, bool& generate_holes, unsigned int& holes,
+										unsigned int& randseed, bool& checkSimple, bool& generate_holes, bool& orderPolygon, unsigned int& holes,
 										unsigned int& select_polygon, char *vFile, bool& run_tests, bool& help) {
 	enum error returnValue = SUCCESS;
 	int comm;
@@ -179,6 +179,7 @@ enum error argInit(	int argc, char *argv[],
 		{"polygonfile", required_argument, NULL, 'p'},
 		{"randseed", required_argument, NULL, 'r'},
 		{"selectpolygon", required_argument, NULL, 's'},
+		{"orderpolygon", no_argument, NULL, 'g'},
 		{"area", no_argument, NULL, 'd'},
 		{"charea", no_argument, NULL, 'e'},
 		{"charearatio", no_argument, NULL, 'f'},
@@ -191,16 +192,8 @@ enum error argInit(	int argc, char *argv[],
 		{0, 0, 0, 0}
 	};
 
-	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:s:defkltuwH", long_options, NULL)) != -1) && returnValue == SUCCESS) {
+	while(((comm = getopt_long (argc, argv, "i:o:a:b:c:h:p:r:s:defgkltuwH", long_options, NULL)) != -1) && returnValue == SUCCESS) {
 		switch(comm) {
-			case 'i':
-				returnValue = inFileInit(inFile, optarg);
-//				std::cerr << "inFile returnValue: " << returnValue << std::endl;
-				break;
-			case 'o':
-				returnValue = outFileInit(outFile, optarg);
-//				std::cerr << "outFile returnValue: " << returnValue << std::endl;
-				break;
 			case 'a':
 				returnValue = algInit(alg, optarg);
 //				std::cerr << "algorithm returnValue: " << returnValue << std::endl;
@@ -213,10 +206,6 @@ enum error argInit(	int argc, char *argv[],
 				returnValue = ofInit(outFormat, optarg);
 //				std::cerr << "outFormat returnValue: " << returnValue << std::endl;
 				break;
-			case 'h':
-				generate_holes = true;
-				holes = atoi(optarg);
-				break;
 			case 'd':
 				area = true;
 				break;
@@ -226,11 +215,29 @@ enum error argInit(	int argc, char *argv[],
 			case 'f':
 				area_ratio = true;
 				break;
+			case 'g':
+				orderPolygon = true;
+				break;
+			case 'h':
+				generate_holes = true;
+				holes = atoi(optarg);
+				break;
+			case 'i':
+				returnValue = inFileInit(inFile, optarg);
+//				std::cerr << "inFile returnValue: " << returnValue << std::endl;
+				break;
 			case 'k':
 				perimeter = true;
 				break;
 			case 'l':
 				norm_perimeter = true;
+				break;
+			case 'o':
+				returnValue = outFileInit(outFile, optarg);
+//				std::cerr << "outFile returnValue: " << returnValue << std::endl;
+				break;
+			case 'p':
+				returnValue = vFileInit(vFile, optarg);
 				break;
 			case 'r':
 				randseed = atoi(optarg);
@@ -238,14 +245,11 @@ enum error argInit(	int argc, char *argv[],
 			case 's':
 				select_polygon = atoi(optarg);
 				break;
-			case 'u':
-				checkSimple = true;
-				break;
 			case 't':
 				run_tests = true;
 				break;
-			case 'p':
-				returnValue = vFileInit(vFile, optarg);
+			case 'u':
+				checkSimple = true;
 				break;
 			case 'w':
 				writeNew = true;

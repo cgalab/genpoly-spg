@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
   bool calcNormalisedPerimeter = false; // calculate and return the normalised perimeter of the polygon.
   bool checkSimple = false; // only verify a given point set and polygon is simple.
   bool generate_holes = false;
+  bool orderPolygon = false;
   bool run_tests = false, help = false;
   //bool shew_pred = false; // enable shewchucks' predicates
   unsigned int randseed = 0;
@@ -62,7 +63,7 @@ int main(int argc, char *argv[]) {
   // parse command line arguments
   returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat,
                         writeNew, calcArea, calcChArea, calcChAreaRatio, calcPerimeter, calcNormalisedPerimeter, randseed, checkSimple,
-                        generate_holes, nr_holes, select_polygon, vFile, run_tests, help);
+                        generate_holes, orderPolygon, nr_holes, select_polygon, vFile, run_tests, help);
 //  std::cerr << "returnvalue: " << returnValue << std::endl;
 
   if (help) return SUCCESS;
@@ -189,6 +190,9 @@ int main(int argc, char *argv[]) {
   if (returnValue != SUCCESS) {
     std::cerr << "Error running the algorithm!" << std::endl;
     return returnValue;
+  }
+  if (orderPolygon) {
+    order_polygon(sph, points);
   }
   if (calcArea) {
     double area = pol_calc_area(sph[select_polygon], points);
