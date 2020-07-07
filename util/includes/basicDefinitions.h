@@ -62,7 +62,8 @@ enum alg_t {
   A_VERIFY,
   A_VERIFY_LONG,
   A_POLSLOPE,
-  A_PNTSLOPE
+  A_PNTSLOPE,
+  A_EDGELIST
 };
 
 // the output format of the result.

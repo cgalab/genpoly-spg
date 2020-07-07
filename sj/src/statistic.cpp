@@ -1,6 +1,7 @@
 #include <map>
 #include <cmath> // for atan2
 #include <point.h>
+#include <edge.h>
 
 
 // Function to check the slopes of the edges of a polygon
@@ -13,23 +14,27 @@ enum error polslopecount(std::vector<unsigned int>& polygon, std::vector<Point>&
   p1 = points[polygon[polygon.size()-1]];
   for (unsigned int i = 0; i < polygon.size(); ++i) {
     p2 = points[polygon[i]];
+//    std::cerr << "p1: " << p1 << ", p2: " << p2 << std::endl;
     if (p1 < p2) {
       slope = atan2(p2.y - p1.y, p2.x - p1.x);
     }
     else {
       slope = atan2(p1.y - p2.y, p1.x - p2.x);
     }
-//    std::cout << "i: " << p2 << ", slope: " << slope << std::endl;
+//    std::cout << "slope: " << slope << std::endl;
 
     s_it = slope_counter.find(slope);
     if (s_it != slope_counter.end()) {
 //      std::cerr << "slope_counter[slope]: " << slope_counter[slope] << std::endl;
-//      std::cerr << "(*s_it).second: " << (*s_it).second << std::endl;
+//      std::cerr << "(*s_it).second (old): " << (*s_it).second << std::endl;
       slope_counter[slope] = (*s_it).second +1;
+//      std::cerr << "new value: " << slope_counter[slope] << std::endl;
     }
     else {
+//      std::cerr << "slope not found, adding first occurrence." << std::endl;
       slope_counter[slope] = 1;
     }
+    p1 = p2;
   }
   for (std::map<double, unsigned int>::iterator it=slope_counter.begin(); it!=slope_counter.end(); ++it)
   std::cout << it->first << " : " << it->second << '\n';
@@ -90,5 +95,42 @@ enum error pntslopecount(std::vector<Point>& points) {
   }
   for (std::map<double, unsigned int>::iterator it=slope_counter.begin(); it!=slope_counter.end(); ++it)
   std::cout << it->first << " : " << it->second << '\n';
+  return SUCCESS;
+}
+
+//Function to print out all edges that are non-collinear and non repeated,
+// i.e. if (a,b) is printed out, where a < b, then (b,a) will not be printed out.
+enum error list_edges_in_pointset(std::vector<Point>& points) {
+  double determinant, distance;
+  unsigned int count = 0;
+  bool found_coll;
+  Point p1, p2, p3;
+
+  for (unsigned int i = 0; i < points.size(); ++i) {
+    p1 = points[i];
+    for (unsigned int j = i+1; j < points.size(); ++j) {
+      p2 = points[j];
+//      std::cout << "i: " << i << ", p1: " << p1 << ", j: " << j << ", p2: " << p2 << std::endl;
+      // we don't want to count the collinear slopes.
+      found_coll = false;
+      for (unsigned int k = 0; k < points.size(); ++k) {
+        if (k == i || k == j) continue;
+        p3 = points[k];
+        determinant = cdet(p1, p2, p3);
+        if (determinant == 0) {
+          distance = reldist(p1, p2, p3);
+//          std::cout << "det=0, dist: " << distance << ", p3: " << p3 << std::endl;
+          if (0 < distance && distance < 1 ) {
+            found_coll = true;
+            break;
+          }
+        }
+      }
+      if (found_coll) continue;
+      ++count;
+      std::cout << "(" << p1.i << "," << p2.i << ")" << std::endl;
+    }
+  }
+  std::cout << "Total edges: " << count << std::endl;
   return SUCCESS;
 }

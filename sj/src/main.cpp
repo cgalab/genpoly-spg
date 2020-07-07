@@ -168,6 +168,9 @@ int main(int argc, char *argv[]) {
   else if (alg == A_PNTSLOPE) {
     returnValue = pntslopecount(points);
   }
+  else if (alg == A_EDGELIST) {
+    returnValue = list_edges_in_pointset(points);
+  }
   if (generate_holes) {
     nr_holes = generateHoles(sph, points, nr_holes);
     if (nr_holes > 0) {

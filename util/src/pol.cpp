@@ -3998,7 +3998,7 @@ bool shift_polygon(unsigned int point_index, unsigned int vertex_index, std::vec
   for (unsigned int i = 0; i < polygon.size(); ++i) {
     points[polygon[i]].v = i;
   }
-  std::cerr << "after shift: " << std::endl;
+//  std::cerr << "after shift: " << std::endl;
 //  pdisplay(polygon, points);
   return true;
 }

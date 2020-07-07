@@ -98,6 +98,9 @@ enum error algInit(enum alg_t *alg, char *optarg) {
 	else if(strcmp(optarg,"pntslope") == 0) {
 		*alg = A_PNTSLOPE;
 	}
+	else if(strcmp(optarg,"edgelist") == 0) {
+		*alg = A_EDGELIST;
+	}
 	else if(strcmp(optarg,"convert") == 0) {
 		*alg = A_CONVERT_FORMAT;
 	}
