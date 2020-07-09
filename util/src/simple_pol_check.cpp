@@ -9,12 +9,12 @@
 #include "edge.h"
 
 // function to purely remove edge 'e' from 'edgeS' if it's in there and check the 'before' and 'after' edges for intersection.
-enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
+enum edge_t removeEdgeFromSet(Edge2& e, std::set<Edge2>& edgeS) {
   enum edge_t valid = E_VALID;
-  Edge before, after;
+  Edge2 before, after;
   bool bef=false, af=false;
   enum intersect_t isval;
-  std::set<Edge>::iterator it;
+  std::set<Edge2>::iterator it;
 
   it = edgeS.find(e); // will return edgeS.end() which if edge not found.
 
@@ -49,19 +49,17 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
       std::cerr << "edge: " << e << std::endl;
       std::cerr << " *it: " << *it << std::endl;
       std::cerr << "edges in 'edgeS':" << std::endl;
-      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+      for (std::set<Edge2>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
 
     }
   } else {
-    // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
-    // this is technically a crutch because there's a problem with the comparator function.
-//    std::cerr << "Crutch" << std::endl;
-//    std::cerr << "Edge: " << e << std::endl;
+    // came to the end of the set without finding the edge, can only happen if there was an intersection that went undiscovered.
+    std::cerr << "Lost Edge in set: " << e << std::endl;
 //    if (it != edgeS.end()) std::cerr << "*it: " << *it << std::endl;
 //    std::cerr << "edges in 'edgeS':" << std::endl;
 //    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
 
-    for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
+    for (std::set<Edge2>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
       if (*it1 == e) {
 //        std::cerr << "*it1: " << *it1 << std::endl;
         // get edges before and after
@@ -92,7 +90,7 @@ enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS) {
 
   return valid;
 }
-
+/*
 // Same as above but return a pair consisting of an E_Edge which contains a 'closest' edge that it intersects
 // and an enum error.
 std::pair<E_Edge, enum edge_t> removeEdgeFromSet2(Edge& e, std::set<Edge>& edgeS) {
@@ -192,14 +190,14 @@ std::pair<E_Edge, enum edge_t> removeEdgeFromSet2(Edge& e, std::set<Edge>& edgeS
 
   return retval;
 }
+*/
 
-
-enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
+enum edge_t processEdge(Edge2& e, std::set<Edge2>& edgeS) {
   enum edge_t valid = E_VALID;
   enum intersect_t isval;
   bool bef = false, af = false;
-  Edge before, after;
-  std::pair<std::set<Edge>::iterator,bool> retval;
+  Edge2 before, after;
+  std::pair<std::set<Edge2>::iterator,bool> retval;
 
   retval = edgeS.insert(e);
 /*
@@ -210,7 +208,6 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
    }
 */
-  assert(*retval.first == e);
   if (*retval.first == e) {
     //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
     if (retval.first != edgeS.begin()) {
@@ -253,9 +250,9 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
     }
   }
   else {
-//    std::cerr << "Error: Iterator did not return same edge." << std::endl;
-//    std::cerr << "Edge: " << e << std::endl;
-//    std::cerr << "*it" << *retval.first << std::endl;
+    std::cerr << "Error: Iterator did not return same edge." << std::endl;
+    std::cerr << "Edge: " << e << std::endl;
+    std::cerr << "*it" << *retval.first << std::endl;
     valid = E_NOT_VALID;
   }
 
@@ -263,7 +260,7 @@ enum edge_t processEdge(Edge& e, std::set<Edge>& edgeS) {
 
   return valid;
 }
-
+/*
 // same as above, but returns a pair containing an E_Edge and an enum edge_t
 std::pair<E_Edge, enum edge_t> processEdge2(Edge& e, std::set<Edge>& edgeS) {
   enum edge_t valid = E_VALID;
@@ -279,14 +276,14 @@ std::pair<E_Edge, enum edge_t> processEdge2(Edge& e, std::set<Edge>& edgeS) {
   std::pair<std::set<Edge>::iterator,bool> retval;
 
   retval = edgeS.insert(e);
-/*
-  if (*retval.first != e) {
-    std::cerr << "retval.first : " << *retval.first << std::endl;
-	   std::cerr << "retval.second: " << retval.second << std::endl;
-     std::cout << "edges in 'edgeS':" << std::endl;
-     for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
-   }
-*/
+
+//  if (*retval.first != e) {
+//    std::cerr << "retval.first : " << *retval.first << std::endl;
+//	   std::cerr << "retval.second: " << retval.second << std::endl;
+//     std::cout << "edges in 'edgeS':" << std::endl;
+//     for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+//   }
+
   assert(*retval.first == e);
   if (*retval.first == e) {
     //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
@@ -346,7 +343,7 @@ std::pair<E_Edge, enum edge_t> processEdge2(Edge& e, std::set<Edge>& edgeS) {
   }
   return retval2;
 }
-
+*/
 
 // Function that verifies whether a point set is simple.
 // Input: a vector of <Point> which is a point set in a simple polygon order.
@@ -366,8 +363,8 @@ enum error simple_pol_check(std::vector<Point>& points) {
   enum edge_t val1 = E_VALID, val2 = E_VALID;
   double val3=1.0;
 	Point *p1, *p2, *p3;
-	Edge e1, e2;
-  std::set<Edge> edgeS; // a sweep-line-status object.
+	Edge2 e1, e2;
+  std::set<Edge2> edgeS; // a sweep-line-status object.
 
   while (index < points.size()) {
 //      std::cerr << std::endl << "i: " << index << std::endl;
@@ -387,14 +384,14 @@ enum error simple_pol_check(std::vector<Point>& points) {
     // construct the edges
 //    std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
     if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
-      e1 = Edge (p1, p2, index);
-      e2 = Edge (p1, p3, index);
-      val3 = det(e1, *p3);
+      e1 = Edge2 (p1, p2);
+      e2 = Edge2 (p1, p3);
+      val3 = e1.cdet(*p3);
     }
     else {
-      e1 = Edge (p1, p3, index);
-      e2 = Edge (p1, p2, index);
-      val3 = det(e1, *p2);
+      e1 = Edge2 (p1, p3);
+      e2 = Edge2 (p1, p2);
+      val3 = e1.cdet(*p2);
     }
 
     //process first edge
@@ -444,8 +441,8 @@ enum error simple_pol_check(std::vector<unsigned int>& polygon, std::vector<Poin
   enum edge_t val1 = E_VALID, val2 = E_VALID;
   double val3=1.0;
 	Point *p1, *p2, *p3;
-	Edge e1, e2;
-  std::set<Edge> edgeS; // a sweep-line-status object.
+	Edge2 e1, e2;
+  std::set<Edge2> edgeS; // a sweep-line-status object.
 
   while (index < points.size()) {
 //      std::cerr << std::endl << "i: " << index << std::endl;
@@ -465,14 +462,14 @@ enum error simple_pol_check(std::vector<unsigned int>& polygon, std::vector<Poin
     // construct the edges
 //    std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
     if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
-      e1 = Edge (p1, p2, index);
-      e2 = Edge (p1, p3, index);
-      val3 = det(e1, *p3);
+      e1 = Edge2 (p1, p2);
+      e2 = Edge2 (p1, p3);
+      val3 = e1.cdet(*p3);
     }
     else {
-      e1 = Edge (p1, p3, index);
-      e2 = Edge (p1, p2, index);
-      val3 = det(e1, *p2);
+      e1 = Edge2 (p1, p3);
+      e2 = Edge2 (p1, p2);
+      val3 = e1.cdet(*p2);
     }
 
     //process first edge
@@ -509,7 +506,7 @@ enum error simple_pol_check(std::vector<unsigned int>& polygon, std::vector<Poin
 
   return retval;
 }
-
+/*
 // Same as above, but a different return type.
 std::pair<E_Edge, enum error> simple_pol_check2(std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum error retval = SUCCESS;
@@ -628,11 +625,17 @@ std::pair<E_Edge, enum error> simple_pol_check2(std::vector<unsigned int>& polyg
 //  std::cerr << "no intersections" << std::endl;
   return retval2;
 }
-
-
+*/
 // function that checks all the polygons in sph for simplicity.
 enum error simple_pol_check(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
   enum error retval = SUCCESS;
+
+  //make sure all points are correctly labeled to its polygon.
+  for (unsigned int i = 0; i < sph.size(); ++i) {
+    for (unsigned int j = 0; j < sph[i].size(); ++j) {
+      points[sph[i][j]].p = i;
+    }
+  }
 
   std::vector<unsigned int> lex (points.size());
 	fill_lex(lex, points); // fill 'lex' with the indexes
@@ -643,8 +646,8 @@ enum error simple_pol_check(std::vector<std::vector<unsigned int>>& sph, std::ve
   enum edge_t val1 = E_VALID, val2 = E_VALID;
   double val3=1.0;
 	Point *p1, *p2, *p3;
-	Edge e1, e2;
-  std::set<Edge> edgeS; // a sweep-line-status object.
+	Edge2 e1, e2;
+  std::set<Edge2> edgeS; // a sweep-line-status object.
 
   while (index < points.size()) {
 //      std::cerr << std::endl << "i: " << index << std::endl;
@@ -664,14 +667,14 @@ enum error simple_pol_check(std::vector<std::vector<unsigned int>>& sph, std::ve
     // construct the edges
 //    std::cerr << "p1: " << *p1 << ", p2: "<< *p2 << " < p3: " << *p3 << " : " << ((*p2 < *p3) ? "true" : "false") << std::endl;
     if (*p2 < *p3) {  // make sure the earlier edge gets processed first.
-      e1 = Edge (p1, p2, index);
-      e2 = Edge (p1, p3, index);
-      val3 = det(e1, *p3);
+      e1 = Edge2 (p1, p2);
+      e2 = Edge2 (p1, p3);
+      val3 = e1.cdet(*p3);
     }
     else {
-      e1 = Edge (p1, p3, index);
-      e2 = Edge (p1, p2, index);
-      val3 = det(e1, *p2);
+      e1 = Edge2 (p1, p3);
+      e2 = Edge2 (p1, p2);
+      val3 = e1.cdet(*p2);
     }
 //    std::cerr << "e1: " << e1 << std::endl;
 //    std::cerr << "e2: " << e2 << std::endl;

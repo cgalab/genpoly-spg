@@ -76,8 +76,8 @@ enum error heap2(std::vector<unsigned int>& polygon, int n, bool& intersects,
       //std::cerr << "finding: " << polygon[0] << std::endl;;
       it = seen.find(polygon[0]);
       if (it != seen.end()) return SUCCESS;
-      std::pair<E_Edge, enum error> result = simple_pol_check2(polygon, points);
-      if (result.second == SUCCESS) {
+      enum error result = simple_pol_check(polygon, points);
+      if (result == SUCCESS) {
         std::cerr << "simple polygon: ";
         //for(unsigned int i = 0; i < polygon.size(); ++i) std::cerr << polygon[i] << ",";
         //std::cerr << "\n";
