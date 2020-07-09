@@ -148,7 +148,8 @@ enum edge_t removeEdgeFromSet(Edge2& e, std::set<Edge2>& edgeS, std::vector<unsi
 //  std::cerr << "edge to be removed: " << e << std::endl;
   it = edgeS.find(e);
 
-  if (e != *it) {
+  if (it == edgeS.end()) return valid;
+  else if (e != *it) {
     // returned an edge that is different from the one we want to find
     // if the edge in 'it' doesn't cross the LSL (linesweep line) 'it' can still intersect 'e',
     //   verify then fix it and return "E_INTERSECTION"
@@ -229,7 +230,8 @@ enum edge_t removeEdgeFromSet(Edge2& e, std::set<Edge2>& edgeS, std::vector<unsi
 //  std::cerr << "edge to be removed: " << e << std::endl;
   it = edgeS.find(e);
 
-  if (e != *it) {
+  if (it == edgeS.end()) return valid;
+  else if (e != *it) {
     // returned an edge that is different from the one we want to find
     // if the edge in 'it' doesn't cross the LSL (linesweep line) 'it' can still intersect 'e',
     //   verify then fix it and return "E_INTERSECTION"
@@ -312,7 +314,8 @@ enum edge_t removeEdgeFromSet(Edge2& e, std::set<Edge2>& edgeS, std::vector<unsi
 //  std::cerr << "edge to be removed: " << e << std::endl;
   it = edgeS.find(e);
 
-  if (e != *it) {
+  if (it == edgeS.end()) return valid;
+  else if (e != *it) {
     // returned an edge that is different from the one we want to find
     // if the edge in 'it' doesn't cross the LSL (linesweep line) 'it' can still intersect 'e',
     //   verify then fix it and return "E_INTERSECTION"
