@@ -63,19 +63,14 @@ void eraseVertexFromSet(Point *p1, std::set<Edge>& edgeS, std::vector<unsigned i
   Edge e1, e2;
 	std::set<Edge>::iterator it1;
 
-  before = ((*p1).v + points.size() -1) % points.size();
-  after =  ((*p1).v + points.size() +1) % points.size();
+	before = ((*p1).v + polygon.size() -1) % polygon.size();
+  after =  ((*p1).v + polygon.size() +1) % polygon.size();
 
   p2 = &points[polygon[before]];
   p3 = &points[polygon[after]];
 
-  if (*p2 < *p3) {
-    e1 = Edge(p1, p2);
-    e2 = Edge(p1, p3);
-  } else {
-    e1 = Edge(p1, p3);
-    e2 = Edge(p1, p2);
-  }
+  e1 = Edge(p1, p2);
+  e2 = Edge(p1, p3);
 
 //  std::cerr << "erasing vertexes: e1: " << e1 << ", e2: " << e2 << std::endl;
 	edgeS.erase(e1);
@@ -90,21 +85,16 @@ void eraseVertexFromSet(Point *p1, std::set<Edge2>& edgeS, std::vector<unsigned 
   Edge2 e1, e2;
 	std::set<Edge2>::iterator it1;
 
-  before = ((*p1).v + points.size() -1) % points.size();
-  after =  ((*p1).v + points.size() +1) % points.size();
+  before = ((*p1).v + polygon.size() -1) % polygon.size();
+  after =  ((*p1).v + polygon.size() +1) % polygon.size();
 
   p2 = &points[polygon[before]];
   p3 = &points[polygon[after]];
 
-  if (*p2 < *p3) {
-    e1 = Edge2(p1, p2);
-    e2 = Edge2(p1, p3);
-  } else {
-    e1 = Edge2(p1, p3);
-    e2 = Edge2(p1, p2);
-  }
+  e1 = Edge2(p1, p2);
+  e2 = Edge2(p1, p3);
 
-//  std::cerr << "erasing vertexes: e1: " << e1 << ", e2: " << e2 << std::endl;
+//  std::cerr << "erasing edges: e1: " << e1 << ", e2: " << e2 << std::endl;
 	edgeS.erase(e1);
 	edgeS.erase(e2);
 }

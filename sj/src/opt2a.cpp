@@ -33,7 +33,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 	fill_lex(lex, points); // fill 'lex' with the indexes
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
-	unsigned int index=0, before, after, lowest_index=0, highest_index=0;
+	unsigned int index=0, before, after;
 	//double d_idx;
   //compObject comp;
 	//std::pair<enum edge_t, std::set<Edge, setComp>::iterator> val1, val2;
@@ -112,7 +112,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points)
       if (fabs(val3 == 0)) {
         if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) { // no idea why but this is very important for solving collinearities
 //          (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
-          if (coll3Sort5(p1, p2, p3, edgeS, polygon, points, lowest_index, highest_index)) {
+          if (coll3Sort5(p1, p2, p3, edgeS, polygon, points)) {
             ++count_coll;
 //            (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
             loop = true;

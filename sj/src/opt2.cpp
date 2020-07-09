@@ -44,7 +44,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	Edge2 e1, e2, old_e1, old_e2;
   bool loop = false;
   bool debug=true;
-  unsigned int count_intersections=0, count_coll=0, count_total_passes=0, lowest_index=0, highest_index=0;
+  unsigned int count_intersections=0, count_coll=0, count_total_passes=0;
   std::set<Edge2> edgeS; // a set of edges.
   //double circumference;
   //std::map<double, unsigned int> circ, c_counter;
@@ -112,7 +112,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
         if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) {
 //          (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
 //          pdisplay(polygon, points);
-          if (coll3Sort5(p1, p2, p3, edgeS, polygon, points, lowest_index, highest_index)) {
+          if (coll3Sort5(p1, p2, p3, edgeS, polygon, points)) {
             ++count_coll;
 //            (debug) ? std::cerr << "after  swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
 //            pdisplay(polygon, points);
