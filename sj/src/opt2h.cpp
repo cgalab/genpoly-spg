@@ -46,7 +46,7 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
   double val3;
 	Point *p1, *p2, *p3;
 	Edge2 e1, e2;
-  bool loop=true, loop_check=true, revert=false;
+  bool loop=true, is_clean=false, revert=false;
 //  bool debug=false;
   unsigned int count_intersections=0, count_coll=0, count_total_passes=0;
   std::set<Edge2> edgeS; // a set of edges.
@@ -75,20 +75,25 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
     //reverse_flag = false;
     //index = 0;
     if (loop) {
-      UniformRandomI(random_index, lowest_index, highest_index);
-      index = random_index;
+      loop = false;
+    }
+    if (highest_index - lowest_index > 2) {
+      UniformRandomI(random_index, lowest_index+1, highest_index-1);
       UniformRandomI(revert, 0, 1);
-      loop = false;}
+    }
     else {
-      //UniformRandomI(revert, 0, 1);
       if (points.size()-1 - highest_index < lowest_index) revert = true;
       else revert = false;
-      if (revert) {index = points.size()-1;}
-      else {index = 0;}
-      loop_check=false;
+      if (revert) {
+        random_index = points.size()-1;
+      }
+      else {random_index = 0;}
+      lowest_index = 0;
+      highest_index = points.size()-1;
     }
+    index = random_index;
     edgeS.clear();
-//    std::cerr << "new i: " << index << ", loop: " << loop << ", loop_check: " << loop_check << ", revert: " << revert << std::endl;
+//    std::cerr << "new i: " << index << ", loop: " << loop << ", is_clean: " << is_clean << ", revert: " << revert << std::endl;
 //    std::cerr << "lowest_index: " << lowest_index << ", highest_index: " << highest_index << std::endl;
   	while (index < points.size()) {
 //      if (966 < index && index < 975) {
@@ -182,7 +187,6 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
         if (val1.first == E_INTERSECTION) {
           ++count_intersections;
           loop=true;
-          //reverse_flag=true;continue;
           break;
         }
         if (val1.first == E_COLLINEAR) {
@@ -241,39 +245,36 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
         }
       }
 
-      if (loop_check) { // true means it isn't the validation part.
-        if (revert) {
-          if (index == lowest_index) {
-            index = points.size();
-            if (lowest_index < random_index) lowest_index = random_index;
-          }
-          else --index;
-        }
-        else if (index == highest_index) {
-          index = points.size();
-          if (random_index < highest_index) highest_index = random_index;
-        }
-        else ++index;
-      }
-      else { // false means it should check from lowest/highest all the way through
-        if (revert) {
-          if (index == 0) {
-            index = points.size();
-            if (lowest_index < random_index) lowest_index = random_index;
-          }
-          else --index;
-        }
-        else ++index;
-      }
-
-//      std::cerr << "i: " << index << ", l_i: " << lowest_index << std::endl;
-//      std::cerr << "revert: " << ((revert) ? "true" : "false") << std::endl;
-//      std::cerr << "lowest_index: " << lowest_index << std::endl;
+//      std::cerr << "i: " << index << ", loop: " << ((loop) ? "T" : "F") << ", revert: " << ((revert) ? "T" : "F") << std::endl;
+//      std::cerr << "random_index: " << random_index << ", lowest_index: " << lowest_index << ", highest_index: " << highest_index << std::endl;
       //if (loop == true) std::cerr << "i: " << index << ", l_i: " << lowest_index << std::endl;
-  	}
-    if (loop) {loop_check = true;}
+
+      if (revert) {
+        if (index == lowest_index) {
+          // if this was a validation check.
+          if (random_index == points.size()-1) is_clean = true;
+          // if you got to the lowest index from random index without an intersection, then update lowest_index
+          if (lowest_index < random_index) lowest_index = random_index;
+//          std::cerr << "new lowest index: " << lowest_index << std::endl;
+          break;
+        }
+        else --index;
+      }
+      else if (index == highest_index) {
+        // if this was a validation check.
+        if (random_index == 0) is_clean = true;
+        // if you got to the highest index from random index without an intersection, then update highest_index
+        if (random_index < highest_index) highest_index = random_index;
+//        std::cerr << "new highest index: " << highest_index << std::endl;
+        break;
+      }
+      else ++index;
+
+
+  	}// end of while loop.
+    if (loop) {is_clean = false;}
     if ((val1.first == E_NOT_VALID) || (val2.first == E_NOT_VALID)) {retval=UNEXPECTED_ERROR; break;}
-  } while (loop_check);
+  } while (!is_clean);
   duration = elapsed();
   std::cout << "Time elapsed: " << duration << std::endl;
   std::cout << "Total passes: " << count_total_passes << std::endl;
