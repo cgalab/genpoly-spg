@@ -11,7 +11,7 @@ bool candidate_compare(E_Edge e1, E_Edge e2);
 enum error sweep_polygonal_chain(std::vector<E_Edge>& valid_candidates, std::vector<Point>& points, bool is_chain, bool l2r);
 void remove_adjacent_candidate(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& it1, std::set<E_Edge>::iterator& it2,
                                std::set<E_Edge>& ls_edges);
-bool set_bin(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& it1, std::set<E_Edge>::iterator& it2, std::set<E_Edge>& ls_edges);
+void set_bin(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& it1, std::set<E_Edge>::iterator& it2, std::set<E_Edge>& ls_edges);
 void insert_update(E_Edge& e, std::set<E_Edge>::iterator& it, std::set<E_Edge>& ls_edges, bool dbl_ins, bool is_chain, bool l2r);
 void removal_update(E_Edge& e, std::set<E_Edge>::iterator& it, std::vector<E_Edge>& valid_candidates,
                     std::set<E_Edge>& ls_edges, bool dbl_rem, bool l2r);

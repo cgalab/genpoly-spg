@@ -495,7 +495,7 @@ void remove_adjacent_candidate(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterato
 //      ls_edges: the linesweep BST for edges.
 //      it1, it2  : iterators to the edges 'e1' and 'e2' in 'ls_edges'
 // OUTPUT:  Updates 'bin' property of the 2 edges.
-bool set_bin(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& it1, std::set<E_Edge>::iterator& it2, std::set<E_Edge>& ls_edges) {
+void set_bin(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& it1, std::set<E_Edge>::iterator& it2, std::set<E_Edge>& ls_edges) {
 //  std::cerr << "inside set bin" << std::endl;
 //  std::cerr << "e1: " << e1 << std::endl;
 //  std::cerr << "e2: " << e2 << std::endl;
