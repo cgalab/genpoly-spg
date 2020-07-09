@@ -430,6 +430,44 @@ bool isPol1Left(unsigned int p1, unsigned int p2, unsigned int cycle) {
   return false;
 }
 
+// function that checks if the given points are adjacent in the polygon.
+bool isPolLength1(Point *p1, Point *p2, unsigned int cycle) {
+  if ((*p1).v == 0) {
+    if ((*p2).v == 1) return true;
+  }
+  if ((*p2).v == 0) {
+    if ((*p1).v == 1) return true;
+  }
+  if ((*p2).v == 0) {
+    if ((*p1).v == cycle-1) return true;
+  }
+  if ((*p1).v == 0) {
+    if ((*p2).v == cycle-1) return true;
+  }
+  if (((*p1).v < (*p2).v) && ((*p2).v - (*p1).v == 1)) return true;
+  if (((*p2).v < (*p1).v) && ((*p1).v - (*p2).v == 1)) return true;
+  return false;
+}
+
+// function that checks if the given indices are adjacent in the polygon.
+bool isPolLength1(unsigned int p1, unsigned int p2, unsigned int cycle) {
+  if (p1 == 0) {
+    if (p2 == 1) return true;
+  }
+  if (p2 == 0) {
+    if (p1 == 1) return true;
+  }
+  if (p2 == 0) {
+    if (p1 == cycle-1) return true;
+  }
+  if (p1 == 0) {
+    if (p2 == cycle-1) return true;
+  }
+  if ((p1 < p2) && (p2 - p1 == 1)) return true;
+  if ((p2 < p1) && (p1 - p2 == 1)) return true;
+  return false;
+}
+
 // Input:
 // lex:     vector for unsigned integers referencing indexes in point set 'points'
 // points:  vector of 'Point'

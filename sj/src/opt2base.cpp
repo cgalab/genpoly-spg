@@ -136,105 +136,124 @@ void update_lowest_index(Point *a, Point *b, Point *c, unsigned int& lowest_inde
   if ((*lex[0]).l < lowest_index) lowest_index = (*lex[0]).l;
 }
 
-// used by: opt2, opt2a
+// used by: opt2a
 // function to purely remove edge 'e' from 'edgeS' if it's in there and check the 'before' and 'after' edges for intersection.
-enum edge_t removeEdgeFromSet(Edge& e, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+enum edge_t removeEdgeFromSet(Edge2& e, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum edge_t valid = E_VALID;
-  Edge before, after;
+  Edge2 before, after;
   bool bef=false, af=false;
   enum intersect_t isval;
-  std::set<Edge>::iterator it;
+  std::set<Edge2>::iterator it, ibef, iaft;
+  unsigned int lowest_index=0, highest_index=0;
 
 //  std::cerr << "edge to be removed: " << e << std::endl;
-  it = edgeS.find(e);
-
-  if (it != edgeS.end()) {
-//    std::cerr << "*it: " << *it << std::endl;
-    if (*it != e) {
-      std::cerr << "edge to be removed: " << e << std::endl;
-      std::cerr << "it : " << *it << std::endl;
-      std::cerr << "edges in 'edgeS':" << std::endl;
-      for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
-      valid = E_NOT_VALID;
-    }
-    assert(e == *it);
-
-    // get edges before and after
-    if (it != edgeS.begin()) {
-      before = *(std::prev(it));
-      bef = true;
-    }
-    if (it != std::prev(edgeS.end())) {
-      after  = *(std::next(it));
-      af = true;
-    }
-
-//    std::cerr << "removing edge from set(): " << *it << std::endl;
-    edgeS.erase(it);
-
-    if (bef && af) {
-//      std::cerr << "before: " << before << ", after: " << after << std::endl;
-      isval = checkIntersection(before, after);
-      if (isval == IS_4P_COLLINEAR) {
-//        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
-        if (coll4Swap(before, after, edgeS, polygon, points)) {
-//          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
-          valid = E_COLLINEAR;
-        }
-      }
-      else if ((isval == IS_TRUE) || (isval == IS_3P_COLLINEAR)) {
-//        std::cerr << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
-        eraseEdgeFromSet(before, edgeS);
-        eraseEdgeFromSet(after, edgeS);
-        flip(before, after, polygon, points);
-        valid = E_INTERSECTION;
-      } else if (isval >= IS_TRUE) {
-        std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
-        std::cerr << "isval: "; print_enum(isval);
-      }
-    }
-  } else {
-    // came to the end of the set without finding the edge, have to use the linear method of finding the edgeS
-    // this is technically a crutch because there's a problem with the comparator function.
-    for (std::set<Edge>::iterator it1=edgeS.begin(); it1!=edgeS.end(); ++it1) {
-      if (*it1 == e) {
-        // get edges before and after
-        if (it1 != edgeS.begin()) {
-          before = *(std::prev(it1));
-          bef = true;
-        }
-        if (it1 != std::prev(edgeS.end())) {
-          after  = *(std::next(it1));
-          af = true;
-        }
-
-        edgeS.erase(it1);
-
-        if (bef && af) {
-//          std::cerr << "before: " << before << ", after: " << after << std::endl;
-          isval = checkIntersection(before, after);
-          if (isval == IS_4P_COLLINEAR) {
-    //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
-            if (coll4Swap(before, after, edgeS, polygon, points)) {
-    //          std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
-              valid = E_COLLINEAR;
-            }
-          }
-          else if ((isval == IS_TRUE) || (isval == IS_3P_COLLINEAR)) {
-//            std::cerr << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
-            eraseEdgeFromSet(before, edgeS);
-            eraseEdgeFromSet(after, edgeS);
-            flip(before, after, polygon, points);
-            valid = E_INTERSECTION;
-          } else if (isval >= IS_TRUE) {
-            std::cerr << "Error!  Unhandled exception in removal of 'before': " << before << ", and 'after': " << after << std::endl;
-            std::cerr << "isval: "; print_enum(isval);
-          }
-        }
-
+  // find the edge, erase invalid edges, or if the edge wasn't found, return.
+  do {
+    it = edgeS.find(e);
+    if (it != edgeS.end()) {
+      // if the vertex indices are not adjacent, remove the edge in it' and find 'e' again
+      if (isPolLength1((*it).p1, (*it).p2, polygon.size())) {
         break;
       }
+      else edgeS.erase(it);
     }
+    else return E_VALID; // edge not found, if it's hidden, it'll be found and handled in the future.
+  } while (true);
+
+  if (e != *it) {
+    // returned an edge that is different from the one we want to find
+    // if the edge in 'it' doesn't cross the LSL (linesweep line) 'it' can still intersect 'e',
+    //   verify then fix it and return "E_INTERSECTION"
+    // if the edge in 'it' crosses the LSL, it intersects 'e', verify, fix and return "E_INTERSECTION"
+    // - we don't find 'e' in this scenario, but as it intersected, we'll remove 'it',
+    // 'e' is still technically in 'edgeS' but the points will change vertex indices, and 'e' will have non-incidental vertices
+    // which means 'e' gets removed in future vertex validations (see while loop above).
+    // if 'e' doesn't intersect 'it' then 'it' should not have returned 'it' but 'edgeS.end()'
+
+    isval = checkIntersection(e, *it);
+    if (isval < IS_TRUE) {
+      std::cerr << "Removal: find returned a different edge that did not intersect!" << std::endl;
+      std::cerr << "e:   " << e << std::endl;
+      std::cerr << "*it: " << *it << std::endl;
+      valid = E_NOT_VALID;
+    }
+    else {
+      if ((isval == IS_4P_COLLINEAR) || (isval == IS_3P_COLLINEAR)) {
+        Edge2 temp_e (*it);
+        coll4Swap5(e, temp_e, edgeS, polygon, points, lowest_index, highest_index);
+        softEraseEdgeFromSet(e, edgeS);
+        softEraseEdgeFromSet(temp_e, edgeS);
+//        std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
+        valid = E_COLLINEAR;
+      }
+      else if (isval == IS_TRUE) {
+        Edge2 temp_e = Edge2(*it);
+        flip(e, temp_e, polygon, points);
+        softEraseEdgeFromSet(e, edgeS);
+        softEraseEdgeFromSet(temp_e, edgeS);
+        valid = E_INTERSECTION;
+      }
+    }
+  }
+  else {
+    // 'e' and 'it' are the same edge, check and clear incidental 'before' and 'after' edges in 'edgeS'.
+
+    // get edges before and after
+    do { // validate the edge.
+      if (it != edgeS.begin()) {
+        ibef = std::prev(it);
+        if (isPolLength1((*ibef).p1, (*ibef).p2, polygon.size())) {
+          bef = true;
+          break;
+        }
+        else { // edge isn't valid, remove and check next one.
+          edgeS.erase(ibef);
+        }
+      }
+      else break;
+    } while (true);
+
+    do {
+      if (it != std::prev(edgeS.end())) {
+        iaft  = std::next(it);
+        if (isPolLength1((*iaft).p1, (*iaft).p2, polygon.size())) {
+          af = true;
+          break;
+        }
+        else {
+          edgeS.erase(iaft);
+        }
+      }
+      else break;
+    } while (true);
+
+    // no need to test 'e' against 'ibef' or 'iaft' independently because
+    // there's no chance they haven't seen each other, either when either pair of edges
+    // were first inserted, or when edges between either pair was removed, and this pair of 'ibef'/'iaft'
+    // would have been checked, so only test 'ibef' against 'iaft'.
+    if (bef && af) {
+      isval = checkIntersection(*ibef, *iaft);
+      if ((isval == IS_4P_COLLINEAR)  || (isval == IS_3P_COLLINEAR)) {
+  //        std::cerr << "4P collinearity between:" << before << " and " << after << std::endl;
+        Edge2 t_bef = Edge2((*ibef).p1, (*ibef).p2);
+        Edge2 t_aft = Edge2((*iaft).p1, (*iaft).p2);
+        coll4Swap5(t_bef, t_aft, edgeS, polygon, points, lowest_index, highest_index);
+  //        std::cerr << "4P coll. after swap: " << before << " and " << after << std::endl;
+        valid = E_COLLINEAR;
+        edgeS.erase(ibef);
+        edgeS.erase(iaft);
+      }
+      else if (isval == IS_TRUE) {
+  //        std::cerr << "Intersection between 'before': " << before << ", and 'after': " << after << std::endl;
+        Edge2 t_bef = Edge2((*ibef).p1, (*ibef).p2);
+        Edge2 t_aft = Edge2((*iaft).p1, (*iaft).p2);
+        flip(t_bef, t_aft, polygon, points);
+        valid = E_INTERSECTION;
+        edgeS.erase(ibef);
+        edgeS.erase(iaft);
+      }
+    }
+    edgeS.erase(it);
   }
   return valid;
 }
@@ -1336,13 +1355,28 @@ enum edge_t removeEdgeFromSetd(Edge& e, unsigned int& lowest_index, std::set<Edg
   return valid;
 }
 
-std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<Edge>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
+std::pair<enum edge_t, std::set<Edge2>::iterator> processEdge(Edge2& e, std::set<Edge2>& edgeS, std::vector<unsigned int>& polygon, std::vector<Point>& points) {
   enum edge_t valid = E_VALID;
   enum intersect_t isval;
   bool bef = false, af = false;
-  Edge before, after;
-  std::pair<std::set<Edge>::iterator,bool> retval;
-  std::pair<enum edge_t, std::set<Edge>::iterator> retval2;
+  Edge2 before, after;
+  std::set<Edge2>::iterator it, it_bef, it_aft;
+  std::pair<std::set<Edge2>::iterator,bool> retval;
+  std::pair<enum edge_t, std::set<Edge2>::iterator> retval2;
+  unsigned int lowest_index=0, highest_index=0;
+
+//  std::cerr << "edge to be inserted: " << e << std::endl;
+  // find the edge; should remove any edge that isn't 'e'
+  do {
+    it = edgeS.find(e);
+    if (it == edgeS.end()) break;
+    else {
+      std::cerr << "found: " << *it << ", should be: " << e << std::endl;
+      // found an edge
+      if (*it == e) break;
+      else edgeS.erase(it);
+    }
+  } while (true);
 
   retval = edgeS.insert(e);
 
@@ -1351,86 +1385,84 @@ std::pair<enum edge_t, std::set<Edge>::iterator> processEdge(Edge& e, std::set<E
     std::cerr << "retval.first : " << *retval.first << std::endl;
 	  std::cerr << "retval.second: " << retval.second << std::endl;
     std::cerr << "edges in 'edgeS':" << std::endl;
-    for (std::set<Edge>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
+    for (std::set<Edge2>::iterator it=edgeS.begin(); it!=edgeS.end(); ++it) std::cerr << *it << std::endl;
     valid = E_NOT_VALID;
     retval2.first = valid;
     retval2.second = retval.first;
     return retval2;
-   }
+  }
 
-  assert(*retval.first == e);
+  //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
+  if (retval.first != edgeS.begin()) {
+    it_bef = std::prev(retval.first);
+    before = *it_bef;
+    //std::cerr << "before: " << before << std::endl;
+    bef = true;
+  }
+  //std::cerr << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
+  if (retval.first != --edgeS.end()) {
+    it_aft = std::next(retval.first);
+    after  = *it_aft;
+    //std::cerr << "after : " << after << std::endl;
+    af = true;
+  }
 
-  if (retval.second) {  // successfully inserted edge.
-    //std::cerr << ((retval.first != edgeS.begin()) ? "'e' is NOT the first edge" : "'e' is the first edge" ) << std::endl;
-    if (retval.first != edgeS.begin()) {
-      before = *(std::prev(retval.first));
-      //std::cerr << "before: " << before << std::endl;
-      bef = true;
+  // check incidental edge 'before' if it intersects with 'e'
+  if (bef) {
+    isval = checkIntersection(e, before);
+    if (isval < IS_TRUE) {
+      //std::cerr << "No intersection." << std::endl;
+      valid = E_VALID;
     }
-    //std::cerr << ( (retval.first != --edgeS.end()) ? "'e' is NOT the last edge" : "'e' is the last edge" ) << std::endl;
-    if (retval.first != --edgeS.end()) {
-      after  = *(std::next(retval.first));
-      //std::cerr << "after : " << after << std::endl;
-      af = true;
-    }
-
-    // check incidental edge 'before' if it intersects with 'e'
-    if (bef) {
-      isval = checkIntersection(e, before);
-      if (isval < IS_TRUE) {
-        //std::cerr << "No intersection." << std::endl;
-        valid = E_VALID;
-      }
-      else if (isval == IS_4P_COLLINEAR) {
+    else if ((isval == IS_4P_COLLINEAR) || (isval == IS_3P_COLLINEAR)) {
 //        std::cerr << "4P collinearity between e:" << e << " and bef: " << before << std::endl;
-        if (coll4Swap(e, before, edgeS, polygon, points)) {
-          eraseEdgeFromSet(e, edgeS); // there is a chance that only the 'before' edge needs sorting, so 'e' is never removed from 'edgeS'
-//          std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
-          valid = E_COLLINEAR;
-        }
-      }
-      else {
-//        std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
-        edgeS.erase(retval.first);
-        eraseEdgeFromSet(before, edgeS);
-        flip(e, before, polygon, points);
-        valid = E_INTERSECTION;
+      if (coll4Swap5(e, before, edgeS, polygon, points, lowest_index, highest_index)) {
+        //edgeS.erase(retval.first);
+        //edgeS.erase(it_bef);
+        softEraseEdgeFromSet(e, edgeS);
+        softEraseEdgeFromSet(before, edgeS);
+//        std::cerr << "4P coll. after swap: " << e << " and bef: " << before << std::endl;
+        valid = E_COLLINEAR;
       }
     }
-    // check incidental edge 'after' if it intersects with 'e'
-    if (af && (valid == E_VALID)) {
-      isval = checkIntersection(e, after);
-      if (isval < IS_TRUE) {
-//        std::cerr << "No intersection." << std::endl;
-        valid = E_VALID;
+    else {
+//      std::cerr << "Intersection: e: " << e << ", before: " << before << std::endl;
+      softEraseEdgeFromSet(e, edgeS);
+      softEraseEdgeFromSet(before, edgeS);
+      flip(e, before, polygon, points);
+      valid = E_INTERSECTION;
+    }
+  }
+  // check incidental edge 'after' if it intersects with 'e'
+  if (af && (valid == E_VALID)) {
+    isval = checkIntersection(e, after);
+    if (isval < IS_TRUE) {
+//      std::cerr << "No intersection." << std::endl;
+      valid = E_VALID;
+    }
+    else if ((isval == IS_4P_COLLINEAR) || (isval == IS_3P_COLLINEAR)) {
+//      std::cerr << "4P collinearity between:" << e << " and aft: " << after << std::endl;
+      if (coll4Swap5(e, after, edgeS, polygon, points, lowest_index, highest_index)) {
+        //edgeS.erase(retval.first);
+        //edgeS.erase(it_aft);
+        softEraseEdgeFromSet(e, edgeS);
+        softEraseEdgeFromSet(after, edgeS);
+//        std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
+        valid = E_COLLINEAR;
       }
-      else if (isval == IS_4P_COLLINEAR) {
-//        std::cerr << "4P collinearity between:" << e << " and aft: " << after << std::endl;
-        if (coll4Swap(e, after, edgeS, polygon, points)) {
-          eraseEdgeFromSet(e, edgeS); // there is a chance that only the 'after' edge needs sorting, so 'e' is never removed from 'edgeS'
-//          std::cerr << "4P coll. after swap: " << e << " and " << after << std::endl;
-          valid = E_COLLINEAR;
-        }
-      }
-      else if ((isval == IS_TRUE) || (isval == IS_3P_COLLINEAR)){
+    }
+    else if (isval == IS_TRUE) {
 //        std::cerr << "Intersection: e: " << e << ", after: " << after << std::endl;
-        edgeS.erase(retval.first);
-        eraseEdgeFromSet(after, edgeS);
-        //removeEdgeFromSet(e, edgeS, polygon, points);
-        //removeEdgeFromSet(after, edgeS, polygon, points);
-        flip(e, after, polygon, points);
-        valid = E_INTERSECTION;
-      }
-      else valid = E_NOT_VALID;
+      softEraseEdgeFromSet(e, edgeS);
+      softEraseEdgeFromSet(after, edgeS);
+      //removeEdgeFromSet(e, edgeS, polygon, points);
+      //removeEdgeFromSet(after, edgeS, polygon, points);
+      flip(e, after, polygon, points);
+      valid = E_INTERSECTION;
     }
+    else valid = E_NOT_VALID;
+  }
 
-  }
-  else {
-    // edge already existed in set.
-    // this can happen if an index was reset when inserting 'e2' and we're dealing with insertion of e1 again.
-//    std::cerr << "Error: Edge already exists in set! : " << *retval.first << std::endl;
-    valid = E_NOT_VALID;
-  }
   retval2.first = valid;
   retval2.second = retval.first;
   return retval2;

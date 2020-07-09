@@ -17,7 +17,7 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
     int return_value;
     bool points_flag = false;
     Point p;
-    if (sph.size() == 0) sph.push_back(std::vector<unsigned int>());
+    if (sph.size() == 0) sph.emplace_back(std::vector<unsigned int>());
 
     while (fgets(aLine, sizeof(aLine), fin) != NULL) {
       if(aLine[0] == '#') continue; // ignore lines beginning with #
@@ -46,16 +46,16 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
           else {
             sscanf(aLine,"%lf %lf",&x,&y);
             p.set(x,y,i,i,sph_index);
-            points.push_back(p);
-            sph[sph_index].push_back(i);
+            points.emplace_back(p);
+            sph[sph_index].emplace_back(i);
             ++i;
           }
           break;
         case IF_COMP:    // each line has "i x y" on it, only accepts a single polygon
           sscanf(aLine,"%u %lf %lf",&i,&x,&y);
           p.set(x,y,i,i,sph_index);
-          points.push_back(p);
-          sph[sph_index].push_back(i);
+          points.emplace_back(p);
+          sph[sph_index].emplace_back(i);
           break;
         case IF_POINTS:  // each line has only "x y" on it
         case IF_DAT:
@@ -65,9 +65,9 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
 //          std::cerr << "io: p: " << p << std::endl;
           if (return_value == 2) {
             if (i == 0) {
-              points.push_back(p);
-              if (sph.size() == sph_index) sph.push_back(std::vector<unsigned int>());
-              sph[sph_index].push_back(i);
+              points.emplace_back(p);
+              if (sph.size() == sph_index) sph.emplace_back(std::vector<unsigned int>());
+              sph[sph_index].emplace_back(i);
               ++i;
               ++v_index;
             }
@@ -76,9 +76,9 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
                 points_index = points.size();
                 points_flag = false;
               }
-              points.push_back(p);
-              if (sph.size() == sph_index) sph.push_back(std::vector<unsigned int>());
-              sph[sph_index].push_back(i);
+              points.emplace_back(p);
+              if (sph.size() == sph_index) sph.emplace_back(std::vector<unsigned int>());
+              sph[sph_index].emplace_back(i);
               ++i;
               ++v_index;
             }
@@ -136,8 +136,8 @@ enum error readvFile(char *vFile, std::vector<std::vector<unsigned int>>& sph, s
       sscanf(aLine,"%u",&i);
       if (counter == 0) {
 //        std::cerr << "create new polygon: " << sph_index << ", at index: " << i << std::endl;
-        sph.push_back(std::vector<unsigned int>());
-        sph[sph_index].push_back(i);
+        sph.emplace_back(std::vector<unsigned int>());
+        sph[sph_index].emplace_back(i);
         points[i].v = counter;
         points[i].p = sph_index;
         ++counter;
@@ -150,7 +150,7 @@ enum error readvFile(char *vFile, std::vector<std::vector<unsigned int>>& sph, s
         }
         else {
 //          std::cerr << "adding: " << i << " into sph[" << sph_index << "]" << std::endl;
-          sph[sph_index].push_back(i);
+          sph[sph_index].emplace_back(i);
           points[i].v = counter;
           points[i].p = sph_index;
           ++counter;

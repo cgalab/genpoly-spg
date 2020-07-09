@@ -603,7 +603,7 @@ public:
 
     // if there's an intersection, return false.
     // need to do the intersection check here, CAN'T USE FUNCTIONS IN EDGES.CPP..
-    //std::cerr << "comparing: " << std::endl;
+//    std::cerr << "comparing: " << std::endl;
 //    std::cerr << "this: " << *this << ", e: " << e << std::endl;
     bool use_p2 = false;
 
@@ -645,17 +645,18 @@ public:
       this_lower = true;
     }
 
-
     // determinant check
     bool check = 0;
     if (use_p2) check = signbit(e_l.cdet(*e_h.p2));
     else check = signbit(e_l.cdet(*e_h.p1));
-
+//    std::cerr << "check: " << check << std::endl;
     if (check) {
+//      std::cerr << (this_lower ? "false" : "true") << std::endl;
       if (this_lower) return false;
       else return true;
     }
     else {
+//      std::cerr << (this_lower ? "true" : "false") << std::endl;
       if (this_lower) return true;
       else return false;
     }
