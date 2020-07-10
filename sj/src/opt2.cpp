@@ -37,7 +37,7 @@ enum error opt2(std::vector<unsigned int>& polygon, std::vector<Point>& points) 
 	//double d_idx;
   //compObject comp;
 	//std::pair<enum edge_t, std::set<Edge, setComp>::iterator> val1, val2;
-  std::pair<enum edge_t, std::set<Edge2>::iterator> val1, val2;
+  std::pair<enum edge_t, Edge2> val1, val2;
   enum edge_t val1_2, val2_1;
   double val3;
 	Point *p1, *p2, *p3;

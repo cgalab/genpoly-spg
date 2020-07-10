@@ -47,6 +47,7 @@ void softEraseEdgeFromSet (Edge2 e, std::set<Edge2>& edgeS) {
 //  std::cerr << "edge being erased: " << e << std::endl;
   it = edgeS.find(e);
   if (it != edgeS.end()) {
+//		std::cerr << "edge found: " << *it << std::endl;
     // if the vertex indices are not incidental, remove the edge in it' and find 'e' again
 		if ((*it) == e) edgeS.erase(it);
     else if ((*it).getPHigh() - (*it).getPLow() != 1) {

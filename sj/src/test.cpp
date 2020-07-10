@@ -610,6 +610,34 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   itest = checkIntersection(e1, e2);
   std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
 
+  p1.set(0.476,-0.026, 1066, 0, 0);
+  p2.set(0.478,-0.016, 1070, 0, 0);
+  e1.set(p1,p2);
+  p3.set(0.472,-0.046, 1058,0,0);
+  p4.set(0.482,0.004, 1078,0,0);
+  e2.set(p3,p4);
+  std::cerr << std::endl;
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be false: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+  std::cout << "e1.cdet(p3): " << e1.cdet(p3) << ", e1.cdet(p4): " << e1.cdet(p4) << std::endl;
+  std::cout << "e2.cdet(p1): " << e2.cdet(p1) << ", e2.cdet(p2): " << e2.cdet(p2) << std::endl;
+  std::cout << "multiplied together: " << e1.cdet(p3)*e1.cdet(p4)*e2.cdet(p1)*e2.cdet(p2) << ", ==epsilon?: " << ((e1.cdet(p3)*e1.cdet(p4)*e2.cdet(p1)*e2.cdet(p2) < EPSILON) ? "true" : "false")<< std::endl;
+  std::cout << "e1.det(p3): " << e1.det(p3) << ", e1.det(p4): " << e1.det(p4) << std::endl;
+  std::cout << "e2.det(p1): " << e2.det(p1) << ", e2.det(p2): " << e2.det(p2) << std::endl;
+  std::cout << "multiplied together: " << e1.det(p3)*e1.det(p4)*e2.det(p1)*e2.det(p2) << ", ==epsilon?: " << ((e1.cdet(p3)*e1.cdet(p4)*e2.cdet(p1)*e2.cdet(p2) < EPSILON) ? "true" : "false")<< std::endl;
+
+  p1.set(0.476,-0.026, 1066, 0, 0);
+  p2.set(0.482,0.004, 1078, 0, 0);
+  e1.set(p1,p2);
+  p3.set(0.472,-0.046, 1058,0,0);
+  p4.set(0.478,-0.016, 1070,0,0);
+  e2.set(p3,p4);
+  std::cerr << std::endl;
+  itest = checkIntersection(e1, e2);
+  std::cout << "intersection: " << e1 << " with " << e2 << ", should be true: " << ((itest >= IS_TRUE) ? "true" : "false") << " , value: ";printEnum(itest);std::cerr << std::endl;
+  std::cout << "e1.cdet(p3): " << e1.cdet(p3) << ", e1.cdet(p4): " << e1.cdet(p4) << std::endl;
+  std::cout << "e2.cdet(p1): " << e2.cdet(p1) << ", e2.cdet(p2): " << e2.cdet(p2) << std::endl;
+
 /*
   Testing Yval class in edge.h
 */

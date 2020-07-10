@@ -41,7 +41,7 @@ enum error opt2h(std::vector<unsigned int>& polygon, std::vector<Point>& points)
 
 	// Given a lexicographical sort, we can go through the vector, check for intersections and untangle them
 	unsigned int index, before, after, lowest_index=0, highest_index=points.size()-1, random_index;
-  std::pair<enum edge_t, std::set<Edge2>::iterator> val1, val2;
+  std::pair<enum edge_t, Edge2> val1, val2;
   enum edge_t val1_2=E_VALID, val2_1=E_VALID;
   double val3;
 	Point *p1, *p2, *p3;

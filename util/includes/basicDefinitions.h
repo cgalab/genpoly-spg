@@ -3,7 +3,7 @@
 
 // largest number a double can take that works with ++/-- operation.
 #define DBL_MAX_ITER_INT 9007199254740992
-#define EPSILON 1e-13
+#define EPSILON 1e-69
 #define MAX_NO_OF_LOOPS 4 // this is the largest number of times a 2opt B.O. loop can return the same circumference.  Not total loops.
 #define PI 3.14159265358979338462643383279502884L
 
