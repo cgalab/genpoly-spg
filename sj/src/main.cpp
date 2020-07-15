@@ -59,6 +59,8 @@ int main(int argc, char *argv[]) {
   unsigned int randseed = 0;
   unsigned int nr_holes = 0;
   unsigned int select_polygon = 0;
+  // initialize Shewchuks' predicates
+  exactinit();
 
   // parse command line arguments
   returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat,
@@ -76,8 +78,6 @@ int main(int argc, char *argv[]) {
     return returnValue;
   }
   if (randseed) mt.seed(randseed);
-  // initialize Shewchuks' predicates
-  //exactinit();
 
   // points from input file saved in a vector
   std::vector<Point> points;

@@ -969,8 +969,18 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
 
   std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
+  std::cerr << "det(p1, p3, p2)   : " << det(p1, p3, p2) << std::endl;
+  std::cerr << "det(p2, p3, p1)   : " << det(p2, p3, p1) << std::endl;
+  std::cerr << "det(p2, p1, p3)   : " << det(p2, p1, p3) << std::endl;
+  std::cerr << "det(p3, p1, p2)   : " << det(p3, p1, p2) << std::endl;
+  std::cerr << "det(p3, p2, p1)   : " << det(p3, p2, p1) << std::endl;
   std::cerr << "det(e1, p3)       : " << e1.cdet(p3) << std::endl;
   std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+  std::cerr << "orient2d(pa,pc,pb): " << orient2d(pa,pc,pb) << std::endl;
+  std::cerr << "orient2d(pb,pc,pa): " << orient2d(pb,pc,pa) << std::endl;
+  std::cerr << "orient2d(pb,pa,pc): " << orient2d(pb,pa,pc) << std::endl;
+  std::cerr << "orient2d(pc,pa,pb): " << orient2d(pc,pa,pb) << std::endl;
+  std::cerr << "orient2d(pc,pb,pa): " << orient2d(pc,pb,pa) << std::endl;
   std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
   std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
   std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
@@ -1033,8 +1043,67 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
 
   std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
+  std::cerr << "det(p1, p3, p2)   : " << det(p1, p3, p2) << std::endl;
+  std::cerr << "det(p2, p3, p1)   : " << det(p2, p3, p1) << std::endl;
+  std::cerr << "det(p2, p1, p3)   : " << det(p2, p1, p3) << std::endl;
+  std::cerr << "det(p3, p1, p2)   : " << det(p3, p1, p2) << std::endl;
+  std::cerr << "det(p3, p2, p1)   : " << det(p3, p2, p1) << std::endl;
   std::cerr << "det(e1, p3)       : " << e1.cdet(p3) << std::endl;
   std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+  std::cerr << "orient2d(pa,pc,pb): " << orient2d(pa,pc,pb) << std::endl;
+  std::cerr << "orient2d(pb,pc,pa): " << orient2d(pb,pc,pa) << std::endl;
+  std::cerr << "orient2d(pb,pa,pc): " << orient2d(pb,pa,pc) << std::endl;
+  std::cerr << "orient2d(pc,pa,pb): " << orient2d(pc,pa,pb) << std::endl;
+  std::cerr << "orient2d(pc,pb,pa): " << orient2d(pc,pb,pa) << std::endl;
+
+  std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
+  std::cerr << "det(e1, p4)       : " << e1.cdet(p4) << std::endl;
+  std::cerr << "orient2d(pa,pb,pd): " << orient2d(pa,pb,pd) << std::endl;
+
+  std::cerr << "det(p3, p4, p1)   : " << det(p3, p4, p1) << std::endl;
+  std::cerr << "det(e2, p1)       : " << e2.cdet(p1) << std::endl;
+  std::cerr << "orient2d(pc,pd,pa): " << orient2d(pc,pd,pa) << std::endl;
+
+  std::cerr << "det(p3, p4, p2)   : " << det(p3, p4, p2) << std::endl;
+  std::cerr << "det(e2, p2)       : " << e2.cdet(p2) << std::endl;
+  std::cerr << "orient2d(pc,pd,pb): " << orient2d(pc,pd,pb) << std::endl;
+
+  std::cerr << "reldist(e1, p3): " << reldist(e1, p3) << std::endl;
+  std::cerr << "reldist(e1, p4): " << reldist(e1, p4) << std::endl;
+  std::cerr << "reldist(e2, p1): " << reldist(e2, p1) << std::endl;
+  std::cerr << "reldist(e2, p2): " << reldist(e2, p2) << std::endl;
+
+  pa.x = 0.476; pa.y = -0.026;
+  pb.x = 0.478; pb.y = -0.016;
+  pc.x = 0.472;   pc.y = -0.046;
+  pd.x = 0.482;   pd.y = 0.004;
+  p1.set(0.476, -0.026);
+  p2.set(0.478, -0.016);
+  p3.set(0.472,  -0.046);
+  p4.set(0.482, 0.004);
+
+  e1.set(p1,p2);
+  e2.set(p3,p4);
+
+  std::cerr << "pa.x: " << pa.x << ", pa.y: " << pa.y << std::endl;
+  std::cerr << "pb.x: " << pb.x << ", pb.y: " << pb.y << std::endl;
+  std::cerr << "pc.x: " << pc.x << ", pc.y: " << pc.y << std::endl;
+  std::cerr << "pd.x: " << pd.x << ", pd.y: " << pd.y << std::endl;
+
+  std::cerr << "det(p1, p2, p3)   : " << det(p1, p2, p3) << std::endl;
+  std::cerr << "det(p1, p3, p2)   : " << det(p1, p3, p2) << std::endl;
+  std::cerr << "det(p2, p3, p1)   : " << det(p2, p3, p1) << std::endl;
+  std::cerr << "det(p2, p1, p3)   : " << det(p2, p1, p3) << std::endl;
+  std::cerr << "det(p3, p1, p2)   : " << det(p3, p1, p2) << std::endl;
+  std::cerr << "det(p3, p2, p1)   : " << det(p3, p2, p1) << std::endl;
+  std::cerr << "e1.cdet(p3)       : " << e1.cdet(p3) << std::endl;
+  std::cerr << "orient2d(pa,pb,pc): " << orient2d(pa,pb,pc) << std::endl;
+  std::cerr << "orient2d(pa,pc,pb): " << orient2d(pa,pc,pb) << std::endl;
+  std::cerr << "orient2d(pb,pc,pa): " << orient2d(pb,pc,pa) << std::endl;
+  std::cerr << "orient2d(pb,pa,pc): " << orient2d(pb,pa,pc) << std::endl;
+  std::cerr << "orient2d(pc,pa,pb): " << orient2d(pc,pa,pb) << std::endl;
+  std::cerr << "orient2d(pc,pb,pa): " << orient2d(pc,pb,pa) << std::endl;
+
 
   std::cerr << "det(p1, p2, p4)   : " << det(p1, p2, p4) << std::endl;
   std::cerr << "det(e1, p4)       : " << e1.cdet(p4) << std::endl;
@@ -1073,19 +1142,29 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
 
   // test the time difference between det and orient2d
   //for (unsigned int i = 0; i < 100000000 ; ++i) orient2d(pa,pb,pc);
-/*
+
   std::cerr << std::endl;
   std::cerr << "============== equality bit check =================" << std::endl;
 
-  double x,y;
-  x = -0.6321507964350201;
-  y = -0.6321507964348736;
-
+  double x, y, z;
+  x = 9.000000999999;
+  y = 999.000000999999;
   //std::cerr.precision(24);
-  std::cerr << "x: " << x << ", y: " << y << std::endl;
+  std::cerr << "x: " << x << std::endl;
   std::cerr << "bitset version: " << std::endl;
-  std::cerr << "x: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&x))) << ", y: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&y))) << std::endl;
-*/
+  std::cerr << "x: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&x))) << std::endl;
+
+  std::cerr << "y: " << y << std::endl;
+  std::cerr << "bitset version: " << std::endl;
+  std::cerr << "y: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&y))) << std::endl;
+
+  z = x*y;
+  std::cerr << "z = x*y: " << z << std::endl;
+  std::cerr << "bitset version: " << std::endl;
+  std::cerr << "z: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&z))) << std::endl;
+
+
+
 /*
   std::cerr << "=========== Heap's alg. test ================" << std::endl;
 
