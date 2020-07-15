@@ -22,17 +22,7 @@ enum error readInFile(char *inFile, in_format_t inFormat, std::vector<Point>& po
     while (fgets(aLine, sizeof(aLine), fin) != NULL) {
       if(aLine[0] == '#') continue; // ignore lines beginning with #
       if(aLine[0] == '\n') continue;
-/*
-      std::cerr.precision(24);
-      std::cerr << "x: " << x << ", y: " << y << std::endl;
-      std::cerr << "bitset version: " << std::endl;
-      std::cerr << "x: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&x))) << ", y: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&y))) << std::endl;
-      x = 0.0;
-      y = 0.0;
-      std::cerr << "x: " << x << ", y: " << y << std::endl;
-      std::cerr << "bitset version: " << std::endl;
-      std::cerr << "x: " << std::bitset<sizeof(double) * 8>(*(reinterpret_cast<unsigned long long*>(&x))) << ", y: " << std::bitset<sizeof(double) * 8>(*(reinterpret_cast<unsigned long long*>(&y))) << std::endl;
-*/
+
       // Should I do regex matching instead of this ?
       // It would catch any errors when the format of the file doesn't match the command line argument for inFormat
       switch (inFormat) {
