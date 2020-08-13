@@ -13,6 +13,7 @@
 #include "pol.h"
 #include "rand.h"
 #include "simple_pol_check.h"
+#include "elapsed.h"
 
 
 // Function to generate holes through adjacent candidates of the linesweep algorithm.
@@ -24,6 +25,9 @@
 //  sph:  sph is modified, sph[0] will be reduced and any holes generated pushed to the back of sph.
 unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int nr_holes) {
   enum error result;
+  double duration = 0;
+  //std::cerr << "holes: " << nr_holes << std::endl;
+  duration = elapsed();
   std::vector<unsigned int> ch; // points on the convex hull.
   unsigned int total_inner_points, total_hole_points;
   std::vector<Ends> ends;
@@ -31,8 +35,7 @@ unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vec
   get_convex_hull(ch, sph[0], points);
 
   // generate a random number of holes between 1 and 'total inner points'/6 if nr_holes is already 0
-  if ( ((points.size()-ch.size())/6.0) > 1.0) {UniformRandomI(nr_holes, 1, (points.size()-ch.size())/6);}
-  else nr_holes = 1;
+  if (nr_holes == 0 && ((points.size()-ch.size())/6.0) > 1.0) {UniformRandomI(nr_holes, 1, (points.size()-ch.size())/6);}
 
   // 'valid' means it threw out ends if: is_2D == false, for the chain between the ends
   get_valid_inner_chains_to_ch(ends, ch, sph[0], points);
@@ -123,6 +126,8 @@ unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vec
 //    std::cerr << "hole result: "  << result << std::endl;
 //    std::cerr << "holes left: " << nr_holes << ", ends left: " << ends.size() << ", total hole points:" << total_hole_points << std::endl;
   } while (nr_holes > 0 && (ends.size() > 0 || total_hole_points > 0));
+  duration = elapsed();
+  std::cout << "Hole generation duration: " << duration << std::endl;
   return nr_holes;
 }
 
