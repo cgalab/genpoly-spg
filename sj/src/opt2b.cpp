@@ -143,7 +143,7 @@ enum error opt2b(std::vector<unsigned int>& polygon, std::vector<Point>& points)
       // if I am about to process 'e1' I can start by clearing it of any collinearity with 'e2'
       if (fabs(val3) == 0) {
         // the 2 edges are collinear
-        if (((*p2 < *p1) && (*p3 < *p1)) || ((*p1 < *p2) && (*p1 < *p3))) {
+        if ((*e1.p1 == *e2.p1) || (*e1.p2 == *e2.p2)) {
 //            (debug) ? std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
 //            std::cerr << "before swap: e1: " << e1 << ", e2: " << e2 << std::endl;
           if (coll3Sort5(p1, p2, p3, edgeS, polygon, points, lowest_index)) {

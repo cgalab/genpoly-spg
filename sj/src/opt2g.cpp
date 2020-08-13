@@ -124,7 +124,7 @@ enum error opt2g(std::vector<unsigned int>& polygon, std::vector<Point>& points)
         // having this check after processing the first edge means '>o' would never be caught.
         if (fabs(val3) == 0) {
           // the 3 points are collinear
-          if (((*p2 < *p1) && (*p3 < *p1)) || ((*p1 < *p2) && (*p1 < *p3))) {
+          if ((*e1.p1 == *e2.p1) || (*e1.p2 == *e2.p2)) {
 //            (debug) ? std::cerr << "PDR: before sort: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
             if (coll3Sort5(p1, p2, p3, edgeS, polygon, points, lowest_index, highest_index)) {
               ++count_coll;

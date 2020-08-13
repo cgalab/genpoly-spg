@@ -327,6 +327,10 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << "    option to print the area of the convex hull to cout." << std::endl;
 				std::cerr << " -f, --charearatio" << std::endl;
 				std::cerr << "    option to print the ratio of (area of the polygon)/(area of convex hull) to cout." << std::endl;
+				std::cerr << " -g, --orderpolygon" << std::endl;
+				std::cerr << "		option to order the generated polygon so that the lowest index in the given pointset is" << std::endl;
+				std::cerr << "		the first vertex in the output, and the polygon is rotated so that the second vertex is the lower" << std::endl;
+				std::cerr << "		vertex of the 2 adjacent vertices to the lowest index." << std::endl;
 				std::cerr << " -k, --perimeter" << std::endl;
 				std::cerr << "    option to print the perimeter of the polygon to cout." << std::endl;
 				std::cerr << " -l, --normperimeter" << std::endl;

@@ -110,7 +110,7 @@ enum error opt2a(std::vector<unsigned int>& polygon, std::vector<Point>& points)
       }
 
       if (fabs(val3 == 0)) {
-        if (((*e1.p1 == *p1) && (*e2.p1 == *p1)) || ((*e1.p2 == *p1) && (*e2.p2 == *p1))) { // no idea why but this is very important for solving collinearities
+        if ((*e1.p1 == *e2.p1) || (*e1.p2 == *e2.p2)) {
 //          (debug) ? std::cerr << "Collinearity: before swap: e1: " << e1 << ", e2: " << e2 << std::endl : std::cerr;
           if (coll3Sort5(p1, p2, p3, edgeS, polygon, points)) {
             ++count_coll;
