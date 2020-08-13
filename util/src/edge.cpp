@@ -370,18 +370,12 @@ enum intersect_t checkIntersection(const Edge2 e1, const Edge2 e2) {
 //	std::cout << "e1.p2 == e2.p1: " << ((*e1.p2 == *e2.p1) ? "true" : "false") << ", e2.p1: " << *e2.p1 << std::endl;
 //	std::cout << "e1.p2 == e2.p2: " << ((*e1.p2 == *e2.p2) ? "true" : "false") << ", e2.p2: " << *e2.p2 << std::endl;
 
-	// converting to 'point' class from 'predicates'
-	pa.x = (*e1.p1).x; pa.y = (*e1.p1).y;
-	pb.x = (*e1.p2).x; pb.y = (*e1.p2).y;
-	pc.x = (*e2.p1).x; pc.y = (*e2.p1).y;
-	pd.x = (*e2.p2).x; pd.y = (*e2.p2).y;
-
 	// determinant between edge 1 and a point in edge 2
-	det_a = orient2d(pa, pb, pc);
-	det_b = orient2d(pa, pb, pd);
+	det_a = e1.cdet(*e2.p1);
+	det_b = e1.cdet(*e2.p2);
 	// determinant between edge 2 and a point in edge 1
-	det_c = orient2d(pc, pd, pa);
-	det_d = orient2d(pc, pd, pb);
+	det_c = e2.cdet(*e1.p1);
+	det_d = e2.cdet(*e1.p2);
 
 //	std::cerr.precision(24);
 //	int sig,ex;
@@ -402,6 +396,11 @@ enum intersect_t checkIntersection(const Edge2 e1, const Edge2 e2) {
 		if (*(e1.p2) == *(e2.p1)) same21 = true;
 		if (*(e1.p2) == *(e2.p2)) same22 = true;
 
+		// 3P collinearity assumes the 3 vertices are adjacent in polygon and the 3 points are collinear.
+		if ((same11 && (det_b == 0 || det_d == 0)) || (same22 && (det_a == 0 || det_c == 0))) {
+			return IS_3P_COLLINEAR;
+		}
+
 		// some determinant was 0, need to check if it's inside an edge or outside.
 		dp_1 = reldist(e1, *e2.p1);
 		dp_2 = reldist(e1, *e2.p2);
@@ -420,9 +419,9 @@ enum intersect_t checkIntersection(const Edge2 e1, const Edge2 e2) {
 		if ( (det_d == 0) && (dp_4 > 0) && (dp_4 < 1) ) col = true;
 
 		// 2opt function only cares about collinearity when it's 4 point and the points intercept in some way.
-		if ((fabs(det_a)+fabs(det_b)+fabs(det_c)+fabs(det_d) == 0) && col) return IS_4P_COLLINEAR;
-		// 3P collinearity assumes the 3 vertices are incidental in polygon and the 3 points are collinear.
-		if ((same11 || same12 || same21 || same22) && col) return IS_3P_COLLINEAR;
+		if ((fabs(det_a)+fabs(det_b)+fabs(det_c)+fabs(det_d) == 0) && col) {
+			return IS_4P_COLLINEAR;
+		}
 		if (col) return IS_TRUE; // 3 points being collinear (and not inc. vert.) is best solved with a 2opt flip.
 		if (same11) return IS_VERTEX11; // not collinear, but are incidental vertices.
 		if (same12) return IS_VERTEX12;
