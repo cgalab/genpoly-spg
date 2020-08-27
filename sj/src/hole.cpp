@@ -26,7 +26,6 @@
 unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points, unsigned int nr_holes) {
   enum error result;
   double duration = 0;
-  //std::cerr << "holes: " << nr_holes << std::endl;
   duration = elapsed();
   std::vector<unsigned int> ch; // points on the convex hull.
   unsigned int total_inner_points, total_hole_points;
@@ -36,6 +35,7 @@ unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vec
 
   // generate a random number of holes between 1 and 'total inner points'/6 if nr_holes is already 0
   if (nr_holes == 0 && ((points.size()-ch.size())/6.0) > 1.0) {UniformRandomI(nr_holes, 1, (points.size()-ch.size())/6);}
+//  std::cerr << "holes: " << nr_holes << std::endl;
 
   // 'valid' means it threw out ends if: is_2D == false, for the chain between the ends
   get_valid_inner_chains_to_ch(ends, ch, sph[0], points);
@@ -140,7 +140,7 @@ unsigned int generateHoles(std::vector<std::vector<unsigned int>>& sph, std::vec
 // OUTPUT:
 //  sph is modified if a hole is found, sph[0] is reduced and a polygon-hole is added to the back of sph.
 enum error get_hole(Ends end, std::vector<std::vector<unsigned int>>& sph, std::vector<Point>& points) {
-//  std::cerr << "in get_hole, ends version: " << end << ", sph.size: " << sph.size() << ", p.size: " << points.size() << std::endl;
+//  std::cerr << "in get_hole, ends version: " << end << ", sph.size: " << sph.size() << ", points.size: " << points.size() << std::endl;
 
   //'polygonal_chain' are indices into 'points', not into 'inner_points'
   std::vector<unsigned int> polygonal_chain;
@@ -378,8 +378,10 @@ enum error sweep_polygonal_chain(std::vector<E_Edge>& valid_candidates, std::vec
       removal_update(e2, retval2.first, valid_candidates, ls_edges, dbl_rem, l2r);
 
       //Adjacent edges and valid_candidates updated, we can remove both edges.
-      ls_edges.erase(retval1.first);
-      ls_edges.erase(retval2.first);
+      //ls_edges.erase(retval1.first);
+      ls_edges.erase(e1);
+      //ls_edges.erase(retval2.first);
+      ls_edges.erase(e2);
 
     }
     else if (isll ^ isrl) {
@@ -529,7 +531,7 @@ void set_bin(E_Edge& e1, E_Edge& e2, std::set<E_Edge>::iterator& it1, std::set<E
 // function that does 2 things:
 // 1) if event is a double insert event and adjacent edges face each other, i.e. dbl_ins and e.p1 == adj_e.p1 is true,
 //    only adds the (e.p1,adj_e.p2) as an angle to both edges.
-// 2) if no double insert, finds the adjacent edge of 'e', checks if 'e' is a valid candidate and if true,
+// 2) if no double insert of 'in' facing edges, finds the adjacent edge of 'e', checks if 'e' is a valid candidate and if true,
 //    adds 'e' to 'closest', updates the angle for both edges and reinserts 'adj_e' and inserts 'e'
 // INPUT:
 //      e: edge that was inserted at the event point
@@ -574,11 +576,11 @@ void insert_update(E_Edge& e, std::set<E_Edge>::iterator& it, std::set<E_Edge>& 
       }
     }
   }
-  else {
+//  else {
     // this is an inner polygonal chain, and the end is between a fictional edge
     // between the c.h. points, which cannot be used anyway
 //    std::cerr << "end edge, skipping" << std::endl;
-  }
+//  }
   update_edge_in_set(e, it, ls_edges);
 //  std::cerr << "after insert:" << std::endl;
 //  std::cerr << "edge: " << e << std::endl;
@@ -597,7 +599,7 @@ void insert_update(E_Edge& e, std::set<E_Edge>::iterator& it, std::set<E_Edge>& 
 //      l2r: direction of the linesweep, true if sweeping 'left to right'
 void removal_update(E_Edge& e, std::set<E_Edge>::iterator& it, std::vector<E_Edge>& valid_candidates,
                     std::set<E_Edge>& ls_edges, bool dbl_rem, bool l2r) {
-//  std::cerr << "inside removal_update" << std::endl;
+//  std::cerr << "inside removal_update, dbl_rem: " << (dbl_rem ? "true" : "false") << std::endl;
 //  std::cerr << "e: " << e << std::endl;
   while (e.closest.size() > 0) {
     if (candidate_compare(e.closest.back(),e)) {
