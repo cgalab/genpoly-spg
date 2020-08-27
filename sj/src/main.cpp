@@ -172,9 +172,12 @@ int main(int argc, char *argv[]) {
     returnValue = list_edges_in_pointset(points);
   }
   if (generate_holes) {
+    std::cout << "holes wanted before: " << nr_holes << std::endl;
+    unsigned int current_holes = sph.size();
     nr_holes = generateHoles(sph, points, nr_holes);
+    std::cout << "holes wanted after: " << nr_holes << std::endl; 
     if (nr_holes > 0) {
-//      std::cerr << "holes left: " << nr_holes << ", swapping axis." << std::endl;
+      std::cerr << "holes left: " << nr_holes << ", swapping axis." << std::endl;
       double temp;
       for (unsigned int i = 0; i < points.size(); ++i) {
         temp = points[i].x;
@@ -189,6 +192,7 @@ int main(int argc, char *argv[]) {
         points[i].y = temp;
       }
     }
+    std::cout << "Generated holes: " << sph.size() - current_holes << std::endl;
   }
   if (returnValue != SUCCESS) {
     std::cerr << "Error running the algorithm!" << std::endl;
