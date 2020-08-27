@@ -593,7 +593,7 @@ public:
     else return IS_FALSE;
   }
 
-  bool operator < (const Edge2& e) const {
+  bool operator < (const Edge2& f) const {
     // new operator, i.e. the reason for this class.
     // std::set uses this operator to compare edges.
     // Given that intersecting edges do not have transitive property, we return false right away.
@@ -608,40 +608,45 @@ public:
     bool use_p2 = false;
 
     // same edge
-    if ((*(*this).p1 == *e.p1) && (*(*this).p2 == *e.p2)) return false;
+    if ((*(*this).p1 == *f.p1) && (*(*this).p2 == *f.p2)) return false;
 
     // non-overlapping line segments
-    if (*e.p2 < *(*this).p1) return false;
-    if (*(*this).p2 < *e.p1) return true;
+    // catches the cases when lex order of points is:
+    // {e.p_1, e.p_2, f.p_1, f.p_2} or {f.p_1, f.p_2, e.p_1, e.p_2}
+    // The other cases both pass through:
+    // {e.p_1, f.p_1, e.p_2, f.p_2}, {e.p_1, f.p_1, f.p_2, e.p_2}
+    // {f.p_1, e.p_1, f.p_2, e.p_2}, {f.p_1, e.p_1, e.p_2, f.p_2}
+    if (*f.p2 < *(*this).p1) return false;
+    if (*(*this).p2 < *f.p1) return true;
 
     // same origin point
-    if (*(*this).p2 == *e.p1) {
+    if (*(*this).p2 == *f.p1) {
 //      std::cerr << "this.p2 == e.p1" << std::endl;
       return true;  // and vice versa.
     }
-    if (*(*this).p1 == *e.p2) {
+    if (*(*this).p1 == *f.p2) {
 //      std::cerr << "this.p1 == e.p2" << std::endl;
       return false; // lex. higher point of 'e' is lower than lex. lower point of 'this'
     }
-    if (*(*this).p1 == *e.p1) {
+    if (*(*this).p1 == *f.p1) {
       use_p2 = true;
     }
 //    std::cerr << "use_p2: " << use_p2 << std::endl;
 
     // intersection case
-    Edge2 e_l(e);
+    Edge2 e_l(f);
     Edge2 e_h (*this);
     bool this_lower = false;
     if (use_p2) {
-      if (*(*this).p2 < *e.p2) {
+      if (*(*this).p2 < *f.p2) {
         e_l.set(*this);
-        e_h.set(e);
+        e_h.set(f);
         this_lower = true;
       }
     }
-    else if (*(*this).p1 < *e.p1) {
+    else if (*(*this).p1 < *f.p1) {
       e_l.set(*this);
-      e_h.set(e);
+      e_h.set(f);
       this_lower = true;
     }
 
