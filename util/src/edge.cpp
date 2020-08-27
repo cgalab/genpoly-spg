@@ -645,7 +645,7 @@ double get_angle(Edge e, Point p, bool use_p1) {
 // controlled by the boolean 'use_p1' and the x-axis is along the edge.
 double get_angle(E_Edge e, Point p, bool l2r) {
 //	std::cerr << "inside edge & point get_angle()" << std::endl;
-	double a1, a2;
+	double a1, a2, result=0;
 	Point p1, p2;
 
 	if (l2r) {p1 = *e.p1; p2 = *e.p2;}
@@ -653,10 +653,26 @@ double get_angle(E_Edge e, Point p, bool l2r) {
 
 	a1 = atan2(p2.y - p1.y, p2.x - p1.x);
 	a2 = atan2(p.y - p1.y, p.x - p1.x);
+	if (!l2r) {
+		if (a1 < 0) a1 = - (PI + a1);
+		else a1 = PI - a1;
+		if (a2 < 0) a2 = - (PI + a2);
+		else a2 = PI - a2;
+	}
 //	std::cerr << "angle of edge:  " << a1 << ", e: " << e << std::endl;
 //	std::cerr << "angle of point: " << a2 << ", p: " << p << std::endl;
 
 	// angles must always be [-180°, 180°]
+//	std::cerr << "a1 - a2: " << a1 - a2 << std::endl;
+	if (e.bin) {
+		if (a1 - a2 < 0) result = 2*PI - (a2-a1);
+		else result = a1 - a2;
+	}
+	else {
+		if (a1 - a2 > 0) result = 2*PI - (a1 - a2);
+		else result = a2 - a1;
+	}
+	/*
 	double sum = a2 - a1;
 //	std::cerr << "a2 - a1: " << sum << std::endl;
 	sum = fabs(sum);
@@ -680,9 +696,10 @@ double get_angle(E_Edge e, Point p, bool l2r) {
 			if ((a2 > 0) && (!e.bin)) sum = 2*PI - sum;
 		}
 	}
+	*/
 
-//	std::cerr << "return: " << sum << std::endl;
-	return sum;
+//	std::cerr << "return: " << result << std::endl;
+	return result;
 }
 
 // function to return an angle:
@@ -693,8 +710,8 @@ double get_angle(E_Edge e, Point p, bool l2r) {
 //			f: the point to get an angle, (l2r) ? f.p1 : f.p2
 //			l2r: true if linesweep is sweeping left2right
 double get_angle(E_Edge e, E_Edge f, bool l2r, bool dbl_rem) {
-//	std::cerr << "inside 2 edge get_angle()" << std::endl;
-	double a1, a2;
+//	std::cerr << "inside 2 edge get_angle(), l2r: " << (l2r ? "true" : "false") << std::endl;
+	double a1, a2, result=0;
 	Point p1, p2, p;
 	if (l2r) {
 		p1 = *e.p1; p2 = *e.p2;
@@ -723,10 +740,27 @@ double get_angle(E_Edge e, E_Edge f, bool l2r, bool dbl_rem) {
 	a2 = atan2(p.y - p1.y, p.x - p1.x); // value of angle from p1 point to p point
 //	std::cerr << "angle of edge:  " << a1 << ", e: " << e << std::endl;
 //	std::cerr << "angle of point: " << a2 << ", p: " << p << std::endl;
+	if (!l2r) {
+		if (a1 < 0) a1 = - (PI + a1);
+		else a1 = PI - a1;
+		if (a2 < 0) a2 = - (PI + a2);
+		else a2 = PI - a2;
+	}
+//	std::cerr << "angle of edge:  " << a1 << ", e: " << e << std::endl;
+//	std::cerr << "angle of point: " << a2 << ", p: " << p << std::endl;
 
 	// angles must always be [-180°, 180°]
-	double sum = a2 - a1;
-//	std::cerr << "a2 - a1: " << sum << std::endl;
+//	std::cerr << "a1 - a2: " << a1 - a2 << std::endl;
+	if (e.bin) {
+		if (a1 - a2 < 0) result = 2*PI - (a2-a1);
+		else result = a1 - a2;
+	}
+	else {
+		if (a1 - a2 > 0) result = 2*PI - (a1 - a2);
+		else result = a2 - a1;
+	}
+
+	/*
 	sum = fabs(sum);
 	if (l2r) {
 		if (a2 > 0 &&  e.bin) sum = 2*PI - sum;
@@ -742,9 +776,9 @@ double get_angle(E_Edge e, E_Edge f, bool l2r, bool dbl_rem) {
 			if ((a2 > 0) && (!e.bin)) sum = 2*PI - sum;
 		}
 	}
-
-//	std::cerr << "return: " << sum << std::endl;
-	return sum;
+*/
+//	std::cerr << "return: " << result << std::endl;
+	return result;
 }
 
 // function that returns the smaller angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
