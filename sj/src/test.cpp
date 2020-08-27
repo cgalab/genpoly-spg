@@ -349,6 +349,44 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
   std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
 
+// (-0.498046875,-0.12109375), [10,10,15,0] , (-0.494140625,-0.1171875), [9,9,20,0]
+// (-0.509765625,-0.1171875), [8,8,8,0] , (-0.494140625,-0.1171875), [9,9,20,0]
+// (-0.498046875,0.12890625), [12,12,17,0] , (-0.498046875,0.1328125), [13,13,18,0]
+
+  p1.set(-0.498046875,-0.12109375, 10,10,15);
+  p2.set(-0.494140625,-0.1171875, 9,9,20);
+  p3.set(-0.509765625,-0.1171875, 8,8,8);
+  p4.set(-0.494140625,-0.1171875, 9,9,20);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.498046875,-0.12109375, 10,10,15);
+  p2.set(-0.494140625,-0.1171875, 9,9,20);
+  p3.set(-0.498046875,0.12890625, 12,12,17);
+  p4.set(-0.498046875,0.1328125, 13,13,18);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+  p1.set(-0.509765625,-0.1171875, 8,8,8);
+  p2.set(-0.494140625,-0.1171875, 9,9,20);
+  p3.set(-0.498046875,0.12890625, 12,12,17);
+  p4.set(-0.498046875,0.1328125, 13,13,18);
+  e1.set(p1, p2);
+  e2.set(p3, p4);
+  std::cerr << "e1: " << e1 << std::endl;
+  std::cerr << "e2: " << e2 << std::endl;
+  std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
+  std::cerr << "e2 < e1: " << ((e2 < e1) ? "true" : "false") << std::endl;
+
+
   std::cerr << std::endl;
   std::cerr << "=== checkIntersection tests ===" << std::endl;
   std::cerr << "=== 'should be true' is a comparison 'itest >= IS_TRUE' : true when intersection exists ===" << std::endl;
@@ -1162,7 +1200,6 @@ test:  bool checkIntersection(const Edge e1, const Edge e2)
   std::cerr << "z = x*y: " << z << std::endl;
   std::cerr << "bitset version: " << std::endl;
   std::cerr << "z: " << std::bitset<sizeof(double) * 8> (*(reinterpret_cast<unsigned long long*>(&z))) << std::endl;
-
 
 
 /*
