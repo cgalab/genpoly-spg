@@ -619,30 +619,6 @@ void poldisplay (std::vector<unsigned int>& p) {
 
 // function to get the angle between an edge and a point, where the origin is one of the points of the edge,
 // controlled by the boolean 'use_p1' and the x-axis is along the edge.
-double get_angle(Edge e, Point p, bool use_p1) {
-	double a1, a2;
-	Point p1 = *e.p1, p2 = *e.p2;
-	if (use_p1) {
-		a1 = atan2(p2.y - p1.y, p2.x - p1.x);
-		a2 = atan2(p.y - p1.y, p.x - p1.x);
-	}
-	else {
-		a1 = atan2(p1.y - p2.y, p1.x - p2.x);
-		if (a1 < 0) a1 = -PI - a1;
-		else a1 = PI - a1;
-		a2 = atan2(p.y - p2.y, p.x - p2.x);
-		if (a2 < 0) a2 = -PI - a2;
-		else a2 = PI - a2;
-	}
-	// angles must always be [-180°, 180°]
-	double sum = a2 - a1;
-	if (sum < -PI) sum = sum + 2*PI;
-	if (sum > PI) sum = sum - 2*PI;
-	return sum;
-}
-
-// function to get the angle between an edge and a point, where the origin is one of the points of the edge,
-// controlled by the boolean 'use_p1' and the x-axis is along the edge.
 double get_angle(E_Edge e, Point p, bool l2r) {
 //	std::cerr << "inside edge & point get_angle()" << std::endl;
 	double a1, a2, result=0;
@@ -672,32 +648,6 @@ double get_angle(E_Edge e, Point p, bool l2r) {
 		if (a1 - a2 > 0) result = 2*PI - (a1 - a2);
 		else result = a2 - a1;
 	}
-	/*
-	double sum = a2 - a1;
-//	std::cerr << "a2 - a1: " << sum << std::endl;
-	sum = fabs(sum);
-	if (l2r) {
-		if (signbit(a1) == signbit(a2)) {
-			if (a2 > a1 &&  e.bin) sum = 2*PI - sum;
-			if (a2 < a1 && !e.bin) sum = 2*PI - sum;
-		}
-		else {
-			if ((a2 > 0) && ( e.bin)) sum = 2*PI - sum;
-			if ((a2 < 0) && (!e.bin)) sum = 2*PI - sum;
-		}
-	}
-	else {
-		if (signbit(a1) == signbit(a2)) {
-			if ((a2 < a1) &&  e.bin) sum = 2*PI - sum;
-			if ((a1 < a2) && !e.bin) sum = 2*PI - sum;
-		}
-		else {
-			if ((a2 < 0) && ( e.bin)) sum = 2*PI - sum;
-			if ((a2 > 0) && (!e.bin)) sum = 2*PI - sum;
-		}
-	}
-	*/
-
 //	std::cerr << "return: " << result << std::endl;
 	return result;
 }
@@ -707,8 +657,9 @@ double get_angle(E_Edge e, Point p, bool l2r) {
 // if l2r is false: return angle (e.p2, f.p2)
 // INPUT:
 //			e: the edge with the origin point of the angle
-//			f: the point to get an angle, (l2r) ? f.p1 : f.p2
-//			l2r: true if linesweep is sweeping left2right
+//			f: the point to get an angle with edge 'e', (l2r) ? f.p1 : f.p2
+//			l2r: true if linesweep is sweeping left to right
+//			dbl_rem:  boolean that switches which point of 'f' should be used.
 double get_angle(E_Edge e, E_Edge f, bool l2r, bool dbl_rem) {
 //	std::cerr << "inside 2 edge get_angle(), l2r: " << (l2r ? "true" : "false") << std::endl;
 	double a1, a2, result=0;
@@ -759,88 +710,8 @@ double get_angle(E_Edge e, E_Edge f, bool l2r, bool dbl_rem) {
 		if (a1 - a2 > 0) result = 2*PI - (a1 - a2);
 		else result = a2 - a1;
 	}
-
-	/*
-	sum = fabs(sum);
-	if (l2r) {
-		if (a2 > 0 &&  e.bin) sum = 2*PI - sum;
-		if (a2 < 0 && !e.bin) sum = 2*PI - sum;
-	}
-	else {
-		if (signbit(a1) == signbit(a2)) {
-			if ((a2 < a1) &&  e.bin) sum = 2*PI - sum;
-			if ((a1 < a2) && !e.bin) sum = 2*PI - sum;
-		}
-		else {
-			if ((a2 < 0) && ( e.bin)) sum = 2*PI - sum;
-			if ((a2 > 0) && (!e.bin)) sum = 2*PI - sum;
-		}
-	}
-*/
 //	std::cerr << "return: " << result << std::endl;
 	return result;
-}
-
-// function that returns the smaller angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
-// use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
-double get_smaller_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
-//	std::cerr << "=== get_smaller_angle function ===" << std::endl;
-  double a1 = get_angle(e1, *e2.p1, use_p1);
-  double a2 = get_angle(e1, *e2.p2, use_p1);
-//	std::cerr << "a1: " << a1 << ", a2: " << a2 << std::endl;
-//	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << ", use_p1: " << ((use_p1) ? "true" : "false") << std::endl;
-//	std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
-
-	if (e1.bin) {
-		if (a1 < 0) {
-			if (a2 < 0) return (fabs(a1) < fabs(a2) ? a1 : a2);
-			return a1;
-		}
-		if (a2 < 0) return a2;
-//		std::cerr << "Possible error, bin was true, and neither angle was negative." << std::endl;
-		return (a1 < a2 ? a1 : a2);
-	}
-	else {
-		if (a1 > 0) {
-			if (a2 > 0) return (a1 < a2 ? a1 : a2);
-			return a1;
-		}
-		if (a2 > 0) return a2;
-		std::cerr << "Possible error, bin was false, and neither angle was positive." << std::endl;
-		return (fabs(a1) < fabs(a2) ? a1 : a2);
-	}
-}
-
-// function that returns the larger angle value between ang('e1',e2.p1) and ang('e1',e2.p2)
-// there is a restriction that the returned angle is of the point on the side of 'e1'
-// which 'e1.bin' designates.
-// use_p1 : boolean that defines whether the origin is e1.p1 or e1.p2
-double get_larger_angle(E_Edge& e1, E_Edge& e2, bool use_p1) {
-//	std::cerr << "=== get_larger_angle function ===" << std::endl;
-  double a1 = get_angle(e1, *e2.p1, use_p1);
-  double a2 = get_angle(e1, *e2.p2, use_p1);
-//	std::cerr << "a1: " << a1 << ", a2: " << a2 << std::endl;
-//	std::cerr << "e1.bin: " << ((e1.bin) ? "true" : "false") << ", use_p1: " << ((use_p1) ? "true" : "false") << std::endl;
-//	std::cerr << "e1 < e2: " << ((e1 < e2) ? "true" : "false") << std::endl;
-
-	if (e1.bin) {
-		if (a1 < 0) {
-			if (a2 < 0) return (fabs(a1) < fabs(a2) ? a2 : a1);
-			return a1;
-		}
-		if (a2 < 0) return a2;
-		std::cerr << "Possible error, bin was true, and neither angle was negative." << std::endl;
-		return (a1 < a2 ? a2 : a1);
-	}
-	else {
-		if (a1 > 0) {
-			if (a2 > 0) return (a1 < a2 ? a2 : a1);
-			return a1;
-		}
-		if (a2 > 0) return a2;
-		std::cerr << "Possible error, bin was false, and neither angle was positive." << std::endl;
-		return (fabs(a1) < fabs(a2) ? a2 : a1);
-	}
 }
 
 // Function to modify the 'bin' value of 'e2'
