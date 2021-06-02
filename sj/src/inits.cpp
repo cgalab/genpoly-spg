@@ -167,7 +167,7 @@ enum error argInit(	int argc, char *argv[],
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
 										bool& writeNew, bool& area,	bool& ch_area, bool& area_ratio, bool& perimeter, bool& norm_perimeter,
 										unsigned int& randseed, bool& checkSimple, bool& generate_holes, bool& orderPolygon, unsigned int& holes,
-										unsigned int& select_polygon, char *vFile, bool& run_tests, bool& help) {
+										unsigned int& select_polygon, char *vFile, bool& run_tests, bool& help, unsigned &polyCount) {
 	enum error returnValue = SUCCESS;
 	int comm;
 
@@ -191,6 +191,7 @@ enum error argInit(	int argc, char *argv[],
 		{"test", no_argument, NULL, 't'},
 		{"checksimple", no_argument, NULL, 'u'},
 		{"writenew", no_argument, NULL, 'w'},
+		{"count", required_argument, NULL, 'C'},
 		{"help", no_argument, NULL, 'H'},
 		{0, 0, 0, 0}
 	};
@@ -257,6 +258,9 @@ enum error argInit(	int argc, char *argv[],
 			case 'w':
 				writeNew = true;
 				break;
+			case 'C':
+				polyCount = atoi(optarg);
+				break;
 			case 'H':
 				help = true;
 				std::cerr << "USAGE: ./spg -i in_file -b in_format -o out_file -c out_format -a algorithm" << std::endl;
@@ -316,6 +320,8 @@ enum error argInit(	int argc, char *argv[],
 				std::cerr << " -r, --randseed <string> | (argument optional*, if used then string required)" << std::endl;
 				std::cerr << "                <string> is an unsigned integer above 0." << std::endl;
 				std::cerr << " *The seed is set at the beginning only and affects all options in this help that describes a random process." << std::endl << std::endl;
+
+				std::cerr << " --count <cnt>  generate this many polygons.  They will all end in the same output file, so this is mainly interesting when you care about the stats." << std::endl << std::endl;
 
 				std::cerr << "ON/OFF FLAGS:" << std::endl;
 				std::cerr << " -w, --writenew" << std::endl;

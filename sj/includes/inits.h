@@ -17,6 +17,6 @@ enum error argInit(	int argc, char *argv[],
 										enum in_format_t *inFormat, enum out_format_t *outFormat,
 										bool& writeNew, bool& area,	bool& ch_area, bool& area_ratio, bool& circumference, bool& norm_perimeter,
 										unsigned int& randseed, bool& checkSimple, bool& generate_holes, bool& orderPolygon, unsigned int& holes,
-										unsigned int& selected_polygon, char *vFile, bool& run_tests, bool& help);
+										unsigned int& selected_polygon, char *vFile, bool& run_tests, bool& help, unsigned &polyCount);
 
 #endif

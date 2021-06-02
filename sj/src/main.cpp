@@ -59,13 +59,15 @@ int main(int argc, char *argv[]) {
   unsigned int randseed = 0;
   unsigned int nr_holes = 0;
   unsigned int select_polygon = 0;
+  unsigned polyCount = 1;
   // initialize Shewchuks' predicates
   exactinit();
 
   // parse command line arguments
   returnValue = argInit(argc, argv, inFile, outFile, &alg, &inFormat, &outFormat,
                         writeNew, calcArea, calcChArea, calcChAreaRatio, calcPerimeter, calcNormalisedPerimeter, randseed, checkSimple,
-                        generate_holes, orderPolygon, nr_holes, select_polygon, vFile, run_tests, help);
+                        generate_holes, orderPolygon, nr_holes, select_polygon, vFile, run_tests, help,
+                        polyCount);
 //  std::cerr << "returnvalue: " << returnValue << std::endl;
 
   if (help) return SUCCESS;
@@ -121,6 +123,8 @@ int main(int argc, char *argv[]) {
     if (returnValue != SUCCESS) return returnValue;
   }
 
+  unsigned loopCtr;
+  for (loopCtr=0; loopCtr < polyCount; ++loopCtr) {
 // std::cerr << "point set verified." << std::endl;
   // get a simple polygon with a given method
   if (alg == A_2OPT) {
@@ -219,6 +223,7 @@ int main(int argc, char *argv[]) {
   }
   if (calcPerimeter) std::cout << "Perimeter: " << pol_calc_perimeter(sph[select_polygon], points) << std::endl;
   if (calcNormalisedPerimeter) std::cout << "Normalised Perimeter: " << pol_calc_normalised_perimeter(sph[select_polygon], points) << std::endl;
+  }
 
   // writing to outfile
   if (outFormat == OF_PURE_AND_PERM) {
